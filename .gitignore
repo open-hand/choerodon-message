@@ -1,0 +1,33 @@
+# maven ignore
+target/
+*.versionsBackup
+
+# eclipse ignore
+.settings/
+.project
+.classpath
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+
+# temp ignore
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+/temp
+/tmp
+app.jar
+
+# system ignore
+.DS_Store
+Thumbs.db
+
+gitlabci/.generated
+
+/bin
+src/main/resources/application-default.yml
