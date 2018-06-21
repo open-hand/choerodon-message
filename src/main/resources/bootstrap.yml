@@ -1,0 +1,18 @@
+server:
+  port: 18080
+spring:
+  application:
+    name: {{service.code}}
+  cloud:
+    config:
+      failFast: true
+      retry:
+        maxAttempts: 6
+        multiplier: 1.5
+        maxInterval: 2000
+      uri: localhost:8010
+      enabled: false
+management:
+  port: 18081
+  security:
+    enabled: false
