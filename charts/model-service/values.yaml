@@ -26,12 +26,12 @@ preJob:
       password: choerodon
 
 deployment:
-  managementPort: 8091
+  managementPort: 18081
 
 env:
   open:
     ## register-server 
-    EUREKA_DEFAULT_ZONE: http://register-server.io-choerodon:8000/eureka/
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server.io-choerodon:8000/eureka/
     ## config-server
     SPRING_CLOUD_CONFIG_ENABLED: true
     SPRING_CLOUD_CONFIG_URI: http://config-server.framework:8010/
@@ -63,7 +63,7 @@ persistence:
 service:
   enabled: false
   type: ClusterIP
-  port: 8090
+  port: 18080
   
 ingress:
   enabled: false
