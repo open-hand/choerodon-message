@@ -64,6 +64,9 @@ service:
   enabled: false
   type: ClusterIP
   port: 8090
+  
+ingress:
+  enabled: false
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
