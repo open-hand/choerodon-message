@@ -16,3 +16,6 @@ management:
   port: 18081
   security:
     enabled: false
+security:
+  basic:
+    enabled: fasle
