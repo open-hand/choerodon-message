@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: registry.cn-hangzhou.aliyuncs.com/{{group.name}}/{{service.code}}
+  repository: registry.cn-hangzhou.aliyuncs.com/choerodon-framework/notify-service
   pullPolicy: Always
 
 preJob:
@@ -79,3 +79,4 @@ resources:
   requests:
     # cpu: 100m
     memory: 1.5Gi
+

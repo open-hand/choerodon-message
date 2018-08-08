@@ -2,7 +2,7 @@ server:
   port: 18080
 spring:
   application:
-    name: {{service.code}}
+    name: notify-service
   cloud:
     config:
       failFast: true
@@ -19,3 +19,4 @@ management:
 security:
   basic:
     enabled: false
+

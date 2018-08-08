@@ -81,3 +81,4 @@ env.open.SPRING_CLOUD_STREAM_KAFKA_BINDER_ZK_NODES|zookeeper地址
 env.open.SERVICES_GITLAB_URL|gitlab地址
 persistence.enabled|是否启用持久化存储
 persistence.existingClaim|绑定的pvc名称
+

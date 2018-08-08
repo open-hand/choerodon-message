@@ -61,3 +61,4 @@ docker-build:
 
 before_script:
   - *auto_devops
+
