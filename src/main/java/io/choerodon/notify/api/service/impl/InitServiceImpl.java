@@ -31,7 +31,6 @@ public class InitServiceImpl {
         this.configMapper = configMapper;
         this.businessTypeMapper = businessTypeMapper;
         this.notifyProperties = notifyProperties;
-        modelMapper.addMappings(NotifyProperties.Email.properties2Entity());
     }
 
     @PostConstruct

@@ -18,7 +18,7 @@ public class ValidatorUtils {
             if (arg == null) {
                 return false;
             }
-            if (arg instanceof String && !StringUtils.isEmpty(arg)) {
+            if (arg instanceof String && StringUtils.isEmpty(arg)) {
                 return false;
             }
         }

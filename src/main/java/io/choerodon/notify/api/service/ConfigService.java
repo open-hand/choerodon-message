@@ -6,4 +6,6 @@ public interface ConfigService {
 
     EmailConfigDTO save(EmailConfigDTO configDTO);
 
+    EmailConfigDTO selectEmail();
+
 }

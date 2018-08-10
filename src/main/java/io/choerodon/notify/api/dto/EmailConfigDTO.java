@@ -1,57 +1,38 @@
 package io.choerodon.notify.api.dto;
 
-import io.choerodon.notify.domain.Config;
-import io.choerodon.notify.infra.utils.ConvertUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.modelmapper.PropertyMap;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
 public class EmailConfigDTO {
 
-    @NotEmpty(message = "error.email.accountEmpty")
+    public static final String EMAIL_REGULAR_EXPRESSION = "[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w])?";
+
+    @NotEmpty(message = "error.emailConfig.accountEmpty")
+    @Pattern(regexp = EMAIL_REGULAR_EXPRESSION, message = "error.emailConfig.accountIllegal")
     private String account;
 
-    @NotEmpty(message = "error.email.passwordEmpty")
+    @NotEmpty(message = "error.emailConfig.passwordEmpty")
     private String password;
 
     private String sendName;
 
-    @NotEmpty(message = "error.email.protocolEmpty")
+    @NotEmpty(message = "error.emailConfig.protocolEmpty")
     private String protocol;
 
-    @NotEmpty(message = "error.email.hostEmpty")
+    @NotEmpty(message = "error.emailConfig.hostEmpty")
     private String host;
 
-    @NotNull(message = "error.email.portNull")
-    @Min(value = 0, message = "error.email.portScope")
-    @Max(value = 65535, message = "error.email.portScope")
+    @Min(value = 0, message = "error.emailConfig.portScope")
+    @Max(value = 65535, message = "error.emailConfig.portScope")
     private Integer port;
 
     private Boolean ssl;
-
-    public static PropertyMap<EmailConfigDTO, Config> dto2Entity() {
-        return new PropertyMap<EmailConfigDTO, Config>() {
-            @Override
-            protected void configure() {
-                using(ConvertUtils.addPrefix("email")).map();
-            }
-        };
-    }
-
-    public static PropertyMap<Config, EmailConfigDTO> entity2Dto() {
-        return new PropertyMap<Config, EmailConfigDTO>() {
-            @Override
-            protected void configure() {
-                using(ConvertUtils.removePrefix("email")).map();
-            }
-        };
-    }
 
 }

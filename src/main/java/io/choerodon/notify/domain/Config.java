@@ -32,7 +32,7 @@ public class Config extends AuditDomain {
     private String emailHost;
     private Integer emailPort;
     private Boolean emailSsl;
-    private String smsHost;
+    private String smsDomain;
     private String smsKeyId;
     private String smsKeyPassword;
 

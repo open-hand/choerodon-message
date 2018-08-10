@@ -13,7 +13,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-config.groovy') {
             column(name: 'email_host', type: 'VARCHAR(64)', remarks: '邮箱服务器地址')
             column(name: 'email_port', type: 'INT UNSIGNED', remarks: '邮箱服务器端口')
             column(name: 'email_ssl', type: 'TINYINT(1)', remarks: '邮箱服务器是否为ssl')
-            column(name: 'sms_host', type: 'VARCHAR(64)', remarks: '短信服务器域名')
+            column(name: 'sms_domain', type: 'VARCHAR(64)', remarks: '短信服务器域名')
             column(name: 'sms_key_id', type: 'VARCHAR(64)', remarks: '短信服务器key')
             column(name: 'sms_key_password', type: 'VARCHAR(64)', remarks: '短信服务器')
 

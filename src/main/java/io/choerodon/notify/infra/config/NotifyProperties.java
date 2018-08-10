@@ -1,10 +1,7 @@
 package io.choerodon.notify.infra.config;
 
-import io.choerodon.notify.domain.Config;
-import io.choerodon.notify.infra.utils.ConvertUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.modelmapper.PropertyMap;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -41,14 +38,6 @@ public class NotifyProperties {
 
         private Boolean ssl = false;
 
-        public static PropertyMap<Email, Config> properties2Entity() {
-            return new PropertyMap<Email, Config>() {
-                @Override
-                protected void configure() {
-                    using(ConvertUtils.addPrefix("email")).map();
-                }
-            };
-        }
     }
 
 }
