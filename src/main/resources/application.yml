@@ -59,14 +59,6 @@ mybatis:
 choerodon:
   notify:
     init-email-config: true # 是否根据spring.mail的配置初始化email配置
-    business-type:
-      验证码: 用于获取验证码，验证用户信息
-      用户绑定: 绑定邮箱、手机号的反馈信息
-      用户激活: 首次注册，确认用户注册成功
-      获取密码: 忘记密码后，根据用户操作提供用户名及相应密码
-      密码修改: 反馈用户密码修改成功
-      添加成员: 项目添加新成员时，及时反馈给被添加的用户
-      用户角色变更: 通知用户的角色权限发生变化
     email:
       account: fly_left@126.com
       password: 123654789Zj
@@ -75,3 +67,25 @@ choerodon:
       host: smtp.126.com
       port: 25
       ssl: false
+    types:
+      verification-code:
+        name: 验证码
+        description: 用于获取验证码，验证用户信息
+      user-binding:
+        name: 用户绑定
+        description: 绑定邮箱、手机号的反馈信息
+      user-activation:
+        name: 用户激活
+        description: 首次注册，确认用户注册成功
+      get-password:
+        name: 获取密码
+        description: 忘记密码后，根据用户操作提供用户名及相应密码
+      modify-password:
+        name: 密码修改
+        description: 反馈用户密码修改成功
+      add-members:
+        name: 添加成员
+        description: 项目添加新成员时，及时反馈给被添加的用户
+      modify-moemberRole:
+        name: 用户角色变更
+        description: 通知用户的角色权限发生变化

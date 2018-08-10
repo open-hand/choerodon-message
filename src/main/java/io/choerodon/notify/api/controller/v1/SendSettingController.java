@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.service.BusinessTypeService;
+import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 
 @RestController
-@RequestMapping("v1/notices/business_types")
-public class BusinessTypeController {
+@RequestMapping("v1/notices/send_settings")
+public class SendSettingController {
 
-    private BusinessTypeService businessTypeService;
+    private SendSettingService sendSettingService;
 
-    public BusinessTypeController(BusinessTypeService businessTypeService) {
-        this.businessTypeService = businessTypeService;
+    public SendSettingController(SendSettingService sendSettingService) {
+        this.sendSettingService = sendSettingService;
     }
 
-    @GetMapping
+    @GetMapping("/names")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "获取业务类型名称列表列表")
     public ResponseEntity<Set<String>> listNames() {
-        return new ResponseEntity<>(businessTypeService.listNames(), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 
 }

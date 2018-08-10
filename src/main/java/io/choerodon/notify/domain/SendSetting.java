@@ -18,23 +18,39 @@ import javax.persistence.Table;
 @Setter
 @ModifyAudit
 @VersionAudit
-@Table(name = "notify_business_type")
+@Table(name = "notify_send_setting")
 @NoArgsConstructor
-public class BusinessType extends AuditDomain {
+public class SendSetting extends AuditDomain {
 
     @Id
     @GeneratedValue
     private Long id;
 
+    private String code;
+
     private String name;
 
     private String description;
 
-    public BusinessType(String name) {
-        this.name = name;
+    private Long emailTemplateId;
+
+    private Long smsTemplateId;
+
+    private Long pmTemplateId;
+
+    private Integer retryCount;
+
+    private Boolean isSendInstantly;
+
+    private Boolean isManualRetry;
+
+
+    public SendSetting(String code) {
+        this.code = code;
     }
 
-    public BusinessType(String name, String description) {
+    public SendSetting(String code, String name, String description) {
+        this.code = code;
         this.name = name;
         this.description = description;
     }

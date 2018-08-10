@@ -13,9 +13,9 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "choerodon.notify")
 public class NotifyProperties {
 
-    private Map<String, String> businessType = new LinkedHashMap<>();
-
     private boolean initEmailConfig = true;
+
+    private Map<String, BusinessType> types = new LinkedHashMap<>();
 
     @NestedConfigurationProperty
     private Email email;
@@ -39,5 +39,22 @@ public class NotifyProperties {
         private Boolean ssl = false;
 
     }
+
+    @Getter
+    @Setter
+    public static class BusinessType {
+
+        private String name;
+
+        private String description;
+
+        private Integer retryCount = 0;
+
+        private Boolean isSendInstantly = true;
+
+        private Boolean isManualRetry = false;
+
+    }
+
 
 }

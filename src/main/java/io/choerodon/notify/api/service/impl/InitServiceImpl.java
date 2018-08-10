@@ -1,9 +1,9 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.notify.domain.BusinessType;
+import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.infra.config.NotifyProperties;
-import io.choerodon.notify.infra.mapper.BusinessTypeMapper;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import io.choerodon.notify.infra.utils.ValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,17 +19,17 @@ public class InitServiceImpl {
 
     private final ConfigMapper configMapper;
 
-    private final BusinessTypeMapper businessTypeMapper;
+    private final SendSettingMapper sendSettingMapper;
 
     private final NotifyProperties notifyProperties;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
     public InitServiceImpl(ConfigMapper configMapper,
-                           BusinessTypeMapper businessTypeMapper,
+                           SendSettingMapper sendSettingMapper,
                            NotifyProperties notifyProperties) {
         this.configMapper = configMapper;
-        this.businessTypeMapper = businessTypeMapper;
+        this.sendSettingMapper = sendSettingMapper;
         this.notifyProperties = notifyProperties;
     }
 
@@ -56,10 +56,10 @@ public class InitServiceImpl {
     }
 
     private void initBusinessType() {
-        notifyProperties.getBusinessType().forEach((k, v) -> {
+        notifyProperties.getTypes().forEach((k, v) -> {
             try {
-                if (businessTypeMapper.selectOne(new BusinessType(k)) == null) {
-                    businessTypeMapper.insertSelective(new BusinessType(k, v));
+                if (sendSettingMapper.selectOne(new SendSetting(k)) == null) {
+                    sendSettingMapper.insertSelective(new SendSetting(k, v.getName(), v.getDescription()));
                 }
             } catch (Exception e) {
                 log.warn("error.initService.initBusinessType {}", e);

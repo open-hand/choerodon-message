@@ -35,5 +35,6 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: "last_updated_by", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "last_update_date", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
+        addUniqueConstraint(tableName: 'notify_template', columnNames: 'code,message_type', constraintName: "message_type_code_unique")
     }
 }
