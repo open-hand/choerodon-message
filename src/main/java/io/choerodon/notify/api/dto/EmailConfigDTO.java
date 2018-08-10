@@ -35,4 +35,5 @@ public class EmailConfigDTO {
 
     private Boolean ssl;
 
+    private Long objectVersionNumber;
 }

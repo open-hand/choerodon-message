@@ -6,6 +6,7 @@ import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -19,8 +20,12 @@ import javax.persistence.Table;
 @Setter
 @ModifyAudit
 @VersionAudit
+@ToString
 @Table(name = "notify_template")
 public class Template extends AuditDomain {
+
+    public static final String MSG_TYPE_EMAIL = "email";
+    public static final String MSG_TYPE_SMS = "sms";
 
     @Id
     @GeneratedValue
@@ -34,7 +39,7 @@ public class Template extends AuditDomain {
 
     private Boolean isPredefined;
 
-    private Long businessTypeId;
+    private String businessType;
 
     private String emailTitle;
 

@@ -21,7 +21,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public EmailConfigDTO save(EmailConfigDTO configDTO) {
+    public EmailConfigDTO create(EmailConfigDTO configDTO) {
         Config dtoConfig = modelMapper.map(configDTO, Config.class);
         Config dbConfig = configMapper.selectOne(new Config());
 
@@ -32,11 +32,22 @@ public class ConfigServiceImpl implements ConfigService {
             if (configMapper.insertSelective(dtoConfig) != 1) {
                 throw new CommonException("error.emailConfig.save");
             }
+
         } else {
-            dtoConfig.setObjectVersionNumber(dbConfig.getObjectVersionNumber());
-            dtoConfig.setId(dbConfig.getId());
-            configMapper.updateByPrimaryKeySelective(dtoConfig);
+            throw new CommonException("error.emailConfig.exist");
         }
+        return modelMapper.map(configMapper.selectByPrimaryKey(dtoConfig.getId()), EmailConfigDTO.class);
+    }
+
+    @Override
+    public EmailConfigDTO update(EmailConfigDTO configDTO) {
+        Config dtoConfig = modelMapper.map(configDTO, Config.class);
+        Config dbConfig = configMapper.selectOne(new Config());
+        if (dbConfig == null) {
+            throw new CommonException("error.emailConfig.notExist");
+        }
+        dtoConfig.setId(dbConfig.getId());
+        configMapper.updateByPrimaryKeySelective(dtoConfig);
         return modelMapper.map(configMapper.selectByPrimaryKey(dtoConfig.getId()), EmailConfigDTO.class);
     }
 

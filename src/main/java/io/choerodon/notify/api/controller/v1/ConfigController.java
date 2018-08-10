@@ -29,8 +29,9 @@ public class ConfigController {
     @PostMapping("/email")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "创建邮箱配置")
-    public ResponseEntity<EmailConfigDTO> createEmail(@RequestBody @Valid EmailConfigDTO configDTO) {
-        return new ResponseEntity<>(configService.save(configDTO), HttpStatus.OK);
+    public ResponseEntity<EmailConfigDTO> createEmail(@RequestBody @Valid EmailConfigDTO config) {
+        config.setObjectVersionNumber(null);
+        return new ResponseEntity<>(configService.create(config), HttpStatus.OK);
     }
 
     @PutMapping("/email")
@@ -40,7 +41,10 @@ public class ConfigController {
         if (!StringUtils.isEmpty(configDTO.getAccount()) && !Pattern.matches(EMAIL_REGULAR_EXPRESSION, configDTO.getAccount())) {
             throw new CommonException("error.emailConfig.accountIllegal");
         }
-        return new ResponseEntity<>(configService.save(configDTO), HttpStatus.OK);
+        if (configDTO.getObjectVersionNumber() == null) {
+            throw new CommonException("error.emailConfig.objectVersionNumberNull");
+        }
+        return new ResponseEntity<>(configService.update(configDTO), HttpStatus.OK);
     }
 
     @GetMapping("/email")

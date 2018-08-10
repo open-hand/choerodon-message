@@ -19,7 +19,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
                 constraints(nullable: false)
             }
 
-            column(name: 'business_type_id', type: 'BIGINT UNSIGNED', remarks: '模版业务类型id') {
+            column(name: 'business_type', type: 'VARCHAR(64)', remarks: '模版业务类型') {
                 constraints(nullable: false)
             }
 

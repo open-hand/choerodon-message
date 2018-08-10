@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.TemplateMapper">
+
+    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.EmailTemplateQueryDTO">
+        SELECT
+        id,
+        code,
+        name,
+        business_type AS type,
+        is_predefined AS isPredefined
+        FROM notify_template
+        WHERE message_type = 'email'
+        <if test="code != null">
+            AND code LIKE concat('%',#{code},'%')
+        </if>
+
+        <if test="name != null">
+            AND name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="type != null">
+            AND business_type LIKE concat('%',#{type},'%')
+        </if>
+        <if test="isPredefined != null">
+            AND is_predefined = #{isPredefined}
+        </if>
+
+        <if test="params != null">
+            AND(
+            code LIKE concat('%',#{params},'%') OR
+            name LIKE concat('%',#{params},'%') OR
+            business_type LIKE concat('%',#{params},'%') OR
+            is_predefined = #{params}
+            )
+        </if>
+    </select>
+
+</mapper>
