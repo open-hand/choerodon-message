@@ -12,7 +12,8 @@ public interface TemplateMapper extends BaseMapper<Template> {
 
     List<EmailTemplateDTO> fulltextSearchEmail(@Param("code") String code, @Param("name") String name,
                                                @Param("type") String type, @Param("params") String params,
-                                               @Param("isPredefined") Boolean isPredefined);
+                                               @Param("isPredefined") Boolean isPredefined,
+                                               @Param("level") String level);
 
 
     List<TemplateNamesDTO> selectNames();

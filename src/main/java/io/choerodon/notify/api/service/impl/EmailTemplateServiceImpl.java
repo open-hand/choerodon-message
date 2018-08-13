@@ -7,14 +7,13 @@ import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.notify.domain.MessageType;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static io.choerodon.notify.domain.Template.MSG_TYPE_EMAIL;
 
 @Service
 public class EmailTemplateServiceImpl implements EmailTemplateService {
@@ -34,10 +33,10 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public Page<EmailTemplateQueryDTO> page(EmailTemplateQueryDTO query) {
+    public Page<EmailTemplateQueryDTO> pageByLevel(EmailTemplateQueryDTO query, String level) {
         return PageHelper.doPageAndSort(query.getPageRequest(),
                 () -> templateMapper.fulltextSearchEmail(query.getCode(), query.getName(),
-                        query.getType(), query.getParams(), query.getIsPredefined()));
+                        query.getType(), query.getParams(), query.getIsPredefined(), level));
 
     }
 
@@ -60,7 +59,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Override
     public EmailTemplateDTO create(EmailTemplateDTO dto) {
         Template template = modelMapper.map(dto, Template.class);
-        template.setMessageType(MSG_TYPE_EMAIL);
+        template.setMessageType(MessageType.EMAIL.getValue());
         template.setBusinessType(dto.getType());
         if (templateMapper.insertSelective(template) != 1) {
             throw new CommonException("error.emailTemplate.save");

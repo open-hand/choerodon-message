@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EmailTemplateService {
 
-    Page<EmailTemplateQueryDTO> page(EmailTemplateQueryDTO query);
+    Page<EmailTemplateQueryDTO> pageByLevel(EmailTemplateQueryDTO query, String level);
 
     List<TemplateNamesDTO> listNames();
 

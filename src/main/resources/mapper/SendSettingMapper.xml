@@ -9,7 +9,7 @@
         name,
         description
         FROM notify_send_setting
-        WHERE 1 = 1
+        WHERE level = #{level}
         <if test="code != null">
             AND code LIKE concat('%',#{code},'%')
         </if>

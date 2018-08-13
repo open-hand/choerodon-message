@@ -24,9 +24,6 @@ import javax.persistence.Table;
 @Table(name = "notify_template")
 public class Template extends AuditDomain {
 
-    public static final String MSG_TYPE_EMAIL = "email";
-    public static final String MSG_TYPE_SMS = "sms";
-
     @Id
     @GeneratedValue
     private Long id;

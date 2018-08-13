@@ -38,6 +38,8 @@ public class SendSetting extends AuditDomain {
 
     private Long pmTemplateId;
 
+    private String level;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
@@ -49,9 +51,10 @@ public class SendSetting extends AuditDomain {
         this.code = code;
     }
 
-    public SendSetting(String code, String name, String description) {
+    public SendSetting(String code, String name, String description, String level) {
         this.code = code;
         this.name = name;
         this.description = description;
+        this.level = level;
     }
 }
