@@ -5,11 +5,14 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
+import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static io.choerodon.notify.domain.Template.MSG_TYPE_EMAIL;
 
@@ -36,6 +39,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 () -> templateMapper.fulltextSearchEmail(query.getCode(), query.getName(),
                         query.getType(), query.getParams(), query.getIsPredefined()));
 
+    }
+
+    @Override
+    public List<TemplateNamesDTO> listNames() {
+        return templateMapper.selectNames();
     }
 
     @Override

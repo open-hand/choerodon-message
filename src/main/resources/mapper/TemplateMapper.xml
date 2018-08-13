@@ -35,4 +35,10 @@
         </if>
     </select>
 
+
+    <select id="selectNames" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
+        SELECT
+        id, name
+        FROM notify_template
+    </select>
 </mapper>

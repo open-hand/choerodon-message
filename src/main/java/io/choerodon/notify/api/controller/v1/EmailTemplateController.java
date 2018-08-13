@@ -8,6 +8,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
+import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("v1/notices/emails/templates")
@@ -41,6 +43,14 @@ public class EmailTemplateController {
                                                             @RequestParam(required = false) String params) {
         EmailTemplateQueryDTO query = new EmailTemplateQueryDTO(name, code, type, isPredefined, params, pageRequest);
         return new ResponseEntity<>(templateService.page(query), HttpStatus.OK);
+    }
+
+    @GetMapping("/names")
+    @CustomPageRequest
+    @Permission(level = ResourceLevel.SITE)
+    @ApiOperation(value = "查询所有邮件模版名")
+    public ResponseEntity<List<TemplateNamesDTO>> listNames() {
+        return new ResponseEntity<>(templateService.listNames(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

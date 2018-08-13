@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.SendSettingMapper">
+
+    <select id="fulltextSearch" resultType="io.choerodon.notify.api.dto.SendSettingListDTO">
+        SELECT
+        id,
+        code,
+        name,
+        description
+        FROM notify_send_setting
+        WHERE 1 = 1
+        <if test="code != null">
+            AND code LIKE concat('%',#{code},'%')
+        </if>
+
+        <if test="name != null">
+            AND name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="description != null">
+            AND business_type LIKE concat('%',#{description},'%')
+        </if>
+        <if test="params != null">
+            AND(
+            code LIKE concat('%',#{params},'%') OR
+            name LIKE concat('%',#{params},'%') OR
+            description LIKE concat('%',#{params},'%')
+            )
+        </if>
+    </select>
+
+</mapper>
