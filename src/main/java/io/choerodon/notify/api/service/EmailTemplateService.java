@@ -3,10 +3,15 @@ package io.choerodon.notify.api.service;
 import io.choerodon.core.domain.Page;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
+import io.choerodon.notify.api.dto.TemplateNamesDTO;
+
+import java.util.List;
 
 public interface EmailTemplateService {
 
     Page<EmailTemplateQueryDTO> page(EmailTemplateQueryDTO query);
+
+    List<TemplateNamesDTO> listNames();
 
     EmailTemplateDTO query(Long id);
 
