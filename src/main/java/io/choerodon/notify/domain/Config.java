@@ -6,6 +6,7 @@ import io.choerodon.mybatis.domain.AuditDomain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,6 +21,7 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class Config extends AuditDomain {
 
     @Id

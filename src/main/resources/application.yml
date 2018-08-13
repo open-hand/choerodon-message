@@ -89,3 +89,6 @@ choerodon:
       modify-moemberRole:
         name: 用户角色变更
         description: 通知用户的角色权限发生变化
+    variables:
+        site-name: 通知服务
+    variable-priorities: properties, userDetails, datasource # 变量优先级

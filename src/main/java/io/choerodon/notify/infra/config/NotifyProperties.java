@@ -13,9 +13,19 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "choerodon.notify")
 public class NotifyProperties {
 
+    private static final String VAR_PROPERTIES = "properties";
+
+    private static final String VAR_USER_DETAILS = "userDetails";
+
+    private static final String VAR_DATASOURCE = "datasource";
+
     private boolean initEmailConfig = true;
 
     private Map<String, BusinessType> types = new LinkedHashMap<>();
+
+    private Map<String, String> variables = new LinkedHashMap<>();
+
+    private String[] variablePriorities = {VAR_PROPERTIES, VAR_USER_DETAILS, VAR_DATASOURCE};
 
     @NestedConfigurationProperty
     private Email email;
