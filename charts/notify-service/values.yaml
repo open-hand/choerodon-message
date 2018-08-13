@@ -21,7 +21,7 @@ preJob:
     mysql:
       host: 192.168.12.175
       port: 3306
-      database: demo_service
+      database: notify_service
       username: root
       password: choerodon
 
@@ -31,12 +31,12 @@ deployment:
 env:
   open:
     ## register-server 
-    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server.io-choerodon:8000/eureka/
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
     ## config-server
     SPRING_CLOUD_CONFIG_ENABLED: true
-    SPRING_CLOUD_CONFIG_URI: http://config-server.framework:8010/
+    SPRING_CLOUD_CONFIG_URI: http://config-server:8010/
     ## mysql
-    SPRING_DATASOURCE_URL: jdbc:mysql://localhost/demo_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    SPRING_DATASOURCE_URL: jdbc:mysql://localhost/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
     SPRING_DATASOURCE_USERNAME: root
     SPRING_DATASOURCE_PASSWORD: choerodon
     ## kafka
