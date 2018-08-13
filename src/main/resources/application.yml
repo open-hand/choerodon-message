@@ -26,6 +26,15 @@ spring:
         binder:
           brokers: 127.0.0.1:9092
           zkNodes: 127.0.0.1:2181
+  mail:
+    username: fly_left@126.com
+    password: 123654789Zj
+    protocol: smtp
+    host: smtp.126.com
+    port: 25
+    properties:
+      mail.smtp.ssl.enable: true
+      mail.send.name: choerodon
 eureka:
   instance:
     preferIpAddress: true
@@ -58,15 +67,6 @@ mybatis:
     mapUnderscoreToCamelCase: true
 choerodon:
   notify:
-    init-email-config: true # 是否根据spring.mail的配置初始化email配置
-    email:
-      account: fly_left@126.com
-      password: 123654789Zj
-      protocol: smtp
-      send-name: choerodon
-      host: smtp.126.com
-      port: 25
-      ssl: false
     types:
       verification-code:
         name: 验证码
@@ -89,6 +89,4 @@ choerodon:
       modify-moemberRole:
         name: 用户角色变更
         description: 通知用户的角色权限发生变化
-    variables:
-        site-name: 通知服务
-    variable-priorities: properties, userDetails, datasource # 变量优先级
+    init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置

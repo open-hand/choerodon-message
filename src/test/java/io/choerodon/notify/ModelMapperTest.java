@@ -2,11 +2,14 @@ package io.choerodon.notify;
 
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
+import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.utils.ConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 
 @Slf4j
 public class ModelMapperTest {
@@ -67,6 +70,21 @@ public class ModelMapperTest {
         Template template2 = mapper.map(dto, Template.class);
 
         log.info("template2 {}", template2);
+
+    }
+
+    @Test
+    public void MailProperties() {
+        MailProperties mailProperties = new MailProperties();
+        mailProperties.setHost("host");
+        mailProperties.setPassword("122");
+        mailProperties.setProtocol("pr");
+        mailProperties.setPort(10);
+        mailProperties.setUsername("sdsd");
+
+        Config saveConfig = mapper.map(mailProperties, Config.class);
+
+        log.info("result {}", saveConfig);
 
     }
 }

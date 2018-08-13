@@ -21,6 +21,9 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import java.util.List;
 
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
+
 @RestController
 @RequestMapping("v1/notices/emails/templates")
 public class EmailTemplateController {
@@ -34,15 +37,30 @@ public class EmailTemplateController {
     @GetMapping
     @CustomPageRequest
     @Permission(level = ResourceLevel.SITE)
-    @ApiOperation(value = "分页查询邮件模版")
-    public ResponseEntity<Page<EmailTemplateQueryDTO>> page(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                            @RequestParam(required = false) String name,
-                                                            @RequestParam(required = false) String code,
-                                                            @RequestParam(required = false) String type,
-                                                            @RequestParam(required = false) Boolean isPredefined,
-                                                            @RequestParam(required = false) String params) {
+    @ApiOperation(value = "全局层分页查询邮件模版")
+    public ResponseEntity<Page<EmailTemplateQueryDTO>> pageSite(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                @RequestParam(required = false) String name,
+                                                                @RequestParam(required = false) String code,
+                                                                @RequestParam(required = false) String type,
+                                                                @RequestParam(required = false) Boolean isPredefined,
+                                                                @RequestParam(required = false) String params) {
         EmailTemplateQueryDTO query = new EmailTemplateQueryDTO(name, code, type, isPredefined, params, pageRequest);
-        return new ResponseEntity<>(templateService.page(query), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.pageByLevel(query, LEVEL_SITE), HttpStatus.OK);
+    }
+
+    @GetMapping("/organizations/{organization_id}")
+    @CustomPageRequest
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "组织层分页查询邮件模版")
+    public ResponseEntity<Page<EmailTemplateQueryDTO>> pageOrganization(@PathVariable("organization_id") long id,
+                                                                        @ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                        @RequestParam(required = false) String name,
+                                                                        @RequestParam(required = false) String code,
+                                                                        @RequestParam(required = false) String type,
+                                                                        @RequestParam(required = false) Boolean isPredefined,
+                                                                        @RequestParam(required = false) String params) {
+        EmailTemplateQueryDTO query = new EmailTemplateQueryDTO(name, code, type, isPredefined, params, pageRequest);
+        return new ResponseEntity<>(templateService.pageByLevel(query, LEVEL_ORG), HttpStatus.OK);
     }
 
     @GetMapping("/names")
