@@ -20,11 +20,10 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     private SendSettingMapper sendSettingMapper;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper = new ModelMapper();
 
-    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, ModelMapper modelMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper) {
         this.sendSettingMapper = sendSettingMapper;
-        this.modelMapper = modelMapper;
     }
 
     @Override
