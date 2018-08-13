@@ -26,7 +26,7 @@ preJob:
       password: choerodon
 
 deployment:
-  managementPort: 18081
+  managementPort: 18086
 
 env:
   open:
@@ -61,7 +61,7 @@ persistence:
 service:
   enabled: false
   type: ClusterIP
-  port: 18080
+  port: 18085
   
 ingress:
   enabled: false
