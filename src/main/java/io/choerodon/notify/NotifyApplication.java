@@ -1,4 +1,4 @@
-package io.choerodon.demo;
+package io.choerodon.notify;
 
 import io.choerodon.resource.annoation.EnableChoerodonResourceServer;
 import org.springframework.boot.SpringApplication;

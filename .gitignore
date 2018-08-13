@@ -29,5 +29,7 @@ Thumbs.db
 
 gitlabci/.generated
 
+/choerodon_temp
+
 /bin
 src/main/resources/application-default.yml
