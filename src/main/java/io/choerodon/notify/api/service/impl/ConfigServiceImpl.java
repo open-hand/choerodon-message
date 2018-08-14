@@ -59,4 +59,5 @@ public class ConfigServiceImpl implements ConfigService {
         }
         return modelMapper.map(config, EmailConfigDTO.class);
     }
+
 }
