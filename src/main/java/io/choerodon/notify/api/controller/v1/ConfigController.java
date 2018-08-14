@@ -4,6 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.service.ConfigService;
+import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,11 @@ public class ConfigController {
 
     private ConfigService configService;
 
-    public ConfigController(ConfigService configService) {
+    private NoticesSendService noticesSendService;
+
+    public ConfigController(ConfigService configService, NoticesSendService noticesSendService) {
         this.configService = configService;
+        this.noticesSendService = noticesSendService;
     }
 
     @PostMapping("/email")
@@ -52,6 +56,13 @@ public class ConfigController {
     @ApiOperation(value = "查询邮箱配置")
     public ResponseEntity<EmailConfigDTO> selectEmail() {
         return new ResponseEntity<>(configService.selectEmail(), HttpStatus.OK);
+    }
+
+    @GetMapping("/email/test")
+    @Permission(level = ResourceLevel.SITE)
+    @ApiOperation(value = "测试邮箱连接")
+    public void testEmailConnect() {
+        noticesSendService.testEmailConnect();
     }
 
 }

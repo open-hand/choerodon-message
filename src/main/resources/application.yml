@@ -33,8 +33,9 @@ spring:
     host: smtp.126.com
     port: 25
     properties:
-      mail.smtp.ssl.enable: true
+      mail.smtp.ssl.enable: false
       mail.send.name: choerodon
+    test-connection: false
 eureka:
   instance:
     preferIpAddress: true

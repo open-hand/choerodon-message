@@ -6,4 +6,5 @@ public interface NoticesSendService {
 
     void postEmail(EmailSendDTO dto);
 
+    void testEmailConnect();
 }
