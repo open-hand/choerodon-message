@@ -10,7 +10,7 @@ public class EmailSendDTO {
 
     private String code;
 
-    private String emailAddress;
+    private String destinationEmail;
 
     private Map<String, Object> variables;
 

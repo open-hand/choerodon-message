@@ -1,7 +1,7 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
-    changeSet(author: 'jcalaz@163.com', id: '2018-08-09-add-notify-template') {
+databaseChangeLog(logicalFilePath: 'script/db/notify-test.groovy') {
+    changeSet(author: 'jcalaz@163.com', id: '2018-08-09-add-notify-test') {
         createTable(tableName: "notify_template") {
             column(name: 'id', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true)

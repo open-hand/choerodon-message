@@ -1,14 +1,12 @@
 package io.choerodon.notify.api.service.impl;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -38,12 +36,16 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private static final String ENCODE_UTF8 = "utf-8";
 
+    private final FreeMarkerConfigBuilder freeMarkerConfigBuilder;
+
     public NoticesSendServiceImpl(SendSettingMapper sendSettingMapper,
                                   ConfigMapper configMapper,
-                                  TemplateMapper templateMapper) {
+                                  TemplateMapper templateMapper,
+                                  FreeMarkerConfigBuilder freeMarkerConfigBuilder) {
         this.sendSettingMapper = sendSettingMapper;
         this.configMapper = configMapper;
         this.templateMapper = templateMapper;
+        this.freeMarkerConfigBuilder = freeMarkerConfigBuilder;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         try {
             mailSender.testConnection();
         } catch (MessagingException e) {
-            throw new CommonException("error.emailConfig.testConnectFailed");
+            throw new FeignException("error.emailConfig.testConnectFailed");
         }
     }
 
@@ -109,9 +111,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, ENCODE_UTF8);
             helper.setFrom(new InternetAddress("\"" + MimeUtility.encodeText(config.getEmailSendName()) + "\"<" + config.getEmailAccount() + ">"));
-            helper.setTo(dto.getEmailAddress());
+            helper.setTo(dto.getDestinationEmail());
             helper.setSubject(MimeUtility.encodeText(template.getEmailTitle(), ENCODE_UTF8, "B"));
-            helper.setText(getMailText(template.getEmailContent(), dto.getVariables()), true);
+
+            helper.setText(renderStringTemplate(template, dto.getVariables()), true);
             mailSender.send(msg);
         } catch (Exception e) {
             throw new FeignException("error.noticeSend.emailSendError", e);
@@ -119,9 +122,16 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     }
 
-    private String getMailText(final String context, final Map<String, Object> variables) throws IOException, TemplateException {
-        Template template = Template.getPlainTextTemplate("", context, new Configuration(Configuration.VERSION_2_3_28));
-        return FreeMarkerTemplateUtils.processTemplateIntoString(template, variables);
+
+    public final String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException{
+        freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(template.getCode());
+        if (ft == null) {
+            ft = freeMarkerConfigBuilder.addTemplate(template.getCode(), template.getEmailContent());
+        }
+        if (ft == null) {
+            throw new FeignException("error.noticeSend.emailParseError");
+        }
+        return FreeMarkerTemplateUtils.processTemplateIntoString(ft, variables);
     }
 
 

@@ -1,6 +1,9 @@
 package io.choerodon.notify.infra.utils;
 
 import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.domain.Template;
+import io.choerodon.swagger.notify.EmailTemplateScanData;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 
 public class ConvertUtils {
@@ -27,6 +30,18 @@ public class ConvertUtils {
         }
         config.setEmailSendName(mailProperties.getProperties().get(EMAIL_SEND_NAME));
         return config;
+    }
+
+    public static Template convertEmailTemplate(final EmailTemplateScanData scanData) {
+        Template template = new Template();
+        template.setCode(scanData.getCode());
+        template.setName(scanData.getName());
+        template.setIsPredefined(true);
+        template.setEmailTitle(scanData.getTitle());
+        template.setMessageType(MessageType.EMAIL.getValue());
+        template.setBusinessType(scanData.getBusinessType());
+        template.setEmailContent(scanData.getContent());
+        return template;
     }
 
 }

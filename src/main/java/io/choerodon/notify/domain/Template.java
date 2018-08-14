@@ -5,6 +5,7 @@ import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -20,6 +21,7 @@ import javax.persistence.Table;
 @Setter
 @ModifyAudit
 @VersionAudit
+@NoArgsConstructor
 @ToString
 @Table(name = "notify_template")
 public class Template extends AuditDomain {
@@ -44,4 +46,8 @@ public class Template extends AuditDomain {
 
     private String smsContent;
 
+    public Template(String code, String messageType) {
+        this.code = code;
+        this.messageType = messageType;
+    }
 }
