@@ -111,7 +111,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, ENCODE_UTF8);
             helper.setFrom(new InternetAddress("\"" + MimeUtility.encodeText(config.getEmailSendName()) + "\"<" + config.getEmailAccount() + ">"));
-            helper.setTo(dto.getEmailAddress());
+            helper.setTo(dto.getDestinationEmail());
             helper.setSubject(MimeUtility.encodeText(template.getEmailTitle(), ENCODE_UTF8, "B"));
 
             helper.setText(renderStringTemplate(template, dto.getVariables()), true);
