@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -17,6 +19,13 @@ public class NotifyProperties {
     public static final String LEVEL_ORG = "organization";
 
     private boolean initSpringEmailConfig = true;
+
+    private List<String> skipServices = Arrays.asList("register-server", "api-gateway",
+            "gateway-helper", "oauth-server", "config-server", "event-store-service");
+
+    private Integer fetchTime = 5;
+
+    private Boolean isLocal = false;
 
     private Map<String, BusinessType> types = new LinkedHashMap<>();
 

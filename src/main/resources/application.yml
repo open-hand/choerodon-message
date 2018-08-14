@@ -15,9 +15,11 @@ spring:
     password: 123456
   kafka: #使用原生spring kafka需要配置
     bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
     consumer:
-      group-id: iam-service
-      auto-offset-reset: earliest
+      group-id: notify-service
+      auto-offset-reset: latest
   cloud:
     bus:
       enabled: true
@@ -91,3 +93,6 @@ choerodon:
         name: 用户角色变更
         description: 通知用户的角色权限发生变化
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
+    skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
+    fetch-time: 5
+    is-local: false

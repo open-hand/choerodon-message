@@ -10,10 +10,13 @@ import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.domain.MessageType;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
+import io.choerodon.notify.infra.utils.ConvertUtils;
+import io.choerodon.swagger.notify.EmailTemplateScanData;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class EmailTemplateServiceImpl implements EmailTemplateService {
@@ -76,5 +79,19 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         EmailTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), EmailTemplateDTO.class);
         returnDto.setType(template.getBusinessType());
         return returnDto;
+    }
+
+    @Override
+    public void createByScan(Set<EmailTemplateScanData> set) {
+        set.stream().map(ConvertUtils::convertEmailTemplate).forEach(t -> {
+            Template query = templateMapper.selectOne(new Template(t.getCode(), t.getMessageType()));
+            if (query == null) {
+                templateMapper.insertSelective(t);
+            } else {
+                t.setId(query.getId());
+                t.setObjectVersionNumber(query.getObjectVersionNumber());
+                templateMapper.updateByPrimaryKeySelective(t);
+            }
+        });
     }
 }
