@@ -7,7 +7,6 @@ import java.util.Map;
 @Data
 public class EmailSendDTO {
 
-
     private String code;
 
     private String destinationEmail;
