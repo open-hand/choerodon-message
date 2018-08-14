@@ -26,8 +26,11 @@ public class NoticesSendController {
     @ApiOperation(value = "发送邮件")
     @Permission(level = ResourceLevel.SITE)
     public void postEmail(@RequestBody EmailSendDTO dto) {
-        if (StringUtils.isEmpty(dto)) {
+        if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.noticeSend.codeEmpty");
+        }
+        if (StringUtils.isEmpty(dto.getDestinationEmail())) {
+            throw new FeignException("error.noticeSend.emailEmpty");
         }
         noticesSendService.postEmail(dto);
     }
