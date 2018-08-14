@@ -14,4 +14,10 @@ public class SendSettingListDTO {
 
     private String description;
 
+    private String emailTemplateCode;
+
+    private String smsTemplateCode;
+
+    private String pmTemplateCode;
+
 }

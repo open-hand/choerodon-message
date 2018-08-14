@@ -4,27 +4,33 @@
 
     <select id="fulltextSearch" resultType="io.choerodon.notify.api.dto.SendSettingListDTO">
         SELECT
-        id,
-        code,
-        name,
-        description
-        FROM notify_send_setting
+        nts.id,
+        nts.code,
+        nts.name,
+        nts.description,
+        ntemail.code AS email_template_code,
+        ntsms.code AS sms_template_code,
+        ntpm.code AS pm_template_code
+        FROM notify_send_setting nts
+        LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
+        LEFT JOIN notify_template ntsms on nts.email_template_id = ntsms.id
+        LEFT JOIN notify_template ntpm on nts.email_template_id = ntpm.id
         WHERE level = #{level}
         <if test="code != null">
-            AND code LIKE concat('%',#{code},'%')
+            AND nts.code LIKE concat('%',#{code},'%')
         </if>
 
         <if test="name != null">
-            AND name LIKE concat('%',#{name},'%')
+            AND nts.name LIKE concat('%',#{name},'%')
         </if>
         <if test="description != null">
-            AND business_type LIKE concat('%',#{description},'%')
+            AND nts.business_type LIKE concat('%',#{description},'%')
         </if>
         <if test="params != null">
             AND(
-            code LIKE concat('%',#{params},'%') OR
-            name LIKE concat('%',#{params},'%') OR
-            description LIKE concat('%',#{params},'%')
+            nts.code LIKE concat('%',#{params},'%') OR
+            nts.name LIKE concat('%',#{params},'%') OR
+            nts.description LIKE concat('%',#{params},'%')
             )
         </if>
     </select>
