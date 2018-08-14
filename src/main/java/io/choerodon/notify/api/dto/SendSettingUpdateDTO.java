@@ -2,6 +2,8 @@ package io.choerodon.notify.api.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 public class SendSettingUpdateDTO {
 
@@ -18,5 +20,8 @@ public class SendSettingUpdateDTO {
     private Boolean isSendInstantly;
 
     private Boolean isManualRetry;
+
+    @NotNull(message = "error.sendSetting.objectVersionNumberNull")
+    private Long objectVersionNumber;
 
 }

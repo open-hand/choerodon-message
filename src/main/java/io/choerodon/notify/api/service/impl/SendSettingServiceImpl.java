@@ -46,7 +46,6 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException("error.sendSetting.notExist");
         }
         SendSetting dto = modelMapper.map(updateDTO, SendSetting.class);
-        dto.setObjectVersionNumber(db.getObjectVersionNumber());
         sendSettingMapper.updateByPrimaryKeySelective(dto);
         return sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
     }
