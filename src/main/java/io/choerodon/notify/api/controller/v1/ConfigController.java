@@ -6,6 +6,7 @@ import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.service.ConfigService;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import static io.choerodon.notify.api.dto.EmailConfigDTO.EMAIL_REGULAR_EXPRESSIO
 
 @RestController
 @RequestMapping("v1/notices/configs")
+@Api("邮箱，短信，站内信配置接口")
 public class ConfigController {
 
     private ConfigService configService;

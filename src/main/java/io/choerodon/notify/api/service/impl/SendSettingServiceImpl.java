@@ -30,8 +30,10 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public Set<BusinessTypeDTO> listNames() {
-        return sendSettingMapper.selectAll().stream()
+    public Set<BusinessTypeDTO> listNames(final String level) {
+        SendSetting query = new SendSetting();
+        query.setLevel(level);
+        return sendSettingMapper.select(query).stream()
                 .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
     }
 

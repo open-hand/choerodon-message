@@ -13,7 +13,7 @@ public interface EmailTemplateService {
 
     Page<EmailTemplateQueryDTO> pageByLevel(EmailTemplateQueryDTO query, String level);
 
-    List<TemplateNamesDTO> listNames();
+    List<TemplateNamesDTO> listNames(String level);
 
     EmailTemplateDTO query(Long id);
 

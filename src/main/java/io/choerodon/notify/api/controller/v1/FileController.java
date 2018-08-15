@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.service.FileService;
 import io.choerodon.swagger.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("v1/notices/files")
+@Api("文件上传接口")
 public class FileController {
 
     private FileService fileService;

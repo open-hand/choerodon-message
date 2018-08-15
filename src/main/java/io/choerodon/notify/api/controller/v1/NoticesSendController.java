@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/notices")
+@Api("邮件，短信，站内信发送接口")
 public class NoticesSendController {
 
     private NoticesSendService noticesSendService;

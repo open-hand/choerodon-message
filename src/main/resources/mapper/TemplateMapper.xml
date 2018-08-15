@@ -41,9 +41,13 @@
     </select>
 
 
-    <select id="selectNames" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
+    <select id="selectNamesByLevel" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
         SELECT
-        id, name, code
-        FROM notify_template
+        nt.id,
+        nt.code,
+        nt.name
+        FROM notify_template nt
+        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
+        WHERE nss.level = #{level}
     </select>
 </mapper>
