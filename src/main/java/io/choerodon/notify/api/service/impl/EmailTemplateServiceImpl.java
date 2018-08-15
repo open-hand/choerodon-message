@@ -50,8 +50,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public List<TemplateNamesDTO> listNames() {
-        return templateMapper.selectNames();
+    public List<TemplateNamesDTO> listNames(final String level) {
+        return templateMapper.selectNamesByLevel(level);
     }
 
     @Override

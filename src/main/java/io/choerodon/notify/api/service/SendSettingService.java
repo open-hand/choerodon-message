@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface SendSettingService {
 
-    Set<BusinessTypeDTO> listNames();
+    Set<BusinessTypeDTO> listNames(String level);
 
     Page<SendSettingListDTO> page(String level, String name, String code,
                                   String description, String params, PageRequest pageRequest);
