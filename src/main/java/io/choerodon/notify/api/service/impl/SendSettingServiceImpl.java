@@ -5,6 +5,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
@@ -35,10 +36,10 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public Page<SendSettingListDTO> page(final String name, final String code, final String description,
-                                         final String params, final PageRequest pageRequest) {
+    public Page<SendSettingListDTO> page(final String level, final String name, final String code,
+                                         final String description, final String params, final PageRequest pageRequest) {
         return PageHelper.doPageAndSort(pageRequest,
-                () -> sendSettingMapper.fulltextSearch(code, name, description, params));
+                () -> sendSettingMapper.fulltextSearch(level, code, name, description, params));
     }
 
     @Override
@@ -50,5 +51,14 @@ public class SendSettingServiceImpl implements SendSettingService {
         SendSetting dto = modelMapper.map(updateDTO, SendSetting.class);
         sendSettingMapper.updateByPrimaryKeySelective(dto);
         return sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
+    }
+
+    @Override
+    public SendSettingDetailDTO query(Long id) {
+        SendSettingDetailDTO sendSetting = sendSettingMapper.selectById(id);
+        if (sendSetting == null) {
+            throw new CommonException("error.sendSetting.notExist");
+        }
+        return sendSetting;
     }
 }

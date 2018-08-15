@@ -9,4 +9,6 @@ public class TemplateNamesDTO {
 
     private String name;
 
+    private String code;
+
 }

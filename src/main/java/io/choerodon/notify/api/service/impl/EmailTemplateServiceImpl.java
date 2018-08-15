@@ -82,7 +82,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Override
     public EmailTemplateDTO update(EmailTemplateDTO dto) {
         if (dto.getType() != null) {
-            valid(dto.getCode());
+            valid(dto.getType());
         }
         Template template = modelMapper.map(dto, Template.class);
         templateMapper.updateByPrimaryKeySelective(template);

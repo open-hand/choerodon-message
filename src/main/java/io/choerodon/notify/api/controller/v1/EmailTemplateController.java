@@ -64,7 +64,6 @@ public class EmailTemplateController {
     }
 
     @GetMapping("/names")
-    @CustomPageRequest
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "查询所有邮件模版名")
     public ResponseEntity<List<TemplateNamesDTO>> listNames() {
