@@ -1,18 +1,15 @@
 package io.choerodon.notify.api.dto;
 
-
 import lombok.Data;
 
 @Data
-public class SendSettingListDTO {
+public class SendSettingDetailDTO {
 
     private Long id;
 
     private String code;
 
     private String name;
-
-    private String level;
 
     private String description;
 
@@ -21,5 +18,15 @@ public class SendSettingListDTO {
     private String smsTemplateCode;
 
     private String pmTemplateCode;
+
+    private String level;
+
+    private Integer retryCount;
+
+    private Boolean isSendInstantly;
+
+    private Boolean isManualRetry;
+
+    private Long objectVersionNumber;
 
 }

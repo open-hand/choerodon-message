@@ -43,7 +43,7 @@
 
     <select id="selectNames" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
         SELECT
-        id, name
+        id, name, code
         FROM notify_template
     </select>
 </mapper>
