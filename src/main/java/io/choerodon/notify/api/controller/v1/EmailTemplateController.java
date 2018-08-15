@@ -88,7 +88,7 @@ public class EmailTemplateController {
         return new ResponseEntity<>(templateService.create(template), HttpStatus.OK);
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "更新邮件模版")
     public ResponseEntity<EmailTemplateDTO> update(@PathVariable Long id,

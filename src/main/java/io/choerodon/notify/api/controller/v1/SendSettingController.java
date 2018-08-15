@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
@@ -32,8 +33,8 @@ public class SendSettingController {
 
     @GetMapping("/names")
     @Permission(level = ResourceLevel.SITE)
-    @ApiOperation(value = "获取业务类型名称列表列表")
-    public ResponseEntity<Set<String>> listNames() {
+    @ApiOperation(value = "获取业务类型名称列表")
+    public ResponseEntity<Set<BusinessTypeDTO>> listNames() {
         return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 

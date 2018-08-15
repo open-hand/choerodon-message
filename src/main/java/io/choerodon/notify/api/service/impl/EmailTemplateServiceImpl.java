@@ -8,7 +8,9 @@ import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.EmailTemplateScanData;
@@ -23,11 +25,15 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     private final TemplateMapper templateMapper;
 
+    private final SendSettingMapper sendSettingMapper;
+
     private final ModelMapper modelMapper = new ModelMapper();
 
 
-    public EmailTemplateServiceImpl(TemplateMapper templateMapper) {
+    public EmailTemplateServiceImpl(TemplateMapper templateMapper,
+                                    SendSettingMapper sendSettingMapper) {
         this.templateMapper = templateMapper;
+        this.sendSettingMapper = sendSettingMapper;
         modelMapper.addMappings(EmailTemplateDTO.entity2Dto());
         modelMapper.addMappings(EmailTemplateDTO.dto2Entity());
         modelMapper.addMappings(EmailTemplateQueryDTO.dto2Entity());
@@ -61,6 +67,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public EmailTemplateDTO create(EmailTemplateDTO dto) {
+        valid(dto.getCode());
         Template template = modelMapper.map(dto, Template.class);
         template.setMessageType(MessageType.EMAIL.getValue());
         template.setBusinessType(dto.getType());
@@ -74,6 +81,9 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public EmailTemplateDTO update(EmailTemplateDTO dto) {
+        if (dto.getType() != null) {
+            valid(dto.getCode());
+        }
         Template template = modelMapper.map(dto, Template.class);
         templateMapper.updateByPrimaryKeySelective(template);
         EmailTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), EmailTemplateDTO.class);
@@ -93,5 +103,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 templateMapper.updateByPrimaryKeySelective(t);
             }
         });
+    }
+
+    private void valid(final String type) {
+        if (sendSettingMapper.selectOne(new SendSetting(type)) == null) {
+            throw new CommonException("error.emailTemplate.businessTypeNotExist");
+        }
     }
 }

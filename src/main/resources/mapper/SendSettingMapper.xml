@@ -24,7 +24,7 @@
             AND nts.name LIKE concat('%',#{name},'%')
         </if>
         <if test="description != null">
-            AND nts.business_type LIKE concat('%',#{description},'%')
+            AND nts.description LIKE concat('%',#{description},'%')
         </if>
         <if test="params != null">
             AND(

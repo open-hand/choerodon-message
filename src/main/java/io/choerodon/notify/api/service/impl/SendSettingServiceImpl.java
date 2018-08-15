@@ -4,11 +4,13 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import io.choerodon.notify.infra.utils.ConvertUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,9 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public Set<String> listNames() {
+    public Set<BusinessTypeDTO> listNames() {
         return sendSettingMapper.selectAll().stream()
-                .map(SendSetting::getName).collect(Collectors.toSet());
+                .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
     }
 
     @Override

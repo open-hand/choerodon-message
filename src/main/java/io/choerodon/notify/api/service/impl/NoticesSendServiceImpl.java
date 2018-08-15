@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.service.impl;
 
 import freemarker.template.TemplateException;
-import io.choerodon.core.exception.FeignException;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
@@ -52,18 +52,18 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     public void postEmail(EmailSendDTO dto) {
         Config config = configMapper.selectOne(new Config());
         if (config == null || StringUtils.isEmpty(config.getEmailAccount())) {
-            throw new FeignException("error.noticeSend.emailConfigNotSet");
+            throw new CommonException("error.noticeSend.emailConfigNotSet");
         }
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
-            throw new FeignException("error.noticeSend.codeNotFound");
+            throw new CommonException("error.noticeSend.codeNotFound");
         }
         if (sendSetting.getEmailTemplateId() == null) {
-            throw new FeignException("error.noticeSend.emailTemplateNotSet");
+            throw new CommonException("error.noticeSend.emailTemplateNotSet");
         }
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         if (template == null) {
-            throw new FeignException("error.noticeSend.emailTemplateNotSet");
+            throw new CommonException("error.noticeSend.emailTemplateNotSet");
         }
         JavaMailSender mailSender = createMailSender(config);
         sendEmail(config, dto, template, mailSender);
@@ -73,13 +73,13 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     public void testEmailConnect() {
         Config config = configMapper.selectOne(new Config());
         if (config == null || StringUtils.isEmpty(config.getEmailAccount())) {
-            throw new FeignException("error.noticeSend.emailConfigNotSet");
+            throw new CommonException("error.noticeSend.emailConfigNotSet");
         }
         JavaMailSenderImpl mailSender = createMailSender(config);
         try {
             mailSender.testConnection();
         } catch (MessagingException e) {
-            throw new FeignException("error.emailConfig.testConnectFailed");
+            throw new CommonException("error.emailConfig.testConnectFailed");
         }
     }
 
@@ -117,19 +117,19 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             helper.setText(renderStringTemplate(template, dto.getVariables()), true);
             mailSender.send(msg);
         } catch (Exception e) {
-            throw new FeignException("error.noticeSend.emailSendError", e);
+            throw new CommonException("error.noticeSend.emailSendError", e);
         }
 
     }
 
 
-    public final String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException{
+    public final String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException {
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(template.getCode());
         if (ft == null) {
             ft = freeMarkerConfigBuilder.addTemplate(template.getCode(), template.getEmailContent());
         }
         if (ft == null) {
-            throw new FeignException("error.noticeSend.emailParseError");
+            throw new CommonException("error.noticeSend.emailParseError");
         }
         return FreeMarkerTemplateUtils.processTemplateIntoString(ft, variables);
     }
