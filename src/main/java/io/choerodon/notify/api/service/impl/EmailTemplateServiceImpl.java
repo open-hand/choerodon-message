@@ -67,7 +67,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public EmailTemplateDTO create(EmailTemplateDTO dto) {
-        valid(dto.getCode());
+        valid(dto.getType());
         Template template = modelMapper.map(dto, Template.class);
         template.setMessageType(MessageType.EMAIL.getValue());
         template.setBusinessType(dto.getType());
