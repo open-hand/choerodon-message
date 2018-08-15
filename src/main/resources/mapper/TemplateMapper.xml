@@ -4,33 +4,38 @@
 
     <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.EmailTemplateQueryDTO">
         SELECT
-        id,
-        code,
-        name,
-        business_type AS type,
-        is_predefined AS isPredefined
-        FROM notify_template
-        WHERE message_type = 'email'
+        nt.id,
+        nt.code,
+        nt.name,
+        nss.name AS type,
+        nt.is_predefined AS isPredefined
+        FROM notify_template nt
+        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
+        WHERE nt.message_type = 'email'
+        AND nss.level = #{level}
+        <if test="type != null">
+            AND nss.name LIKE concat('%',#{type},'%')
+        </if>
         <if test="code != null">
-            AND code LIKE concat('%',#{code},'%')
+            AND nt.code LIKE concat('%',#{code},'%')
         </if>
 
         <if test="name != null">
-            AND name LIKE concat('%',#{name},'%')
+            AND nt.name LIKE concat('%',#{name},'%')
         </if>
         <if test="type != null">
-            AND business_type LIKE concat('%',#{type},'%')
+            AND nt.business_type LIKE concat('%',#{type},'%')
         </if>
         <if test="isPredefined != null">
-            AND is_predefined = #{isPredefined}
+            AND nt.is_predefined = #{isPredefined}
         </if>
 
         <if test="params != null">
             AND(
-            code LIKE concat('%',#{params},'%') OR
-            name LIKE concat('%',#{params},'%') OR
-            business_type LIKE concat('%',#{params},'%') OR
-            is_predefined = #{params}
+            nt.code LIKE concat('%',#{params},'%') OR
+            nt.name LIKE concat('%',#{params},'%') OR
+            nss.name  LIKE concat('%',#{params},'%') OR
+            nt.is_predefined = #{params}
             )
         </if>
     </select>

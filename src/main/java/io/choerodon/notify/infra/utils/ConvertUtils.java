@@ -1,7 +1,9 @@
 package io.choerodon.notify.infra.utils;
 
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.swagger.notify.EmailTemplateScanData;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
@@ -42,6 +44,10 @@ public class ConvertUtils {
         template.setBusinessType(scanData.getBusinessType());
         template.setEmailContent(scanData.getContent());
         return template;
+    }
+
+    public static BusinessTypeDTO convertBusinessTypeDTO(final SendSetting sendSetting) {
+        return new BusinessTypeDTO(sendSetting.getId(), sendSetting.getCode(), sendSetting.getName());
     }
 
 }
