@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.util.regex.Pattern;
 
 import static io.choerodon.notify.api.dto.EmailConfigDTO.EMAIL_REGULAR_EXPRESSION;
+import static io.choerodon.notify.domain.Config.EMAIL_PROTOCOL_SMTP;
 
 @RestController
 @RequestMapping("v1/notices/configs")
@@ -37,6 +38,12 @@ public class ConfigController {
     @ApiOperation(value = "创建邮箱配置")
     public ResponseEntity<EmailConfigDTO> createEmail(@RequestBody @Valid EmailConfigDTO config) {
         config.setObjectVersionNumber(null);
+        if (config.getSsl() == null) {
+            config.setSsl(false);
+        }
+        if (config.getProtocol() == null) {
+            config.setProtocol(EMAIL_PROTOCOL_SMTP);
+        }
         return new ResponseEntity<>(configService.create(config), HttpStatus.OK);
     }
 
@@ -50,6 +57,9 @@ public class ConfigController {
         if (configDTO.getObjectVersionNumber() == null) {
             throw new CommonException("error.emailConfig.objectVersionNumberNull");
         }
+        if (configDTO.getPort() == null) {
+            configDTO.setPort(25);
+        }
         return new ResponseEntity<>(configService.update(configDTO), HttpStatus.OK);
     }
 
@@ -60,11 +70,20 @@ public class ConfigController {
         return new ResponseEntity<>(configService.selectEmail(), HttpStatus.OK);
     }
 
-    @GetMapping("/email/test")
+    @PostMapping("/email/test")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "测试邮箱连接")
-    public void testEmailConnect() {
-        noticesSendService.testEmailConnect();
+    public void testEmailConnect(@RequestBody @Valid EmailConfigDTO config) {
+        if (config.getSsl() == null) {
+            config.setSsl(false);
+        }
+        if (config.getProtocol() == null) {
+            config.setProtocol(EMAIL_PROTOCOL_SMTP);
+        }
+        if (config.getPort() == null) {
+            config.setPort(25);
+        }
+        noticesSendService.testEmailConnect(config);
     }
 
 }
