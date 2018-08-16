@@ -96,3 +96,6 @@ choerodon:
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
     fetch-time: 5
     is-local: false
+logging:
+  level:
+   javax.mail: info

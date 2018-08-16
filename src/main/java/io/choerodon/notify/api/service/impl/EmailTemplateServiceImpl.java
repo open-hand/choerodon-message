@@ -23,6 +23,8 @@ import java.util.Set;
 @Service
 public class EmailTemplateServiceImpl implements EmailTemplateService {
 
+    private static final String ERROR_TEMPLATE_NOT_EXIST = "error.emailTemplate.notExist";
+
     private final TemplateMapper templateMapper;
 
     private final SendSettingMapper sendSettingMapper;
@@ -58,7 +60,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     public EmailTemplateDTO query(Long id) {
         Template template = templateMapper.selectByPrimaryKey(id);
         if (template == null) {
-            throw new CommonException("error.emailTemplate.notExist");
+            throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         EmailTemplateDTO dto = modelMapper.map(template, EmailTemplateDTO.class);
         dto.setType(template.getBusinessType());
@@ -81,6 +83,10 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public EmailTemplateDTO update(EmailTemplateDTO dto) {
+        Template dbTemplate = templateMapper.selectByPrimaryKey(dto.getId());
+        if (dbTemplate == null) {
+            throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
+        }
         if (dto.getType() != null) {
             valid(dto.getType());
         }
@@ -110,4 +116,21 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             throw new CommonException("error.emailTemplate.businessTypeNotExist");
         }
     }
+
+    @Override
+    public void delete(Long id) {
+        Template dbTemplate = templateMapper.selectByPrimaryKey(id);
+        if (dbTemplate == null) {
+            throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
+        }
+        if (dbTemplate.getIsPredefined() == null || dbTemplate.getIsPredefined()) {
+            throw new CommonException("error.emailTemplate.cannotDeletePredefined");
+        } else {
+            if (templateMapper.deleteByPrimaryKey(id) != 1) {
+                throw new CommonException("error.emailTemplate.delete");
+            }
+        }
+
+    }
+
 }

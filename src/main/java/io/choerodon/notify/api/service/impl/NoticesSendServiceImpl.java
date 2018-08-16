@@ -79,7 +79,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         try {
             mailSender.testConnection();
         } catch (MessagingException e) {
-            throw new CommonException("error.emailConfig.testConnectFailed");
+            throw new CommonException("error.emailConfig.testConnectFailed", e);
         }
     }
 
@@ -89,16 +89,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         mailSender.setPort(config.getEmailPort());
         mailSender.setUsername(config.getEmailAccount());
         mailSender.setPassword(config.getEmailPassword());
-        mailSender.setProtocol(config.getEmailProtocol());
+        mailSender.setProtocol(config.getEmailProtocol().toLowerCase());
         Properties properties = new Properties();
-        if (Config.EMAIL_PROTOCOL_SMTP.equals(config.getEmailProtocol()) && config.getEmailSsl()) {
+        if (Config.EMAIL_PROTOCOL_SMTP.equalsIgnoreCase(config.getEmailProtocol()) && config.getEmailSsl()) {
             properties.put(Config.EMAIL_SSL_SMTP, true);
-        }
-        if (Config.EMAIL_PROTOCOL_IMAP.equals(config.getEmailProtocol()) && config.getEmailSsl()) {
-            properties.put(Config.EMAIL_SSL_IMAP, true);
-        }
-        if (Config.EMAIL_PROTOCOL_POP3.equals(config.getEmailProtocol()) && config.getEmailSsl()) {
-            properties.put(Config.EMAIL_PROTOCOL_POP3, true);
         }
         mailSender.setJavaMailProperties(properties);
         return mailSender;
@@ -123,7 +117,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
 
-    public final String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException {
+    private String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException {
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(template.getCode());
         if (ft == null) {
             ft = freeMarkerConfigBuilder.addTemplate(template.getCode(), template.getEmailContent());

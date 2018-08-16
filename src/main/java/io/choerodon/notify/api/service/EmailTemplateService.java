@@ -23,4 +23,6 @@ public interface EmailTemplateService {
 
     void createByScan(Set<EmailTemplateScanData> set);
 
+    void delete(Long id);
+
 }

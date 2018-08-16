@@ -70,18 +70,6 @@ public class InitServiceImpl {
                 return Boolean.parseBoolean(ssl);
             }
         }
-        if (Config.EMAIL_PROTOCOL_POP3.equals(protocol)) {
-            String ssl = map.get(Config.EMAIL_SSL_POP3);
-            if (ssl != null) {
-                return Boolean.parseBoolean(ssl);
-            }
-        }
-        if (Config.EMAIL_PROTOCOL_IMAP.equals(protocol)) {
-            String ssl = map.get(Config.EMAIL_SSL_IMAP);
-            if (ssl != null) {
-                return Boolean.parseBoolean(ssl);
-            }
-        }
         return false;
     }
 

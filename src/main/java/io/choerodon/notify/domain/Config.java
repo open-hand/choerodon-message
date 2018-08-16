@@ -25,11 +25,7 @@ import javax.persistence.Table;
 public class Config extends AuditDomain {
 
     public static final String EMAIL_PROTOCOL_SMTP = "SMTP";
-    public static final String EMAIL_PROTOCOL_POP3 = "POP3";
-    public static final String EMAIL_PROTOCOL_IMAP = "IMAP";
     public static final String EMAIL_SSL_SMTP = "mail.smtp.ssl.enable";
-    public static final String EMAIL_SSL_POP3 = "mail.pop3.ssl.enable";
-    public static final String EMAIL_SSL_IMAP = "mail.imap.ssl.enable";
 
     @Id
     @GeneratedValue
