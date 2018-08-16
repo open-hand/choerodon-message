@@ -64,6 +64,14 @@ public class EmailTemplateSiteController {
         return new ResponseEntity<>(templateService.query(id), HttpStatus.OK);
     }
 
+    @GetMapping("/check")
+    @Permission(level = ResourceLevel.SITE)
+    @ApiOperation(value = "全局层检查编码")
+    public void check(@RequestParam("code") String code) {
+        templateService.check(code);
+    }
+
+
     @PostMapping
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层创建邮件模版")

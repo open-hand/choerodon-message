@@ -95,4 +95,13 @@ public class EmailTemplateOrgController {
                        @PathVariable Long id) {
         templateService.delete(id);
     }
+
+    @GetMapping("/check/organizations/{organization_id}")
+    @Permission(level = ResourceLevel.SITE)
+    @ApiOperation(value = "组织层检查编码")
+    public void check(@PathVariable("organization_id") long orgId,
+                      @RequestParam("code") String code) {
+        templateService.check(code);
+    }
+
 }
