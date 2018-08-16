@@ -14,6 +14,7 @@ import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -86,5 +87,13 @@ public class EmailTemplateOrgController {
             throw new CommonException("error.emailTemplate.objectVersionNumberNull");
         }
         return new ResponseEntity<>(templateService.update(template), HttpStatus.OK);
+    }
+
+    @Delete("/{id}/organizations/{organization_id}")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "组织层删除邮件模版")
+    public void delete(@PathVariable("organization_id") long orgId,
+                       @PathVariable Long id) {
+        templateService.delete(id);
     }
 }
