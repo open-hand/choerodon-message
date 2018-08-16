@@ -25,4 +25,6 @@ public interface EmailTemplateService {
 
     void delete(Long id);
 
+    void check(String code);
+
 }

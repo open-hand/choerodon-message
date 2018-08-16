@@ -130,7 +130,13 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 throw new CommonException("error.emailTemplate.delete");
             }
         }
-
     }
 
+    @Override
+    public void check(String code) {
+        Template dbTemplate = templateMapper.selectOne(new Template(code, MessageType.EMAIL.getValue()));
+        if (dbTemplate != null) {
+            throw new CommonException("error.emailTemplate.codeExist");
+        }
+    }
 }
