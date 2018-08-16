@@ -2,6 +2,7 @@ package io.choerodon.notify.api.service.impl;
 
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
@@ -10,6 +11,7 @@ import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -37,6 +39,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private static final String ENCODE_UTF8 = "utf-8";
 
     private final FreeMarkerConfigBuilder freeMarkerConfigBuilder;
+
+    private final ModelMapper modelMapper = new ModelMapper();
 
     public NoticesSendServiceImpl(SendSettingMapper sendSettingMapper,
                                   ConfigMapper configMapper,
@@ -70,11 +74,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public void testEmailConnect() {
-        Config config = configMapper.selectOne(new Config());
-        if (config == null || StringUtils.isEmpty(config.getEmailAccount())) {
-            throw new CommonException("error.noticeSend.emailConfigNotSet");
-        }
+    public void testEmailConnect(EmailConfigDTO dto) {
+        Config config = modelMapper.map(dto, Config.class);
         JavaMailSenderImpl mailSender = createMailSender(config);
         try {
             mailSender.testConnection();
