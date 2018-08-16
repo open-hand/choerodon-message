@@ -29,13 +29,13 @@ spring:
           brokers: 127.0.0.1:9092
           zkNodes: 127.0.0.1:2181
   mail:
-    username: fly_left@126.com
-    password: 123654789Zj
+    username: choerodon
+    password: choerodon
     protocol: smtp
-    host: smtp.126.com
-    port: 25
+    host: smtp.qiye.aliyun.com
+    port: 465
     properties:
-      mail.smtp.ssl.enable: false
+      mail.smtp.ssl.enable: true
       mail.send.name: choerodon
     test-connection: false
 eureka:
