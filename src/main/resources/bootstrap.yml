@@ -16,6 +16,9 @@ management:
   port: 18086
   security:
     enabled: false
+  health:
+    mail:
+      enabled: false
 security:
   basic:
     enabled: false

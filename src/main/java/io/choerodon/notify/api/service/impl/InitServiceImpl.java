@@ -76,8 +76,14 @@ public class InitServiceImpl {
     private void initBusinessType() {
         notifyProperties.getTypes().forEach((k, v) -> {
             try {
-                if (sendSettingMapper.selectOne(new SendSetting(k)) == null) {
-                    sendSettingMapper.insertSelective(new SendSetting(k, v.getName(), v.getDescription(), v.getLevel()));
+                SendSetting query = sendSettingMapper.selectOne(new SendSetting(k));
+                SendSetting setting = new SendSetting(k, v.getName(), v.getDescription(),
+                        v.getLevel(), v.getRetryCount(), v.getIsSendInstantly(), v.getIsManualRetry());
+                if (query == null) {
+                    sendSettingMapper.insertSelective(setting);
+                } else {
+                    setting.setId(query.getId());
+                    sendSettingMapper.updateByPrimaryKeySelective(setting);
                 }
             } catch (Exception e) {
                 log.warn("error.initService.initBusinessType {}", e);
