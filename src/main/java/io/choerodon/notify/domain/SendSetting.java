@@ -51,10 +51,15 @@ public class SendSetting extends AuditDomain {
         this.code = code;
     }
 
-    public SendSetting(String code, String name, String description, String level) {
+    public SendSetting(String code, String name, String description,
+                       String level, Integer retryCount,
+                       Boolean isSendInstantly, Boolean isManualRetry) {
         this.code = code;
         this.name = name;
         this.description = description;
         this.level = level;
+        this.retryCount = retryCount;
+        this.isSendInstantly = isSendInstantly;
+        this.isManualRetry = isManualRetry;
     }
 }

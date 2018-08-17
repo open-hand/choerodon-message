@@ -89,9 +89,11 @@ choerodon:
       add-members:
         name: 添加成员
         description: 项目添加新成员时，及时反馈给被添加的用户
+        level: organization
       modify-moemberRole:
         name: 用户角色变更
         description: 通知用户的角色权限发生变化
+        level: organization
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
     fetch-time: 5
