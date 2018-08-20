@@ -19,12 +19,8 @@
         <if test="code != null">
             AND nt.code LIKE concat('%',#{code},'%')
         </if>
-
         <if test="name != null">
             AND nt.name LIKE concat('%',#{name},'%')
-        </if>
-        <if test="type != null">
-            AND nt.business_type LIKE concat('%',#{type},'%')
         </if>
         <if test="isPredefined != null">
             AND nt.is_predefined = #{isPredefined}
@@ -34,8 +30,7 @@
             AND(
             nt.code LIKE concat('%',#{params},'%') OR
             nt.name LIKE concat('%',#{params},'%') OR
-            nss.name  LIKE concat('%',#{params},'%') OR
-            nt.is_predefined = #{params}
+            nss.name  LIKE concat('%',#{params},'%')
             )
         </if>
     </select>
