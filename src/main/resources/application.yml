@@ -71,25 +71,18 @@ mybatis:
 choerodon:
   notify:
     types:
-      verification-code:
-        name: 验证码
-        description: 用于获取验证码，验证用户信息
-      user-binding:
-        name: 用户绑定
-        description: 绑定邮箱、手机号的反馈信息
-      user-activation:
-        name: 用户激活
-        description: 首次注册，确认用户注册成功
-      get-password:
-        name: 获取密码
-        description: 忘记密码后，根据用户操作提供用户名及相应密码
-      modify-password:
-        name: 密码修改
-        description: 反馈用户密码修改成功
-      add-members:
-        name: 添加成员
-        description: 项目添加新成员时，及时反馈给被添加的用户
-        level: organization
+      forgetpassword:
+        name: 忘记密码
+        description: 用户触发忘记密码，发送验证邮件。(LDAP用户不允许重置密码)
+      adduser:
+        name: 添加/导入新用户
+        description: 管理员添加或导入新用户时，新用户收到自己的账户信息
+      addfunction:
+        name: 添加新功能
+        description: 系统添加新功能时，给用户发送新功能的介绍和操作指南
+      modifypassword:
+        name: 修改密码
+        description: 用户在平台修改密码后反馈密码修改成功的通知，确认是否是用户的操作
       modify-moemberRole:
         name: 用户角色变更
         description: 通知用户的角色权限发生变化
