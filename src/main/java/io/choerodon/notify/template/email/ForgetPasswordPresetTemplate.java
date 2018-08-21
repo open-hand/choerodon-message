@@ -4,31 +4,31 @@ import io.choerodon.swagger.notify.EmailTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VerificationCodeTemplate implements EmailTemplate {
+public class ForgetPasswordPresetTemplate implements EmailTemplate {
 
     @Override
     public String businessTypeCode() {
-        return "verification-code";
+        return "忘记密码";
     }
 
     @Override
     public String code() {
-        return "verification-code-template";
+        return "forgetPassword-preset";
     }
 
     @Override
     public String name() {
-        return "notify验证码";
+        return "忘记密码";
     }
 
     @Override
     public String title() {
-        return "notify验证码";
+        return "验证邮件";
     }
 
     @Override
     public String content() {
-        return "<p>您收到的验证码为：${code}</p>";
+        return "classpath://template/forgetPasswordPreset.html";
     }
 
 }
