@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.RecordMapper">
+
+    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.RecordListDTO">
+    SELECT
+    status,
+    receive_account AS email,
+    template_type,
+    failed_reason,
+    creation_date
+    FROM notify_record
+    WHERE 1 = 1
+    <if test="status != null">
+        AND status LIKE concat('%',#{status},'%')
+    </if>
+    <if test="email != null">
+        AND receive_account LIKE concat('%',#{email},'%')
+    </if>
+    <if test="type != null">
+        AND template_type LIKE concat('%',#{type},'%')
+    </if>
+    <if test="reason != null">
+        AND failed_reason LIKE concat('%',#{reason},'%')
+    </if>
+    <if test="params != null">
+        AND(
+        status LIKE concat('%',#{params},'%') OR
+        receive_account LIKE concat('%',#{params},'%') OR
+        template_type  LIKE concat('%',#{params},'%') OR
+        failed_reason  LIKE concat('%',#{params},'%')
+        )
+    </if>
+    </select>
+
+    <update id="updateRecordStatus">
+        UPDATE notify_record
+        SET object_version_number = object_version_number + 1,
+        status = #{status}
+        <if test="reason != null">
+            , failed_reason = #{reason}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

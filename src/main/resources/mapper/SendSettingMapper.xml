@@ -47,8 +47,11 @@
         nts.is_send_instantly,
         nts.is_manual_retry,
         nts.object_version_number,
+        ntemail.id AS email_template_id,
         ntemail.code AS email_template_code,
+        ntsms.id AS sms_template_id,
         ntsms.code AS sms_template_code,
+        ntpm.id AS pm_template_id,
         ntpm.code AS pm_template_code
         FROM notify_send_setting nts
         LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id

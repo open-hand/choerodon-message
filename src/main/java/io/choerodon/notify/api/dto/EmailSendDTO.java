@@ -1,10 +1,14 @@
 package io.choerodon.notify.api.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class EmailSendDTO {
 
     private String code;

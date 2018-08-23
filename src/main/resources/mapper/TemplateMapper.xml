@@ -45,4 +45,14 @@
         LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
         WHERE nss.level = #{level}
     </select>
+
+
+    <select id="selectLevelByCode" resultType="java.lang.String">
+        SELECT
+        nss.level
+        FROM notify_template nt
+        INNER JOIN notify_send_setting nss on nss.code =  nt.business_type
+        WHERE nt.code = #{code}
+    </select>
+
 </mapper>

@@ -18,15 +18,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: 'is_predefined', type: 'TINYINT(1)', remarks: '是否为预定义') {
                 constraints(nullable: false)
             }
-
             column(name: 'business_type', type: 'VARCHAR(64)', remarks: '模版业务类型') {
                 constraints(nullable: false)
             }
-
             column(name: 'email_title', type: 'VARCHAR(64)', remarks: 'email模版标题')
-
             column(name: 'email_content', type: 'TEXT', remarks: 'email模版内容')
-
             column(name: 'sms_content', type: 'TEXT', remarks: '短信模版内容')
 
             column(name: "object_version_number", type: "BIGINT UNSIGNED", defaultValue: "1")

@@ -34,8 +34,7 @@ public class NoticesSendController {
         if (StringUtils.isEmpty(dto.getDestinationEmail())) {
             throw new FeignException("error.noticeSend.emailEmpty");
         }
-        noticesSendService.postEmail(dto);
+        noticesSendService.createMailSenderAndSendEmail(dto);
     }
-
 
 }

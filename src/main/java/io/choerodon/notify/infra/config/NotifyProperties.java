@@ -27,6 +27,8 @@ public class NotifyProperties {
 
     private Boolean isLocal = false;
 
+    private Integer asynSendNoticesThreadNum = 5;
+
     private Map<String, BusinessType> types = new LinkedHashMap<>();
 
     @Getter

@@ -15,9 +15,15 @@ public class SendSettingDetailDTO {
 
     private String emailTemplateCode;
 
+    private Long emailTemplateId;
+
     private String smsTemplateCode;
 
+    private Long smsTemplateId;
+
     private String pmTemplateCode;
+
+    private Long pmTemplateId;
 
     private String level;
 

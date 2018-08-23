@@ -16,9 +16,13 @@ import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.EmailTemplateScanData;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Set;
+
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
 
 @Service
 public class EmailTemplateServiceImpl implements EmailTemplateService {
@@ -134,9 +138,15 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public void check(String code) {
-        Template dbTemplate = templateMapper.selectOne(new Template(code, MessageType.EMAIL.getValue()));
-        if (dbTemplate != null) {
-            throw new CommonException("error.emailTemplate.codeExist");
+        String level = templateMapper.selectLevelByCode(code);
+        if (StringUtils.isEmpty(level)) {
+            return;
+        }
+        if (LEVEL_SITE.equals(level)) {
+            throw new CommonException("error.emailTemplate.codeSiteExist");
+        }
+        if (LEVEL_ORG.equals(level)) {
+            throw new CommonException("error.emailTemplate.codeOrgExist");
         }
     }
 }

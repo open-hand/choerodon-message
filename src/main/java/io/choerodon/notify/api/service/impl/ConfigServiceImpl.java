@@ -4,6 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.service.ConfigService;
 import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,11 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public ConfigServiceImpl(ConfigMapper configMapper) {
+    private final ConfigCache configCache;
+
+    public ConfigServiceImpl(ConfigMapper configMapper, ConfigCache configCache) {
         this.configMapper = configMapper;
+        this.configCache = configCache;
     }
 
     @Override
@@ -36,6 +40,7 @@ public class ConfigServiceImpl implements ConfigService {
         } else {
             throw new CommonException("error.emailConfig.exist");
         }
+        configCache.refreshConfig();
         return modelMapper.map(configMapper.selectByPrimaryKey(dtoConfig.getId()), EmailConfigDTO.class);
     }
 
@@ -48,6 +53,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
         dtoConfig.setId(dbConfig.getId());
         configMapper.updateByPrimaryKeySelective(dtoConfig);
+        configCache.refreshConfig();
         return modelMapper.map(configMapper.selectByPrimaryKey(dtoConfig.getId()), EmailConfigDTO.class);
     }
 
