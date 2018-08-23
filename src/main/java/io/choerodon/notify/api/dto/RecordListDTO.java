@@ -9,6 +9,7 @@ import java.util.Date;
 @Setter
 public class RecordListDTO {
 
+    private Long id;
     private String status;
     private String email;
     private String templateType;

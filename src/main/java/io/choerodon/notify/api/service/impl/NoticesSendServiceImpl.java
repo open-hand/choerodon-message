@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
@@ -12,6 +13,7 @@ import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
+import io.choerodon.notify.infra.utils.ConvertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,6 +52,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final RecordMapper recordMapper;
 
     private final EmailQueueObservable emailQueueObservable;
@@ -83,21 +87,23 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         if (template == null) {
-            throw new CommonException("error.noticeSend.emailTemplateNotSet");
+            throw new CommonException("error.emailTemplate.notExist");
         }
         final Config config = configCache.getEmailConfig();
         Record record = new Record(sendSetting, MessageType.EMAIL.getValue());
         record.setReceiveAccount(dto.getDestinationEmail());
         record.setTemplateType(template.getBusinessType());
+        record.setTemplateId(template.getId());
         record.setTemplate(template);
-        record.setVariables(dto.getVariables());
+        record.setVariablesMap(dto.getVariables());
         record.setConfig(config);
-        record.setMailSender(createMailSender(config));
+        record.setVariables(ConvertUtils.convertMapToJson(objectMapper, dto.getVariables()));
+        record.setMailSender(createEmailSender(config));
         if (recordMapper.insert(record) != 1) {
             throw new CommonException("error.noticeSend.recordInsert");
         }
         if (sendSetting.getIsSendInstantly()) {
-            sendEmail(record);
+            sendEmail(record, true);
         } else {
             emailQueueObservable.emit(record);
         }
@@ -106,7 +112,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     @Override
     public void testEmailConnect(EmailConfigDTO dto) {
         Config config = modelMapper.map(dto, Config.class);
-        JavaMailSenderImpl mailSender = createMailSender(config);
+        JavaMailSenderImpl mailSender = createEmailSender(config);
         try {
             mailSender.testConnection();
         } catch (MessagingException e) {
@@ -115,20 +121,20 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public void sendEmail(final Record record) {
+    public void sendEmail(final Record record, boolean retry) {
         try {
             doSendAndUpdateRecord(record);
         } catch (EmailSendException e) {
             recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
                     e.getError().getReason());
-            if (record.getMaxRetryCount() > 0) {
+            if (retry && record.getMaxRetryCount() > 0) {
                 retrySend(record);
             }
             throw new CommonException("error.noticeSend.email", e);
         } catch (Exception e) {
             recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
                     EmailSendError.UNKNOWN_ERROR.getReason());
-            if (record.getMaxRetryCount() > 0) {
+            if (retry && record.getMaxRetryCount() > 0) {
                 retrySend(record);
             }
             throw new CommonException("error.noticeSend.email", e);
@@ -171,7 +177,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                     + "\"<" + record.getConfig().getEmailAccount() + ">"));
             helper.setTo(record.getReceiveAccount());
             helper.setSubject(MimeUtility.encodeText(record.getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
-            helper.setText(renderStringTemplate(record.getTemplate(), record.getVariables()), true);
+            helper.setText(renderStringTemplate(record.getTemplate(), record.getVariablesMap()), true);
             mailSender.send(msg);
             recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.COMPLETE.getValue(), null);
         } catch (MailAuthenticationException e) {
@@ -190,7 +196,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
     }
 
-    private JavaMailSenderImpl createMailSender(final Config config) {
+    @Override
+    public JavaMailSenderImpl createEmailSender(final Config config) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(config.getEmailHost());
         mailSender.setPort(config.getEmailPort());

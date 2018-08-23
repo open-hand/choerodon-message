@@ -15,10 +15,14 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-record.groovy') {
             column(name: 'template_type', type: 'VARCHAR(32)', remarks: '模版类型') {
                 constraints(nullable: false)
             }
+            column(name: 'template_id', type: 'BIGINT UNSIGNED', remarks: '模版id') {
+                constraints(nullable: false)
+            }
+            column(name: 'variables', type: 'TEXT', remarks: '发送邮件的参数(map形式)')
             column(name: 'level', type: 'VARCHAR(16)', remarks: '所属层级') {
                 constraints(nullable: false)
             }
-            column(name: 'failed_reason', type: 'VARCHAR(32)', remarks: '失败原因')
+            column(name: 'failed_reason', type: 'VARCHAR(64)', remarks: '失败原因')
             column(name: 'message_type', type: 'VARCHAR(16)', remarks: '消息类型:email,sms') {
                 constraints(nullable: false)
             }

@@ -11,4 +11,6 @@ public interface MessageRecordService {
                                   String failedReason, String params,
                                   String level);
 
+    void manualRetrySendEmail(long recordId);
+
 }

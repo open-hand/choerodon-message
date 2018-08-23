@@ -28,7 +28,7 @@ public class MessageRecordOrgController {
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @GetMapping("/email/organizations/{organization_id}")
+    @GetMapping("/emails/organizations/{organization_id}")
     @ApiOperation(value = "组织层分页查询邮件消息记录")
     @CustomPageRequest
     public ResponseEntity<Page<RecordListDTO>> pageEmail(@PathVariable("organization_id") long id,
@@ -41,5 +41,15 @@ public class MessageRecordOrgController {
         return new ResponseEntity<>(messageRecordService.pageEmail(pageRequest, status, receiveEmail,
                 templateType, failedReason, params, LEVEL_ORG), HttpStatus.OK);
     }
+
+
+    @Permission(level = ResourceLevel.SITE)
+    @GetMapping("/emails/{id}/retry/organizations/{organization_id}")
+    @ApiOperation(value = "组织层重试发送邮件")
+    public void manualRetrySendEmail(@PathVariable long id,
+                                     @PathVariable("organization_id") long orgId) {
+        messageRecordService.manualRetrySendEmail(id);
+    }
+
 
 }

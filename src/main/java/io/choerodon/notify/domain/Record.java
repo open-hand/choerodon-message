@@ -28,16 +28,18 @@ public class Record extends AuditDomain {
     private String status;
     private String receiveAccount;
     private String templateType;
+    private Long templateId;
     private String failedReason;
     private String messageType;
     private Integer maxRetryCount;
     private Boolean isManualRetry;
     private String level;
+    private String variables;
 
     @Transient
     private Template template;
     @Transient
-    private Map<String, Object> variables;
+    private Map<String, Object> variablesMap;
     @Transient
     private JavaMailSenderImpl mailSender;
     @Transient

@@ -12,10 +12,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
@@ -32,7 +29,7 @@ public class MessageRecordSiteController {
 
 
     @Permission(level = ResourceLevel.SITE)
-    @GetMapping("/email")
+    @GetMapping("/emails")
     @ApiOperation(value = "全局层分页查询邮件消息记录")
     @CustomPageRequest
     public ResponseEntity<Page<RecordListDTO>> pageEmail(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
@@ -43,6 +40,13 @@ public class MessageRecordSiteController {
                                                          @RequestParam(required = false) String params) {
         return new ResponseEntity<>(messageRecordService.pageEmail(pageRequest, status, receiveEmail,
                 templateType, failedReason, params, LEVEL_SITE), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.SITE)
+    @GetMapping("/emails/{id}/retry")
+    @ApiOperation(value = "全局层重试发送邮件")
+    public void manualRetrySendEmail(@PathVariable long id) {
+        messageRecordService.manualRetrySendEmail(id);
     }
 
 }
