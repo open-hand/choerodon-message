@@ -124,14 +124,14 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             if (record.getMaxRetryCount() > 0) {
                 retrySend(record);
             }
-            throw new CommonException("error.noticeSend.email");
+            throw new CommonException("error.noticeSend.email", e);
         } catch (Exception e) {
             recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
                     EmailSendError.UNKNOWN_ERROR.getReason());
             if (record.getMaxRetryCount() > 0) {
                 retrySend(record);
             }
-            throw new CommonException("error.noticeSend.email");
+            throw new CommonException("error.noticeSend.email", e);
         }
 
     }

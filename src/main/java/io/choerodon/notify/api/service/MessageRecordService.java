@@ -8,6 +8,7 @@ public interface MessageRecordService {
 
     Page<RecordListDTO> pageEmail(PageRequest pageRequest, String status,
                                   String receiveEmail, String templateType,
-                                  String failedReason, String params);
+                                  String failedReason, String params,
+                                  String level);
 
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -49,7 +48,6 @@ public class InitServiceImpl {
         Config dbConfig = configMapper.selectOne(new Config());
         if (ValidatorUtils.valid(mailProperties)) {
             Config saveConfig = ConvertUtils.mailProperties2Config(mailProperties);
-            saveConfig.setEmailSsl(getSslEnabled(mailProperties));
             if (dbConfig == null) {
                 configMapper.insertSelective(saveConfig);
             } else if (StringUtils.isEmpty(dbConfig.getEmailAccount())) {
@@ -58,19 +56,6 @@ public class InitServiceImpl {
                 configMapper.updateByPrimaryKeySelective(saveConfig);
             }
         }
-    }
-
-    private boolean getSslEnabled(final MailProperties mailProperties) {
-        String protocol = mailProperties.getProtocol();
-        Map<String, String> map = mailProperties.getProperties();
-
-        if (Config.EMAIL_PROTOCOL_SMTP.equals(protocol)) {
-            String ssl = map.get(Config.EMAIL_SSL_SMTP);
-            if (ssl != null) {
-                return Boolean.parseBoolean(ssl);
-            }
-        }
-        return false;
     }
 
     private void initBusinessType() {

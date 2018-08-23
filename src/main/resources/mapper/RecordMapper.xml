@@ -10,7 +10,7 @@
     failed_reason,
     creation_date
     FROM notify_record
-    WHERE 1 = 1
+    WHERE level = #{level}
     <if test="status != null">
         AND status LIKE concat('%',#{status},'%')
     </if>

@@ -32,6 +32,7 @@ public class Record extends AuditDomain {
     private String messageType;
     private Integer maxRetryCount;
     private Boolean isManualRetry;
+    private String level;
 
     @Transient
     private Template template;
@@ -62,6 +63,7 @@ public class Record extends AuditDomain {
         this.maxRetryCount = setting.getRetryCount();
         this.isManualRetry = setting.getIsManualRetry();
         this.messageType = type;
+        this.level = setting.getLevel();
     }
 
     @Override

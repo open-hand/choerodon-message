@@ -20,8 +20,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     @Override
     public Page<RecordListDTO> pageEmail(PageRequest pageRequest, String status,
                                          String receiveEmail, String templateType,
-                                         String failedReason, String params) {
+                                         String failedReason, String params, String level) {
         return PageHelper.doPageAndSort(pageRequest, () ->
-                recordMapper.fulltextSearchEmail(status, receiveEmail, templateType, failedReason, params));
+                recordMapper.fulltextSearchEmail(status, receiveEmail, templateType, failedReason, params, level));
     }
 }
