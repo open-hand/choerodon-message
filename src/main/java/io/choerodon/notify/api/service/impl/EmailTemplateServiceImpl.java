@@ -95,7 +95,9 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             valid(dto.getType());
         }
         Template template = modelMapper.map(dto, Template.class);
-        templateMapper.updateByPrimaryKeySelective(template);
+        if ( templateMapper.updateByPrimaryKeySelective(template) != 1) {
+            throw new CommonException("error.emailTemplate.update");
+        }
         EmailTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), EmailTemplateDTO.class);
         returnDto.setType(template.getBusinessType());
         return returnDto;

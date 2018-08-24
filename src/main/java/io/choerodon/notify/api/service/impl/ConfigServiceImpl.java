@@ -52,7 +52,9 @@ public class ConfigServiceImpl implements ConfigService {
             throw new CommonException("error.emailConfig.notExist");
         }
         dtoConfig.setId(dbConfig.getId());
-        configMapper.updateByPrimaryKeySelective(dtoConfig);
+        if (configMapper.updateByPrimaryKeySelective(dtoConfig) != 1){
+           throw new CommonException("error.emailConfig.update");
+        }
         configCache.refreshConfig();
         return modelMapper.map(configMapper.selectByPrimaryKey(dtoConfig.getId()), EmailConfigDTO.class);
     }

@@ -60,7 +60,9 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (updateDTO.getIsSendInstantly() != null) {
             db.setIsSendInstantly(updateDTO.getIsSendInstantly());
         }
-        sendSettingMapper.updateByPrimaryKey(db);
+        if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
+            throw new CommonException("error.sendSetting.update");
+        }
         return sendSettingMapper.selectByPrimaryKey(db.getId());
     }
 

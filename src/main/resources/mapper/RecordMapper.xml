@@ -37,10 +37,7 @@
     <update id="updateRecordStatus">
         UPDATE notify_record
         SET object_version_number = object_version_number + 1,
-        status = #{status}
-        <if test="reason != null">
-            , failed_reason = #{reason}
-        </if>
+        status = #{status}, failed_reason = #{reason}
         WHERE id = #{id}
     </update>
 
