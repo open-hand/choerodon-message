@@ -25,7 +25,7 @@ public class EmailQueueObservable extends Observable<Record> {
         });
     }
 
-    public void emit(Record value) {
+    void emit(Record value) {
         if (publishSubject.hasObservers()) {
             publishSubject.onNext(value);
         } else {

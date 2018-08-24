@@ -8,7 +8,7 @@ public class ForgetPasswordPresetTemplate implements EmailTemplate {
 
     @Override
     public String businessTypeCode() {
-        return "忘记密码";
+        return "forgetPassword";
     }
 
     @Override

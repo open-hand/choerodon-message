@@ -12,7 +12,6 @@ import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 public class SendSettingServiceImpl implements SendSettingService {
 
     private SendSettingMapper sendSettingMapper;
-
-    private final ModelMapper modelMapper = new ModelMapper();
 
     public SendSettingServiceImpl(SendSettingMapper sendSettingMapper) {
         this.sendSettingMapper = sendSettingMapper;
@@ -50,9 +47,21 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (db == null) {
             throw new CommonException("error.sendSetting.notExist");
         }
-        SendSetting dto = modelMapper.map(updateDTO, SendSetting.class);
-        sendSettingMapper.updateByPrimaryKeySelective(dto);
-        return sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
+        db.setObjectVersionNumber(updateDTO.getObjectVersionNumber());
+        db.setEmailTemplateId(updateDTO.getEmailTemplateId());
+        db.setSmsTemplateId(updateDTO.getSmsTemplateId());
+        db.setPmTemplateId(updateDTO.getPmTemplateId());
+        if (updateDTO.getRetryCount() != null) {
+            db.setRetryCount(updateDTO.getRetryCount());
+        }
+        if (updateDTO.getIsManualRetry() != null) {
+            db.setIsManualRetry(updateDTO.getIsManualRetry());
+        }
+        if (updateDTO.getIsSendInstantly() != null) {
+            db.setIsSendInstantly(updateDTO.getIsSendInstantly());
+        }
+        sendSettingMapper.updateByPrimaryKey(db);
+        return sendSettingMapper.selectByPrimaryKey(db.getId());
     }
 
     @Override
