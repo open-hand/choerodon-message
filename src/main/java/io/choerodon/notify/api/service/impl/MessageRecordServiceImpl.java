@@ -52,6 +52,9 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         if (record == null) {
             throw new CommonException("error.record.notExist");
         }
+        if (!record.getIsManualRetry()) {
+            throw new CommonException("error.record.notAllowedRetry");
+        }
         if (!Record.RecordStatus.FAILED.getValue().equals(record.getStatus())) {
             throw new CommonException("error.record.retryNotFailed");
         }
