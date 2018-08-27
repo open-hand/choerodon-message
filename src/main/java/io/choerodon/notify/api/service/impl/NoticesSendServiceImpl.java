@@ -6,16 +6,19 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.exception.EmailSendException;
-import io.choerodon.notify.api.pojo.EmailSendError;
+import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.notify.domain.*;
+import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.domain.Record;
+import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
@@ -37,8 +40,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Slf4j
 public class NoticesSendServiceImpl implements NoticesSendService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendService.class);
 
     private final SendSettingMapper sendSettingMapper;
 
@@ -49,8 +53,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private static final String ENCODE_UTF8 = "utf-8";
 
     private final FreeMarkerConfigBuilder freeMarkerConfigBuilder;
-
-    private final ModelMapper modelMapper = new ModelMapper();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -89,21 +91,19 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         if (template == null) {
             throw new CommonException("error.emailTemplate.notExist");
         }
-        final Config config = configCache.getEmailConfig();
-        Record record = new Record(sendSetting, MessageType.EMAIL.getValue());
+        Record record = new Record();
+        record.setStatus(null);
+        record.setMessageType(MessageType.EMAIL.getValue());
         record.setReceiveAccount(dto.getDestinationEmail());
-        record.setTemplateType(template.getBusinessType());
-        record.setTemplateId(template.getId());
-        record.setTemplate(template);
-        record.setVariablesMap(dto.getVariables());
-        record.setConfig(config);
+        record.setBusinessType(dto.getCode());
         record.setVariables(ConvertUtils.convertMapToJson(objectMapper, dto.getVariables()));
-        record.setMailSender(createEmailSender(config));
+        record.setSendData(new RecordSendData(template, dto.getVariables(),
+                createEmailSender(), sendSetting.getRetryCount()));
         if (recordMapper.insert(record) != 1) {
             throw new CommonException("error.noticeSend.recordInsert");
         }
         if (sendSetting.getIsSendInstantly()) {
-            sendEmail(record, true);
+            sendEmail(record, false);
         } else {
             emailQueueObservable.emit(record);
         }
@@ -111,8 +111,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void testEmailConnect(EmailConfigDTO dto) {
-        Config config = modelMapper.map(dto, Config.class);
-        JavaMailSenderImpl mailSender = createEmailSender(config);
+        JavaMailSenderImpl mailSender = createEmailSender();
         try {
             mailSender.testConnection();
         } catch (MessagingException e) {
@@ -121,44 +120,48 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public void sendEmail(final Record record, boolean retry) {
+    public void sendEmail(final Record record, final boolean isManualRetry) {
         try {
-            doSendAndUpdateRecord(record);
+            doSendAndUpdateRecord(record, isManualRetry);
         } catch (EmailSendException e) {
-            recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
-                    e.getError().getReason());
-            if (retry && record.getMaxRetryCount() > 0) {
-                retrySend(record);
-            }
-            throw new CommonException("error.noticeSend.email", e);
+            sendFailedHandler(record, isManualRetry, e.getError().getReason(), e);
         } catch (Exception e) {
-            recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
-                    EmailSendError.UNKNOWN_ERROR.getReason());
-            if (retry && record.getMaxRetryCount() > 0) {
+            sendFailedHandler(record, isManualRetry, EmailSendError.UNKNOWN_ERROR.getReason(), e);
+        }
+    }
+
+    private void sendFailedHandler(final Record record, final boolean isManualRetry,
+                                   final String reason, final Exception e) {
+        String retryStatus = null;
+        if (isManualRetry) {
+            retryStatus = RecordRetryStatus.MANUAL_RETRY_FAILED.getValue();
+        } else {
+            if (record.getSendData().getMaxRetryCount() > 0) {
                 retrySend(record);
             }
-            throw new CommonException("error.noticeSend.email", e);
         }
-
+        recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
+                reason, retryStatus);
+        throw new CommonException("error.noticeSend.email", e);
     }
 
     private void retrySend(final Record record) {
         Observable.just(record)
                 .map(t -> {
-                    doSendAndUpdateRecord(record);
+                    doSendAndUpdateRecord(record, false);
                     return t;
                 })
-                .retryWhen(x -> x.zipWith(Observable.range(1, record.getMaxRetryCount()),
+                .retryWhen(x -> x.zipWith(Observable.range(1, record.getSendData().getMaxRetryCount()),
                         (e, retryCount) -> {
-                            log.info("retry send email, retryCount {}, Record {}", retryCount, record);
-                            if (retryCount >= record.getMaxRetryCount()) {
-                                log.warn("error.emailSend.retrySendError {}", e.toString());
+                            LOGGER.info("retry send email, retryCount {}, Record {}", retryCount, record);
+                            if (retryCount >= record.getSendData().getMaxRetryCount()) {
+                                LOGGER.warn("error.emailSend.retrySendError {}", e);
                                 if (e instanceof EmailSendException) {
-                                    recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
-                                            ((EmailSendException) e).getError().getReason());
+                                    recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
+                                            ((EmailSendException) e).getError().getReason(), null);
                                 } else {
-                                    recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.FAILED.getValue(),
-                                            EmailSendError.UNKNOWN_ERROR.getReason());
+                                    recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
+                                            EmailSendError.UNKNOWN_ERROR.getReason(), null);
                                 }
                             }
                             return retryCount;
@@ -168,18 +171,22 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 });
     }
 
-    private void doSendAndUpdateRecord(final Record record) {
+    private void doSendAndUpdateRecord(final Record record, final boolean isManualRetry) {
         try {
-            final JavaMailSenderImpl mailSender = record.getMailSender();
+            final JavaMailSenderImpl mailSender = record.getSendData().getMailSender();
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, ENCODE_UTF8);
-            helper.setFrom(new InternetAddress("\"" + MimeUtility.encodeText(record.getConfig().getEmailSendName())
-                    + "\"<" + record.getConfig().getEmailAccount() + ">"));
+            helper.setFrom(new InternetAddress("\"" + MimeUtility.encodeText(configCache.getEmailConfig().getEmailSendName())
+                    + "\"<" + configCache.getEmailConfig().getEmailAccount() + ">"));
             helper.setTo(record.getReceiveAccount());
-            helper.setSubject(MimeUtility.encodeText(record.getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
-            helper.setText(renderStringTemplate(record.getTemplate(), record.getVariablesMap()), true);
+            helper.setSubject(MimeUtility.encodeText(record.getSendData().getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
+            helper.setText(renderStringTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables()), true);
             mailSender.send(msg);
-            recordMapper.updateRecordStatus(record.getId(), Record.RecordStatus.COMPLETE.getValue(), null);
+            String retryStatus = null;
+            if (isManualRetry) {
+                retryStatus = RecordRetryStatus.MANUAL_RETRY_SUCCESS.getValue();
+            }
+            recordMapper.updateRecordStatus(record.getId(), RecordStatus.COMPLETE.getValue(), null, retryStatus);
         } catch (MailAuthenticationException e) {
             throw new EmailSendException(e, EmailSendError.AUTH_ERROR);
         } catch (MessagingException e) {
@@ -197,7 +204,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public JavaMailSenderImpl createEmailSender(final Config config) {
+    public JavaMailSenderImpl createEmailSender() {
+        final Config config = configCache.getEmailConfig();
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(config.getEmailHost());
         mailSender.setPort(config.getEmailPort());
@@ -216,7 +224,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         return mailSender;
     }
 
-    private String renderStringTemplate(final Template template, final Map<String, Object> variables) throws IOException, TemplateException {
+    private String renderStringTemplate(final Template template, final Map<String, Object> variables)
+            throws IOException, TemplateException {
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(template.getCode());
         if (ft == null) {
             ft = freeMarkerConfigBuilder.addTemplate(template.getCode(), template.getEmailContent());

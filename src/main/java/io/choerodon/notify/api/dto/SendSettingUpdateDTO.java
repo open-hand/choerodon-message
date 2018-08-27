@@ -1,10 +1,7 @@
 package io.choerodon.notify.api.dto;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 
-@Data
 public class SendSettingUpdateDTO {
 
     private Long id;
@@ -24,4 +21,67 @@ public class SendSettingUpdateDTO {
     @NotNull(message = "error.sendSetting.objectVersionNumberNull")
     private Long objectVersionNumber;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getEmailTemplateId() {
+        return emailTemplateId;
+    }
+
+    public void setEmailTemplateId(Long emailTemplateId) {
+        this.emailTemplateId = emailTemplateId;
+    }
+
+    public Long getSmsTemplateId() {
+        return smsTemplateId;
+    }
+
+    public void setSmsTemplateId(Long smsTemplateId) {
+        this.smsTemplateId = smsTemplateId;
+    }
+
+    public Long getPmTemplateId() {
+        return pmTemplateId;
+    }
+
+    public void setPmTemplateId(Long pmTemplateId) {
+        this.pmTemplateId = pmTemplateId;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
+    }
+
+    public Boolean getIsSendInstantly() {
+        return isSendInstantly;
+    }
+
+    public void setIsSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+    }
+
+    public Boolean getIsManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setIsManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+    }
 }

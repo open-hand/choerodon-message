@@ -7,7 +7,7 @@ import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.EmailTemplateQueryDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
-import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -56,8 +56,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public List<TemplateNamesDTO> listNames(final String level) {
-        return templateMapper.selectNamesByLevel(level);
+    public List<TemplateNamesDTO> listNames(final String level, final String businessType) {
+        return templateMapper.selectNamesByLevelAndType(level, businessType);
     }
 
     @Override

@@ -89,7 +89,7 @@ public class RegisterInstanceListener {
 
     private Set<EmailTemplateScanData> fetchEmailTemplate(final RegisterInstancePayloadDTO payload) {
         String address = payload.getInstanceAddress();
-        if (notifyProperties.getIsLocal()) {
+        if (notifyProperties.getLocal()) {
             address = "127.0.0.1:" + address.split(":")[1];
         }
         ResponseEntity<String> response = restTemplate.getForEntity("http://"

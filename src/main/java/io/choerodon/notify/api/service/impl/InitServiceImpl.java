@@ -7,7 +7,8 @@ import io.choerodon.notify.infra.mapper.ConfigMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.notify.infra.utils.ValidatorUtils;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,8 +16,9 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 
 @Service
-@Slf4j
 public class InitServiceImpl {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitServiceImpl.class);
 
     private final ConfigMapper configMapper;
 
@@ -63,7 +65,7 @@ public class InitServiceImpl {
             try {
                 SendSetting query = sendSettingMapper.selectOne(new SendSetting(k));
                 SendSetting setting = new SendSetting(k, v.getName(), v.getDescription(),
-                        v.getLevel(), v.getRetryCount(), v.getIsSendInstantly(), v.getIsManualRetry());
+                        v.getLevel(), v.getRetryCount(), v.getSendInstantly(), v.getManualRetry());
                 if (query == null) {
                     sendSettingMapper.insertSelective(setting);
                 } else {
@@ -71,7 +73,7 @@ public class InitServiceImpl {
                     sendSettingMapper.updateByPrimaryKeySelective(setting);
                 }
             } catch (Exception e) {
-                log.warn("error.initService.initBusinessType {}", e);
+                LOGGER.warn("error.initService.initBusinessType {}", e);
             }
         });
     }

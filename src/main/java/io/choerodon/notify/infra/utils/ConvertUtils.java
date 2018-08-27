@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.domain.Config;
-import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.swagger.notify.EmailTemplateScanData;

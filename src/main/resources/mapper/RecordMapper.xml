@@ -4,32 +4,39 @@
 
     <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.RecordListDTO">
         SELECT
-        id,
-        status,
-        receive_account AS email,
-        template_type,
-        failed_reason,
-        creation_date
-        FROM notify_record
-        WHERE level = #{level}
-        <if test="status != null">
-            AND status LIKE concat('%',#{status},'%')
+        rc.id,
+        rc.status,
+        rc.receive_account AS email,
+        rc.retry_status,
+        tl.name AS template_type,
+        rc.failed_reason,
+        rc.creation_date
+        FROM notify_record rc
+        LEFT JOIN notify_send_setting nts ON nts.code = rc.business_type
+        LEFT JOIN notify_template tl ON nts.email_template_id = tl.id
+        WHERE nts.level = #{query.level} AND rc.status IS NOT NULL
+        <if test="query.status != null">
+            AND rc.status LIKE concat('%',#{query.status},'%')
         </if>
-        <if test="email != null">
-            AND receive_account LIKE concat('%',#{email},'%')
+        <if test="query.retryStatus != null">
+            AND rc.retry_status LIKE concat('%',#{query.retryStatus},'%')
         </if>
-        <if test="type != null">
-            AND template_type LIKE concat('%',#{type},'%')
+        <if test="query.email != null">
+            AND rc.receive_account LIKE concat('%',#{query.email},'%')
         </if>
-        <if test="reason != null">
-            AND failed_reason LIKE concat('%',#{reason},'%')
+        <if test="query.templateType != null">
+            AND tl.name LIKE concat('%',#{query.templateType},'%')
         </if>
-        <if test="params != null">
+        <if test="query.failedReason != null">
+            AND rc.failed_reason LIKE concat('%',#{query.failedReason},'%')
+        </if>
+        <if test="query.params != null">
             AND(
-            status LIKE concat('%',#{params},'%') OR
-            receive_account LIKE concat('%',#{params},'%') OR
-            template_type LIKE concat('%',#{params},'%') OR
-            failed_reason LIKE concat('%',#{params},'%')
+            rc.status LIKE concat('%',#{query.params},'%') OR
+            rc.retry_status LIKE concat('%',#{query.params},'%') OR
+            rc.receive_account LIKE concat('%',#{query.params},'%') OR
+            tl.name LIKE concat('%',#{query.params},'%') OR
+            rc.failed_reason LIKE concat('%',#{query.params},'%')
             )
         </if>
     </select>
@@ -37,7 +44,7 @@
     <update id="updateRecordStatus">
         UPDATE notify_record
         SET object_version_number = object_version_number + 1,
-        status = #{status}, failed_reason = #{reason}
+        status = #{status}, failed_reason = #{reason}, retry_status = #{retryStatus}
         WHERE id = #{id}
     </update>
 

@@ -1,16 +1,7 @@
 package io.choerodon.notify.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.Objects;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class BusinessTypeDTO {
 
     private Long id;
@@ -29,5 +20,38 @@ public class BusinessTypeDTO {
     public int hashCode() {
 
         return Objects.hash(code);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public BusinessTypeDTO() {
+    }
+
+    public BusinessTypeDTO(Long id, String code, String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
     }
 }

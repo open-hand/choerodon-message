@@ -3,10 +3,6 @@ package io.choerodon.notify.domain;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,10 +14,6 @@ import javax.persistence.Table;
 @ModifyAudit
 @VersionAudit
 @Table(name = "notify_config")
-@Getter
-@Setter
-@NoArgsConstructor
-@ToString
 public class Config extends AuditDomain {
 
     public static final String EMAIL_PROTOCOL_SMTP = "SMTP";
@@ -41,4 +33,91 @@ public class Config extends AuditDomain {
     private String smsKeyId;
     private String smsKeyPassword;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEmailAccount() {
+        return emailAccount;
+    }
+
+    public void setEmailAccount(String emailAccount) {
+        this.emailAccount = emailAccount;
+    }
+
+    public String getEmailPassword() {
+        return emailPassword;
+    }
+
+    public void setEmailPassword(String emailPassword) {
+        this.emailPassword = emailPassword;
+    }
+
+    public String getEmailSendName() {
+        return emailSendName;
+    }
+
+    public void setEmailSendName(String emailSendName) {
+        this.emailSendName = emailSendName;
+    }
+
+    public String getEmailProtocol() {
+        return emailProtocol;
+    }
+
+    public void setEmailProtocol(String emailProtocol) {
+        this.emailProtocol = emailProtocol;
+    }
+
+    public String getEmailHost() {
+        return emailHost;
+    }
+
+    public void setEmailHost(String emailHost) {
+        this.emailHost = emailHost;
+    }
+
+    public Integer getEmailPort() {
+        return emailPort;
+    }
+
+    public void setEmailPort(Integer emailPort) {
+        this.emailPort = emailPort;
+    }
+
+    public Boolean getEmailSsl() {
+        return emailSsl;
+    }
+
+    public void setEmailSsl(Boolean emailSsl) {
+        this.emailSsl = emailSsl;
+    }
+
+    public String getSmsDomain() {
+        return smsDomain;
+    }
+
+    public void setSmsDomain(String smsDomain) {
+        this.smsDomain = smsDomain;
+    }
+
+    public String getSmsKeyId() {
+        return smsKeyId;
+    }
+
+    public void setSmsKeyId(String smsKeyId) {
+        this.smsKeyId = smsKeyId;
+    }
+
+    public String getSmsKeyPassword() {
+        return smsKeyPassword;
+    }
+
+    public void setSmsKeyPassword(String smsKeyPassword) {
+        this.smsKeyPassword = smsKeyPassword;
+    }
 }

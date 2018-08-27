@@ -16,7 +16,7 @@ public interface TemplateMapper extends BaseMapper<Template> {
                                                @Param("level") String level);
 
 
-    List<TemplateNamesDTO> selectNamesByLevel(@Param("level") String level);
+    List<TemplateNamesDTO> selectNamesByLevelAndType(@Param("level") String level, @Param("type") String businessType);
 
     String selectLevelByCode(@Param("code") String code);
 

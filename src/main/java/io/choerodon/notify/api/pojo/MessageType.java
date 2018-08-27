@@ -1,4 +1,4 @@
-package io.choerodon.notify.domain;
+package io.choerodon.notify.api.pojo;
 
 public enum MessageType {
     EMAIL("email"),

@@ -1,16 +1,14 @@
 package io.choerodon.notify.api.service;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.RecordListDTO;
+import io.choerodon.notify.api.pojo.RecordQueryParam;
+import io.choerodon.notify.domain.Record;
 
 public interface MessageRecordService {
 
-    Page<RecordListDTO> pageEmail(PageRequest pageRequest, String status,
-                                  String receiveEmail, String templateType,
-                                  String failedReason, String params,
-                                  String level);
+    Page<RecordListDTO> pageEmail(RecordQueryParam param);
 
-    void manualRetrySendEmail(long recordId);
+    Record manualRetrySendEmail(long recordId);
 
 }

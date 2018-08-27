@@ -14,4 +14,5 @@ public class EmailSendException extends RuntimeException {
     public EmailSendError getError() {
         return error;
     }
+
 }

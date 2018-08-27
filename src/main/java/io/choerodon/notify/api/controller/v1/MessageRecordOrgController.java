@@ -6,6 +6,7 @@ import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.RecordListDTO;
+import io.choerodon.notify.api.pojo.RecordQueryParam;
 import io.choerodon.notify.api.service.MessageRecordService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
+
 
 @RestController
 @RequestMapping("v1/records")
@@ -37,11 +39,12 @@ public class MessageRecordOrgController {
                                                          @RequestParam(required = false) String receiveEmail,
                                                          @RequestParam(required = false) String templateType,
                                                          @RequestParam(required = false) String failedReason,
+                                                         @RequestParam(required = false) String retryStatus,
                                                          @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(messageRecordService.pageEmail(pageRequest, status, receiveEmail,
-                templateType, failedReason, params, LEVEL_ORG), HttpStatus.OK);
+        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryStatus, failedReason, params, LEVEL_ORG);
+        param.setPageRequest(pageRequest);
+        return new ResponseEntity<>(messageRecordService.pageEmail(param), HttpStatus.OK);
     }
-
 
     @Permission(level = ResourceLevel.SITE)
     @GetMapping("/emails/{id}/retry/organizations/{organization_id}")

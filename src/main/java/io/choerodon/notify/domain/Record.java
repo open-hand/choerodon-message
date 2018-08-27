@@ -3,23 +3,16 @@ package io.choerodon.notify.domain;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import io.choerodon.notify.api.pojo.RecordSendData;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.Map;
 
-@Getter
-@Setter
 @ModifyAudit
 @VersionAudit
 @Table(name = "notify_record")
-@NoArgsConstructor
 public class Record extends AuditDomain {
 
     @Id
@@ -27,46 +20,14 @@ public class Record extends AuditDomain {
     private Long id;
     private String status;
     private String receiveAccount;
-    private String templateType;
-    private Long templateId;
     private String failedReason;
+    private String businessType;
+    private String retryStatus;
     private String messageType;
-    private Integer maxRetryCount;
-    private Boolean isManualRetry;
-    private String level;
     private String variables;
 
     @Transient
-    private Template template;
-    @Transient
-    private Map<String, Object> variablesMap;
-    @Transient
-    private JavaMailSenderImpl mailSender;
-    @Transient
-    private Config config;
-
-    public enum RecordStatus {
-        RUNNING("RUNNING"),
-        COMPLETE("COMPLETED"),
-        FAILED("FAILED");
-        private String value;
-
-        RecordStatus(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    public Record(SendSetting setting, String type) {
-        this.status = RecordStatus.RUNNING.getValue();
-        this.maxRetryCount = setting.getRetryCount();
-        this.isManualRetry = setting.getIsManualRetry();
-        this.messageType = type;
-        this.level = setting.getLevel();
-    }
+    private RecordSendData sendData;
 
     @Override
     public String toString() {
@@ -74,11 +35,80 @@ public class Record extends AuditDomain {
                 "id=" + id +
                 ", status='" + status + '\'' +
                 ", receiveAccount='" + receiveAccount + '\'' +
-                ", templateType='" + templateType + '\'' +
                 ", failedReason='" + failedReason + '\'' +
                 ", messageType='" + messageType + '\'' +
-                ", maxRetryCount=" + maxRetryCount +
-                ", isManualRetry=" + isManualRetry +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getReceiveAccount() {
+        return receiveAccount;
+    }
+
+    public void setReceiveAccount(String receiveAccount) {
+        this.receiveAccount = receiveAccount;
+    }
+
+    public String getFailedReason() {
+        return failedReason;
+    }
+
+    public void setFailedReason(String failedReason) {
+        this.failedReason = failedReason;
+    }
+
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
+    }
+
+    public String getRetryStatus() {
+        return retryStatus;
+    }
+
+    public void setRetryStatus(String retryStatus) {
+        this.retryStatus = retryStatus;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getVariables() {
+        return variables;
+    }
+
+    public void setVariables(String variables) {
+        this.variables = variables;
+    }
+
+    public RecordSendData getSendData() {
+        return sendData;
+    }
+
+    public void setSendData(RecordSendData sendData) {
+        this.sendData = sendData;
     }
 }
