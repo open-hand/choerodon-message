@@ -11,6 +11,7 @@ public class RecordListDTO {
     private String retryStatus;
     private String failedReason;
     private Date creationDate;
+    private Boolean isManualRetry;
 
     public Long getId() {
         return id;
@@ -66,5 +67,13 @@ public class RecordListDTO {
 
     public void setRetryStatus(String retryStatus) {
         this.retryStatus = retryStatus;
+    }
+
+    public Boolean getIsManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setIsManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
     }
 }

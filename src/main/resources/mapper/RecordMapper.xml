@@ -8,6 +8,7 @@
         rc.status,
         rc.receive_account AS email,
         rc.retry_status,
+        nts.is_manual_retry,
         tl.name AS template_type,
         rc.failed_reason,
         rc.creation_date
