@@ -4,6 +4,7 @@ import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -32,6 +33,7 @@ public class SendSetting extends AuditDomain {
 
     private Long pmTemplateId;
 
+    @Column(name = "fd_level")
     private String level;
 
     private Integer retryCount;

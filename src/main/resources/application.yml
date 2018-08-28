@@ -70,27 +70,9 @@ mybatis:
     mapUnderscoreToCamelCase: true
 choerodon:
   notify:
-    types:
-      forgetPassword:
-        name: 忘记密码
-        description: 用户触发忘记密码，发送验证邮件。(LDAP用户不允许重置密码)
-      addUser:
-        name: 添加/导入新用户
-        description: 管理员添加或导入新用户时，新用户收到自己的账户信息
-      addFunction:
-        name: 添加新功能
-        description: 系统添加新功能时，给用户发送新功能的介绍和操作指南
-      modifyPassword:
-        name: 修改密码
-        description: 用户在平台修改密码后反馈密码修改成功的通知，确认是否是用户的操作
-      modifyMoemberRole:
-        name: 用户角色变更
-        description: 通知用户的角色权限发生变化
-        level: organization
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
     fetch-time: 5
-    is-local: false
 logging:
   level:
    javax.mail: info

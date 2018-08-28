@@ -7,7 +7,7 @@
         nts.id,
         nts.code,
         nts.name,
-        nts.level,
+        nts.fd_level AS level,
         nts.description,
         ntemail.code AS email_template_code,
         ntsms.code AS sms_template_code,
@@ -16,7 +16,7 @@
         LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
         LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
-        WHERE level = #{level}
+        WHERE nts.fd_level = #{level}
         <if test="code != null">
             AND nts.code LIKE concat('%',#{code},'%')
         </if>
@@ -42,7 +42,7 @@
         nts.code,
         nts.name,
         nts.description,
-        nts.level,
+        nts.fd_level AS level,
         nts.retry_count,
         nts.is_send_instantly,
         nts.is_manual_retry,
