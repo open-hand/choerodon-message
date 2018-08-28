@@ -93,6 +93,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         Record record = new Record();
         record.setStatus(null);
+        record.setRetryCount(0);
         record.setMessageType(MessageType.EMAIL.getValue());
         record.setReceiveAccount(dto.getDestinationEmail());
         record.setBusinessType(dto.getCode());
@@ -132,16 +133,16 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private void sendFailedHandler(final Record record, final boolean isManualRetry,
                                    final String reason, final Exception e) {
-        String retryStatus = null;
+        boolean increase = false;
         if (isManualRetry) {
-            retryStatus = RecordRetryStatus.MANUAL_RETRY_FAILED.getValue();
+            increase = true;
         } else {
             if (record.getSendData().getMaxRetryCount() > 0) {
                 retrySend(record);
             }
         }
-        recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
-                reason, retryStatus);
+        recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
+                reason, increase);
         throw new CommonException("error.noticeSend.email", e);
     }
 
@@ -157,11 +158,11 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                             if (retryCount >= record.getSendData().getMaxRetryCount()) {
                                 LOGGER.warn("error.emailSend.retrySendError {}", e);
                                 if (e instanceof EmailSendException) {
-                                    recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
-                                            ((EmailSendException) e).getError().getReason(), null);
+                                    recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
+                                            ((EmailSendException) e).getError().getReason(), false);
                                 } else {
-                                    recordMapper.updateRecordStatus(record.getId(), RecordStatus.FAILED.getValue(),
-                                            EmailSendError.UNKNOWN_ERROR.getReason(), null);
+                                    recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
+                                            EmailSendError.UNKNOWN_ERROR.getReason(), false);
                                 }
                             }
                             return retryCount;
@@ -182,11 +183,11 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             helper.setSubject(MimeUtility.encodeText(record.getSendData().getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
             helper.setText(renderStringTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables()), true);
             mailSender.send(msg);
-            String retryStatus = null;
+            boolean increase = false;
             if (isManualRetry) {
-                retryStatus = RecordRetryStatus.MANUAL_RETRY_SUCCESS.getValue();
+                increase = true;
             }
-            recordMapper.updateRecordStatus(record.getId(), RecordStatus.COMPLETE.getValue(), null, retryStatus);
+            recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.COMPLETE.getValue(), null, increase);
         } catch (MailAuthenticationException e) {
             throw new EmailSendException(e, EmailSendError.AUTH_ERROR);
         } catch (MessagingException e) {

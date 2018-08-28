@@ -38,7 +38,7 @@ public class MessageRecordSiteController {
                                                          @RequestParam(required = false) String status,
                                                          @RequestParam(required = false) String receiveEmail,
                                                          @RequestParam(required = false) String templateType,
-                                                         @RequestParam(required = false) String retryStatus,
+                                                         @RequestParam(required = false) Integer retryStatus,
                                                          @RequestParam(required = false) String failedReason,
                                                          @RequestParam(required = false) String params) {
         final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryStatus, failedReason, params, LEVEL_SITE);

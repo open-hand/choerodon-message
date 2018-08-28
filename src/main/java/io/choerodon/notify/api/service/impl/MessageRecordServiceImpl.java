@@ -6,7 +6,6 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.notify.api.dto.RecordListDTO;
 import io.choerodon.notify.api.pojo.RecordQueryParam;
-import io.choerodon.notify.api.pojo.RecordRetryStatus;
 import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.MessageRecordService;
@@ -57,9 +56,6 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         if (sendSetting == null) {
             throw new CommonException("error.noticeSend.codeNotFound");
         }
-        if (RecordRetryStatus.MANUAL_RETRY_SUCCESS.getValue().equals(record.getRetryStatus())) {
-            throw new CommonException("error.record.retrySuccess");
-        }
         if (!RecordStatus.FAILED.getValue().equals(record.getStatus())) {
             throw new CommonException("error.record.retryNotFailed");
         }
@@ -69,12 +65,6 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         if (template == null) {
             throw new CommonException("error.emailTemplate.notExist");
-        }
-        record.setId(null);
-        record.setStatus(null);
-        record.setRetryStatus(null);
-        if (recordMapper.insert(record) != 1) {
-            throw new CommonException("error.noticeSend.recordInsert");
         }
         record.setSendData(new RecordSendData(template, ConvertUtils.convertJsonToMap(objectMapper, record.getVariables()),
                 noticesSendService.createEmailSender(), sendSetting.getRetryCount()));

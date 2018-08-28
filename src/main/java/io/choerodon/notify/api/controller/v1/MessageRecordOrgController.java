@@ -39,9 +39,9 @@ public class MessageRecordOrgController {
                                                          @RequestParam(required = false) String receiveEmail,
                                                          @RequestParam(required = false) String templateType,
                                                          @RequestParam(required = false) String failedReason,
-                                                         @RequestParam(required = false) String retryStatus,
+                                                         @RequestParam(required = false) Integer retryCount,
                                                          @RequestParam(required = false) String params) {
-        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryStatus, failedReason, params, LEVEL_ORG);
+        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryCount, failedReason, params, LEVEL_ORG);
         param.setPageRequest(pageRequest);
         return new ResponseEntity<>(messageRecordService.pageEmail(param), HttpStatus.OK);
     }

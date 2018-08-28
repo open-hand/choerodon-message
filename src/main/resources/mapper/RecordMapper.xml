@@ -7,7 +7,7 @@
         rc.id,
         rc.status,
         rc.receive_account AS email,
-        rc.retry_status,
+        rc.retry_count,
         nts.is_manual_retry,
         tl.name AS template_type,
         rc.failed_reason,
@@ -19,8 +19,8 @@
         <if test="query.status != null">
             AND rc.status LIKE concat('%',#{query.status},'%')
         </if>
-        <if test="query.retryStatus != null">
-            AND rc.retry_status LIKE concat('%',#{query.retryStatus},'%')
+        <if test="query.retryCount != null">
+            AND rc.retry_count = #{query.retryCount}
         </if>
         <if test="query.email != null">
             AND rc.receive_account LIKE concat('%',#{query.email},'%')
@@ -34,7 +34,7 @@
         <if test="query.params != null">
             AND(
             rc.status LIKE concat('%',#{query.params},'%') OR
-            rc.retry_status LIKE concat('%',#{query.params},'%') OR
+            rc.retry_count = #{query.params} OR
             rc.receive_account LIKE concat('%',#{query.params},'%') OR
             tl.name LIKE concat('%',#{query.params},'%') OR
             rc.failed_reason LIKE concat('%',#{query.params},'%')
@@ -42,10 +42,13 @@
         </if>
     </select>
 
-    <update id="updateRecordStatus">
+    <update id="updateRecordStatusAndIncreaseCount">
         UPDATE notify_record
         SET object_version_number = object_version_number + 1,
-        status = #{status}, failed_reason = #{reason}, retry_status = #{retryStatus}
+        status = #{status}, failed_reason = #{reason}
+        <if test="increase">
+            , retry_count = retry_count + 1
+        </if>
         WHERE id = #{id}
     </update>
 

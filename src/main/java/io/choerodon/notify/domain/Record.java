@@ -22,7 +22,7 @@ public class Record extends AuditDomain {
     private String receiveAccount;
     private String failedReason;
     private String businessType;
-    private String retryStatus;
+    private Integer retryCount;
     private String messageType;
     private String variables;
 
@@ -80,12 +80,12 @@ public class Record extends AuditDomain {
         this.businessType = businessType;
     }
 
-    public String getRetryStatus() {
-        return retryStatus;
+    public Integer getRetryCount() {
+        return retryCount;
     }
 
-    public void setRetryStatus(String retryStatus) {
-        this.retryStatus = retryStatus;
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 
     public String getMessageType() {

@@ -12,6 +12,6 @@ public interface RecordMapper extends BaseMapper<Record> {
 
     List<RecordListDTO> fulltextSearchEmail(@Param("query") final RecordQueryParam param);
 
-    void updateRecordStatus(@Param("id") long id, @Param("status") String status,
-                            @Param("reason") String reason, @Param("retryStatus") String retryStatus);
+    void updateRecordStatusAndIncreaseCount(@Param("id") long id, @Param("status") String status,
+                            @Param("reason") String reason, @Param("increase") boolean increase);
 }

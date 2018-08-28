@@ -13,7 +13,9 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-record.groovy') {
             column(name: 'business_type', type: 'VARCHAR(32)', remarks: '模版业务类型code') {
                 constraints(nullable: false)
             }
-            column(name: "retry_status", type: "VARCHAR(16)", remarks: '重发状态')
+            column(name: "retry_count", type: "INT UNSIGNED", remarks: '手动重发次数', defaultValue: "0") {
+                constraints(nullable: false)
+            }
             column(name: 'variables', type: 'TEXT', remarks: '发送邮件的参数(map形式)')
             column(name: 'failed_reason', type: 'VARCHAR(64)', remarks: '失败原因')
             column(name: 'message_type', type: 'VARCHAR(16)', remarks: '消息类型:email,sms') {

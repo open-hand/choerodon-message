@@ -7,7 +7,7 @@ public class RecordQueryParam {
     private String status;
     private String email;
     private String templateType;
-    private String retryStatus;
+    private Integer retryCount;
     private String failedReason;
     private String params;
     private String level;
@@ -16,12 +16,12 @@ public class RecordQueryParam {
     }
 
     public RecordQueryParam(String status, String email,
-                            String templateType, String retryStatus,
+                            String templateType, Integer retryCount,
                             String failedReason, String params, String level) {
         this.status = status;
         this.email = email;
         this.templateType = templateType;
-        this.retryStatus = retryStatus;
+        this.retryCount = retryCount;
         this.failedReason = failedReason;
         this.params = params;
         this.level = level;
@@ -59,12 +59,12 @@ public class RecordQueryParam {
         this.templateType = templateType;
     }
 
-    public String getRetryStatus() {
-        return retryStatus;
+    public Integer getRetryCount() {
+        return retryCount;
     }
 
-    public void setRetryStatus(String retryStatus) {
-        this.retryStatus = retryStatus;
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 
     public String getFailedReason() {

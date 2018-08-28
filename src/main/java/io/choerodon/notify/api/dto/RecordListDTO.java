@@ -8,7 +8,7 @@ public class RecordListDTO {
     private String status;
     private String email;
     private String templateType;
-    private String retryStatus;
+    private Integer retryCount;
     private String failedReason;
     private Date creationDate;
     private Boolean isManualRetry;
@@ -61,12 +61,12 @@ public class RecordListDTO {
         this.creationDate = creationDate;
     }
 
-    public String getRetryStatus() {
-        return retryStatus;
+    public Integer getRetryCount() {
+        return retryCount;
     }
 
-    public void setRetryStatus(String retryStatus) {
-        this.retryStatus = retryStatus;
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 
     public Boolean getIsManualRetry() {
