@@ -33,7 +33,6 @@ public class SendSettingDetailDTO {
 
     private Long objectVersionNumber;
 
-
     public Long getId() {
         return id;
     }
@@ -130,19 +129,19 @@ public class SendSettingDetailDTO {
         this.retryCount = retryCount;
     }
 
-    public Boolean getSendInstantly() {
+    public Boolean getIsSendInstantly() {
         return isSendInstantly;
     }
 
-    public void setSendInstantly(Boolean sendInstantly) {
+    public void setIsSendInstantly(Boolean sendInstantly) {
         isSendInstantly = sendInstantly;
     }
 
-    public Boolean getManualRetry() {
+    public Boolean getIsManualRetry() {
         return isManualRetry;
     }
 
-    public void setManualRetry(Boolean manualRetry) {
+    public void setIsManualRetry(Boolean manualRetry) {
         isManualRetry = manualRetry;
     }
 

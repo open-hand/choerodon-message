@@ -58,7 +58,7 @@ public class ConfigCache {
         config.setEmailProtocol(db.getEmailProtocol());
         config.setEmailHost(db.getEmailHost());
         config.setEmailPort(db.getEmailPort());
-        config.setEmailSsl(db.getEmailSsl());
+        config.setIsEmailSsl(db.getIsEmailSsl());
         config.setEmailSendName(db.getEmailSendName());
         config.setSmsKeyPassword(db.getSmsKeyPassword());
         config.setSmsDomain(db.getSmsDomain());

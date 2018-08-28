@@ -60,6 +60,9 @@ public class EmailTemplateQueryDTO {
         };
     }
 
+    public EmailTemplateQueryDTO() {
+    }
+
     public Long getId() {
         return id;
     }
