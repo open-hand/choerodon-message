@@ -12,7 +12,7 @@
         FROM notify_template nt
         LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
         WHERE nt.message_type = 'email'
-        AND nss.level = #{level}
+        AND nss.fd_level = #{level}
         <if test="type != null">
             AND nss.name LIKE concat('%',#{type},'%')
         </if>
