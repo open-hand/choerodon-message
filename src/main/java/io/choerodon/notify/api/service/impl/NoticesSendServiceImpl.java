@@ -101,6 +101,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         record.setMessageType(MessageType.EMAIL.getValue());
         record.setReceiveAccount(dto.getDestinationEmail());
         record.setBusinessType(dto.getCode());
+        record.setTemplateId(template.getId());
         record.setVariables(ConvertUtils.convertMapToJson(objectMapper, dto.getVariables()));
         record.setSendData(new RecordSendData(template, dto.getVariables(), createEmailSender(), sendSetting.getRetryCount()));
         if (recordMapper.insert(record) != 1) {
