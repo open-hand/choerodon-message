@@ -76,11 +76,11 @@ public class EmailConfigDTO {
         this.port = port;
     }
 
-    public Boolean getIsSsl() {
+    public Boolean getSsl() {
         return ssl;
     }
 
-    public void setIsSsl(Boolean ssl) {
+    public void setSsl(Boolean ssl) {
         this.ssl = ssl;
     }
 

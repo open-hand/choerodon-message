@@ -38,8 +38,8 @@ public class ConfigController {
     @ApiOperation(value = "创建邮箱配置")
     public ResponseEntity<EmailConfigDTO> createEmail(@RequestBody @Valid EmailConfigDTO config) {
         config.setObjectVersionNumber(null);
-        if (config.getIsSsl() == null) {
-            config.setIsSsl(false);
+        if (config.getSsl() == null) {
+            config.setSsl(false);
         }
         if (config.getProtocol() == null) {
             config.setProtocol(EMAIL_PROTOCOL_SMTP);
@@ -74,8 +74,8 @@ public class ConfigController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "测试邮箱连接")
     public void testEmailConnect(@RequestBody @Valid EmailConfigDTO config) {
-        if (config.getIsSsl() == null) {
-            config.setIsSsl(false);
+        if (config.getSsl() == null) {
+            config.setSsl(false);
         }
         if (config.getProtocol() == null) {
             config.setProtocol(EMAIL_PROTOCOL_SMTP);
