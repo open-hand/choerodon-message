@@ -6,7 +6,10 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.exception.EmailSendException;
-import io.choerodon.notify.api.pojo.*;
+import io.choerodon.notify.api.pojo.EmailSendError;
+import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.api.pojo.RecordSendData;
+import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.Record;
@@ -34,6 +37,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -98,8 +102,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         record.setReceiveAccount(dto.getDestinationEmail());
         record.setBusinessType(dto.getCode());
         record.setVariables(ConvertUtils.convertMapToJson(objectMapper, dto.getVariables()));
-        record.setSendData(new RecordSendData(template, dto.getVariables(),
-                createEmailSender(), sendSetting.getRetryCount()));
+        record.setSendData(new RecordSendData(template, dto.getVariables(), createEmailSender(), sendSetting.getRetryCount()));
         if (recordMapper.insert(record) != 1) {
             throw new CommonException("error.noticeSend.recordInsert");
         }
@@ -142,7 +145,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             }
         }
         recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
-                reason, increase);
+                reason, increase, null);
         throw new CommonException("error.noticeSend.email", e);
     }
 
@@ -159,10 +162,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                                 LOGGER.warn("error.emailSend.retrySendError {}", e);
                                 if (e instanceof EmailSendException) {
                                     recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
-                                            ((EmailSendException) e).getError().getReason(), false);
+                                            ((EmailSendException) e).getError().getReason(), false, null);
                                 } else {
                                     recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.FAILED.getValue(),
-                                            EmailSendError.UNKNOWN_ERROR.getReason(), false);
+                                            EmailSendError.UNKNOWN_ERROR.getReason(), false, null);
                                 }
                             }
                             return retryCount;
@@ -183,11 +186,12 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             helper.setSubject(MimeUtility.encodeText(record.getSendData().getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
             helper.setText(renderStringTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables()), true);
             mailSender.send(msg);
-            boolean increase = false;
             if (isManualRetry) {
-                increase = true;
+                recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.COMPLETE.getValue(), null, true, new Date());
+            } else {
+                recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.COMPLETE.getValue(), null, false, null);
             }
-            recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.COMPLETE.getValue(), null, increase);
+
         } catch (MailAuthenticationException e) {
             throw new EmailSendException(e, EmailSendError.AUTH_ERROR);
         } catch (MessagingException e) {
@@ -227,9 +231,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private String renderStringTemplate(final Template template, final Map<String, Object> variables)
             throws IOException, TemplateException {
-        freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(template.getCode());
+        String templateKey = template.getCode() + ":" + template.getObjectVersionNumber();
+        freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
         if (ft == null) {
-            ft = freeMarkerConfigBuilder.addTemplate(template.getCode(), template.getEmailContent());
+            ft = freeMarkerConfigBuilder.addTemplate(templateKey, template.getEmailContent());
         }
         if (ft == null) {
             throw new CommonException("error.noticeSend.emailParseError");

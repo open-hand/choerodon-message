@@ -21,6 +21,9 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-record.groovy') {
             column(name: 'message_type', type: 'VARCHAR(16)', remarks: '消息类型:email,sms') {
                 constraints(nullable: false)
             }
+            column(name: 'template_id', type: 'BIGINT UNSIGNED', remarks: '使用的邮件模板id'){
+                constraints(nullable: false)
+            }
 
             column(name: "object_version_number", type: "BIGINT UNSIGNED", defaultValue: "1")
             column(name: "created_by", type: "BIGINT UNSIGNED", defaultValue: "0")

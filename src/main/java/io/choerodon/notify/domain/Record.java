@@ -25,20 +25,11 @@ public class Record extends AuditDomain {
     private Integer retryCount;
     private String messageType;
     private String variables;
+    private Long templateId;
 
     @Transient
     private RecordSendData sendData;
 
-    @Override
-    public String toString() {
-        return "Record{" +
-                "id=" + id +
-                ", status='" + status + '\'' +
-                ", receiveAccount='" + receiveAccount + '\'' +
-                ", failedReason='" + failedReason + '\'' +
-                ", messageType='" + messageType + '\'' +
-                '}';
-    }
 
     public Long getId() {
         return id;
@@ -110,5 +101,29 @@ public class Record extends AuditDomain {
 
     public void setSendData(RecordSendData sendData) {
         this.sendData = sendData;
+    }
+
+    public Long getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Long templateId) {
+        this.templateId = templateId;
+    }
+
+    @Override
+    public String toString() {
+        return "Record{" +
+                "id=" + id +
+                ", status='" + status + '\'' +
+                ", receiveAccount='" + receiveAccount + '\'' +
+                ", failedReason='" + failedReason + '\'' +
+                ", businessType='" + businessType + '\'' +
+                ", retryCount=" + retryCount +
+                ", messageType='" + messageType + '\'' +
+                ", variables='" + variables + '\'' +
+                ", templateId=" + templateId +
+                ", sendData=" + sendData +
+                '}';
     }
 }

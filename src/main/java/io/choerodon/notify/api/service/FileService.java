@@ -1,9 +1,10 @@
 package io.choerodon.notify.api.service;
 
-import org.springframework.web.multipart.MultipartFile;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public interface FileService {
 
-     String uploadFile(MultipartFile file);
+    List<String> uploadFile(HttpServletRequest request);
 
 }

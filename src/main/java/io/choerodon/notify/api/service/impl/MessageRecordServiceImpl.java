@@ -11,9 +11,7 @@ import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.MessageRecordService;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Record;
-import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.RecordMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import org.springframework.stereotype.Service;
@@ -27,17 +25,14 @@ public class MessageRecordServiceImpl implements MessageRecordService {
 
     private final TemplateMapper templateMapper;
 
-    private final SendSettingMapper settingMapper;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public MessageRecordServiceImpl(RecordMapper recordMapper, NoticesSendService noticesSendService,
-                                    TemplateMapper templateMapper,
-                                    SendSettingMapper settingMapper) {
+    public MessageRecordServiceImpl(RecordMapper recordMapper,
+                                    NoticesSendService noticesSendService,
+                                    TemplateMapper templateMapper) {
         this.recordMapper = recordMapper;
         this.noticesSendService = noticesSendService;
         this.templateMapper = templateMapper;
-        this.settingMapper = settingMapper;
     }
 
     @Override
@@ -52,22 +47,16 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         if (record == null) {
             throw new CommonException("error.record.notExist");
         }
-        SendSetting sendSetting = settingMapper.selectOne(new SendSetting(record.getBusinessType()));
-        if (sendSetting == null) {
-            throw new CommonException("error.noticeSend.codeNotFound");
-        }
         if (!RecordStatus.FAILED.getValue().equals(record.getStatus())) {
             throw new CommonException("error.record.retryNotFailed");
         }
-        if (sendSetting.getEmailTemplateId() == null) {
-            throw new CommonException("error.noticeSend.emailTemplateNotSet");
-        }
-        io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
+
+        io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(record.getTemplateId());
         if (template == null) {
             throw new CommonException("error.emailTemplate.notExist");
         }
         record.setSendData(new RecordSendData(template, ConvertUtils.convertJsonToMap(objectMapper, record.getVariables()),
-                noticesSendService.createEmailSender(), sendSetting.getRetryCount()));
+                noticesSendService.createEmailSender(), null));
         noticesSendService.sendEmail(record, true);
         return recordMapper.selectByPrimaryKey(record.getId());
     }

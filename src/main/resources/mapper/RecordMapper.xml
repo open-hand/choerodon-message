@@ -14,7 +14,7 @@
         rc.creation_date
         FROM notify_record rc
         LEFT JOIN notify_send_setting nts ON nts.code = rc.business_type
-        LEFT JOIN notify_template tl ON nts.email_template_id = tl.id
+        LEFT JOIN notify_template tl ON rc.template_id = tl.id
         WHERE nts.fd_level = #{query.level} AND rc.status IS NOT NULL
         <if test="query.status != null">
             AND rc.status LIKE concat('%',#{query.status},'%')
@@ -48,6 +48,9 @@
         status = #{status}, failed_reason = #{reason}
         <if test="increase">
             , retry_count = retry_count + 1
+        </if>
+        <if test="date != null">
+           , creation_date = #{date}
         </if>
         WHERE id = #{id}
     </update>
