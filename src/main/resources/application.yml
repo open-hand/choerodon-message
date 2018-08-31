@@ -1,5 +1,13 @@
 # application.yml
 spring:
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
   sleuth:
     integration:
       enabled: false
