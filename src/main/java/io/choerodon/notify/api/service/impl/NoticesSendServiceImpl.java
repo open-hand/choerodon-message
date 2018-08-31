@@ -220,7 +220,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         mailSender.setProtocol(config.getEmailProtocol().toLowerCase());
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
-        if (Config.EMAIL_PROTOCOL_SMTP.equalsIgnoreCase(config.getEmailProtocol()) && config.getIsEmailSsl()) {
+        if (Config.EMAIL_PROTOCOL_SMTP.equalsIgnoreCase(config.getEmailProtocol()) && config.getEmailSsl()) {
             properties.put(Config.EMAIL_SSL_SMTP, true);
             properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             properties.put("mail.smtp.port", config.getEmailPort());

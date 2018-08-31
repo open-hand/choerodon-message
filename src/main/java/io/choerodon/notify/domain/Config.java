@@ -89,11 +89,11 @@ public class Config extends AuditDomain {
         this.emailPort = emailPort;
     }
 
-    public Boolean getIsEmailSsl() {
+    public Boolean getEmailSsl() {
         return emailSsl;
     }
 
-    public void setIsEmailSsl(Boolean emailSsl) {
+    public void setEmailSsl(Boolean emailSsl) {
         this.emailSsl = emailSsl;
     }
 

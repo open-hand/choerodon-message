@@ -34,10 +34,10 @@ public class ConvertUtils {
         config.setEmailPassword(mailProperties.getPassword());
         config.setEmailPort(mailProperties.getPort());
         config.setEmailProtocol(mailProperties.getProtocol());
-        config.setIsEmailSsl(false);
+        config.setEmailSsl(false);
         String ssl = mailProperties.getProperties().get(EMAIL_SSL);
         if (ssl != null) {
-            config.setIsEmailSsl(Boolean.parseBoolean(ssl));
+            config.setEmailSsl(Boolean.parseBoolean(ssl));
         }
         config.setEmailSendName(mailProperties.getProperties().get(EMAIL_SEND_NAME));
         return config;
