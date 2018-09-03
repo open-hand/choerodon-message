@@ -1,5 +1,13 @@
 # application.yml
 spring:
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
   sleuth:
     integration:
       enabled: false
@@ -70,34 +78,9 @@ mybatis:
     mapUnderscoreToCamelCase: true
 choerodon:
   notify:
-    types:
-      verification-code:
-        name: 验证码
-        description: 用于获取验证码，验证用户信息
-      user-binding:
-        name: 用户绑定
-        description: 绑定邮箱、手机号的反馈信息
-      user-activation:
-        name: 用户激活
-        description: 首次注册，确认用户注册成功
-      get-password:
-        name: 获取密码
-        description: 忘记密码后，根据用户操作提供用户名及相应密码
-      modify-password:
-        name: 密码修改
-        description: 反馈用户密码修改成功
-      add-members:
-        name: 添加成员
-        description: 项目添加新成员时，及时反馈给被添加的用户
-        level: organization
-      modify-moemberRole:
-        name: 用户角色变更
-        description: 通知用户的角色权限发生变化
-        level: organization
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
     fetch-time: 5
-    is-local: false
 logging:
   level:
    javax.mail: info

@@ -12,7 +12,7 @@
         FROM notify_template nt
         LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
         WHERE nt.message_type = 'email'
-        AND nss.level = #{level}
+        AND nss.fd_level = #{level}
         <if test="type != null">
             AND nss.name LIKE concat('%',#{type},'%')
         </if>
@@ -35,14 +35,26 @@
         </if>
     </select>
 
-
-    <select id="selectNamesByLevel" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
+    <select id="selectNamesByLevelAndType" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
         SELECT
         nt.id,
         nt.code,
         nt.name
         FROM notify_template nt
-        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
-        WHERE nss.level = #{level}
+        INNER JOIN notify_send_setting nss on nss.code =  nt.business_type
+        <if test="type != null">
+            AND nss.code = #{type}
+        </if>
+        WHERE nss.fd_level = #{level}
     </select>
+
+
+    <select id="selectLevelByCode" resultType="java.lang.String">
+        SELECT
+        nss.fd_level
+        FROM notify_template nt
+        INNER JOIN notify_send_setting nss on nss.code =  nt.business_type
+        WHERE nt.code = #{code}
+    </select>
+
 </mapper>

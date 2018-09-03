@@ -1,15 +1,9 @@
 package io.choerodon.notify.api.dto;
 
 import io.choerodon.notify.domain.Template;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
 
-@Getter
-@Setter
-@ToString
 public class EmailTemplateDTO {
 
     private Long id;
@@ -57,4 +51,67 @@ public class EmailTemplateDTO {
         };
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getIsPredefined() {
+        return isPredefined;
+    }
+
+    public void setIsPredefined(Boolean predefined) {
+        isPredefined = predefined;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+    }
 }

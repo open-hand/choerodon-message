@@ -9,9 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("v1/notices/files")
@@ -27,8 +28,8 @@ public class FileController {
     @Permission(level = ResourceLevel.SITE, permissionLogin = true)
     @ApiOperation(value = "上传文件")
     @PostMapping
-    public ResponseEntity<String> uploadPhoto(@RequestPart MultipartFile file) {
-        return new ResponseEntity<>(fileService.uploadFile(file), HttpStatus.OK);
+    public ResponseEntity<List<String>> uploadFile(HttpServletRequest request) {
+        return new ResponseEntity<>(fileService.uploadFile(request), HttpStatus.OK);
     }
 
 }

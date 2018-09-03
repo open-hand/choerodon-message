@@ -1,12 +1,21 @@
 package io.choerodon.notify.infra.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.domain.Config;
-import io.choerodon.notify.domain.MessageType;
+import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.swagger.notify.EmailTemplateScanData;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConvertUtils {
 
@@ -48,6 +57,26 @@ public class ConvertUtils {
 
     public static BusinessTypeDTO convertBusinessTypeDTO(final SendSetting sendSetting) {
         return new BusinessTypeDTO(sendSetting.getId(), sendSetting.getCode(), sendSetting.getName());
+    }
+
+    public static String convertMapToJson(final ObjectMapper objectMapper, final Map<String, Object> map) {
+        try {
+            return objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new CommonException("error.convertMapToJson.JsonProcessing", e);
+        }
+    }
+
+    public static Map<String, Object> convertJsonToMap(final ObjectMapper objectMapper, final String mapJson) {
+        try {
+            if (StringUtils.isEmpty(mapJson)) {
+                return new HashMap<>(0);
+            }
+            JavaType jvt = objectMapper.getTypeFactory().constructParametricType(HashMap.class, String.class, Object.class);
+            return objectMapper.readValue(mapJson, jvt);
+        } catch (IOException e) {
+            throw new CommonException("error.convertJsonToMap.IO", e);
+        }
     }
 
 }

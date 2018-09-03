@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.RecordMapper">
+
+    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.RecordListDTO">
+        SELECT
+        rc.id,
+        rc.status,
+        rc.receive_account AS email,
+        rc.retry_count,
+        nts.is_manual_retry,
+        tl.name AS template_type,
+        rc.failed_reason,
+        rc.creation_date
+        FROM notify_record rc
+        LEFT JOIN notify_send_setting nts ON nts.code = rc.business_type
+        LEFT JOIN notify_template tl ON rc.template_id = tl.id
+        WHERE nts.fd_level = #{query.level} AND rc.status IS NOT NULL
+        <if test="query.status != null">
+            AND rc.status LIKE concat('%',#{query.status},'%')
+        </if>
+        <if test="query.retryCount != null">
+            AND rc.retry_count = #{query.retryCount}
+        </if>
+        <if test="query.email != null">
+            AND rc.receive_account LIKE concat('%',#{query.email},'%')
+        </if>
+        <if test="query.templateType != null">
+            AND tl.name LIKE concat('%',#{query.templateType},'%')
+        </if>
+        <if test="query.failedReason != null">
+            AND rc.failed_reason LIKE concat('%',#{query.failedReason},'%')
+        </if>
+        <if test="query.params != null">
+            AND(
+            rc.status LIKE concat('%',#{query.params},'%') OR
+            rc.retry_count = #{query.params} OR
+            rc.receive_account LIKE concat('%',#{query.params},'%') OR
+            tl.name LIKE concat('%',#{query.params},'%') OR
+            rc.failed_reason LIKE concat('%',#{query.params},'%')
+            )
+        </if>
+    </select>
+
+    <update id="updateRecordStatusAndIncreaseCount">
+        UPDATE notify_record
+        SET object_version_number = object_version_number + 1,
+        status = #{status}, failed_reason = #{reason}
+        <if test="increase">
+            , retry_count = retry_count + 1
+        </if>
+        <if test="date != null">
+           , creation_date = #{date}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

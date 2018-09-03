@@ -53,8 +53,9 @@ public class EmailTemplateOrgController {
     @GetMapping("/names/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "组织层查询所有邮件模版名")
-    public ResponseEntity<List<TemplateNamesDTO>> listNames(@PathVariable("organization_id") long id) {
-        return new ResponseEntity<>(templateService.listNames(LEVEL_ORG), HttpStatus.OK);
+    public ResponseEntity<List<TemplateNamesDTO>> listNames(@PathVariable("organization_id") long id,
+                                                            @RequestParam(required = false, name = "business_type") String businessType) {
+        return new ResponseEntity<>(templateService.listNames(LEVEL_ORG, businessType), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/organizations/{organization_id}")

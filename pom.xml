@@ -12,12 +12,11 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.6.0.RELEASE</version>
+        <version>0.8.0.RELEASE</version>
     </parent>
-
     <!--choerodon-starters dependency-->
     <properties>
-        <choerodon.starters.version>0.6.0.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.6.2.RELEASE</choerodon.starters.version>
     </properties>
     <dependencies>
         <!--spring boot-->
@@ -89,12 +88,6 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <!-- Only needed at compile time -->
-            <optional>true</optional>
         </dependency>
         <!--mail-->
         <dependency>
@@ -175,7 +168,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

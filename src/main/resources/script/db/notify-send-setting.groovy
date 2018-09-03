@@ -15,7 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: 'description', type: 'VARCHAR(255)', remarks: '消息业务类型描述') {
                 constraints(nullable: false)
             }
-            column(name: 'level', type: 'VARCHAR(16)', remarks: '所属层级') {
+            column(name: 'fd_level', type: 'VARCHAR(16)', remarks: '所属层级') {
                 constraints(nullable: false)
             }
             column(name: 'email_template_id', type: 'BIGINT UNSIGNED', remarks: '邮箱模板id')
