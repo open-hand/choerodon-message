@@ -6,10 +6,10 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.choerodon.notify.api.dto.EmailTemplateDTO;
+import io.choerodon.notify.api.dto.PmTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.notify.api.service.PmTemplateService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
@@ -24,21 +24,24 @@ import java.util.List;
 
 import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
 
+/**
+ * @author dengyouquan
+ */
 @RestController
-@RequestMapping("v1/notices/emails/templates")
-@Api("组织层邮件模版接口")
-public class EmailTemplateOrgController {
+@RequestMapping("v1/notices/letters/templates")
+@Api("组织层站内信模版接口")
+public class PmTemplateOrgController {
 
-    private EmailTemplateService templateService;
+    private PmTemplateService templateService;
 
-    public EmailTemplateOrgController(EmailTemplateService templateService) {
+    public PmTemplateOrgController(PmTemplateService templateService) {
         this.templateService = templateService;
     }
 
     @GetMapping("/organizations/{organization_id}")
     @CustomPageRequest
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层分页查询邮件模版")
+    @ApiOperation(value = "组织层分页查询站内信模版")
     public ResponseEntity<Page<TemplateQueryDTO>> pageOrganization(@PathVariable("organization_id") long id,
                                                                    @ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                    @RequestParam(required = false) String name,
@@ -52,7 +55,7 @@ public class EmailTemplateOrgController {
 
     @GetMapping("/names/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层查询所有邮件模版名")
+    @ApiOperation(value = "组织层查询所有站内信模版名")
     public ResponseEntity<List<TemplateNamesDTO>> listNames(@PathVariable("organization_id") long id,
                                                             @RequestParam(required = false, name = "business_type") String businessType) {
         return new ResponseEntity<>(templateService.listNames(LEVEL_ORG, businessType), HttpStatus.OK);
@@ -60,15 +63,15 @@ public class EmailTemplateOrgController {
 
     @GetMapping("/{id}/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层查询邮件模版详情")
-    public ResponseEntity<EmailTemplateDTO> query(@PathVariable("organization_id") long orgId, @PathVariable Long id) {
+    @ApiOperation(value = "组织层查询站内信模版详情")
+    public ResponseEntity<PmTemplateDTO> query(@PathVariable("organization_id") long orgId, @PathVariable Long id) {
         return new ResponseEntity<>(templateService.query(id), HttpStatus.OK);
     }
 
     @PostMapping("/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层创建邮件模版")
-    public ResponseEntity<EmailTemplateDTO> create(@PathVariable("organization_id") long id, @RequestBody @Valid EmailTemplateDTO template) {
+    @ApiOperation(value = "组织层创建站内信模版")
+    public ResponseEntity<PmTemplateDTO> create(@PathVariable("organization_id") long id, @RequestBody @Valid PmTemplateDTO template) {
         template.setIsPredefined(false);
         template.setId(null);
         template.setObjectVersionNumber(null);
@@ -77,21 +80,21 @@ public class EmailTemplateOrgController {
 
     @PutMapping("/{id}/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层更新邮件模版")
-    public ResponseEntity<EmailTemplateDTO> update(@PathVariable("organization_id") long orgId,
+    @ApiOperation(value = "组织层更新站内信模版")
+    public ResponseEntity<PmTemplateDTO> update(@PathVariable("organization_id") long orgId,
                                                    @PathVariable Long id,
-                                                   @RequestBody EmailTemplateDTO template) {
+                                                   @RequestBody PmTemplateDTO template) {
         template.setId(id);
         template.setIsPredefined(null);
         if (template.getObjectVersionNumber() == null) {
-            throw new CommonException("error.emailTemplate.objectVersionNumberNull");
+            throw new CommonException("error.pmTemplate.objectVersionNumberNull");
         }
         return new ResponseEntity<>(templateService.update(template), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/organizations/{organization_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiOperation(value = "组织层删除邮件模版")
+    @ApiOperation(value = "组织层删除站内信模版")
     public void delete(@PathVariable("organization_id") long orgId,
                        @PathVariable Long id) {
         templateService.delete(id);

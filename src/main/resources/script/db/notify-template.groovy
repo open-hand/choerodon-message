@@ -2,8 +2,8 @@ package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
     changeSet(author: 'jcalaz@163.com', id: '2018-08-09-add-notify-template') {
-        if(helper.dbType().isSupportSequence()){
-            createSequence(sequenceName: 'NOTIFY_TEMPLATE_S', startValue:"1")
+        if (helper.dbType().isSupportSequence()) {
+            createSequence(sequenceName: 'NOTIFY_TEMPLATE_S', startValue: "1")
         }
         createTable(tableName: "NOTIFY_TEMPLATE") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
@@ -40,5 +40,12 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
     changeSet(author: 'superleader8@gmail.com', id: '2018-09-05-rename-unique') {
         dropUniqueConstraint(constraintName: 'message_type_code_unique', tableName: 'NOTIFY_TEMPLATE')
         addUniqueConstraint(tableName: 'NOTIFY_TEMPLATE', columnNames: 'CODE,MESSAGE_TYPE', constraintName: "UK_NOTIFY_TEMPLATE_U1")
+    }
+
+    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-05-add-column-pm') {
+        addColumn(tableName: 'NOTIFY_TEMPLATE') {
+            column(name: 'PM_TITLE', type: 'VARCHAR(32)', remarks: 'pm模版标题')
+            column(name: 'PM_CONTENT', type: 'TEXT', remarks: 'pm模版内容')
+        }
     }
 }
