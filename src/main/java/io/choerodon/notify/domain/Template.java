@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 /**
  * 消息模板实体
- * 包括邮件模板和短信模版
+ * 包括邮件,站内信模板和短信模版
  */
 @ModifyAudit
 @VersionAudit
@@ -36,6 +36,10 @@ public class Template extends AuditDomain {
 
     private String emailContent;
 
+    private String pmTitle;
+
+    private String pmContent;
+
     private String smsContent;
 
     public Template(String code, String messageType) {
@@ -57,6 +61,8 @@ public class Template extends AuditDomain {
                 ", businessType='" + businessType + '\'' +
                 ", emailTitle='" + emailTitle + '\'' +
                 ", emailContent='" + emailContent + '\'' +
+                ", pmTitle='" + pmTitle + '\'' +
+                ", pmContent='" + pmContent + '\'' +
                 ", smsContent='" + smsContent + '\'' +
                 '}';
     }
@@ -131,5 +137,21 @@ public class Template extends AuditDomain {
 
     public void setSmsContent(String smsContent) {
         this.smsContent = smsContent;
+    }
+
+    public String getPmTitle() {
+        return pmTitle;
+    }
+
+    public void setPmTitle(String pmTitle) {
+        this.pmTitle = pmTitle;
+    }
+
+    public String getPmContent() {
+        return pmContent;
+    }
+
+    public void setPmContent(String pmContent) {
+        this.pmContent = pmContent;
     }
 }

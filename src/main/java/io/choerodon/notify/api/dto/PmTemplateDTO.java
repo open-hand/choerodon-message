@@ -4,53 +4,53 @@ import io.choerodon.notify.domain.Template;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
 
-public class EmailTemplateDTO {
+public class PmTemplateDTO {
 
     private Long id;
 
-    @NotEmpty(message = "error.emailTemplate.codeEmpty")
+    @NotEmpty(message = "error.pmTemplate.codeEmpty")
     private String code;
 
-    @NotEmpty(message = "error.emailTemplate.nameEmpty")
+    @NotEmpty(message = "error.pmTemplate.nameEmpty")
     private String name;
 
     private Boolean isPredefined;
 
-    @NotEmpty(message = "error.emailTemplate.typeEmpty")
+    @NotEmpty(message = "error.pmTemplate.typeEmpty")
     private String type;
 
-    @NotEmpty(message = "error.emailTemplate.titleEmpty")
+    @NotEmpty(message = "error.pmTemplate.titleEmpty")
     private String title;
 
-    @NotEmpty(message = "error.emailTemplate.contentEmpty")
+    @NotEmpty(message = "error.pmTemplate.contentEmpty")
     private String content;
 
     private Long objectVersionNumber;
 
-    public static PropertyMap<EmailTemplateDTO, Template> dto2Entity() {
-        return new PropertyMap<EmailTemplateDTO, Template>() {
+    public static PropertyMap<PmTemplateDTO, Template> dto2Entity() {
+        return new PropertyMap<PmTemplateDTO, Template>() {
             protected void configure() {
                 skip().setMessageType(null);
                 skip().setSmsContent(null);
-                skip().setPmTitle(null);
-                skip().setPmContent(null);
+                skip().setEmailTitle(null);
+                skip().setEmailContent(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
                 skip().setLastUpdateDate(null);
                 skip().setLastUpdatedBy(null);
                 map().setBusinessType(source.getType());
-                map().setEmailContent(source.getContent());
-                map().setEmailTitle(source.getTitle());
+                map().setPmContent(source.getContent());
+                map().setPmTitle(source.getTitle());
             }
         };
     }
 
-    public static PropertyMap<Template, EmailTemplateDTO> entity2Dto() {
-        return new PropertyMap<Template, EmailTemplateDTO>() {
+    public static PropertyMap<Template, PmTemplateDTO> entity2Dto() {
+        return new PropertyMap<Template, PmTemplateDTO>() {
             protected void configure() {
                 map().setType(source.getBusinessType());
-                map().setContent(source.getEmailContent());
-                map().setTitle(source.getEmailTitle());
+                map().setContent(source.getPmContent());
+                map().setTitle(source.getPmTitle());
             }
         };
     }
