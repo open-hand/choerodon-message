@@ -15,6 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: 'NAME', type: 'VARCHAR(32)', remarks: '模版名称') {
                 constraints(nullable: false)
             }
+
             column(name: 'MESSAGE_TYPE', type: 'VARCHAR(16)', remarks: '模版类型:email,sms') {
                 constraints(nullable: false)
             }
@@ -46,6 +47,12 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         addColumn(tableName: 'NOTIFY_TEMPLATE') {
             column(name: 'PM_TITLE', type: 'VARCHAR(32)', remarks: 'pm模版标题')
             column(name: 'PM_CONTENT', type: 'TEXT', remarks: 'pm模版内容')
+        }
+    }
+    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-04-add-column-pm') {
+        createTable(tableName: "notify_template") {
+            column(name: 'pm_title', type: 'VARCHAR(32)', remarks: '站内信模版标题')
+            column(name: 'pm_content', type: 'TEXT', remarks: '站内信模版内容')
         }
     }
 }
