@@ -4,11 +4,8 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.notify.api.dto.PmTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.swagger.notify.EmailTemplateScanData;
 
 import java.util.List;
-import java.util.Set;
 
 public interface PmTemplateService {
 
