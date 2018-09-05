@@ -5,7 +5,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.domain.Template;
 import org.modelmapper.PropertyMap;
 
-public class EmailTemplateQueryDTO {
+public class TemplateQueryDTO {
 
     private Long id;
 
@@ -24,7 +24,7 @@ public class EmailTemplateQueryDTO {
     private PageRequest pageRequest;
 
 
-    public EmailTemplateQueryDTO(String name, String code, String type, Boolean isPredefined, String params, PageRequest pageRequest) {
+    public TemplateQueryDTO(String name, String code, String type, Boolean isPredefined, String params, PageRequest pageRequest) {
         this.name = name;
         this.code = code;
         this.type = type;
@@ -33,8 +33,8 @@ public class EmailTemplateQueryDTO {
         this.pageRequest = pageRequest;
     }
 
-    public static PropertyMap<EmailTemplateQueryDTO, Template> dto2Entity() {
-        return new PropertyMap<EmailTemplateQueryDTO, Template>() {
+    public static PropertyMap<TemplateQueryDTO, Template> dto2Entity() {
+        return new PropertyMap<TemplateQueryDTO, Template>() {
             protected void configure() {
                 skip().setMessageType(null);
                 skip().setSmsContent(null);
@@ -43,6 +43,8 @@ public class EmailTemplateQueryDTO {
                 skip().setObjectVersionNumber(null);
                 skip().setEmailTitle(null);
                 skip().setEmailContent(null);
+                skip().setPmTitle(null);
+                skip().setPmContent(null);
                 skip().setLastUpdateDate(null);
                 skip().setLastUpdatedBy(null);
                 map().setBusinessType(source.getType());
@@ -50,8 +52,8 @@ public class EmailTemplateQueryDTO {
         };
     }
 
-    public static PropertyMap<Template, EmailTemplateQueryDTO> entity2Dto() {
-        return new PropertyMap<Template, EmailTemplateQueryDTO>() {
+    public static PropertyMap<Template, TemplateQueryDTO> entity2Dto() {
+        return new PropertyMap<Template, TemplateQueryDTO>() {
             protected void configure() {
                 map().setType(source.getBusinessType());
                 skip().setParams(null);
@@ -60,7 +62,7 @@ public class EmailTemplateQueryDTO {
         };
     }
 
-    public EmailTemplateQueryDTO() {
+    public TemplateQueryDTO() {
     }
 
     public Long getId() {

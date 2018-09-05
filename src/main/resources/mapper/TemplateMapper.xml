@@ -2,7 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.notify.infra.mapper.TemplateMapper">
 
-    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.EmailTemplateQueryDTO">
+    <select id="selectNamesByLevelAndTypeAnyMessageType" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
+        SELECT
+        nt.id,
+        nt.code,
+        nt.name
+        FROM notify_template nt
+        INNER JOIN notify_send_setting nss on nss.code = nt.business_type
+        <if test="type != null">
+            AND nss.code = #{type}
+        </if>
+        WHERE nss.fd_level = #{level} AND nt.message_type = #{messageType}
+    </select>
+
+    <select id="fulltextSearchStationLetter" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
+        SELECT
+        nt.id,
+        nt.code,
+        nt.name,
+        nss.name AS type,
+        nt.is_predefined AS isPredefined
+        FROM notify_template nt
+        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
+        WHERE nt.message_type = 'pm'
+        AND nss.fd_level = #{level}
+        <if test="type != null">
+            AND nss.name LIKE concat(concat('%',#{type}),'%')
+        </if>
+        <if test="code != null">
+            AND nt.code LIKE concat(concat('%',#{code}),'%')
+        </if>
+        <if test="name != null">
+            AND nt.name LIKE concat(concat('%',#{name}),'%')
+        </if>
+        <if test="isPredefined != null">
+            AND nt.is_predefined = #{isPredefined}
+        </if>
+
+        <if test="params != null">
+            AND(
+            nt.code LIKE concat(concat('%',#{params}),'%') OR
+            nt.name LIKE concat(concat('%',#{params}),'%') OR
+            nss.name  LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+    </select>
+
+    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
         SELECT
         nt.id,
         nt.code,
@@ -47,7 +93,6 @@
         </if>
         WHERE nss.fd_level = #{level}
     </select>
-
 
     <select id="selectLevelByCode" resultType="java.lang.String">
         SELECT
