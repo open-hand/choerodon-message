@@ -15,7 +15,6 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: 'NAME', type: 'VARCHAR(32)', remarks: '模版名称') {
                 constraints(nullable: false)
             }
-
             column(name: 'MESSAGE_TYPE', type: 'VARCHAR(16)', remarks: '模版类型:email,sms') {
                 constraints(nullable: false)
             }
@@ -28,7 +27,6 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: 'EMAIL_TITLE', type: 'VARCHAR(64)', remarks: 'email模版标题')
             column(name: 'EMAIL_CONTENT', type: 'TEXT', remarks: 'email模版内容')
             column(name: 'SMS_CONTENT', type: 'TEXT', remarks: '短信模版内容')
-
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")
             column(name: "CREATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "CREATION_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
@@ -42,17 +40,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         dropUniqueConstraint(constraintName: 'message_type_code_unique', tableName: 'NOTIFY_TEMPLATE')
         addUniqueConstraint(tableName: 'NOTIFY_TEMPLATE', columnNames: 'CODE,MESSAGE_TYPE', constraintName: "UK_NOTIFY_TEMPLATE_U1")
     }
-
     changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-05-add-column-pm') {
-        addColumn(tableName: 'NOTIFY_TEMPLATE') {
-            column(name: 'PM_TITLE', type: 'VARCHAR(32)', remarks: 'pm模版标题')
-            column(name: 'PM_CONTENT', type: 'TEXT', remarks: 'pm模版内容')
-        }
-    }
-    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-04-add-column-pm') {
-        addColumn(tableName: "notify_template") {
-            column(name: 'pm_title', type: 'VARCHAR(32)', remarks: '站内信模版标题')
-            column(name: 'pm_content', type: 'TEXT', remarks: '站内信模版内容')
+        addColumn(tableName: "NOTIFY_TEMPLATE") {
+            column(name: 'PM_TITLE', type: 'VARCHAR(32)', remarks: '站内信模版标题', afterColumn: 'SMS_CONTENT')
+            column(name: 'PM_CONTENT', type: 'TEXT', remarks: '站内信模版内容', afterColumn: 'PM_TITLE')
         }
     }
 }
