@@ -143,6 +143,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0.1.0</version>
+        </dependency>
         <!--监控相关依赖 -->
         <dependency><!-- 如果服务需要监控功能则需要此依赖 -->
             <groupId>org.springframework.cloud</groupId>

@@ -14,13 +14,13 @@
         WHERE nt.message_type = 'email'
         AND nss.fd_level = #{level}
         <if test="type != null">
-            AND nss.name LIKE concat('%',#{type},'%')
+            AND nss.name LIKE concat(concat('%',#{type}),'%')
         </if>
         <if test="code != null">
-            AND nt.code LIKE concat('%',#{code},'%')
+            AND nt.code LIKE concat(concat('%',#{code}),'%')
         </if>
         <if test="name != null">
-            AND nt.name LIKE concat('%',#{name},'%')
+            AND nt.name LIKE concat(concat('%',#{name}),'%')
         </if>
         <if test="isPredefined != null">
             AND nt.is_predefined = #{isPredefined}
@@ -28,9 +28,9 @@
 
         <if test="params != null">
             AND(
-            nt.code LIKE concat('%',#{params},'%') OR
-            nt.name LIKE concat('%',#{params},'%') OR
-            nss.name  LIKE concat('%',#{params},'%')
+            nt.code LIKE concat(concat('%',#{params}),'%') OR
+            nt.name LIKE concat(concat('%',#{params}),'%') OR
+            nss.name  LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>
