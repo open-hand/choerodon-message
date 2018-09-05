@@ -17,27 +17,27 @@
         LEFT JOIN notify_template tl ON rc.template_id = tl.id
         WHERE nts.fd_level = #{query.level} AND rc.status IS NOT NULL
         <if test="query.status != null">
-            AND rc.status LIKE concat('%',#{query.status},'%')
+            AND rc.status LIKE concat(concat('%',#{query.status}),'%')
         </if>
         <if test="query.retryCount != null">
             AND rc.retry_count = #{query.retryCount}
         </if>
         <if test="query.email != null">
-            AND rc.receive_account LIKE concat('%',#{query.email},'%')
+            AND rc.receive_account LIKE concat(concat('%',#{query.email}),'%')
         </if>
         <if test="query.templateType != null">
-            AND tl.name LIKE concat('%',#{query.templateType},'%')
+            AND tl.name LIKE concat(concat('%',#{query.templateType}),'%')
         </if>
         <if test="query.failedReason != null">
-            AND rc.failed_reason LIKE concat('%',#{query.failedReason},'%')
+            AND rc.failed_reason LIKE concat(concat('%',#{query.failedReason}),'%')
         </if>
         <if test="query.params != null">
             AND(
-            rc.status LIKE concat('%',#{query.params},'%') OR
+            rc.status LIKE concat(concat('%',#{query.params}),'%') OR
             rc.retry_count = #{query.params} OR
-            rc.receive_account LIKE concat('%',#{query.params},'%') OR
-            tl.name LIKE concat('%',#{query.params},'%') OR
-            rc.failed_reason LIKE concat('%',#{query.params},'%')
+            rc.receive_account LIKE concat(concat('%',#{query.params}),'%') OR
+            tl.name LIKE concat(concat('%',#{query.params}),'%') OR
+            rc.failed_reason LIKE concat(concat('%',#{query.params}),'%')
             )
         </if>
     </select>

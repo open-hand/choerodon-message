@@ -2,12 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.notify.infra.mapper.SendSettingMapper">
 
-    <select id="fulltextSearch" resultType="io.choerodon.notify.api.dto.SendSettingListDTO">
+    <resultMap id="SendSettingListDTO" type="io.choerodon.notify.api.dto.SendSettingListDTO">
+        <id column="id" property="id"></id>
+        <result column="fd_level" property="level" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="fulltextSearch" resultMap="SendSettingListDTO">
         SELECT
         nts.id,
         nts.code,
         nts.name,
-        nts.fd_level AS level,
+        nts.fd_level,
         nts.description,
         ntemail.code AS email_template_code,
         ntsms.code AS sms_template_code,
@@ -18,31 +23,36 @@
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
         WHERE nts.fd_level = #{level}
         <if test="code != null">
-            AND nts.code LIKE concat('%',#{code},'%')
+            AND nts.code LIKE concat(concat('%',#{code}),'%')
         </if>
 
         <if test="name != null">
-            AND nts.name LIKE concat('%',#{name},'%')
+            AND nts.name LIKE concat(concat('%',#{name}),'%')
         </if>
         <if test="description != null">
-            AND nts.description LIKE concat('%',#{description},'%')
+            AND nts.description LIKE concat(concat('%',#{description}),'%')
         </if>
         <if test="params != null">
             AND(
-            nts.code LIKE concat('%',#{params},'%') OR
-            nts.name LIKE concat('%',#{params},'%') OR
-            nts.description LIKE concat('%',#{params},'%')
+            nts.code LIKE concat(concat('%',#{params}),'%') OR
+            nts.name LIKE concat(concat('%',#{params}),'%') OR
+            nts.description LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>
 
-    <select id="selectById" resultType="io.choerodon.notify.api.dto.SendSettingDetailDTO">
+    <resultMap id="SendSettingDetailDTO" type="io.choerodon.notify.api.dto.SendSettingDetailDTO">
+        <id column="id" property="id"></id>
+        <result column="fd_level" property="level" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="SendSettingDetailDTO">
         SELECT
         nts.id,
         nts.code,
         nts.name,
         nts.description,
-        nts.fd_level AS level,
+        nts.fd_level,
         nts.retry_count,
         nts.is_send_instantly,
         nts.is_manual_retry,
