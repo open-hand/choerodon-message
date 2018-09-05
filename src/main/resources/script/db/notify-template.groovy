@@ -46,10 +46,4 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             column(name: 'PM_CONTENT', type: 'TEXT', remarks: '站内信模版内容', afterColumn: 'PM_TITLE')
         }
     }
-    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-04-add-column-pm') {
-        addColumn(tableName: "notify_template") {
-            column(name: 'pm_title', type: 'VARCHAR(32)', remarks: '站内信模版标题')
-            column(name: 'pm_content', type: 'TEXT', remarks: '站内信模版内容')
-        }
-    }
 }
