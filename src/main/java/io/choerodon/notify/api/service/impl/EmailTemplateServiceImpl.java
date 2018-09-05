@@ -4,10 +4,10 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
-import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -113,6 +113,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 t.setId(query.getId());
                 t.setObjectVersionNumber(query.getObjectVersionNumber());
                 templateMapper.updateByPrimaryKeySelective(t);
+
             }
         });
     }
