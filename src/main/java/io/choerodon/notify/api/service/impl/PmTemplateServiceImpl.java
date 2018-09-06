@@ -109,7 +109,7 @@ public class PmTemplateServiceImpl implements PmTemplateService {
     @Override
     public void delete(Long id) {
         Template dbTemplate = templateMapper.selectByPrimaryKey(id);
-        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.PM.getValue())){
+        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.PM.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         if (dbTemplate.getIsPredefined() == null || dbTemplate.getIsPredefined()) {
@@ -123,7 +123,7 @@ public class PmTemplateServiceImpl implements PmTemplateService {
 
     @Override
     public void check(String code) {
-        String level = templateMapper.selectLevelByCode(code);
+        String level = templateMapper.selectLevelByCode(code, MessageType.PM.getValue());
         if (StringUtils.isEmpty(level)) {
             return;
         }

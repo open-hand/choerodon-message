@@ -141,7 +141,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public void check(String code) {
-        String level = templateMapper.selectLevelByCode(code);
+        String level = templateMapper.selectLevelByCode(code, MessageType.EMAIL.getValue());
         if (StringUtils.isEmpty(level)) {
             return;
         }
