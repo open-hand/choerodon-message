@@ -5,21 +5,21 @@ import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
+import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.exception.EmailSendException;
 import io.choerodon.notify.api.pojo.EmailSendError;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.notify.domain.Config;
-import io.choerodon.notify.domain.Record;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,13 +66,18 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private final Executor executor;
 
+    private final SiteMsgRecordMapper siteMsgRecordMapper;
+
+    private final ModelMapper modelMapper = new ModelMapper();
+
     public NoticesSendServiceImpl(SendSettingMapper sendSettingMapper,
                                   TemplateMapper templateMapper,
                                   FreeMarkerConfigBuilder freeMarkerConfigBuilder,
                                   ConfigCache configCache,
                                   RecordMapper recordMapper,
                                   EmailQueueObservable emailQueueObservable,
-                                  @Qualifier("asyncSendNoticeExecutor") Executor executor) {
+                                  @Qualifier("asyncSendNoticeExecutor") Executor executor,
+                                  SiteMsgRecordMapper siteMsgRecordMapper) {
         this.sendSettingMapper = sendSettingMapper;
         this.templateMapper = templateMapper;
         this.freeMarkerConfigBuilder = freeMarkerConfigBuilder;
@@ -80,6 +85,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         this.recordMapper = recordMapper;
         this.emailQueueObservable = emailQueueObservable;
         this.executor = executor;
+        this.siteMsgRecordMapper = siteMsgRecordMapper;
+        modelMapper.addMappings(SiteMsgRecordDTO.dto2Entity());
+        modelMapper.addMappings(SiteMsgRecordDTO.entity2Dto());
+        modelMapper.validate();
     }
 
     @Override
@@ -122,6 +131,15 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         } catch (MessagingException e) {
             throw new CommonException("error.emailConfig.testConnectFailed", e);
         }
+    }
+
+    @Override
+    public SiteMsgRecordDTO sendSiteMsg(SiteMsgRecordDTO siteMsgRecordDTO) {
+        SiteMsgRecord siteMsgRecord = modelMapper.map(siteMsgRecordDTO, SiteMsgRecord.class);
+        if (siteMsgRecordMapper.insertSelective(siteMsgRecord) != 1) {
+            throw new CommonException("error.siteMsgRecord.save");
+        }
+        return modelMapper.map(siteMsgRecordMapper.selectByPrimaryKey(siteMsgRecord.getId()), SiteMsgRecordDTO.class);
     }
 
     @Override
@@ -243,6 +261,5 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         return FreeMarkerTemplateUtils.processTemplateIntoString(ft, variables);
     }
-
 
 }

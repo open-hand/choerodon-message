@@ -3,15 +3,22 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailSendDTO;
+import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
+import io.choerodon.notify.api.dto.SiteMsgSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 @RequestMapping("v1/notices")
@@ -37,4 +44,19 @@ public class NoticesSendController {
         noticesSendService.createMailSenderAndSendEmail(dto);
     }
 
+    @PostMapping("/letters")
+    @ApiOperation(value = "发送站内信")
+    @Permission(level = ResourceLevel.SITE)
+    public ResponseEntity<SiteMsgRecordDTO> postLetter(@RequestBody @Valid SiteMsgSendDTO siteMsgSendDTO) {
+        SiteMsgRecordDTO siteMsgRecordDTO = new SiteMsgRecordDTO();
+        siteMsgRecordDTO.setDeleted(false);
+        siteMsgRecordDTO.setRead(false);
+        siteMsgRecordDTO.setId(null);
+        siteMsgRecordDTO.setSendTime(new Date());
+        siteMsgRecordDTO.setObjectVersionNumber(null);
+        siteMsgRecordDTO.setTitle(siteMsgSendDTO.getTitle());
+        siteMsgRecordDTO.setContent(siteMsgSendDTO.getContent());
+        siteMsgRecordDTO.setUserId(siteMsgSendDTO.getUserId());
+        return new ResponseEntity<>(noticesSendService.sendSiteMsg(siteMsgRecordDTO), HttpStatus.OK);
+    }
 }
