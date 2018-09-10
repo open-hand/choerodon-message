@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.Date;
 
 @RestController
@@ -47,16 +46,30 @@ public class NoticesSendController {
     @PostMapping("/letters")
     @ApiOperation(value = "发送站内信")
     @Permission(level = ResourceLevel.SITE)
-    public ResponseEntity<SiteMsgRecordDTO> postLetter(@RequestBody @Valid SiteMsgSendDTO siteMsgSendDTO) {
+    public ResponseEntity<SiteMsgRecordDTO> postLetter(@RequestBody SiteMsgSendDTO siteMsgSendDTO) {
         SiteMsgRecordDTO siteMsgRecordDTO = new SiteMsgRecordDTO();
         siteMsgRecordDTO.setDeleted(false);
         siteMsgRecordDTO.setRead(false);
         siteMsgRecordDTO.setId(null);
         siteMsgRecordDTO.setSendTime(new Date());
         siteMsgRecordDTO.setObjectVersionNumber(null);
-        siteMsgRecordDTO.setTitle(siteMsgSendDTO.getTitle());
-        siteMsgRecordDTO.setContent(siteMsgSendDTO.getContent());
-        siteMsgRecordDTO.setUserId(siteMsgSendDTO.getUserId());
+        validateSiteMsg(siteMsgSendDTO);
+        siteMsgRecordDTO.setSiteMsgSend(siteMsgSendDTO);
         return new ResponseEntity<>(noticesSendService.sendSiteMsg(siteMsgRecordDTO), HttpStatus.OK);
+    }
+
+    private void validateSiteMsg(@RequestBody SiteMsgSendDTO siteMsgSendDTO) {
+        if (siteMsgSendDTO == null) {
+            throw new FeignException("error.noticeSend.siteMsgEmpty");
+        }
+        if (StringUtils.isEmpty(siteMsgSendDTO.getUserId())) {
+            throw new FeignException("error.noticeSend.siteMsg.userIdEmpty");
+        }
+        if (StringUtils.isEmpty(siteMsgSendDTO.getTitle())) {
+            throw new FeignException("error.noticeSend.siteMsg.titleEmpty");
+        }
+        if (StringUtils.isEmpty(siteMsgSendDTO.getContent())) {
+            throw new FeignException("error.noticeSend.siteMsg.contentEmpty");
+        }
     }
 }

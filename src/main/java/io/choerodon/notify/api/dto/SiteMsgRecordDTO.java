@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.dto;
 
 import io.choerodon.notify.domain.SiteMsgRecord;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
 
@@ -13,12 +14,15 @@ import java.util.Date;
 public class SiteMsgRecordDTO {
     private Long id;
 
+    @ApiModelProperty(value = "站内信用户id,确保用户id已存在/必填")
     @NotNull(message = "error.siteMsgRecord.userIdNull")
     private Long userId;
 
+    @ApiModelProperty(value = "站内信标题/必填")
     @NotEmpty(message = "error.siteMsgRecord.titleEmpty")
     private String title;
 
+    @ApiModelProperty(value = "站内信内容/必填")
     @NotEmpty(message = "error.siteMsgRecord.contentEmpty")
     private String content;
 
@@ -45,8 +49,16 @@ public class SiteMsgRecordDTO {
         return new PropertyMap<SiteMsgRecord, SiteMsgRecordDTO>() {
             @Override
             protected void configure() {
+                skip().setSiteMsgSend(null);
             }
         };
+    }
+
+    public void setSiteMsgSend(SiteMsgSendDTO siteMsgSend) {
+        if (siteMsgSend == null) return;
+        this.setTitle(siteMsgSend.getTitle());
+        this.setContent(siteMsgSend.getContent());
+        this.setUserId(siteMsgSend.getUserId());
     }
 
     @Override
