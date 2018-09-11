@@ -49,16 +49,8 @@ public class SiteMsgRecordDTO {
         return new PropertyMap<SiteMsgRecord, SiteMsgRecordDTO>() {
             @Override
             protected void configure() {
-                skip().setSiteMsgSend(null);
             }
         };
-    }
-
-    public void setSiteMsgSend(SiteMsgSendDTO siteMsgSend) {
-        if (siteMsgSend == null) return;
-        this.setTitle(siteMsgSend.getTitle());
-        this.setContent(siteMsgSend.getContent());
-        this.setUserId(siteMsgSend.getUserId());
     }
 
     @Override
