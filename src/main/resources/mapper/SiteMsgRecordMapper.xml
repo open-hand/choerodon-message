@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.SiteMsgRecordMapper">
+
+    <resultMap id="SiteMsgRecordDTO" type="io.choerodon.notify.api.dto.SiteMsgRecordDTO">
+        <id column="id" property="id"></id>
+        <result column="is_read" property="read" jdbcType="BOOLEAN"/>
+        <result column="is_deleted" property="deleted" jdbcType="BOOLEAN"/>
+    </resultMap>
+
+    <select id="fulltextSearch" resultMap="SiteMsgRecordDTO">
+        SELECT
+        nsr.*
+        FROM notify_sitemsg_record nsr
+        WHERE 1 = 1
+        <if test="query.id != null">
+            AND nsr.id = #{query.id}
+        </if>
+        <if test="query.userId != null">
+            AND nsr.user_id = #{query.userId}
+        </if>
+        <if test="query.title != null">
+            AND nsr.title LIKE concat(concat('%',#{query.title}),'%')
+        </if>
+        <if test="query.content != null">
+            AND nsr.content LIKE concat(concat('%',#{query.content}),'%')
+        </if>
+        <if test="query.read != null">
+            AND nsr.is_read = #{query.read}
+        </if>
+        <if test="query.deleted != null">
+            AND nsr.is_deleted = #{query.deleted}
+        </if>
+        <if test="query.params != null">
+            AND(
+            nsr.title LIKE concat(concat('%',#{query.title}),'%') OR
+            nsr.content LIKE concat(concat('%',#{query.content}),'%')
+            )
+        </if>
+    </select>
+</mapper>
