@@ -49,7 +49,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         for (Long id : ids) {
             if (id == null) continue;
             SiteMsgRecord siteMsgRecord = siteMsgRecordMapper.selectByPrimaryKey(id);
-            if (siteMsgRecord != null && siteMsgRecord.getUserId() == userId && !siteMsgRecord.getRead()) {
+            if (siteMsgRecord != null && siteMsgRecord.getUserId().equals(userId) && !siteMsgRecord.getRead()) {
                 siteMsgRecord.setRead(true);
                 siteMsgRecordMapper.updateByPrimaryKeySelective(siteMsgRecord);
             }
@@ -63,7 +63,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         for (Long id : ids) {
             if (id == null) continue;
             SiteMsgRecord siteMsgRecord = siteMsgRecordMapper.selectByPrimaryKey(id);
-            if (siteMsgRecord != null && siteMsgRecord.getUserId() == userId && !siteMsgRecord.getDeleted()) {
+            if (siteMsgRecord != null && siteMsgRecord.getUserId().equals(userId) && !siteMsgRecord.getDeleted()) {
                 siteMsgRecord.setDeleted(true);
                 siteMsgRecordMapper.updateByPrimaryKeySelective(siteMsgRecord);
             }
