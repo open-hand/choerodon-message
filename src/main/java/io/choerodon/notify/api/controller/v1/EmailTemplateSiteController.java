@@ -86,7 +86,7 @@ public class EmailTemplateSiteController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层更新邮件模版")
     public ResponseEntity<EmailTemplateDTO> update(@PathVariable Long id,
-                                                   @RequestBody EmailTemplateDTO template) {
+                                                   @RequestBody @Valid EmailTemplateDTO template) {
         template.setId(id);
         template.setIsPredefined(null);
         if (template.getObjectVersionNumber() == null) {

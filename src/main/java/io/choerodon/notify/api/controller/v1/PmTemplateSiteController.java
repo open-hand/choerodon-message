@@ -86,7 +86,7 @@ public class PmTemplateSiteController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层更新站内信模版")
     public ResponseEntity<PmTemplateDTO> update(@PathVariable Long id,
-                                                   @RequestBody PmTemplateDTO template) {
+                                                   @RequestBody @Valid PmTemplateDTO template) {
         template.setId(id);
         template.setIsPredefined(null);
         if (template.getObjectVersionNumber() == null) {
