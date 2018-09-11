@@ -80,7 +80,7 @@ public class EmailTemplateOrgController {
     @ApiOperation(value = "组织层更新邮件模版")
     public ResponseEntity<EmailTemplateDTO> update(@PathVariable("organization_id") long orgId,
                                                    @PathVariable Long id,
-                                                   @RequestBody EmailTemplateDTO template) {
+                                                   @RequestBody @Valid EmailTemplateDTO template) {
         template.setId(id);
         template.setIsPredefined(null);
         if (template.getObjectVersionNumber() == null) {
