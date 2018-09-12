@@ -38,4 +38,15 @@
             )
         </if>
     </select>
+
+    <select id="selectByUserIdAndReadAndDeleted" resultMap="SiteMsgRecordDTO">
+        SELECT
+        nsr.*
+        FROM notify_sitemsg_record nsr
+        WHERE nsr.user_id = #{userId}
+        AND nsr.is_deleted = false
+        <if test="read != null">
+            AND nsr.is_read = #{read}
+        </if>
+    </select>
 </mapper>

@@ -29,4 +29,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-12-add-index-userId-deleted-readed') {
+        createIndex(tableName: 'NOTIFY_SITEMSG_RECORD', indexName: 'IDX_USERID_DELETED_READ', unique: false) {
+            column(name: 'USER_ID')
+            column(name: 'IS_DELETED')
+            column(name: 'IS_READ')
+        }
+    }
 }
