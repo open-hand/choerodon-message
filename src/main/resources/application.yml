@@ -1,5 +1,8 @@
 # application.yml
 spring:
+  redis:
+    port: 6379
+    host: localhost
   http:
     encoding:
       charset: UTF-8
@@ -77,6 +80,13 @@ mybatis:
   configuration: # 数据库下划线转驼峰配置
     mapUnderscoreToCamelCase: true
 choerodon:
+  websocket:
+    security: false
+    front: /ws/**
+    oauth-url: http://your.oauth-server/oauth/api/user
+    agent: /agent/**
+    max-redis-msg-listener-concurrency: 500
+    register-interval: 2000
   notify:
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service

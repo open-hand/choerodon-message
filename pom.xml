@@ -84,12 +84,19 @@
             <artifactId>choerodon-starter-bus</artifactId>
             <version>${choerodon.starters.version}</version>
         </dependency>
+        <!--websocket-->
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-websocket-helper</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+
+        <!--mail-->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.28</version>
         </dependency>
-        <!--mail-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
