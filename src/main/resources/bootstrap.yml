@@ -22,4 +22,5 @@ management:
 security:
   basic:
     enabled: false
+  ignored: /agent/**, /ws/**
 
