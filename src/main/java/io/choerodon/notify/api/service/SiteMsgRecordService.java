@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.service;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam;
 
@@ -12,18 +13,18 @@ import java.util.List;
 public interface SiteMsgRecordService {
 
     /**
-     * 分页查询用户所有消息
+     * 分页查询用户所有未删除消息
      *
      * @return
      */
-    Page<SiteMsgRecordDTO> pagingQuery(SiteMsgRecordQueryParam siteMsgRecordQueryParam);
+    Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, PageRequest pageRequest);
 
     /**
      * 查询用户所有的未读消息接口
      *
      * @return
      */
-    List<SiteMsgRecordDTO> listByReadAndId(Long userId, Boolean isRead);
+    List<SiteMsgRecordDTO> listByReadAndUserId(Long userId, Boolean isRead);
 
     /**
      * 批量修改消息为已读

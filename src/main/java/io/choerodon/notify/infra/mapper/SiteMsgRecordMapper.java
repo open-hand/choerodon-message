@@ -14,4 +14,7 @@ import java.util.List;
 public interface SiteMsgRecordMapper extends BaseMapper<SiteMsgRecord> {
 
     List<SiteMsgRecordDTO> fulltextSearch(@Param("query") SiteMsgRecordQueryParam siteMsgRecordQueryParam);
+
+    List<SiteMsgRecordDTO> selectByUserIdAndReadAndDeleted(@Param("userId") Long userId,
+                                                           @Param("read") Boolean read);
 }

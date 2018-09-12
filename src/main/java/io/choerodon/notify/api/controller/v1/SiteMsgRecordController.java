@@ -6,7 +6,6 @@ import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
-import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
@@ -35,7 +34,7 @@ public class SiteMsgRecordController {
     @CustomPageRequest
     @ApiOperation(value = "全局层查询用户所有的站内信未读消息接口")
     public ResponseEntity<List<SiteMsgRecordDTO>> pagingQueryNotRead(@PathVariable(value = "id") Long userId) {
-        return new ResponseEntity<>(siteMsgRecordService.listByReadAndId(userId,false), HttpStatus.OK);
+        return new ResponseEntity<>(siteMsgRecordService.listByReadAndUserId(userId, false), HttpStatus.OK);
     }
 
     @GetMapping("/users/{id}")
@@ -44,8 +43,7 @@ public class SiteMsgRecordController {
     @ApiOperation(value = "全局层查询用户站内信消息接口")
     public ResponseEntity<Page<SiteMsgRecordDTO>> pagingQuery(@PathVariable(value = "id") Long userId,
                                                               @ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest) {
-        SiteMsgRecordQueryParam queryParam = new SiteMsgRecordQueryParam(userId, false, pageRequest);
-        return new ResponseEntity<>(siteMsgRecordService.pagingQuery(queryParam), HttpStatus.OK);
+        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, pageRequest), HttpStatus.OK);
     }
 
     @PutMapping("/users/{id}/batch_read")
