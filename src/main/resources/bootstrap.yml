@@ -22,5 +22,5 @@ management:
 security:
   basic:
     enabled: false
-  ignored: /agent/**, /ws/**
+  ignored: /choerodon_msg/**
 

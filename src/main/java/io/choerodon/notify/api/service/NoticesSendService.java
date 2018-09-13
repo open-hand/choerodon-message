@@ -2,16 +2,14 @@ package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
-import io.choerodon.notify.domain.Record;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import io.choerodon.notify.api.dto.PmSendDTO;
 
 public interface NoticesSendService {
 
-    void createMailSenderAndSendEmail(EmailSendDTO dto);
+    void sendEmail(EmailSendDTO dto);
 
-    void sendEmail(Record record, boolean isManualRetry);
-
-    JavaMailSenderImpl createEmailSender();
+    void sendPm(PmSendDTO dto);
 
     void testEmailConnect(EmailConfigDTO config);
+
 }
