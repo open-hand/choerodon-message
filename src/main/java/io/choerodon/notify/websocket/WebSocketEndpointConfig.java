@@ -1,41 +1,49 @@
 package io.choerodon.notify.websocket;
 
-import io.choerodon.notify.websocket.ws.AbstractHandshakeInterceptor;
+import io.choerodon.notify.websocket.ws.AuthHandshakeInterceptor;
+import io.choerodon.notify.websocket.ws.WebSocketHandshakeInterceptor;
 import io.choerodon.notify.websocket.ws.WebSocketMessageHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSocket
 @EnableConfigurationProperties(WebSocketProperties.class)
 public class WebSocketEndpointConfig implements WebSocketConfigurer {
 
+    @Autowired
     private WebSocketMessageHandler webSocketHandler;
 
+    @Autowired
     private WebSocketProperties webSocketProperties;
 
-    private List<AbstractHandshakeInterceptor> handshakeInterceptors;
+    @Autowired
+    private Optional<List<WebSocketHandshakeInterceptor>> handshakeInterceptors;
 
-    public WebSocketEndpointConfig(WebSocketMessageHandler webSocketHandler,
-                                   WebSocketProperties webSocketProperties,
-                                   List<AbstractHandshakeInterceptor> handshakeInterceptors) {
-        this.webSocketHandler = webSocketHandler;
-        this.webSocketProperties = webSocketProperties;
-        this.handshakeInterceptors = handshakeInterceptors;
+    @Bean
+    @ConditionalOnProperty(prefix = "choerodon.ws", name = "oauth")
+    AuthHandshakeInterceptor authHandshakeInterceptor() {
+        return new AuthHandshakeInterceptor(webSocketProperties);
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        AbstractHandshakeInterceptor[] abstractHandshakeInterceptors = new AbstractHandshakeInterceptor[handshakeInterceptors.size()];
-        handshakeInterceptors.toArray(abstractHandshakeInterceptors);
+        List<WebSocketHandshakeInterceptor> interceptors = handshakeInterceptors.orElseGet(Collections::emptyList);
+        WebSocketHandshakeInterceptor[] webSocketHandshakeInterceptors = new WebSocketHandshakeInterceptor[interceptors.size()];
+        interceptors.toArray(webSocketHandshakeInterceptors);
         registry.addHandler(webSocketHandler, webSocketProperties.getPaths())
                 .setAllowedOrigins("*")
-                .addInterceptors(abstractHandshakeInterceptors);
+                .addInterceptors(webSocketHandshakeInterceptors);
 
     }
 }

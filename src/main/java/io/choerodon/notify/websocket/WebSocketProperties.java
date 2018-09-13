@@ -7,11 +7,31 @@ public class WebSocketProperties {
 
     private String[] paths = {"/choerodon_msg/**"};
 
+    private boolean oauth = false;
+
+    private String oauthUrl = "http://oauth-server/oauth/api/user";
+
     public String[] getPaths() {
         return paths;
     }
 
     public void setPaths(String[] paths) {
         this.paths = paths;
+    }
+
+    public boolean isOauth() {
+        return oauth;
+    }
+
+    public void setOauth(boolean oauth) {
+        this.oauth = oauth;
+    }
+
+    public String getOauthUrl() {
+        return oauthUrl;
+    }
+
+    public void setOauthUrl(String oauthUrl) {
+        this.oauthUrl = oauthUrl;
     }
 }
