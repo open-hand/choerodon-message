@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailSendDTO;
+import io.choerodon.notify.api.dto.PmSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("v1/notices")
@@ -34,7 +38,17 @@ public class NoticesSendController {
         if (StringUtils.isEmpty(dto.getDestinationEmail())) {
             throw new FeignException("error.noticeSend.emailEmpty");
         }
-        noticesSendService.createMailSenderAndSendEmail(dto);
+        noticesSendService.sendEmail(dto);
+    }
+
+    @PostMapping("/pms")
+    @ApiOperation(value = "发送邮件")
+    @Permission(level = ResourceLevel.SITE)
+    public void postPm(@RequestBody @Valid PmSendDTO dto) {
+        if (dto.getParams() == null) {
+            dto.setParams(new HashMap<>(0));
+        }
+        noticesSendService.sendPm(dto);
     }
 
 }

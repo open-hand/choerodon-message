@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.notify.api.service.NoticesSendService;
+import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.domain.Record;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -12,19 +12,18 @@ import java.util.concurrent.Executor;
 @Component
 public class EmailQueueObserver implements Action1<Record> {
 
-    private final NoticesSendService noticesSendService;
+    private final EmailSendService emailSendService;
 
-    public EmailQueueObserver(NoticesSendService noticesSendService,
+    public EmailQueueObserver(EmailSendService emailSendService,
                               @Qualifier("asyncSendNoticeExecutor") Executor executor,
                               EmailQueueObservable observable) {
-        this.noticesSendService = noticesSendService;
+        this.emailSendService = emailSendService;
         observable.subscribeOn(Schedulers.from(executor)).subscribe(this);
     }
 
     @Override
     public void call(Record dto) {
-       noticesSendService.sendEmail(dto, false);
+        emailSendService.sendEmail(dto, false);
     }
-
 
 }
