@@ -86,6 +86,7 @@ choerodon:
     fetch-time: 5
   ws:
     paths: /choerodon_msg/**
+    oauth: false
 logging:
   level:
    javax.mail: info
