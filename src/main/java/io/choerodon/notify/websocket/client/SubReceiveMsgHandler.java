@@ -1,7 +1,7 @@
 package io.choerodon.notify.websocket.client;
 
 
-import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.RelationshipDefining;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
@@ -11,16 +11,16 @@ public class SubReceiveMsgHandler implements ReceiveMsgHandler<String> {
 
     private static final String SUB = "sub";
 
-    private RelationshipDefiningInter relationshipDefiningInter;
+    private RelationshipDefining relationshipDefining;
 
-    public SubReceiveMsgHandler(RelationshipDefiningInter relationshipDefiningInter) {
-        this.relationshipDefiningInter = relationshipDefiningInter;
+    public SubReceiveMsgHandler(RelationshipDefining relationshipDefining) {
+        this.relationshipDefining = relationshipDefining;
     }
 
     @Override
     public void handle(WebSocketSession session, String key) {
          if (!StringUtils.isEmpty(key)) {
-             relationshipDefiningInter.contactWebSocketSessionWithKey(key, session);
+             relationshipDefining.contact(key, session);
          }
     }
 

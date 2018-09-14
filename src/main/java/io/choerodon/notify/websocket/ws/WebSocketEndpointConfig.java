@@ -1,6 +1,6 @@
 package io.choerodon.notify.websocket.ws;
 
-import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.RelationshipDefining;
 import io.choerodon.notify.websocket.handshake.AuthHandshakeInterceptor;
 import io.choerodon.notify.websocket.handshake.WebSocketHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -50,7 +52,7 @@ public class WebSocketEndpointConfig implements WebSocketConfigurer {
 
     @Bean
     @ConditionalOnMissingBean
-    public RelationshipDefiningInter relationshipDefiningInter() {
-        return new DefaultRelationshipDefining();
+    public RelationshipDefining relationshipDefiningInter(StringRedisTemplate redisTemplate, Environment environment) {
+        return new DefaultRelationshipDefining(redisTemplate, environment);
     }
 }
