@@ -9,11 +9,13 @@ import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.PmSendService;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.websocket.MessageSendOperator;
+import io.choerodon.notify.websocket.MessageSender;
 import io.choerodon.notify.websocket.ws.WebSocketPayload;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+
+import static io.choerodon.notify.websocket.ws.MessageOperatorBuilder.Key;
 
 @Service("pmWsSendService")
 public class PmWsSendServiceImpl implements PmSendService {
@@ -24,14 +26,14 @@ public class PmWsSendServiceImpl implements PmSendService {
 
     private final TemplateMapper templateMapper;
 
-    private final MessageSendOperator messageSendOperator;
+    private final MessageSender messageSender;
 
     public PmWsSendServiceImpl(TemplateRender templateRender,
                                TemplateMapper templateMapper,
-                               MessageSendOperator messageSendOperator) {
+                               MessageSender messageSender) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
-        this.messageSendOperator = messageSendOperator;
+        this.messageSender = messageSender;
     }
 
     @Override
@@ -46,7 +48,8 @@ public class PmWsSendServiceImpl implements PmSendService {
         try {
             String pm = templateRender.renderTemplate(template, dto.getParams());
             PmRedisMessageDTO data = new PmRedisMessageDTO(dto.getId(), dto.getCode(), pm);
-            messageSendOperator.smartSend(new WebSocketPayload<>(MSG_TYPE_PM, data));
+            String key = "choerodon:msg:" + dto.getCode() + ":" + dto.getId();
+            messageSender.dsl().where(Key.eq(key)).payload(new WebSocketPayload<>(MSG_TYPE_PM, data)).sendByKey();
         } catch (JsonProcessingException e) {
             throw new CommonException("error.PmSendService.send.JsonProcessingException", e);
         } catch (IOException | TemplateException e) {

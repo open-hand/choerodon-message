@@ -1,9 +1,10 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.ws;
 
-import io.choerodon.notify.websocket.ws.AuthHandshakeInterceptor;
-import io.choerodon.notify.websocket.ws.WebSocketHandshakeInterceptor;
-import io.choerodon.notify.websocket.ws.WebSocketMessageHandler;
+import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.handshake.AuthHandshakeInterceptor;
+import io.choerodon.notify.websocket.handshake.WebSocketHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -45,5 +46,11 @@ public class WebSocketEndpointConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("*")
                 .addInterceptors(webSocketHandshakeInterceptors);
 
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RelationshipDefiningInter relationshipDefiningInter() {
+        return new DefaultRelationshipDefining();
     }
 }
