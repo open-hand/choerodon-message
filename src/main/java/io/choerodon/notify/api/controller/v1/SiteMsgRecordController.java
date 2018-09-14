@@ -7,6 +7,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
+import io.choerodon.notify.api.validator.SiteMsgRecordValidator;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
@@ -29,37 +30,34 @@ public class SiteMsgRecordController {
         this.siteMsgRecordService = siteMsgRecordService;
     }
 
-    @GetMapping("/users/{id}/not_read")
-    @Permission(level = ResourceLevel.SITE)
-    @CustomPageRequest
-    @ApiOperation(value = "全局层查询用户所有的站内信未读消息接口")
-    public ResponseEntity<List<SiteMsgRecordDTO>> pagingQueryNotRead(@PathVariable(value = "id") Long userId) {
-        return new ResponseEntity<>(siteMsgRecordService.listByReadAndUserId(userId, false), HttpStatus.OK);
-    }
-
-    @GetMapping("/users/{id}")
+    @GetMapping
     @Permission(level = ResourceLevel.SITE)
     @CustomPageRequest
     @ApiOperation(value = "全局层查询用户站内信消息接口")
-    public ResponseEntity<Page<SiteMsgRecordDTO>> pagingQuery(@PathVariable(value = "id") Long userId,
-                                                              @ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest) {
-        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, pageRequest), HttpStatus.OK);
+    public ResponseEntity<Page<SiteMsgRecordDTO>> pagingQuery(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                              @RequestParam("user_id") Long userId,
+                                                              @RequestParam(value = "read", required = false) Boolean isRead
+    ) {
+        SiteMsgRecordValidator.validateCurrentUser(userId);
+        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, isRead, pageRequest), HttpStatus.OK);
     }
 
-    @PutMapping("/users/{id}/batch_read")
+    @PutMapping("/batch_read")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层批量已读站内信消息接口")
-    public ResponseEntity<List<SiteMsgRecordDTO>> batchRead(@PathVariable(value = "id") long userId,
+    public ResponseEntity<List<SiteMsgRecordDTO>> batchRead(@RequestParam("user_id") Long userId,
                                                             @RequestBody Long[] ids) {
+        SiteMsgRecordValidator.validateCurrentUser(userId);
         siteMsgRecordService.batchUpdateSiteMsgRecordIsRead(userId, ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/users/{id}/batch_delete")
+    @PutMapping("/batch_delete")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层批量删除站内信消息接口")
-    public ResponseEntity<List<SiteMsgRecordDTO>> batchDeleted(@PathVariable(value = "id") long userId,
+    public ResponseEntity<List<SiteMsgRecordDTO>> batchDeleted(@RequestParam("user_id") Long userId,
                                                                @RequestBody Long[] ids) {
+        SiteMsgRecordValidator.validateCurrentUser(userId);
         siteMsgRecordService.batchUpdateSiteMsgRecordIsDeleted(userId, ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -17,14 +17,7 @@ public interface SiteMsgRecordService {
      *
      * @return
      */
-    Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, PageRequest pageRequest);
-
-    /**
-     * 查询用户所有的未读消息接口
-     *
-     * @return
-     */
-    List<SiteMsgRecordDTO> listByReadAndUserId(Long userId, Boolean isRead);
+    Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, PageRequest pageRequest);
 
     /**
      * 批量修改消息为已读

@@ -25,14 +25,9 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
     }
 
     @Override
-    public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, PageRequest pageRequest) {
+    public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, PageRequest pageRequest) {
         return PageHelper.doPageAndSort(pageRequest, () ->
-                siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, null));
-    }
-
-    @Override
-    public List<SiteMsgRecordDTO> listByReadAndUserId(Long userId, Boolean isRead) {
-        return siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead);
+                siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead));
     }
 
     @Override
