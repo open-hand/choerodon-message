@@ -36,6 +36,9 @@ public class WebSocketPayload<T> {
         this.uuid = uuid;
     }
 
+    public WebSocketPayload() {
+    }
+
     public WebSocketPayload(String type, T data) {
         this.type = type;
         this.data = data;

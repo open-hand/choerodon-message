@@ -1,4 +1,4 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.ws;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

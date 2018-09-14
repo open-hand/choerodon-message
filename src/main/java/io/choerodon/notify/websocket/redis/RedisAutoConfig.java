@@ -1,13 +1,10 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.redis;
 
-import io.choerodon.notify.websocket.redis.DefaultRedisChannelListener;
-import io.choerodon.notify.websocket.redis.RedisOperatorHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -45,9 +42,5 @@ public class RedisAutoConfig {
         return new MessageListenerAdapter(defaultRedisChannelListener, "receiveMessage");
     }
 
-    @Bean
-    RedisOperatorHelper redisOperatorHelper(RedisTemplate<Object, Object> redisTemplate) {
-        return new RedisOperatorHelper(redisTemplate);
-    }
 
 }
