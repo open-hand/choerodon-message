@@ -3,7 +3,7 @@ package io.choerodon.notify.websocket.ws;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.RelationshipDefining;
 import io.choerodon.notify.websocket.client.ReceiveMsgHandler;
 import io.choerodon.notify.websocket.path.PathMatchHandler;
 import io.choerodon.notify.websocket.exception.MsgHandlerDuplicateMathTypeException;
@@ -32,13 +32,13 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
 
     private List<PathMatchHandler> pathMatchHandlers;
 
-    private RelationshipDefiningInter relationshipDefiningInter;
+    private RelationshipDefining relationshipDefining;
 
     private final Map<String, HandlerInfo> typeClassMap = new HashMap<>(2 << 4);
 
     public WebSocketMessageHandler(Optional<List<ReceiveMsgHandler>> msgHandlers,
                                    Optional<List<PathMatchHandler>> optionalMatchHandlers,
-                                   RelationshipDefiningInter relationshipDefiningInter,
+                                   RelationshipDefining relationshipDefining,
                                    MessageSender messageSender) {
         msgHandlers.orElseGet(Collections::emptyList).forEach(t -> {
             if (typeClassMap.get(t.matchType()) == null) {
@@ -49,7 +49,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
         });
         this.messageSender = messageSender;
         this.pathMatchHandlers = optionalMatchHandlers.orElseGet(Collections::emptyList);
-        this.relationshipDefiningInter = relationshipDefiningInter;
+        this.relationshipDefining = relationshipDefining;
     }
 
 
@@ -64,7 +64,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
-        this.relationshipDefiningInter.removeWebSocketSessionRelationship(session);
+        this.relationshipDefining.removeWebSocketSessionContact(session);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package io.choerodon.notify.websocket.ws;
 
 import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.RelationshipDefining;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ public class MessageOperatorBuilder {
 
     private WebSocketPayload<?> payload;
 
-    private RelationshipDefiningInter relationshipDefiningInter;
+    private RelationshipDefining relationshipDefining;
 
     public MessageOperatorBuilder(MessageSender operator,
-                                  RelationshipDefiningInter relationshipDefiningInter) {
+                                  RelationshipDefining relationshipDefining) {
         this.operator = operator;
-        this.relationshipDefiningInter = relationshipDefiningInter;
+        this.relationshipDefining = relationshipDefining;
     }
 
     public MessageOperatorBuilder where(Key key) {
@@ -56,8 +56,8 @@ public class MessageOperatorBuilder {
 
     public void sendByKey() {
         match.keys.forEach(k -> {
-            relationshipDefiningInter.getWebSocketSessionsByKey(k).forEach(session -> operator.sendWebSocket(session, payload));
-            relationshipDefiningInter.getRedisChannelsByKey(k).forEach(redis -> operator.sendRedis(redis, payload));
+            relationshipDefining.getWebSocketSessionsByKey(k).forEach(session -> operator.sendWebSocket(session, payload));
+            relationshipDefining.getRedisChannelsByKey(k).forEach(redis -> operator.sendRedis(redis, payload));
         });
     }
 

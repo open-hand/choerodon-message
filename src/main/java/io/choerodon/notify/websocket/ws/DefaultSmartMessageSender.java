@@ -3,7 +3,7 @@ package io.choerodon.notify.websocket.ws;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefiningInter;
+import io.choerodon.notify.websocket.RelationshipDefining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,19 +25,20 @@ public class DefaultSmartMessageSender implements MessageSender {
 
     private String defaultChannel;
 
-    private RelationshipDefiningInter relationshipDefiningInter;
+    private RelationshipDefining relationshipDefining;
 
     public DefaultSmartMessageSender(@Qualifier("defaultChannel") String defaultChannel,
                                      StringRedisTemplate redisTemplate,
-                                     RelationshipDefiningInter relationshipDefiningInter) {
+                                     RelationshipDefining relationshipDefining) {
         this.defaultChannel = defaultChannel;
         this.redisTemplate = redisTemplate;
+        this.relationshipDefining = relationshipDefining;
     }
 
 
     @Override
     public MessageOperatorBuilder dsl() {
-        return new MessageOperatorBuilder(this, relationshipDefiningInter);
+        return new MessageOperatorBuilder(this, relationshipDefining);
     }
 
 
