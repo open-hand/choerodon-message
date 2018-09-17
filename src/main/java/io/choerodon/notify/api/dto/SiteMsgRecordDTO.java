@@ -45,13 +45,6 @@ public class SiteMsgRecordDTO {
         };
     }
 
-    public static PropertyMap<SiteMsgRecord, SiteMsgRecordDTO> entity2Dto() {
-        return new PropertyMap<SiteMsgRecord, SiteMsgRecordDTO>() {
-            @Override
-            protected void configure() {
-            }
-        };
-    }
 
     @Override
     public String toString() {

@@ -3,9 +3,6 @@ package io.choerodon.notify.api.service;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
-import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam;
-
-import java.util.List;
 
 /**
  * @author dengyouquan

@@ -84,10 +84,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             sessions.removeIf(t -> t.equals(delSession));
             if (sessions.isEmpty()) {
                 it.remove();
-                Set<String> selfChannels = this.selfSubChannels();
-                String[] channels = new String[selfChannels.size()];
-                selfChannels.toArray(channels);
-                redisTemplate.opsForSet().remove(next.getKey(), channels);
+                this.selfSubChannels().forEach(t -> redisTemplate.opsForSet().remove(next.getKey(), t));
             }
         }
     }
