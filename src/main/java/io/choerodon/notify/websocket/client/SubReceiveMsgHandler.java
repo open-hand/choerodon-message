@@ -1,7 +1,9 @@
 package io.choerodon.notify.websocket.client;
 
 
+import io.choerodon.notify.websocket.MessageSender;
 import io.choerodon.notify.websocket.RelationshipDefining;
+import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
@@ -13,20 +15,25 @@ public class SubReceiveMsgHandler implements ReceiveMsgHandler<String> {
 
     private RelationshipDefining relationshipDefining;
 
-    public SubReceiveMsgHandler(RelationshipDefining relationshipDefining) {
-        this.relationshipDefining = relationshipDefining;
-    }
+    private MessageSender messageSender;
 
-    @Override
-    public void handle(WebSocketSession session, String key) {
-         if (!StringUtils.isEmpty(key)) {
-             relationshipDefining.contact(key, session);
-         }
+    public SubReceiveMsgHandler(RelationshipDefining relationshipDefining,
+                                MessageSender messageSender) {
+        this.relationshipDefining = relationshipDefining;
+        this.messageSender = messageSender;
     }
 
     @Override
     public String matchType() {
         return SUB;
+    }
+
+    @Override
+    public void handle(WebSocketSession session, String key) {
+        if (!StringUtils.isEmpty(key)) {
+            relationshipDefining.contact(key, session);
+            messageSender.sendWebSocket(session, new WebSocketSendPayload<>(SUB, null, relationshipDefining.getKeysBySession(session)));
+        }
     }
 
 }

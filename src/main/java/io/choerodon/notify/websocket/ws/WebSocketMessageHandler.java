@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -55,7 +55,6 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        LOGGER.info("new websocket connect session {}, uri {}", session.getId(), session.getUri());
         pathMatchHandlers.forEach(handler -> handler.sessionHandlerAfterConnected(session));
         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_SESSION, null, session.getId()));
     }
@@ -74,18 +73,18 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-        super.handleBinaryMessage(session, message);
-        String receiveMsg = new String(message.getPayload().array());
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        super.handleTextMessage(session, message);
+        String receiveMsg = message.getPayload();
         try {
             JSONObject jsonObject = new JSONObject(receiveMsg);
             String type = jsonObject.getString("type");
             if (type != null) {
                 HandlerInfo handlerInfo = typeClassMap.get(type);
                 if (handlerInfo != null) {
-                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketReceivePayload.class, handlerInfo.getClass());
+                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketReceivePayload.class, handlerInfo.payloadType);
                     WebSocketReceivePayload<?> payload = objectMapper.readValue(receiveMsg, javaType);
-                    handlerInfo.msgHandler.handle(session, payload);
+                    handlerInfo.msgHandler.handle(session, payload.getData());
                 } else {
                     LOGGER.warn("abandon message that can not find msgHandler, message {}", receiveMsg);
                 }

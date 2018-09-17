@@ -11,6 +11,8 @@ public interface RelationshipDefining {
      */
     Set<WebSocketSession> getWebSocketSessionsByKey(String key);
 
+    Set<String> getKeysBySession(WebSocketSession session);
+
     /**
      * 获取与业务key关联的redis channel
      */

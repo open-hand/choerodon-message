@@ -2,6 +2,8 @@ package io.choerodon.notify.websocket.ws;
 
 import io.choerodon.notify.websocket.RelationshipDefining;
 import io.choerodon.notify.websocket.exception.GetSelfSubChannelsFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
@@ -14,7 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultRelationshipDefining implements RelationshipDefining {
 
-    private Map<String, Set<WebSocketSession>> keySessionMap = new ConcurrentHashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(RelationshipDefining.class);
+
+    private Map<String, Set<WebSocketSession>> keySessionsMap = new ConcurrentHashMap<>();
+
+    private Map<WebSocketSession, Set<String>> sessionKeysMap = new ConcurrentHashMap<>();
 
     private StringRedisTemplate redisTemplate;
 
@@ -30,7 +36,12 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     @Override
     public Set<WebSocketSession> getWebSocketSessionsByKey(String key) {
-        return keySessionMap.getOrDefault(key, Collections.emptySet());
+        return keySessionsMap.getOrDefault(key, Collections.emptySet());
+    }
+
+    @Override
+    public Set<String> getKeysBySession(WebSocketSession session) {
+        return sessionKeysMap.getOrDefault(session, Collections.emptySet());
     }
 
     @Override
@@ -48,8 +59,11 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             return;
         }
         if (session != null) {
-            Set<WebSocketSession> sessions = keySessionMap.computeIfAbsent(key, k -> new HashSet<>());
+            Set<WebSocketSession> sessions = keySessionsMap.computeIfAbsent(key, k -> new HashSet<>());
             sessions.add(session);
+            Set<String> subKeys = sessionKeysMap.computeIfAbsent(session, k -> new HashSet<>());
+            subKeys.add(key);
+            LOGGER.info("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
         }
         Set<String> selfChannels = this.selfSubChannels();
         String[] channels = new String[selfChannels.size()];
@@ -62,7 +76,8 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         if (delSession == null) {
             return;
         }
-        Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionMap.entrySet().iterator();
+        sessionKeysMap.remove(delSession);
+        Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionsMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Set<WebSocketSession>> next = it.next();
             Set<WebSocketSession> sessions = next.getValue();

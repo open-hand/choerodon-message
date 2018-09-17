@@ -32,10 +32,10 @@ public abstract class PathMatchHandler {
             String key = generateKey(map);
             if (key != null) {
                 pathHandler(session, key);
-                LOGGER.info("websocket uri {}, subscribe key is {}, use pathMatchHandler {}", uri, key, this.getClass().getName());
+                LOGGER.info("webSocket uri {}, sessionId {}, subscribe key is {}, use pathMatchHandler {}", uri, session.getId(), key, this.getClass().getName());
             }
         } else {
-            LOGGER.debug("websocket uri {}, mismatch pathMatchHandler {}", uri, this.getClass().getName());
+            LOGGER.debug("webSocket uri {}, mismatch pathMatchHandler {}", uri, this.getClass().getName());
         }
     }
 
