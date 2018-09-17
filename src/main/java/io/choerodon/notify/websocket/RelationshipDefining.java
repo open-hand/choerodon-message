@@ -14,7 +14,7 @@ public interface RelationshipDefining {
     /**
      * 获取与业务key关联的redis channel
      */
-    Set<String> getRedisChannelsByKey(String key);
+    Set<String> getRedisChannelsByKey(String key, boolean exceptSelf);
 
     /**
      * 关联key,webSocket,redisChannel

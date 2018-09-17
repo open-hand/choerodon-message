@@ -54,6 +54,6 @@ public class AuthHandshakeInterceptor implements WebSocketHandshakeInterceptor {
 
     @Override
     public void afterHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Exception e) {
-
+         // do nothing
     }
 }

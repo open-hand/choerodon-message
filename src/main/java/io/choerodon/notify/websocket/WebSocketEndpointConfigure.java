@@ -1,8 +1,10 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket;
 
-import io.choerodon.notify.websocket.RelationshipDefining;
 import io.choerodon.notify.websocket.handshake.AuthHandshakeInterceptor;
 import io.choerodon.notify.websocket.handshake.WebSocketHandshakeInterceptor;
+import io.choerodon.notify.websocket.ws.DefaultRelationshipDefining;
+import io.choerodon.notify.websocket.ws.WebSocketMessageHandler;
+import io.choerodon.notify.websocket.ws.WebSocketProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,7 +24,7 @@ import java.util.Optional;
 @Configuration
 @EnableWebSocket
 @EnableConfigurationProperties(WebSocketProperties.class)
-public class WebSocketEndpointConfig implements WebSocketConfigurer {
+public class WebSocketEndpointConfigure implements WebSocketConfigurer {
 
     @Autowired
     private WebSocketMessageHandler webSocketHandler;

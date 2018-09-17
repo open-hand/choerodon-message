@@ -2,7 +2,7 @@ package io.choerodon.notify;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.notify.websocket.ws.WebSocketPayload;
+import io.choerodon.notify.websocket.ws.WebSocketReceivePayload;
 import org.json.JSONObject;
 
 public class Test {
@@ -12,16 +12,16 @@ public class Test {
     @org.junit.Test
     public void name() throws Exception {
 
-        WebSocketPayload<String> payload1 = new WebSocketPayload<>("test", "data");
+        WebSocketReceivePayload<String> payload1 = new WebSocketReceivePayload<>("test", "data");
         String json1 = objectMapper.writeValueAsString(payload1);
         System.out.println(json1);
 
-        WebSocketPayload<?> payload2 = objectMapper.readValue(json1, WebSocketPayload.class);
+        WebSocketReceivePayload<?> payload2 = objectMapper.readValue(json1, WebSocketReceivePayload.class);
         System.out.println(payload2);
         System.out.println(payload2.getData().getClass());
 
 
-        WebSocketPayload<TestOne> payload3 = new WebSocketPayload<>("test", new TestOne("xiaoming",34));
+        WebSocketReceivePayload<TestOne> payload3 = new WebSocketReceivePayload<>("test", new TestOne("xiaoming",34));
         String json2 = objectMapper.writeValueAsString(payload3);
         System.out.println(json2);
 
@@ -29,8 +29,8 @@ public class Test {
         JSONObject jsonObject = new JSONObject(json2);
         String type = jsonObject.getString("type");
         if (type.equals("test")) {
-            JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketPayload.class, TestOne.class);
-            WebSocketPayload<?> payload4 = objectMapper.readValue(json2, javaType);
+            JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketReceivePayload.class, TestOne.class);
+            WebSocketReceivePayload<?> payload4 = objectMapper.readValue(json2, javaType);
             System.out.println(payload4.getData());
         }
 

@@ -1,7 +1,7 @@
 package io.choerodon.notify.websocket.notify;
 
-import io.choerodon.notify.websocket.path.PathMatchHandler;
 import io.choerodon.notify.websocket.RelationshipDefining;
+import io.choerodon.notify.websocket.client.PathMatchHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;

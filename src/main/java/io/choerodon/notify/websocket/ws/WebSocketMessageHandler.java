@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.notify.websocket.MessageSender;
 import io.choerodon.notify.websocket.RelationshipDefining;
+import io.choerodon.notify.websocket.client.PathMatchHandler;
 import io.choerodon.notify.websocket.client.ReceiveMsgHandler;
-import io.choerodon.notify.websocket.path.PathMatchHandler;
 import io.choerodon.notify.websocket.exception.MsgHandlerDuplicateMathTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +18,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.*;
 
-import static io.choerodon.notify.websocket.ws.MessageOperatorBuilder.Session;
-import static io.choerodon.notify.websocket.ws.WebSocketPayload.MSG_TYPE_SESSION;
+import static io.choerodon.notify.websocket.ws.WebSocketSendPayload.MSG_TYPE_SESSION;
 
 @Component
 public class WebSocketMessageHandler extends TextWebSocketHandler {
@@ -58,7 +57,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
         super.afterConnectionEstablished(session);
         LOGGER.info("new websocket connect session {}, uri {}", session.getId(), session.getUri());
         pathMatchHandlers.forEach(handler -> handler.sessionHandlerAfterConnected(session));
-        messageSender.dsl().where(Session.eq(session)).payload(new WebSocketPayload<>(MSG_TYPE_SESSION, session.getId())).sendWebSocket();
+        messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_SESSION, null, session.getId()));
     }
 
     @Override
@@ -70,6 +69,7 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         super.handleTransportError(session, exception);
+        LOGGER.error("error.webSocketMessageHandler.handleTransportError", exception);
     }
 
     @Override
@@ -83,8 +83,8 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
             if (type != null) {
                 HandlerInfo handlerInfo = typeClassMap.get(type);
                 if (handlerInfo != null) {
-                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketPayload.class, handlerInfo.getClass());
-                    WebSocketPayload<?> payload = objectMapper.readValue(receiveMsg, javaType);
+                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(WebSocketReceivePayload.class, handlerInfo.getClass());
+                    WebSocketReceivePayload<?> payload = objectMapper.readValue(receiveMsg, javaType);
                     handlerInfo.msgHandler.handle(session, payload);
                 } else {
                     LOGGER.warn("abandon message that can not find msgHandler, message {}", receiveMsg);

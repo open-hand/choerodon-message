@@ -10,12 +10,10 @@ import io.choerodon.notify.api.service.PmSendService;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.ws.WebSocketPayload;
+import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-
-import static io.choerodon.notify.websocket.ws.MessageOperatorBuilder.Key;
 
 @Service("pmWsSendService")
 public class PmWsSendServiceImpl implements PmSendService {
@@ -49,7 +47,7 @@ public class PmWsSendServiceImpl implements PmSendService {
             String pm = templateRender.renderTemplate(template, dto.getParams());
             PmRedisMessageDTO data = new PmRedisMessageDTO(dto.getId(), dto.getCode(), pm);
             String key = "choerodon:msg:" + dto.getCode() + ":" + dto.getId();
-            messageSender.dsl().where(Key.eq(key)).payload(new WebSocketPayload<>(MSG_TYPE_PM, data)).sendByKey();
+            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, data));
         } catch (JsonProcessingException e) {
             throw new CommonException("error.PmSendService.send.JsonProcessingException", e);
         } catch (IOException | TemplateException e) {

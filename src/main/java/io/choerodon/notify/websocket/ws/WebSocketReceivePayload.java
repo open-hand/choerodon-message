@@ -2,13 +2,9 @@ package io.choerodon.notify.websocket.ws;
 
 import java.util.Objects;
 
-public class WebSocketPayload<T> {
-
-    public static final String MSG_TYPE_SESSION = "session";
+public class WebSocketReceivePayload<T> {
 
     private String type;
-
-    private String uuid;
 
     private T data;
 
@@ -28,28 +24,19 @@ public class WebSocketPayload<T> {
         this.data = data;
     }
 
-    public String getUuid() {
-        return uuid;
+
+    public WebSocketReceivePayload() {
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public WebSocketPayload() {
-    }
-
-    public WebSocketPayload(String type, T data) {
+    public WebSocketReceivePayload(String type, T data) {
         this.type = type;
         this.data = data;
-        this.uuid = WebSocketUtils.generateUUID();
     }
 
     @Override
     public String toString() {
-        return "WebSocketPayload{" +
+        return "WebSocketReceivePayload{" +
                 "type='" + type + '\'' +
-                ", uuid='" + uuid + '\'' +
                 ", data=" + data +
                 '}';
     }
@@ -58,13 +45,14 @@ public class WebSocketPayload<T> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WebSocketPayload<?> webSocketPayload = (WebSocketPayload<?>) o;
-        return Objects.equals(uuid, webSocketPayload.uuid);
+        WebSocketReceivePayload<?> that = (WebSocketReceivePayload<?>) o;
+        return Objects.equals(type, that.type) &&
+                Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(uuid);
+        return Objects.hash(type, data);
     }
 }
