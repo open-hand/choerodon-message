@@ -13,7 +13,7 @@ public interface ReceiveMsgHandler<T> {
     @SuppressWarnings("unchecked")
     default Class<T> payloadClass() {
         ParameterizedType type = (ParameterizedType) this.getClass()
-                .getGenericSuperclass();
+                .getGenericInterfaces()[0];
         return (Class<T>) type.getActualTypeArguments()[0];
     }
 

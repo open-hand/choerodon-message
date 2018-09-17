@@ -6,9 +6,9 @@ import io.choerodon.notify.websocket.MessageSender;
 import io.choerodon.notify.websocket.RelationshipDefining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -23,27 +23,16 @@ public class DefaultSmartMessageSender implements MessageSender {
 
     private StringRedisTemplate redisTemplate;
 
-    private String defaultChannel;
-
     private RelationshipDefining relationshipDefining;
 
-    public DefaultSmartMessageSender(@Qualifier("defaultChannel") String defaultChannel,
-                                     StringRedisTemplate redisTemplate,
+    public DefaultSmartMessageSender(StringRedisTemplate redisTemplate,
                                      RelationshipDefining relationshipDefining) {
-        this.defaultChannel = defaultChannel;
         this.redisTemplate = redisTemplate;
         this.relationshipDefining = relationshipDefining;
     }
 
-
     @Override
-    public MessageOperatorBuilder dsl() {
-        return new MessageOperatorBuilder(this, relationshipDefining);
-    }
-
-
-    @Override
-    public void sendWebSocket(WebSocketSession session, WebSocketPayload<?> payload) {
+    public void sendWebSocket(WebSocketSession session, WebSocketSendPayload<?> payload) {
         if (payload == null) {
             LOGGER.warn("error.messageOperator.sendWebSocket.payloadIsNull");
             return;
@@ -58,7 +47,7 @@ public class DefaultSmartMessageSender implements MessageSender {
     }
 
     @Override
-    public void sendRedis(String channel, WebSocketPayload<?> payload) {
+    public void sendRedis(String channel, WebSocketSendPayload<?> payload) {
         if (payload == null) {
             LOGGER.warn("error.messageOperator.sendRedis.payloadIsNull");
             return;
@@ -71,17 +60,38 @@ public class DefaultSmartMessageSender implements MessageSender {
     }
 
     @Override
-    public void sendRedisDefaultChannel(WebSocketPayload<?> payload) {
-        if (payload == null) {
-            LOGGER.warn("error.messageOperator.sendRedisDefaultChannel.payloadIsNull");
-            return;
-        }
-        try {
-            redisTemplate.convertAndSend(defaultChannel, objectMapper.writeValueAsString(payload));
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("error.messageOperator.sendRedisDefaultChannel.JsonProcessingException, payload: {}", payload, e);
+    public void sendWebSocket(WebSocketSession session, String json) {
+        if (session != null && json != null) {
+            try {
+                session.sendMessage(new TextMessage(json));
+            } catch (IOException e) {
+                LOGGER.warn("error.messageOperator.sendWebSocket.IOException, json: {}", json, e);
+            }
         }
     }
 
+    @Override
+    public void sendRedis(String channel, String json) {
+        if (!StringUtils.isEmpty(channel) && json != null) {
+            redisTemplate.convertAndSend(channel, json);
+        }
+    }
+
+    @Override
+    public void sendByKey(String key, WebSocketSendPayload<?> payload) {
+        if (!StringUtils.isEmpty(key) && payload != null) {
+            relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, payload));
+            relationshipDefining.getRedisChannelsByKey(key, true).forEach(redis -> this.sendRedis(redis, payload));
+        }
+
+    }
+
+    @Override
+    public void sendByKey(String key, String json) {
+        if (!StringUtils.isEmpty(key) && json != null) {
+            relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, json));
+            relationshipDefining.getRedisChannelsByKey(key, true).forEach(redis -> this.sendRedis(redis, json));
+        }
+    }
 }
 

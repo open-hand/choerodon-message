@@ -20,6 +20,8 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private Environment environment;
 
+    private Set<String> selfSubChannels = new HashSet<>();
+
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
                                        Environment environment) {
         this.redisTemplate = redisTemplate;
@@ -32,8 +34,12 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     }
 
     @Override
-    public Set<String> getRedisChannelsByKey(String key) {
-        return redisTemplate.opsForSet().members(key);
+    public Set<String> getRedisChannelsByKey(String key, boolean exceptSelf) {
+        Set<String> channels = redisTemplate.opsForSet().members(key);
+        if (exceptSelf) {
+            channels.removeIf(t -> selfSubChannels().contains(t));
+        }
+        return channels;
     }
 
     @Override
@@ -45,8 +51,9 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             Set<WebSocketSession> sessions = keySessionMap.computeIfAbsent(key, k -> new HashSet<>());
             sessions.add(session);
         }
-        String[] channels = new String[selfSubChannels().size()];
-        selfSubChannels().toArray(channels);
+        Set<String> selfChannels = this.selfSubChannels();
+        String[] channels = new String[selfChannels.size()];
+        selfChannels.toArray(channels);
         redisTemplate.opsForSet().add(key, channels);
     }
 
@@ -57,10 +64,15 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         }
         Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionMap.entrySet().iterator();
         while (it.hasNext()) {
-            Set<WebSocketSession> sessions = it.next().getValue();
+            Map.Entry<String, Set<WebSocketSession>> next = it.next();
+            Set<WebSocketSession> sessions = next.getValue();
             sessions.removeIf(t -> t.equals(delSession));
             if (sessions.isEmpty()) {
                 it.remove();
+                Set<String> selfChannels = this.selfSubChannels();
+                String[] channels = new String[selfChannels.size()];
+                selfChannels.toArray(channels);
+                redisTemplate.opsForSet().remove(next.getKey(), channels);
             }
         }
     }
@@ -68,8 +80,11 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     @Override
     public Set<String> selfSubChannels() {
         try {
-            String channel = InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("server.port");
-            return Collections.singleton(channel);
+            if (selfSubChannels.isEmpty()) {
+                String channel = InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("server.port");
+                selfSubChannels.add(channel);
+            }
+            return selfSubChannels;
         } catch (UnknownHostException e) {
             throw new GetSelfSubChannelsFailedException(e);
         }
