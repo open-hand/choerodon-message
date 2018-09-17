@@ -19,7 +19,7 @@ public class SiteMsgPathMatchHandler extends PathMatchHandler {
 
     @Override
     public String matchPath() {
-        return "/choerodon_msg/{code}/{id}";
+        return "/choerodon:msg/{code}/{id}";
     }
 
     @Override

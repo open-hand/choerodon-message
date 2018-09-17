@@ -49,4 +49,15 @@
             AND nsr.is_read = #{read}
         </if>
     </select>
+
+
+    <select id="selectCountOfUnRead" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM notify_sitemsg_record
+        WHERE user_id = #{userId}
+        AND nsr.is_deleted = false
+        AND nsr.is_read = false
+    </select>
+
 </mapper>

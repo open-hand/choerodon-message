@@ -42,7 +42,7 @@ public class NoticesSendController {
     }
 
     @PostMapping("/pms")
-    @ApiOperation(value = "发送邮件")
+    @ApiOperation(value = "发送站内信")
     @Permission(level = ResourceLevel.SITE)
     public void postPm(@RequestBody @Valid PmSendDTO dto) {
         if (dto.getParams() == null) {

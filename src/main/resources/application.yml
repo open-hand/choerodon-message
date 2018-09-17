@@ -85,7 +85,7 @@ choerodon:
     skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
     fetch-time: 5
   ws:
-    paths: /choerodon_msg/**
+    paths: /choerodon:msg/**
     oauth: false
 logging:
   level:

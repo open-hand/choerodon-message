@@ -104,4 +104,16 @@ public class SiteMsgRecord extends AuditDomain {
     public void setSendTime(Date sendTime) {
         this.sendTime = sendTime;
     }
+
+    public SiteMsgRecord(Long userId, String title, String content) {
+        this.userId = userId;
+        this.title = title;
+        this.content = content;
+        this.read = false;
+        this.deleted = false;
+        this.sendTime = new Date();
+    }
+
+    public SiteMsgRecord() {
+    }
 }

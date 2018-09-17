@@ -1,13 +1,14 @@
 package io.choerodon.notify.api.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.PmRedisMessageDTO;
+import io.choerodon.core.exception.FeignException;
 import io.choerodon.notify.api.dto.PmSendDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.PmSendService;
+import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.MessageSender;
 import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
@@ -18,40 +19,48 @@ import java.io.IOException;
 @Service("pmWsSendService")
 public class PmWsSendServiceImpl implements PmSendService {
 
-    private static final String MSG_TYPE_PM = "pm";
+    private static final String MSG_TYPE_PM = "sit-msg";
 
     private final TemplateRender templateRender;
 
     private final TemplateMapper templateMapper;
 
+    private final SiteMsgRecordMapper siteMsgRecordMapper;
+
     private final MessageSender messageSender;
 
     public PmWsSendServiceImpl(TemplateRender templateRender,
                                TemplateMapper templateMapper,
-                               MessageSender messageSender) {
+                               MessageSender messageSender,
+                               SiteMsgRecordMapper siteMsgRecordMapper) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
+        this.siteMsgRecordMapper = siteMsgRecordMapper;
     }
 
     @Override
     public void send(PmSendDTO dto) {
-        Template query = new Template();
-        query.setCode(dto.getTemplateCode());
-        query.setMessageType(MessageType.PM.getValue());
-        Template template = templateMapper.selectOne(query);
-        if (template == null) {
-            throw new CommonException("error.pmTemplate.notExist");
-        }
-        try {
-            String pm = templateRender.renderTemplate(template, dto.getParams());
-            PmRedisMessageDTO data = new PmRedisMessageDTO(dto.getId(), dto.getCode(), pm);
-            String key = "choerodon:msg:" + dto.getCode() + ":" + dto.getId();
-            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, data));
-        } catch (JsonProcessingException e) {
-            throw new CommonException("error.PmSendService.send.JsonProcessingException", e);
-        } catch (IOException | TemplateException e) {
-            throw new CommonException("error.templateRender.renderError", e);
+        if (MSG_TYPE_PM.equals(dto.getCode())) {
+            Template query = new Template();
+            query.setCode(dto.getTemplateCode());
+            query.setMessageType(MessageType.PM.getValue());
+            Template template = templateMapper.selectOne(query);
+            if (template == null) {
+                throw new CommonException("error.pmTemplate.notExist");
+            }
+            try {
+                String pm = templateRender.renderTemplate(template, dto.getParams());
+                SiteMsgRecord record = new SiteMsgRecord(dto.getId(), template.getPmTitle(), pm);
+                if (siteMsgRecordMapper.insert(record) != 1) {
+                    throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
+                }
+                String key = "choerodon:msg:sit-msg:" + dto.getId();
+                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(dto.getId())));
+            } catch (IOException | TemplateException e) {
+                throw new CommonException("error.templateRender.renderError", e);
+            }
+
         }
     }
 

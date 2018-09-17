@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("choerodon.ws")
 public class WebSocketProperties {
 
-    private String[] paths = {"/choerodon_msg/**"};
+    private String[] paths = {"/choerodon:msg/**"};
 
     private boolean oauth = false;
 
