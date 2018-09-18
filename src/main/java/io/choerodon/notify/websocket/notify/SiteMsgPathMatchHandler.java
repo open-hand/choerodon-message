@@ -49,8 +49,10 @@ public class SiteMsgPathMatchHandler extends PathMatchHandler {
     public void pathHandler(WebSocketSession session, String key, Map<String, String> pathKeyValue) {
         String id = pathKeyValue.get("id");
         relationshipDefining.contact(key, session);
-        messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(id))));
+        int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(id));
+        if (unReadNum > 0) {
+            messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
+        }
     }
-
 
 }
