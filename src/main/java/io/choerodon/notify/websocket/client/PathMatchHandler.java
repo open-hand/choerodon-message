@@ -18,7 +18,7 @@ public abstract class PathMatchHandler {
 
     public abstract String generateKey(Map<String, String> pathKeyValue);
 
-    public abstract void pathHandler(WebSocketSession session, String key);
+    public abstract void pathHandler(WebSocketSession session, String key, Map<String, String> pathKeyValue);
 
     public void sessionHandlerAfterConnected(WebSocketSession session) {
         String path = matchPath();
@@ -31,7 +31,7 @@ public abstract class PathMatchHandler {
             Map<String, String> map = matcher.extractUriTemplateVariables(path, uri);
             String key = generateKey(map);
             if (key != null) {
-                pathHandler(session, key);
+                pathHandler(session, key, map);
                 LOGGER.info("webSocket uri {}, sessionId {}, subscribe key is {}, use pathMatchHandler {}", uri, session.getId(), key, this.getClass().getName());
             }
         } else {

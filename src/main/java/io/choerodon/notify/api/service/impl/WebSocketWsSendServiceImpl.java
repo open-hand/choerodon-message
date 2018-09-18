@@ -19,7 +19,7 @@ import java.io.IOException;
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
-    private static final String MSG_TYPE_PM = "sit-msg";
+    public static final String MSG_TYPE_PM = "sit-msg";
 
     private final TemplateRender templateRender;
 
