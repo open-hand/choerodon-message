@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-public class PmSendDTO {
+public class WsSendDTO {
 
     @NotNull(message = "error.postPm.idNull")
     private Long id;

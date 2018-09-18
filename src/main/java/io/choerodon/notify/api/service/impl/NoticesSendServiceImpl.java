@@ -2,10 +2,10 @@ package io.choerodon.notify.api.service.impl;
 
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.EmailSendDTO;
-import io.choerodon.notify.api.dto.PmSendDTO;
+import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.notify.api.service.PmSendService;
+import io.choerodon.notify.api.service.WebSocketSendService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +14,12 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     private EmailSendService emailSendService;
 
-    private PmSendService pmSendService;
+    private WebSocketSendService webSocketSendService;
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
-                                  @Qualifier("pmWsSendService") PmSendService pmSendService) {
+                                  @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService) {
         this.emailSendService = emailSendService;
-        this.pmSendService = pmSendService;
+        this.webSocketSendService = webSocketSendService;
     }
 
     @Override
@@ -28,8 +28,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public void sendPm(PmSendDTO dto) {
-        pmSendService.send(dto);
+    public void sendWs(WsSendDTO dto) {
+        webSocketSendService.send(dto);
     }
 
     @Override

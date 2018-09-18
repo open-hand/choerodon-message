@@ -3,7 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailSendDTO;
-import io.choerodon.notify.api.dto.PmSendDTO;
+import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
@@ -41,14 +41,14 @@ public class NoticesSendController {
         noticesSendService.sendEmail(dto);
     }
 
-    @PostMapping("/pms")
-    @ApiOperation(value = "发送站内信")
+    @PostMapping("/ws")
+    @ApiOperation(value = "发送消息到webSocket")
     @Permission(level = ResourceLevel.SITE)
-    public void postPm(@RequestBody @Valid PmSendDTO dto) {
+    public void postPm(@RequestBody @Valid WsSendDTO dto) {
         if (dto.getParams() == null) {
             dto.setParams(new HashMap<>(0));
         }
-        noticesSendService.sendPm(dto);
+        noticesSendService.sendWs(dto);
     }
 
 }

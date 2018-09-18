@@ -56,8 +56,8 @@
         COUNT(*)
         FROM notify_sitemsg_record
         WHERE user_id = #{userId}
-        AND nsr.is_deleted = false
-        AND nsr.is_read = false
+        AND is_deleted = false
+        AND is_read = false
     </select>
 
 </mapper>
