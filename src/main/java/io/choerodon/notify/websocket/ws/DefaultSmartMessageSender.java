@@ -71,11 +71,10 @@ public class DefaultSmartMessageSender implements MessageSender {
     }
 
     @Override
-    public void sendRedis(String channel, String json) {
-        if (!StringUtils.isEmpty(channel) && json != null) {
-            redisTemplate.convertAndSend(channel, json);
-        }
+    public void sendWebSocketByKey(String key, String json) {
+        relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, json));
     }
+
 
     @Override
     public void sendByKey(String key, WebSocketSendPayload<?> payload) {
@@ -86,12 +85,5 @@ public class DefaultSmartMessageSender implements MessageSender {
 
     }
 
-    @Override
-    public void sendByKey(String key, String json) {
-        if (!StringUtils.isEmpty(key) && json != null) {
-            relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, json));
-            relationshipDefining.getRedisChannelsByKey(key, true).forEach(redis -> this.sendRedis(redis, json));
-        }
-    }
 }
 

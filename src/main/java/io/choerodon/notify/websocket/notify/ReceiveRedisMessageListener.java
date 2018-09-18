@@ -30,7 +30,7 @@ public class ReceiveRedisMessageListener {
                 JSONObject jsonObject = new JSONObject(json);
                 String key = jsonObject.getString("key");
                 if (!StringUtils.isEmpty(key)) {
-                    messageSender.sendByKey(key, json);
+                    messageSender.sendWebSocketByKey(key, json);
                 }
             } catch (JSONException e) {
                 LOGGER.warn("error.receiveRedisMessageListener.receiveMessage.send", e);
