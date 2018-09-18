@@ -8,8 +8,8 @@ import io.choerodon.notify.api.dto.RecordListDTO;
 import io.choerodon.notify.api.pojo.RecordQueryParam;
 import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
+import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.MessageRecordService;
-import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -21,17 +21,17 @@ public class MessageRecordServiceImpl implements MessageRecordService {
 
     private final RecordMapper recordMapper;
 
-    private final NoticesSendService noticesSendService;
+    private final EmailSendService emailSendService;
 
     private final TemplateMapper templateMapper;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MessageRecordServiceImpl(RecordMapper recordMapper,
-                                    NoticesSendService noticesSendService,
+                                    EmailSendService emailSendService,
                                     TemplateMapper templateMapper) {
         this.recordMapper = recordMapper;
-        this.noticesSendService = noticesSendService;
+        this.emailSendService = emailSendService;
         this.templateMapper = templateMapper;
     }
 
@@ -56,8 +56,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
             throw new CommonException("error.emailTemplate.notExist");
         }
         record.setSendData(new RecordSendData(template, ConvertUtils.convertJsonToMap(objectMapper, record.getVariables()),
-                noticesSendService.createEmailSender(), null));
-        noticesSendService.sendEmail(record, true);
+                emailSendService.createEmailSender(), null));
+        emailSendService.sendEmail(record, true);
         return recordMapper.selectByPrimaryKey(record.getId());
     }
 }

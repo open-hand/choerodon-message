@@ -85,10 +85,20 @@
             <version>${choerodon.starters.version}</version>
         </dependency>
         <!--websocket-->
-        <dependency>
+<!--        <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-websocket-helper</artifactId>
             <version>${choerodon.starters.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>1.5.9.RELEASE</version>
         </dependency>
 
         <!--mail-->
