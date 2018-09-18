@@ -39,6 +39,4 @@ public class RedisAutoConfigure {
         LOGGER.info("begin listen redis channels: {}", topics);
         return container;
     }
-
-
 }

@@ -35,7 +35,7 @@ public abstract class PathMatchHandler {
                 LOGGER.info("webSocket uri {}, sessionId {}, subscribe key is {}, use pathMatchHandler {}", uri, session.getId(), key, this.getClass().getName());
             }
         } else {
-            LOGGER.debug("webSocket uri {}, mismatch pathMatchHandler {}", uri, this.getClass().getName());
+            LOGGER.info("webSocket uri {}, mismatch pathMatchHandler {}", uri, this.getClass().getName());
         }
     }
 

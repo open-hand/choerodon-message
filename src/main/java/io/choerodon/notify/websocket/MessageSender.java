@@ -9,11 +9,10 @@ public interface MessageSender {
 
     void sendWebSocket(WebSocketSession session, String json);
 
-    void sendRedis(String channel, WebSocketSendPayload<?> payload);
+    void sendWebSocketByKey(String key, String json);
 
-    void sendRedis(String channel, String json);
+    void sendRedis(String channel, WebSocketSendPayload<?> payload);
 
     void sendByKey(String key, WebSocketSendPayload<?> payload);
 
-    void sendByKey(String key, String json);
 }
