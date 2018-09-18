@@ -11,6 +11,9 @@ public interface RelationshipDefining {
      */
     Set<WebSocketSession> getWebSocketSessionsByKey(String key);
 
+    /**
+     * 获取于该session关联的业务key
+     */
     Set<String> getKeysBySession(WebSocketSession session);
 
     /**
