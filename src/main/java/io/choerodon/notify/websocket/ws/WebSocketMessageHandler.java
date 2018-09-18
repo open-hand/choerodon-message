@@ -51,7 +51,6 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
         this.relationshipDefining = relationshipDefining;
     }
 
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
