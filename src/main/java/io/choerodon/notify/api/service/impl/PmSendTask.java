@@ -9,8 +9,8 @@ import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
+import io.choerodon.notify.websocket.send.MessageSender;
+import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -25,14 +25,15 @@ import java.util.Map;
 @Component
 public class PmSendTask {
     private static final String MSG_TYPE_PM = "sit-msg";
-    public static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:sit-msg:";
+    private static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:sit-msg:";
     private final TemplateRender templateRender;
     private final TemplateMapper templateMapper;
     private final MessageSender messageSender;
     private final ObjectMapper objectMapper;
     private final UserFeignClient userFeignClient;
 
-    public PmSendTask(TemplateRender templateRender, TemplateMapper templateMapper, MessageSender messageSender, UserFeignClient userFeignClient) {
+    public PmSendTask(TemplateRender templateRender, TemplateMapper templateMapper,
+                      MessageSender messageSender, UserFeignClient userFeignClient) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
@@ -45,12 +46,13 @@ public class PmSendTask {
             @JobParam(name = "templateCode"),
             @JobParam(name = "variables")
     })
+    @SuppressWarnings("unchecked")
     public void sendPm(Map<String, Object> map) {
         String code = (String) map.get("code");
         String templateCode = (String) map.get("templateCode");
         String mapJson = (String) map.get("variables");
         Map<String, Object> params = new HashMap<>(0);
-        if(!StringUtils.isEmpty(mapJson)){
+        if (!StringUtils.isEmpty(mapJson)) {
             try {
                 params = objectMapper.readValue(mapJson, Map.class);
             } catch (IOException e) {
