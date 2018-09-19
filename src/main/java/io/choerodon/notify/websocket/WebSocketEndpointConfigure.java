@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -20,6 +19,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
 @EnableWebSocket
@@ -54,7 +55,12 @@ public class WebSocketEndpointConfigure implements WebSocketConfigurer {
 
     @Bean
     @ConditionalOnMissingBean
-    public RelationshipDefining relationshipDefiningInter(StringRedisTemplate redisTemplate, Environment environment) {
-        return new DefaultRelationshipDefining(redisTemplate, environment);
+    public RelationshipDefining relationshipDefiningInter(StringRedisTemplate redisTemplate, RedisRegister redisRegister) {
+        return new DefaultRelationshipDefining(redisTemplate, redisRegister);
+    }
+
+    @Bean(name = "registerHeartBeat")
+    public ScheduledExecutorService registerHeartBeat() {
+        return Executors.newScheduledThreadPool(1);
     }
 }

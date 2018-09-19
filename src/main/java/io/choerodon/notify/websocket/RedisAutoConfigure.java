@@ -10,18 +10,15 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Configuration
 public class RedisAutoConfigure {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisAutoConfigure.class);
 
-    private RelationshipDefining relationshipDefining;
+    private RedisRegister redisRegister;
 
-    public RedisAutoConfigure(RelationshipDefining relationshipDefining) {
-        this.relationshipDefining = relationshipDefining;
+    public RedisAutoConfigure(RedisRegister redisRegister) {
+        this.redisRegister = redisRegister;
     }
 
     @Bean
@@ -32,11 +29,11 @@ public class RedisAutoConfigure {
     @Bean
     RedisMessageListenerContainer defaultContainer(RedisConnectionFactory connectionFactory,
                                                    MessageListenerAdapter messageListenerAdapter) {
-        List<PatternTopic> topics = relationshipDefining.selfSubChannels().stream().map(PatternTopic::new).collect(Collectors.toList());
+        PatternTopic topic = new PatternTopic(redisRegister.channelName());
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(messageListenerAdapter, topics);
-        LOGGER.info("begin listen redis channels: {}", topics);
+        container.addMessageListener(messageListenerAdapter, topic);
+        LOGGER.info("Begin listen redis channel: {}", topic);
         return container;
     }
 }

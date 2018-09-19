@@ -31,9 +31,4 @@ public interface RelationshipDefining {
      */
     void removeWebSocketSessionContact(WebSocketSession session);
 
-    /**
-     * 本实例订阅的redis channel
-     */
-    Set<String> selfSubChannels();
-
 }
