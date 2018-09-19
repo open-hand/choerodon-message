@@ -1,16 +1,17 @@
 package io.choerodon.notify.api.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.TemplateException;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.websocket.send.MessageSender;
-import io.choerodon.notify.websocket.send.WebSocketSendPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -24,19 +25,16 @@ import java.util.Map;
  **/
 @Component
 public class PmSendTask {
+    private final Logger logger = LoggerFactory.getLogger(PmSendTask.class);
     private static final String MSG_TYPE_PM = "sit-msg";
-    private static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:sit-msg:";
-    private final TemplateRender templateRender;
     private final TemplateMapper templateMapper;
-    private final MessageSender messageSender;
+    private final NoticesSendService noticesSendService;
     private final ObjectMapper objectMapper;
     private final UserFeignClient userFeignClient;
 
-    public PmSendTask(TemplateRender templateRender, TemplateMapper templateMapper,
-                      MessageSender messageSender, UserFeignClient userFeignClient) {
-        this.templateRender = templateRender;
+    public PmSendTask(TemplateMapper templateMapper, NoticesSendService noticesSendService, UserFeignClient userFeignClient) {
         this.templateMapper = templateMapper;
-        this.messageSender = messageSender;
+        this.noticesSendService = noticesSendService;
         this.userFeignClient = userFeignClient;
         objectMapper = new ObjectMapper();
     }
@@ -46,7 +44,6 @@ public class PmSendTask {
             @JobParam(name = "templateCode"),
             @JobParam(name = "variables")
     })
-    @SuppressWarnings("unchecked")
     public void sendPm(Map<String, Object> map) {
         String code = (String) map.get("code");
         String templateCode = (String) map.get("templateCode");
@@ -59,19 +56,23 @@ public class PmSendTask {
                 throw new CommonException("error.pmSendTask.paramsJsonNotValid", e);
             }
         }
-        Template template = validatorCode(code, templateCode);
+        validatorCode(code, templateCode);
         Map<String, Object> finalParams = params;
-        Arrays.stream(userFeignClient.getUserIds().getBody()).map(id -> CHOERODON_MSG_SIT_MSG + id).forEach(key -> {
-            try {
-                String pm = templateRender.renderPmTemplate(template, finalParams);
-                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, pm));
-            } catch (IOException | TemplateException e) {
-                throw new CommonException("error.templateRender.renderError", e);
-            }
+        long startTime = System.currentTimeMillis();
+        logger.info("send pm started");
+        Arrays.stream(userFeignClient.getUserIds().getBody()).forEach(id -> {
+            WsSendDTO wsSendDTO = new WsSendDTO();
+            wsSendDTO.setParams(finalParams);
+            wsSendDTO.setTemplateCode(templateCode);
+            wsSendDTO.setCode(code);
+            wsSendDTO.setId(id);
+            noticesSendService.sendWs(wsSendDTO);
         });
+        long endTime = System.currentTimeMillis();
+        logger.info("send pm completed. speed time:{} millisecond", (endTime - startTime));
     }
 
-    private Template validatorCode(String code, String templateCode) {
+    private void validatorCode(String code, String templateCode) {
         if (!MSG_TYPE_PM.equals(code)) {
             throw new CommonException("error.pmSendTask.codeNotValid");
         }
@@ -85,6 +86,5 @@ public class PmSendTask {
         if (template == null) {
             throw new CommonException("error.pmSendTask.templateCodeNotExist");
         }
-        return template;
     }
 }

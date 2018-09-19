@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author dengyouquan
  **/
 @FeignClient(name = "iam-service",
-        configuration = FeignConfig.class)
+        configuration = FeignConfig.class,
+        fallback = UserFeignClientFallback.class)
 public interface UserFeignClient {
-    @GetMapping("/v1/iam/users/ids")
+    @GetMapping("/v1/users/ids")
     ResponseEntity<Long[]> getUserIds();
 }
