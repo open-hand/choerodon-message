@@ -1,4 +1,4 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket.receive;
 
 import java.util.Objects;
 

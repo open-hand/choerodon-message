@@ -1,6 +1,6 @@
 package io.choerodon.notify.websocket.handshake;
 
-import io.choerodon.notify.websocket.ws.WebSocketProperties;
+import io.choerodon.notify.websocket.ChoerodonWebSocketProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -22,10 +22,10 @@ public class AuthHandshakeInterceptor implements WebSocketHandshakeInterceptor {
 
     private static final RestTemplate restTemplate = new RestTemplate();
 
-    private WebSocketProperties webSocketProperties;
+    private ChoerodonWebSocketProperties choerodonWebSocketProperties;
 
-    public AuthHandshakeInterceptor(WebSocketProperties webSocketProperties) {
-        this.webSocketProperties = webSocketProperties;
+    public AuthHandshakeInterceptor(ChoerodonWebSocketProperties choerodonWebSocketProperties) {
+        this.choerodonWebSocketProperties = choerodonWebSocketProperties;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class AuthHandshakeInterceptor implements WebSocketHandshakeInterceptor {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, accessToken.get(0));
                 HttpEntity<String> entity = new HttpEntity<>("", headers);
-                ResponseEntity responseEntity = restTemplate.exchange(webSocketProperties.getOauthUrl(), HttpMethod.GET, entity, String.class);
+                ResponseEntity responseEntity = restTemplate.exchange(choerodonWebSocketProperties.getOauthUrl(), HttpMethod.GET, entity, String.class);
                 return responseEntity.getStatusCode().is2xxSuccessful();
 
             } else {

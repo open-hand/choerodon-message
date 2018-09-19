@@ -1,5 +1,6 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.register;
 
+import io.choerodon.notify.websocket.ChoerodonWebSocketProperties;
 import io.choerodon.notify.websocket.exception.GetSelfSubChannelsFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +18,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class DefaultRedisRegisterImpl implements RedisRegister {
+public class DefaultRedisChannelRegisterImpl implements RedisChannelRegister {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRedisRegisterImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRedisChannelRegisterImpl.class);
 
     private static final Long HEART_BEAT_INTERVAL = 10000L;
 
@@ -38,12 +39,16 @@ public class DefaultRedisRegisterImpl implements RedisRegister {
 
     private ScheduledExecutorService scheduledExecutorService;
 
-    public DefaultRedisRegisterImpl(Environment environment,
-                                    StringRedisTemplate redisTemplate,
-                                    @Qualifier("registerHeartBeat") ScheduledExecutorService scheduledExecutorService) {
+    private ChoerodonWebSocketProperties properties;
+
+    public DefaultRedisChannelRegisterImpl(Environment environment,
+                                           StringRedisTemplate redisTemplate,
+                                           @Qualifier("registerHeartBeat") ScheduledExecutorService scheduledExecutorService,
+                                           ChoerodonWebSocketProperties properties) {
         this.scheduledExecutorService = scheduledExecutorService;
         this.environment = environment;
         this.redisTemplate = redisTemplate;
+        this.properties = properties;
     }
 
     @PostConstruct
@@ -68,7 +73,7 @@ public class DefaultRedisRegisterImpl implements RedisRegister {
             } catch (Exception e) {
                 LOGGER.error("error.redisRegister.heartBeat", e);
             }
-        }, 10000L, HEART_BEAT_INTERVAL, TimeUnit.MILLISECONDS);
+        }, properties.getHeartBeatIntervalMs(), properties.getHeartBeatIntervalMs(), TimeUnit.MILLISECONDS);
     }
 
     @Override

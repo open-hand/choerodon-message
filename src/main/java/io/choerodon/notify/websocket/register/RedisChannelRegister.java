@@ -1,8 +1,8 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.register;
 
 import java.util.Set;
 
-public interface RedisRegister {
+public interface RedisChannelRegister {
 
     /**
      * 获取存活的channel列表

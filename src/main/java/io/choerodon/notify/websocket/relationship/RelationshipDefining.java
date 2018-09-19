@@ -1,4 +1,4 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.relationship;
 
 import org.springframework.web.socket.WebSocketSession;
 

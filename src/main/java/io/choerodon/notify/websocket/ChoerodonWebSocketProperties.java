@@ -1,15 +1,17 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("choerodon.ws")
-public class WebSocketProperties {
+public class ChoerodonWebSocketProperties {
 
     private String[] paths = {"/choerodon:msg/**"};
 
     private boolean oauth = false;
 
     private String oauthUrl = "http://oauth-server/oauth/api/user";
+
+    private Long heartBeatIntervalMs = 10000L;
 
     public String[] getPaths() {
         return paths;
@@ -33,5 +35,13 @@ public class WebSocketProperties {
 
     public void setOauthUrl(String oauthUrl) {
         this.oauthUrl = oauthUrl;
+    }
+
+    public Long getHeartBeatIntervalMs() {
+        return heartBeatIntervalMs;
+    }
+
+    public void setHeartBeatIntervalMs(Long heartBeatIntervalMs) {
+        this.heartBeatIntervalMs = heartBeatIntervalMs;
     }
 }

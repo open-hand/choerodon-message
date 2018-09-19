@@ -1,7 +1,6 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket.relationship;
 
-import io.choerodon.notify.websocket.RedisRegister;
-import io.choerodon.notify.websocket.RelationshipDefining;
+import io.choerodon.notify.websocket.register.RedisChannelRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,12 +20,12 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private StringRedisTemplate redisTemplate;
 
-    private RedisRegister redisRegister;
+    private RedisChannelRegister redisChannelRegister;
 
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
-                                       RedisRegister redisRegister) {
+                                       RedisChannelRegister redisChannelRegister) {
         this.redisTemplate = redisTemplate;
-        this.redisRegister = redisRegister;
+        this.redisChannelRegister = redisChannelRegister;
     }
 
 
@@ -43,9 +42,9 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     @Override
     public Set<String> getRedisChannelsByKey(String key, boolean exceptSelf) {
         Set<String> set = new HashSet<>();
-        Set<String> survivalChannels = redisRegister.getSurvivalChannels();
+        Set<String> survivalChannels = redisChannelRegister.getSurvivalChannels();
         if (exceptSelf) {
-            survivalChannels.remove(redisRegister.channelName());
+            survivalChannels.remove(redisChannelRegister.channelName());
         }
         survivalChannels.forEach(t -> {
             if (redisTemplate.opsForSet().members(t).contains(key)) {
@@ -67,7 +66,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             subKeys.add(key);
             LOGGER.info("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
         }
-        redisTemplate.opsForSet().add(redisRegister.channelName(), key);
+        redisTemplate.opsForSet().add(redisChannelRegister.channelName(), key);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             sessions.removeIf(t -> t.equals(delSession));
             if (sessions.isEmpty()) {
                 it.remove();
-                redisTemplate.opsForSet().remove(redisRegister.channelName(), next.getKey());
+                redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
             }
         }
     }

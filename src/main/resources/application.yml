@@ -87,6 +87,7 @@ choerodon:
   ws:
     paths: /choerodon:msg/**
     oauth: false
+    heart-beat-interval-ms: 10000
 logging:
   level:
    javax.mail: info

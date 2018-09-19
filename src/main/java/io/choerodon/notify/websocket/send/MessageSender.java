@@ -1,6 +1,5 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.send;
 
-import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
 import org.springframework.web.socket.WebSocketSession;
 
 public interface MessageSender {
