@@ -30,4 +30,17 @@ public class TemplateRender {
         }
         return FreeMarkerTemplateUtils.processTemplateIntoString(ft, variables);
     }
+
+    String renderPmTemplate(final Template template, final Map<String, Object> variables)
+            throws IOException, TemplateException {
+        String templateKey = template.getCode() + ":" + template.getObjectVersionNumber();
+        freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
+        if (ft == null) {
+            ft = freeMarkerConfigBuilder.addTemplate(templateKey, template.getPmContent());
+        }
+        if (ft == null) {
+            throw new CommonException("error.templateRender.renderError");
+        }
+        return FreeMarkerTemplateUtils.processTemplateIntoString(ft, variables);
+    }
 }
