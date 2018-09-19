@@ -1,12 +1,13 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket.connect;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefining;
-import io.choerodon.notify.websocket.client.PathMatchHandler;
-import io.choerodon.notify.websocket.client.ReceiveMsgHandler;
+import io.choerodon.notify.websocket.send.MessageSender;
+import io.choerodon.notify.websocket.relationship.RelationshipDefining;
+import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
 import io.choerodon.notify.websocket.exception.MsgHandlerDuplicateMathTypeException;
+import io.choerodon.notify.websocket.receive.WebSocketReceivePayload;
+import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -18,7 +19,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.*;
 
-import static io.choerodon.notify.websocket.ws.WebSocketSendPayload.MSG_TYPE_SESSION;
+import static io.choerodon.notify.websocket.send.WebSocketSendPayload.MSG_TYPE_SESSION;
 
 @Component
 public class WebSocketMessageHandler extends TextWebSocketHandler {

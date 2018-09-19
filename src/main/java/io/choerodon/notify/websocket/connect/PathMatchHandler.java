@@ -1,4 +1,4 @@
-package io.choerodon.notify.websocket.client;
+package io.choerodon.notify.websocket.connect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

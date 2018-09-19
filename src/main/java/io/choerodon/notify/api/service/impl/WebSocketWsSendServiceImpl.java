@@ -10,8 +10,8 @@ import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
+import io.choerodon.notify.websocket.send.MessageSender;
+import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

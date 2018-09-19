@@ -1,9 +1,8 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket.send;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefining;
+import io.choerodon.notify.websocket.relationship.RelationshipDefining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;

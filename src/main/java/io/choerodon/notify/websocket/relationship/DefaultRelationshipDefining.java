@@ -1,16 +1,12 @@
-package io.choerodon.notify.websocket.ws;
+package io.choerodon.notify.websocket.relationship;
 
-import io.choerodon.notify.websocket.RelationshipDefining;
-import io.choerodon.notify.websocket.exception.GetSelfSubChannelsFailedException;
+import io.choerodon.notify.websocket.register.RedisChannelRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,15 +20,14 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private StringRedisTemplate redisTemplate;
 
-    private Environment environment;
-
-    private Set<String> selfSubChannels = new HashSet<>();
+    private RedisChannelRegister redisChannelRegister;
 
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
-                                       Environment environment) {
+                                       RedisChannelRegister redisChannelRegister) {
         this.redisTemplate = redisTemplate;
-        this.environment = environment;
+        this.redisChannelRegister = redisChannelRegister;
     }
+
 
     @Override
     public Set<WebSocketSession> getWebSocketSessionsByKey(String key) {
@@ -46,11 +41,17 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     @Override
     public Set<String> getRedisChannelsByKey(String key, boolean exceptSelf) {
-        Set<String> channels = redisTemplate.opsForSet().members(key);
+        Set<String> set = new HashSet<>();
+        Set<String> survivalChannels = redisChannelRegister.getSurvivalChannels();
         if (exceptSelf) {
-            channels.removeIf(t -> selfSubChannels().contains(t));
+            survivalChannels.remove(redisChannelRegister.channelName());
         }
-        return channels;
+        survivalChannels.forEach(t -> {
+            if (redisTemplate.opsForSet().members(t).contains(key)) {
+                set.add(t);
+            }
+        });
+        return set;
     }
 
     @Override
@@ -65,10 +66,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             subKeys.add(key);
             LOGGER.info("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
         }
-        Set<String> selfChannels = this.selfSubChannels();
-        String[] channels = new String[selfChannels.size()];
-        selfChannels.toArray(channels);
-        redisTemplate.opsForSet().add(key, channels);
+        redisTemplate.opsForSet().add(redisChannelRegister.channelName(), key);
     }
 
     @Override
@@ -84,21 +82,10 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             sessions.removeIf(t -> t.equals(delSession));
             if (sessions.isEmpty()) {
                 it.remove();
-                this.selfSubChannels().forEach(t -> redisTemplate.opsForSet().remove(next.getKey(), t));
+                redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
             }
         }
     }
 
-    @Override
-    public Set<String> selfSubChannels() {
-        try {
-            if (selfSubChannels.isEmpty()) {
-                String channel = InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("server.port");
-                selfSubChannels.add(channel);
-            }
-            return selfSubChannels;
-        } catch (UnknownHostException e) {
-            throw new GetSelfSubChannelsFailedException(e);
-        }
-    }
+
 }

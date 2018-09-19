@@ -1,4 +1,4 @@
-package io.choerodon.notify.websocket;
+package io.choerodon.notify.websocket.relationship;
 
 import org.springframework.web.socket.WebSocketSession;
 
@@ -30,10 +30,5 @@ public interface RelationshipDefining {
      * 解除于该webSocket关联的key以及redisChannel
      */
     void removeWebSocketSessionContact(WebSocketSession session);
-
-    /**
-     * 本实例订阅的redis channel
-     */
-    Set<String> selfSubChannels();
 
 }

@@ -1,9 +1,10 @@
-package io.choerodon.notify.websocket.client;
+package io.choerodon.notify.websocket.notify;
 
 
-import io.choerodon.notify.websocket.MessageSender;
-import io.choerodon.notify.websocket.RelationshipDefining;
-import io.choerodon.notify.websocket.ws.WebSocketSendPayload;
+import io.choerodon.notify.websocket.send.MessageSender;
+import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
+import io.choerodon.notify.websocket.relationship.RelationshipDefining;
+import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
