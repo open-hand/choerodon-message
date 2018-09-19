@@ -55,7 +55,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             throw new CommonException("error.pmTemplate.notExist");
         }
         try {
-            String pm = templateRender.renderTemplate(template, dto.getParams());
+            String pm = templateRender.renderPmTemplate(template, dto.getParams());
             SiteMsgRecord record = new SiteMsgRecord(dto.getId(), template.getPmTitle(), pm);
             if (siteMsgRecordMapper.insert(record) != 1) {
                 throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");

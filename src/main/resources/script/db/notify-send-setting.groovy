@@ -18,7 +18,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: 'DESCRIPTION', type: 'VARCHAR(255)', remarks: '消息业务类型描述') {
                 constraints(nullable: false)
             }
-            column(name: 'FD_LEVEL', type: 'VARCHAR(16)', remarks: '所属层级') {
+            column(name: 'LEVEL', type: 'VARCHAR(16)', remarks: '所属层级') {
                 constraints(nullable: false)
             }
             column(name: 'EMAIL_TEMPLATE_ID', type: 'BIGINT UNSIGNED', remarks: '邮箱模板id')
@@ -43,5 +43,8 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: "LAST_UPDATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
+    }
+    changeSet(author: 'jcalaz@163.com', id: '2018-09-19-rename-column') {
+        renameColumn(tableName: 'NOTIFY_SEND_SETTING', oldColumnName: 'LEVEL', newColumnName: 'FD_LEVEL', columnDataType: 'VARCHAR(16)', remarks: '所属层级')
     }
 }

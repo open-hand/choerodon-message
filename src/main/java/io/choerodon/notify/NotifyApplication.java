@@ -7,7 +7,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients("io.choerodon")
 @EnableEurekaClient
 @EnableChoerodonResourceServer
 public class NotifyApplication {
