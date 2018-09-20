@@ -95,5 +95,6 @@ choerodon:
     heart-beat-interval-ms: 10000
 logging:
   level:
-   javax.mail: info
+    javax.mail: info
+    io.choerodon.asgard: debug
 
