@@ -41,8 +41,8 @@ public class PmSendTask {
 
     @JobTask(maxRetryCount = 2, code = "sendPm", params = {
             @JobParam(name = "code", defaultValue = MSG_TYPE_PM),
-            @JobParam(name = "templateCode"),
-            @JobParam(name = "variables")
+            @JobParam(name = "templateCode", defaultValue = "msg"),
+            @JobParam(name = "variables", defaultValue = "")
     })
     public void sendPm(Map<String, Object> map) {
         String code = (String) map.get("code");
