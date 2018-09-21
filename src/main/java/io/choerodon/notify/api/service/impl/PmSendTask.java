@@ -39,7 +39,7 @@ public class PmSendTask {
         objectMapper = new ObjectMapper();
     }
 
-    @JobTask(maxRetryCount = 2, code = "sendPm", params = {
+    @JobTask(maxRetryCount = 2, code = "sendStationLetter", params = {
             @JobParam(name = "code", defaultValue = MSG_TYPE_PM),
             @JobParam(name = "templateCode", defaultValue = "msg"),
             @JobParam(name = "variables", defaultValue = "")
