@@ -96,5 +96,4 @@ choerodon:
 logging:
   level:
     javax.mail: info
-    io.choerodon.asgard: debug
 
