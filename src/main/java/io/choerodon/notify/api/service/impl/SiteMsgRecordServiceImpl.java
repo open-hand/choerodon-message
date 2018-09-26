@@ -47,7 +47,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
                 siteMsgRecordMapper.updateByPrimaryKeySelective(siteMsgRecord);
             }
         }
-        String key = "choerodon:msg:sit-msg:" + userId;
+        String key = "choerodon:msg:site-msg:" + userId;
         messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
@@ -63,7 +63,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
                 siteMsgRecordMapper.updateByPrimaryKeySelective(siteMsgRecord);
             }
         }
-        String key = "choerodon:msg:sit-msg:" + userId;
+        String key = "choerodon:msg:site-msg:" + userId;
         messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 }
