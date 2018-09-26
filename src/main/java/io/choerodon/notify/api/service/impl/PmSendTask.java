@@ -50,9 +50,9 @@ public class PmSendTask {
     }
 
     @JobTask(maxRetryCount = 2, code = "sendStationLetter", params = {
-            @JobParam(name = "code", defaultValue = MSG_TYPE_PM),
-            @JobParam(name = "templateCode", defaultValue = "msg"),
-            @JobParam(name = "variables", defaultValue = "")
+            @JobParam(name = "code", defaultValue = MSG_TYPE_PM, description = "发送站内信编码[使用默认值]"),
+            @JobParam(name = "templateCode", defaultValue = "msg", description = "站内信模板编码"),
+            @JobParam(name = "variables", defaultValue = "站内信模板内容的渲染参数")
     })
     public void sendStationLetter(Map<String, Object> map) {
         String code = (String) map.get("code");
