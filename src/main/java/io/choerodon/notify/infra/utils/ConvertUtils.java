@@ -9,7 +9,8 @@ import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
-import io.choerodon.swagger.notify.EmailTemplateScanData;
+import io.choerodon.swagger.notify.NotifyTemplateScanData;
+import io.choerodon.swagger.notify.NotifyType;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.util.StringUtils;
 
@@ -43,15 +44,22 @@ public class ConvertUtils {
         return config;
     }
 
-    public static Template convertEmailTemplate(final EmailTemplateScanData scanData) {
+    public static Template convertNotifyTemplate(final NotifyTemplateScanData scanData) {
         Template template = new Template();
         template.setCode(scanData.getCode());
         template.setName(scanData.getName());
         template.setIsPredefined(true);
-        template.setEmailTitle(scanData.getTitle());
-        template.setMessageType(MessageType.EMAIL.getValue());
         template.setBusinessType(scanData.getBusinessType());
-        template.setEmailContent(scanData.getContent());
+        if(scanData.getType().equals(NotifyType.EMAIL.getValue())){
+            template.setEmailTitle(scanData.getTitle());
+            template.setMessageType(MessageType.EMAIL.getValue());
+            template.setEmailContent(scanData.getContent());
+        }
+        if(scanData.getType().equals(NotifyType.PM.getValue())){
+            template.setPmTitle(scanData.getTitle());
+            template.setMessageType(MessageType.PM.getValue());
+            template.setPmContent(scanData.getContent());
+        }
         return template;
     }
 

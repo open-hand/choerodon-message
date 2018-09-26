@@ -6,7 +6,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.RegisterInstancePayloadDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.infra.config.NotifyProperties;
-import io.choerodon.swagger.notify.EmailTemplateScanData;
+import io.choerodon.swagger.notify.NotifyTemplateScanData;
 import io.choerodon.swagger.swagger.CustomSwagger2Controller;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class RegisterInstanceListener {
             Observable.just(payload)
                     .map(t -> {
                         if (STATUS_UP.equals(payload.getStatus())) {
-                            emailTemplateService.createByScan(fetchEmailTemplate(payload));
+                            emailTemplateService.createByScan(fetchNotifyTemplate(payload));
                         }
                         return t;
                     })
@@ -87,23 +87,23 @@ public class RegisterInstanceListener {
         }
     }
 
-    private Set<EmailTemplateScanData> fetchEmailTemplate(final RegisterInstancePayloadDTO payload) {
+    private Set<NotifyTemplateScanData> fetchNotifyTemplate(final RegisterInstancePayloadDTO payload) {
         String address = payload.getInstanceAddress();
         if (notifyProperties.getLocal()) {
             address = "127.0.0.1:" + address.split(":")[1];
         }
         ResponseEntity<String> response = restTemplate.getForEntity("http://"
-                + address + CustomSwagger2Controller.CUSTOM_EMAIL_URL, String.class);
+                + address + CustomSwagger2Controller.CUSTOM_NOTIFY_URL, String.class);
 
         try {
             if (response.getStatusCode() == HttpStatus.OK) {
-                JavaType javaType = mapper.getTypeFactory().constructCollectionType(HashSet.class, EmailTemplateScanData.class);
+                JavaType javaType = mapper.getTypeFactory().constructCollectionType(HashSet.class, NotifyTemplateScanData.class);
                 return mapper.readValue(response.getBody(), javaType);
             } else {
-                throw new RemoteAccessException("error.fetchEmailTemplate.httpRequest");
+                throw new RemoteAccessException("error.fetchNotifyTemplate.httpRequest");
             }
         } catch (IOException e) {
-            throw new CommonException("error.fetchEmailTemplate.jsonDeserialize", e);
+            throw new CommonException("error.fetchNotifyTemplate.jsonDeserialize", e);
         }
 
     }
