@@ -54,6 +54,9 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         if (template == null) {
             throw new CommonException("error.pmTemplate.notExist");
         }
+        if (template.getPmContent() == null) {
+            throw new CommonException("error.pmTemplate.contentNull");
+        }
         try {
             String pm = templateRender.renderPmTemplate(template, dto.getParams());
             SiteMsgRecord record = new SiteMsgRecord(dto.getId(), template.getPmTitle(), pm);

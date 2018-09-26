@@ -2,11 +2,11 @@ package io.choerodon.notify.websocket.connect;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.notify.websocket.send.MessageSender;
-import io.choerodon.notify.websocket.relationship.RelationshipDefining;
-import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
 import io.choerodon.notify.websocket.exception.MsgHandlerDuplicateMathTypeException;
+import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
 import io.choerodon.notify.websocket.receive.WebSocketReceivePayload;
+import io.choerodon.notify.websocket.relationship.RelationshipDefining;
+import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +30,11 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
 
     private MessageSender messageSender;
 
-    private List<PathMatchHandler> pathMatchHandlers;
-
     private RelationshipDefining relationshipDefining;
 
     private final Map<String, HandlerInfo> typeClassMap = new HashMap<>(2 << 4);
 
     public WebSocketMessageHandler(Optional<List<ReceiveMsgHandler>> msgHandlers,
-                                   Optional<List<PathMatchHandler>> optionalMatchHandlers,
                                    RelationshipDefining relationshipDefining,
                                    MessageSender messageSender) {
         msgHandlers.orElseGet(Collections::emptyList).forEach(t -> {
@@ -48,14 +45,12 @@ public class WebSocketMessageHandler extends TextWebSocketHandler {
             }
         });
         this.messageSender = messageSender;
-        this.pathMatchHandlers = optionalMatchHandlers.orElseGet(Collections::emptyList);
         this.relationshipDefining = relationshipDefining;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        pathMatchHandlers.forEach(handler -> handler.sessionHandlerAfterConnected(session));
         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_SESSION, null, session.getId()));
     }
 
