@@ -10,13 +10,13 @@ import javax.validation.constraints.Size;
 
 public class PmTemplateDTO {
 
-    private static final String CODE_REGULAR_EXPRESSION = "^(?!.*?-$)[a-z][a-z0-9-]*$";
+    private static final String CODE_REGULAR_EXPRESSION = "^(?!.*?-$)[a-zA-Z][a-zA-Z0-9-_.]*$";
 
     private Long id;
 
     @ApiModelProperty(value = "模板编码/必填")
     @NotEmpty(message = "error.pmTemplate.codeEmpty")
-    @Size(min = 1, max = 14, message = "error.pmTemplate.code.size")
+    @Size(min = 1, max = 64, message = "error.pmTemplate.code.size")
     @Pattern(regexp = CODE_REGULAR_EXPRESSION, message = "error.pmTemplate.code.illegal")
     private String code;
 
