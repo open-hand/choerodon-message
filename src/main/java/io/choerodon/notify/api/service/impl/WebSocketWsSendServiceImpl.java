@@ -19,7 +19,7 @@ import java.io.IOException;
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
-    public static final String MSG_TYPE_PM = "sit-msg";
+    public static final String MSG_TYPE_PM = "site-msg";
 
     private final TemplateRender templateRender;
 
@@ -63,7 +63,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             if (siteMsgRecordMapper.insert(record) != 1) {
                 throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
             }
-            String key = "choerodon:msg:sit-msg:" + dto.getId();
+            String key = "choerodon:msg:site-msg:" + dto.getId();
             messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(dto.getId())));
         } catch (IOException | TemplateException e) {
             throw new CommonException("error.templateRender.renderError", e);

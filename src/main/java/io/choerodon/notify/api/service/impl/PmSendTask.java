@@ -6,7 +6,6 @@ import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
@@ -20,16 +19,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dengyouquan
  **/
 @Component
 public class PmSendTask {
-    public static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:sit-msg:";
+    public static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:site-msg:";
     private final Logger logger = LoggerFactory.getLogger(PmSendTask.class);
-    private static final String MSG_TYPE_PM = "sit-msg";
+    private static final String MSG_TYPE_PM = "site-msg";
     private final TemplateMapper templateMapper;
     private final TemplateRender templateRender;
     private final MessageSender messageSender;
@@ -38,8 +39,8 @@ public class PmSendTask {
     private final UserFeignClient userFeignClient;
 
     public PmSendTask(TemplateMapper templateMapper, TemplateRender templateRender,
-                      MessageSender messageSender, NoticesSendService noticesSendService,
-                      UserFeignClient userFeignClient, SiteMsgRecordMapper siteMsgRecordMapper) {
+                      MessageSender messageSender, UserFeignClient userFeignClient,
+                      SiteMsgRecordMapper siteMsgRecordMapper) {
         this.templateMapper = templateMapper;
         this.templateRender = templateRender;
         this.messageSender = messageSender;
