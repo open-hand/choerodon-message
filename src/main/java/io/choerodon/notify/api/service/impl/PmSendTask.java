@@ -22,13 +22,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author dengyouquan
  **/
 @Component
 public class PmSendTask {
-    public static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:site-msg:";
+    private static final String CHOERODON_MSG_SIT_MSG = "choerodon:msg:site-msg:";
     private final Logger logger = LoggerFactory.getLogger(PmSendTask.class);
     private static final String MSG_TYPE_PM = "site-msg";
     private final TemplateMapper templateMapper;
@@ -49,15 +50,15 @@ public class PmSendTask {
         objectMapper = new ObjectMapper();
     }
 
-    @JobTask(maxRetryCount = 2, code = "sendStationLetter", params = {
+    @JobTask(maxRetryCount = 1, code = "sendStationLetter", params = {
             @JobParam(name = "code", defaultValue = MSG_TYPE_PM, description = "发送站内信编码[使用默认值]"),
-            @JobParam(name = "templateCode", defaultValue = "msg", description = "站内信模板编码"),
-            @JobParam(name = "variables", description = "站内信模板内容的渲染参数")
-    })
+            @JobParam(name = "templateCode", defaultValue = "addFunction-preset", description = "站内信模板编码"),
+            @JobParam(name = "variables", defaultValue = "{\"content\":\"定时任务\"}", description = "站内信模板内容的渲染参数")
+    }, description = "发送站内信")
     public void sendStationLetter(Map<String, Object> map) {
-        String code = (String) map.get("code");
-        String templateCode = (String) map.get("templateCode");
-        String mapJson = (String) map.get("variables");
+        String code = Optional.ofNullable((String) map.get("code")).orElse(MSG_TYPE_PM);
+        String templateCode = Optional.ofNullable((String) map.get("templateCode")).orElse("addFunction-preset");
+        String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("{\"content\":\"定时任务\"}");
         Map<String, Object> params = new HashMap<>(0);
         if (!StringUtils.isEmpty(mapJson)) {
             try {
