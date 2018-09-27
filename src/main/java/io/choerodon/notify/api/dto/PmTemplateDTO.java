@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 public class PmTemplateDTO {
 
-    private static final String CODE_REGULAR_EXPRESSION = "^(?!.*?-$)[a-zA-Z][a-zA-Z0-9-_.]*$";
+    private static final String CODE_REGULAR_EXPRESSION = "^[a-zA-Z][a-zA-Z0-9-_.]*$";
 
     private Long id;
 
