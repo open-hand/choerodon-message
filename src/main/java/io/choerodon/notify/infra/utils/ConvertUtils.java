@@ -5,18 +5,16 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
-import io.choerodon.swagger.notify.NotifyTemplateScanData;
-import io.choerodon.swagger.notify.NotifyType;
-import org.springframework.boot.autoconfigure.mail.MailProperties;
-import org.springframework.util.StringUtils;
-
+import io.choerodon.swagger.notify.EmailTemplateScanData;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
+import org.springframework.util.StringUtils;
 
 public class ConvertUtils {
 
@@ -44,18 +42,18 @@ public class ConvertUtils {
         return config;
     }
 
-    public static Template convertNotifyTemplate(final NotifyTemplateScanData scanData) {
+    public static Template convertNotifyTemplate(final EmailTemplateScanData scanData) {
         Template template = new Template();
         template.setCode(scanData.getCode());
         template.setName(scanData.getName());
         template.setIsPredefined(true);
         template.setBusinessType(scanData.getBusinessType());
-        if(scanData.getType().equals(NotifyType.EMAIL.getValue())){
+        if(scanData.getBusinessType().equals(MessageType.EMAIL.getValue())){
             template.setEmailTitle(scanData.getTitle());
             template.setMessageType(MessageType.EMAIL.getValue());
             template.setEmailContent(scanData.getContent());
         }
-        if(scanData.getType().equals(NotifyType.PM.getValue())){
+        if(scanData.getBusinessType().equals(MessageType.PM.getValue())){
             template.setPmTitle(scanData.getTitle());
             template.setMessageType(MessageType.PM.getValue());
             template.setPmContent(scanData.getContent());

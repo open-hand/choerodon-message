@@ -1,5 +1,8 @@
 package io.choerodon.notify.api.service.impl;
 
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
+import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -13,16 +16,12 @@ import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
-import io.choerodon.swagger.notify.NotifyTemplateScanData;
+import io.choerodon.swagger.notify.EmailTemplateScanData;
+import java.util.List;
+import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
-import java.util.Set;
-
-import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
-import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
 
 @Service
 public class EmailTemplateServiceImpl implements EmailTemplateService {
@@ -104,7 +103,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public void createByScan(Set<NotifyTemplateScanData> set) {
+    public void createByScan(Set<EmailTemplateScanData> set) {
         set.stream().map(ConvertUtils::convertNotifyTemplate).forEach(t -> {
             Template query = templateMapper.selectOne(new Template(t.getCode(), t.getMessageType()));
             if (query == null) {

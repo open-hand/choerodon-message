@@ -6,7 +6,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.RegisterInstancePayloadDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.infra.config.NotifyProperties;
-import io.choerodon.swagger.notify.NotifyTemplateScanData;
+import io.choerodon.swagger.notify.EmailTemplateScanData;
 import io.choerodon.swagger.swagger.CustomSwagger2Controller;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
@@ -55,31 +55,27 @@ public class RegisterInstanceListener {
         try {
             LOGGER.info("receive message from register-server, {}", message);
             RegisterInstancePayloadDTO payload = mapper.readValue(message, RegisterInstancePayloadDTO.class);
-            boolean isSkipService =
-                    notifyProperties.getSkipServices().stream().anyMatch(t -> t.equals(payload.getAppName()));
+            boolean isSkipService = notifyProperties.getSkipServices().stream()
+                    .anyMatch(t -> t.equals(payload.getAppName()));
             if (isSkipService) {
                 LOGGER.info("skip message that is skipServices, {}", payload);
                 return;
             }
-            Observable.just(payload)
-                    .map(t -> {
-                        if (STATUS_UP.equals(payload.getStatus())) {
-                            emailTemplateService.createByScan(fetchNotifyTemplate(payload));
-                        }
-                        return t;
-                    })
-                    .retryWhen(x -> x.zipWith(Observable.range(1, notifyProperties.getFetchTime()),
-                            (t, retryCount) -> {
-                                if (retryCount >= notifyProperties.getFetchTime()) {
-                                    if (t instanceof RemoteAccessException || t instanceof RestClientException) {
-                                        LOGGER.warn("error.registerConsumer.fetchDataError, payload {}, cause {}", payload, t);
-                                    } else {
-                                        LOGGER.warn("error.registerConsumer.msgConsumerError, payload {}, cause {}", payload, t);
-                                    }
-                                }
-                                return retryCount;
-                            }).flatMap(y -> Observable.timer(2, TimeUnit.SECONDS)))
-                    .subscribeOn(Schedulers.io())
+            Observable.just(payload).map(t -> {
+                if (STATUS_UP.equals(payload.getStatus())) {
+                    emailTemplateService.createByScan(fetchNotifyTemplate(payload));
+                }
+                return t;
+            }).retryWhen(x -> x.zipWith(Observable.range(1, notifyProperties.getFetchTime()), (t, retryCount) -> {
+                if (retryCount >= notifyProperties.getFetchTime()) {
+                    if (t instanceof RemoteAccessException || t instanceof RestClientException) {
+                        LOGGER.warn("error.registerConsumer.fetchDataError, payload {}, cause {}", payload, t);
+                    } else {
+                        LOGGER.warn("error.registerConsumer.msgConsumerError, payload {}, cause {}", payload, t);
+                    }
+                }
+                return retryCount;
+            }).flatMap(y -> Observable.timer(2, TimeUnit.SECONDS))).subscribeOn(Schedulers.io())
                     .subscribe((RegisterInstancePayloadDTO registerInstancePayload) -> {
                     });
         } catch (Exception e) {
@@ -87,17 +83,18 @@ public class RegisterInstanceListener {
         }
     }
 
-    private Set<NotifyTemplateScanData> fetchNotifyTemplate(final RegisterInstancePayloadDTO payload) {
+    private Set<EmailTemplateScanData> fetchNotifyTemplate(final RegisterInstancePayloadDTO payload) {
         String address = payload.getInstanceAddress();
         if (notifyProperties.getLocal()) {
             address = "127.0.0.1:" + address.split(":")[1];
         }
-        ResponseEntity<String> response = restTemplate.getForEntity("http://"
-                + address + CustomSwagger2Controller.CUSTOM_NOTIFY_URL, String.class);
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("http://" + address + CustomSwagger2Controller.CUSTOM_EMAIL_URL, String.class);
 
         try {
             if (response.getStatusCode() == HttpStatus.OK) {
-                JavaType javaType = mapper.getTypeFactory().constructCollectionType(HashSet.class, NotifyTemplateScanData.class);
+                JavaType javaType = mapper.getTypeFactory().constructCollectionType(HashSet.class,
+                        EmailTemplateScanData.class);
                 return mapper.readValue(response.getBody(), javaType);
             } else {
                 throw new RemoteAccessException("error.fetchNotifyTemplate.httpRequest");

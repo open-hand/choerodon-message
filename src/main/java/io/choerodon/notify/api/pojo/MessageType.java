@@ -1,9 +1,7 @@
 package io.choerodon.notify.api.pojo;
 
 public enum MessageType {
-    EMAIL("email"),
-    SMS("sms"),
-    PM("pm");
+    EMAIL("email"), SMS("sms"), PM("pm");
 
     private String value;
 
