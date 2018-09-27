@@ -47,7 +47,12 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         }
     }
     changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-26-change-column') {
-        //会删掉注释
-        addNotNullConstraint(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE', columnDataType: 'VARCHAR(64)')
+        if(helper.isOracle()) {
+            modifyDataType(columnName: 'CODE', newDataType:'VARCHAR(64)', tableName: 'NOTIFY_TEMPLATE')
+        }
+        if(helper.isMysql()) {
+            //会删掉注释
+            addNotNullConstraint(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE', columnDataType: 'VARCHAR(64)')
+        }
     }
 }
