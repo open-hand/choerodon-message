@@ -77,9 +77,10 @@ public class PmSendTask {
         for (Long id : ids) {
             SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pmContent);
             //oracle 不支持 insertList
-            siteMsgRecordMapper.insert(record);
-            String key = CHOERODON_MSG_SIT_MSG + id;
-            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            if (siteMsgRecordMapper.insert(record) == 1) {
+                String key = CHOERODON_MSG_SIT_MSG + id;
+                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            }
         }
         long endTime = System.currentTimeMillis();
         logger.info("PmSendTask send pm completed. speed time:{} millisecond", (endTime - startTime));
