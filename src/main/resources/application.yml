@@ -49,6 +49,8 @@ spring:
       mail.smtp.ssl.enable: true
       mail.send.name: choerodon
     test-connection: false
+  freemarker:
+    check-template-location: false
 eureka:
   instance:
     preferIpAddress: true

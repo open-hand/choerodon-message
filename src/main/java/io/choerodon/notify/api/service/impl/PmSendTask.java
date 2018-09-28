@@ -19,10 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author dengyouquan
@@ -53,15 +50,16 @@ public class PmSendTask {
     @JobTask(maxRetryCount = 1, code = "sendStationLetter", params = {
             @JobParam(name = "code", defaultValue = MSG_TYPE_PM, description = "发送站内信编码[使用默认值]"),
             @JobParam(name = "templateCode", defaultValue = "addFunction-preset", description = "站内信模板编码"),
-            @JobParam(name = "variables", defaultValue = "{\"content\":\"定时任务\"}", description = "站内信模板内容的渲染参数")
+            @JobParam(name = "variables", defaultValue = "{'content':'定时任务'}", description = "站内信模板内容的渲染参数")
     }, description = "发送站内信")
     public void sendStationLetter(Map<String, Object> map) {
         String code = Optional.ofNullable((String) map.get("code")).orElse(MSG_TYPE_PM);
         String templateCode = Optional.ofNullable((String) map.get("templateCode")).orElse("addFunction-preset");
-        String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("{\"content\":\"定时任务\"}");
+        String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("{'content':'定时任务'}");
         Map<String, Object> params = new HashMap<>(0);
         if (!StringUtils.isEmpty(mapJson)) {
             try {
+                mapJson = mapJson.replaceAll("\'", "\"");
                 params = objectMapper.readValue(mapJson, Map.class);
             } catch (IOException e) {
                 throw new CommonException("error.pmSendTask.paramsJsonNotValid", e);
@@ -71,13 +69,18 @@ public class PmSendTask {
         long startTime = System.currentTimeMillis();
         logger.info("PmSendTask send pm started");
         String pmContent = renderPmTemplate(template, params);
-        Arrays.stream(userFeignClient.getUserIds().getBody()).parallel().forEach(id -> {
+        Long[] ids = userFeignClient.getUserIds().getBody();
+        if (ids == null || ids.length == 0) {
+            logger.info("PmSendTask no user,no send stationletter.");
+            return;
+        }
+        for (Long id : ids) {
             SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pmContent);
             //oracle 不支持 insertList
             siteMsgRecordMapper.insert(record);
             String key = CHOERODON_MSG_SIT_MSG + id;
             messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
-        });
+        }
         long endTime = System.currentTimeMillis();
         logger.info("PmSendTask send pm completed. speed time:{} millisecond", (endTime - startTime));
     }
