@@ -1,12 +1,13 @@
 package io.choerodon.notify.api.service.impl;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.domain.SiteMsgRecord;
+import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author dengyouquan
@@ -33,17 +35,19 @@ public class PmSendTask {
     private final TemplateRender templateRender;
     private final MessageSender messageSender;
     private final SiteMsgRecordMapper siteMsgRecordMapper;
+    private final SiteMsgRecordService siteMsgRecordService;
     private final ObjectMapper objectMapper;
     private final UserFeignClient userFeignClient;
 
     public PmSendTask(TemplateMapper templateMapper, TemplateRender templateRender,
                       MessageSender messageSender, UserFeignClient userFeignClient,
-                      SiteMsgRecordMapper siteMsgRecordMapper) {
+                      SiteMsgRecordMapper siteMsgRecordMapper, SiteMsgRecordService siteMsgRecordService) {
         this.templateMapper = templateMapper;
         this.templateRender = templateRender;
         this.messageSender = messageSender;
         this.userFeignClient = userFeignClient;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
+        this.siteMsgRecordService = siteMsgRecordService;
         objectMapper = new ObjectMapper();
     }
 
@@ -60,28 +64,31 @@ public class PmSendTask {
         if (!StringUtils.isEmpty(mapJson)) {
             try {
                 mapJson = mapJson.replaceAll("\'", "\"");
-                params = objectMapper.readValue(mapJson, Map.class);
+                JavaType javaType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+                params = objectMapper.readValue(mapJson, javaType);
             } catch (IOException e) {
                 throw new CommonException("error.pmSendTask.paramsJsonNotValid", e);
             }
         }
         Template template = validatorCode(code, templateCode);
         long startTime = System.currentTimeMillis();
-        logger.info("PmSendTask send pm started");
+        logger.info("PmSendTask send pm started.");
         String pmContent = renderPmTemplate(template, params);
         Long[] ids = userFeignClient.getUserIds().getBody();
         if (ids == null || ids.length == 0) {
-            logger.info("PmSendTask no user,no send stationletter.");
+            logger.info("PmSendTask no user,no send station letter.");
             return;
         }
+        //挂起当前事务，先插入记录，再发送websocket,防止用户先收到websocket却没有消息记录
+        siteMsgRecordService.insertRecord(template, pmContent, ids);
+        logger.info("PmSendTask insert database completed.speed time:{} millisecond", (System.currentTimeMillis() - startTime));
+        AtomicInteger count = new AtomicInteger();
         for (Long id : ids) {
-            SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pmContent);
-            //oracle 不支持 insertList
-            if (siteMsgRecordMapper.insert(record) == 1) {
-                String key = CHOERODON_MSG_SIT_MSG + id;
-                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
-            }
+            String key = CHOERODON_MSG_SIT_MSG + id;
+            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            count.incrementAndGet();
         }
+        logger.info("PmSendTask send websocket completed.count:{}", count);
         long endTime = System.currentTimeMillis();
         logger.info("PmSendTask send pm completed. speed time:{} millisecond", (endTime - startTime));
     }
