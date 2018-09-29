@@ -1,12 +1,12 @@
 package io.choerodon.notify;
 
+import io.choerodon.notify.infra.utils.CustomShallowEtagHeaderFilter;
 import io.choerodon.resource.annoation.EnableChoerodonResourceServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import javax.servlet.Filter;
 
@@ -22,7 +22,7 @@ public class NotifyApplication {
 
     @Bean
     public Filter shallowEtagHeaderFilter() {
-        return new ShallowEtagHeaderFilter();
+        return new CustomShallowEtagHeaderFilter();
     }
 
 }
