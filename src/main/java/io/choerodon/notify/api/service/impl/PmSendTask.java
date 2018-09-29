@@ -62,8 +62,8 @@ public class PmSendTask {
             @JobParam(name = "variables", defaultValue = "{'content':'定时任务'}", description = "站内信模板内容的渲染参数")
     }, description = "发送站内信")
     public void sendStationLetter(Map<String, Object> map) {
-        String code = Optional.ofNullable((String) map.get("templateCode")).orElse("addFunction");
-        String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("{'content':'定时任务'}");
+        String code = Optional.ofNullable((String) map.get("templateCode")).orElseThrow(() -> new CommonException("error.PmSendTask.codeEmpty"));
+        String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("");
         Map<String, Object> params = convertJsonToMap(mapJson);
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
         if (sendSetting == null || sendSetting.getPmTemplateId() == null) {
@@ -71,7 +71,7 @@ public class PmSendTask {
             return;
         }
         Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
-        if (template == null){
+        if (template == null) {
             logger.info("PmSendTask no template,cann`t send station letter.");
             return;
         }
