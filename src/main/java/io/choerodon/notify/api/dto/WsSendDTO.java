@@ -13,7 +13,6 @@ public class WsSendDTO {
     @NotEmpty(message = "error.postPm.codeEmpty")
     private String code;
 
-    @NotEmpty(message = "error.postPm.templateCodeEmpty")
     private String templateCode;
 
     private Map<String, Object> params;
