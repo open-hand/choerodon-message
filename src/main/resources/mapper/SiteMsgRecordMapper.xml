@@ -44,7 +44,7 @@
         nsr.*
         FROM notify_sitemsg_record nsr
         WHERE nsr.user_id = #{userId}
-        AND nsr.is_deleted = false
+        AND nsr.is_deleted = 0
         <if test="read != null">
             AND nsr.is_read = #{read}
         </if>
@@ -56,8 +56,8 @@
         COUNT(*)
         FROM notify_sitemsg_record
         WHERE user_id = #{userId}
-        AND is_deleted = false
-        AND is_read = false
+        AND is_deleted = 0
+        AND is_read = 0
     </select>
 
 </mapper>
