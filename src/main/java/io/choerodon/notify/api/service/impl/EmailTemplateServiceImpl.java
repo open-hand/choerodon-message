@@ -14,6 +14,7 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.NotifyTemplateScanData;
+import io.choerodon.swagger.notify.NotifyType;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -107,13 +108,26 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     public void createByScan(Set<NotifyTemplateScanData> set) {
         set.stream().map(ConvertUtils::convertNotifyTemplate).forEach(t -> {
             Template query = templateMapper.selectOne(new Template(t.getCode(), t.getMessageType()));
+            Long templateId;
             if (query == null) {
+                templateId = t.getId();
                 templateMapper.insertSelective(t);
             } else {
-                t.setId(query.getId());
+                templateId = query.getId();
+                t.setId(templateId);
                 t.setObjectVersionNumber(query.getObjectVersionNumber());
                 templateMapper.updateByPrimaryKeySelective(t);
-
+            }
+            SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(t.getBusinessType()));
+            if (sendSetting != null) {
+                if (NotifyType.EMAIL.getValue().equals(t.getMessageType()) && sendSetting.getEmailTemplateId() == null) {
+                    sendSetting.setEmailTemplateId(templateId);
+                } else if (NotifyType.PM.getValue().equals(t.getMessageType()) && sendSetting.getPmTemplateId() == null) {
+                    sendSetting.setPmTemplateId(templateId);
+                } else if (NotifyType.SMS.getValue().equals(t.getMessageType()) && sendSetting.getSmsTemplateId() == null) {
+                    sendSetting.setSmsTemplateId(templateId);
+                }
+                sendSettingMapper.updateByPrimaryKey(sendSetting);
             }
         });
     }
