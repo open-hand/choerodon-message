@@ -23,7 +23,7 @@ public class EmailQueueObserver implements Action1<Record> {
 
     @Override
     public void call(Record dto) {
-        emailSendService.sendEmail(dto, false);
+        emailSendService.sendRecord(dto, false);
     }
 
 }

@@ -12,6 +12,8 @@ import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 public class SendSettingServiceImpl implements SendSettingService {
 
     private SendSettingMapper sendSettingMapper;
+
+    private final ModelMapper modelMapper = new ModelMapper();
 
     public SendSettingServiceImpl(SendSettingMapper sendSettingMapper) {
         this.sendSettingMapper = sendSettingMapper;
@@ -73,5 +77,19 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException("error.sendSetting.notExist");
         }
         return sendSetting;
+    }
+
+    @Override
+    public void createByScan(Set<NotifyBusinessTypeScanData> businessTypes) {
+        businessTypes.stream().map(t -> modelMapper.map(t, SendSetting.class)).forEach(i -> {
+            SendSetting query = sendSettingMapper.selectOne(new SendSetting(i.getCode()));
+            if (query == null) {
+                sendSettingMapper.insertSelective(i);
+            } else {
+                 query.setName(i.getName());
+                 query.setDescription(i.getDescription());
+                 sendSettingMapper.updateByPrimaryKeySelective(query);
+            }
+        });
     }
 }

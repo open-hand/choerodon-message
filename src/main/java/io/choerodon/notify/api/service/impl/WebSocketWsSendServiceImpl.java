@@ -3,8 +3,6 @@ package io.choerodon.notify.api.service.impl;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.notify.api.dto.WsSendDTO;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.SiteMsgRecord;
@@ -19,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
@@ -49,9 +49,9 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void send(WsSendDTO dto) {
-        SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
-        if (dto.getCode() == null || sendSetting == null) {
+    public void send(String code, Map<String, Object> params, Set<Long> ids) {
+        SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
+        if (code == null || sendSetting == null) {
             logger.info("no sendsetting,cann`t send station letter.");
             return;
         }
@@ -67,13 +67,15 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             throw new CommonException("error.pmTemplate.contentNull");
         }
         try {
-            String pm = templateRender.renderPmTemplate(template, dto.getParams());
-            SiteMsgRecord record = new SiteMsgRecord(dto.getId(), template.getPmTitle(), pm);
-            if (siteMsgRecordMapper.insert(record) != 1) {
-                throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
+            for (Long id : ids) {
+                String pm = templateRender.renderPmTemplate(template, params);
+                SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pm);
+                if (siteMsgRecordMapper.insert(record) != 1) {
+                    throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
+                }
+                String key = "choerodon:msg:site-msg:" + id;
+                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
             }
-            String key = "choerodon:msg:site-msg:" + dto.getId();
-            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(dto.getId())));
         } catch (IOException | TemplateException e) {
             throw new CommonException("error.templateRender.renderError", e);
         }

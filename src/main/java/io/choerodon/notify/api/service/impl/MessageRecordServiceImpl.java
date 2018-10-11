@@ -57,7 +57,7 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         }
         record.setSendData(new RecordSendData(template, ConvertUtils.convertJsonToMap(objectMapper, record.getVariables()),
                 emailSendService.createEmailSender(), null));
-        emailSendService.sendEmail(record, true);
+        emailSendService.sendRecord(record, true);
         return recordMapper.selectByPrimaryKey(record.getId());
     }
 }

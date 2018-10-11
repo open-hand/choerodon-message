@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailSendDTO;
+import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.swagger.annotation.Permission;
@@ -26,6 +27,22 @@ public class NoticesSendController {
 
     public NoticesSendController(NoticesSendService noticesSendService) {
         this.noticesSendService = noticesSendService;
+    }
+
+    @PostMapping
+    @ApiOperation(value = "发送邮件，站内信，短信")
+    @Permission(level = ResourceLevel.SITE)
+    public void postNotice(@RequestBody NoticeSendDTO dto) {
+        if (StringUtils.isEmpty(dto.getCode())) {
+            throw new FeignException("error.postNotify.codeEmpty");
+        }
+        if (dto.getTargetUsers() == null || dto.getTargetUsers().isEmpty()) {
+            return;
+        }
+        if (dto.getParams() == null) {
+            dto.setParams(new HashMap<>(0));
+        }
+        noticesSendService.sendNotice(dto);
     }
 
     @PostMapping("/emails")

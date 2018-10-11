@@ -1,13 +1,12 @@
 package io.choerodon.notify.api.eventhandler;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.RegisterInstancePayloadDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.config.NotifyProperties;
-import io.choerodon.swagger.notify.NotifyTemplateScanData;
-import io.choerodon.swagger.swagger.CustomSwagger2Controller;
+import io.choerodon.swagger.CustomController;
+import io.choerodon.swagger.notify.NotifyScanData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -38,10 +34,14 @@ public class RegisterInstanceListener {
     private final EmailTemplateService emailTemplateService;
 
     private final NotifyProperties notifyProperties;
+    private final SendSettingService sendSettingService;
 
-    public RegisterInstanceListener(EmailTemplateService emailTemplateService, NotifyProperties notifyProperties) {
+    public RegisterInstanceListener(EmailTemplateService emailTemplateService,
+                                    NotifyProperties notifyProperties,
+                                    SendSettingService sendSettingService) {
         this.emailTemplateService = emailTemplateService;
         this.notifyProperties = notifyProperties;
+        this.sendSettingService = sendSettingService;
     }
 
     /**
@@ -64,7 +64,9 @@ public class RegisterInstanceListener {
             Observable.just(payload)
                     .map(t -> {
                         if (STATUS_UP.equals(payload.getStatus())) {
-                            emailTemplateService.createByScan(fetchNotifyTemplate(payload));
+                            NotifyScanData notifyScanData = fetchNotifyTemplate(payload);
+                            emailTemplateService.createByScan(notifyScanData.getTemplateScanData());
+                            sendSettingService.createByScan(notifyScanData.getBusinessTypeScanData());
                         }
                         return t;
                     })
@@ -87,24 +89,17 @@ public class RegisterInstanceListener {
         }
     }
 
-    private Set<NotifyTemplateScanData> fetchNotifyTemplate(final RegisterInstancePayloadDTO payload) {
+    private NotifyScanData fetchNotifyTemplate(final RegisterInstancePayloadDTO payload) {
         String address = payload.getInstanceAddress();
         if (notifyProperties.getLocal()) {
             address = "127.0.0.1:" + address.split(":")[1];
         }
-        ResponseEntity<String> response = restTemplate.getForEntity("http://"
-                + address + CustomSwagger2Controller.CUSTOM_NOTIFY_URL, String.class);
-
-        try {
-            if (response.getStatusCode() == HttpStatus.OK) {
-                JavaType javaType = mapper.getTypeFactory().constructCollectionType(HashSet.class, NotifyTemplateScanData.class);
-                return mapper.readValue(response.getBody(), javaType);
-            } else {
-                throw new RemoteAccessException("error.fetchNotifyTemplate.httpRequest");
-            }
-        } catch (IOException e) {
-            throw new CommonException("error.fetchNotifyTemplate.jsonDeserialize", e);
+        ResponseEntity<NotifyScanData> response = restTemplate.getForEntity("http://"
+                + address + CustomController.CUSTOM_NOTIFY_URL, NotifyScanData.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody();
+        } else {
+            throw new RemoteAccessException("error.fetchNotifyTemplate.httpRequest");
         }
-
     }
 }

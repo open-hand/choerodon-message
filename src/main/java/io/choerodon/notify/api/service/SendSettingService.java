@@ -7,6 +7,7 @@ import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 
 import java.util.Set;
 
@@ -20,5 +21,7 @@ public interface SendSettingService {
     SendSetting update(SendSettingUpdateDTO updateDTO);
 
     SendSettingDetailDTO query(Long id);
+
+    void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
 }
