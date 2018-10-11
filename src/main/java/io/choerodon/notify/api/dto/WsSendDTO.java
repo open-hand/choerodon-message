@@ -13,8 +13,6 @@ public class WsSendDTO {
     @NotEmpty(message = "error.postPm.codeEmpty")
     private String code;
 
-    private String templateCode;
-
     private Map<String, Object> params;
 
     public Long getId() {
@@ -31,14 +29,6 @@ public class WsSendDTO {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getTemplateCode() {
-        return templateCode;
-    }
-
-    public void setTemplateCode(String templateCode) {
-        this.templateCode = templateCode;
     }
 
     public Map<String, Object> getParams() {
