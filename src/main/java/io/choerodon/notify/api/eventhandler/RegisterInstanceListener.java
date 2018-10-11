@@ -65,8 +65,8 @@ public class RegisterInstanceListener {
                     .map(t -> {
                         if (STATUS_UP.equals(payload.getStatus())) {
                             NotifyScanData notifyScanData = fetchNotifyTemplate(payload);
-                            emailTemplateService.createByScan(notifyScanData.getTemplateScanData());
                             sendSettingService.createByScan(notifyScanData.getBusinessTypeScanData());
+                            emailTemplateService.createByScan(notifyScanData.getTemplateScanData());
                         }
                         return t;
                     })
