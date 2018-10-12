@@ -110,8 +110,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             Template query = templateMapper.selectOne(new Template(t.getCode(), t.getMessageType()));
             Long templateId;
             if (query == null) {
-                templateId = t.getId();
                 templateMapper.insertSelective(t);
+                templateId = t.getId();
             } else {
                 templateId = query.getId();
                 t.setId(templateId);
