@@ -3,6 +3,7 @@ spring:
   redis:
     port: 6379
     host: localhost
+    database: 2
   http:
     encoding:
       charset: UTF-8
