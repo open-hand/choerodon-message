@@ -69,7 +69,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         try {
             for (Long id : ids) {
                 String pmContent = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
-                String pmTitle = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
+                String pmTitle = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.TITLE);
                 SiteMsgRecord record = new SiteMsgRecord(id, pmTitle, pmContent);
                 if (siteMsgRecordMapper.insert(record) != 1) {
                     throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
