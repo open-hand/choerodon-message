@@ -6,7 +6,6 @@ import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.domain.Template;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;

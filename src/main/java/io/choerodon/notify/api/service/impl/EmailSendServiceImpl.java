@@ -90,12 +90,10 @@ public class EmailSendServiceImpl implements EmailSendService {
         if (code == null || sendSetting == null) {
             LOGGER.info("no sendsetting,cann`t send email.");
             return;
-            //throw new CommonException("error.noticeSend.codeNotFound");
         }
         if (sendSetting.getEmailTemplateId() == null) {
             LOGGER.info("sendsetting no opposite email template,cann`t send email");
             return;
-            //throw new CommonException("error.noticeSend.emailTemplateNotSet");
         }
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         if (template == null) {
