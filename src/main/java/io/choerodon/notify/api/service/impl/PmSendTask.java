@@ -118,7 +118,7 @@ public class PmSendTask {
     private String renderPmTemplate(Template template, Map<String, Object> params) {
         String pm = template.getPmContent();
         try {
-            pm = templateRender.renderPmTemplate(template, params);
+            pm = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
         } catch (IOException | TemplateException e) {
             throw new CommonException("error.templateRender.renderError", e);
         }
