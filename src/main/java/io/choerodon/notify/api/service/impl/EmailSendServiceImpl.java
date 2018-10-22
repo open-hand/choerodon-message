@@ -88,10 +88,14 @@ public class EmailSendServiceImpl implements EmailSendService {
     public void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails) {
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
         if (code == null || sendSetting == null) {
-            throw new CommonException("error.noticeSend.codeNotFound");
+            LOGGER.info("no sendsetting,cann`t send email.");
+            return;
+            //throw new CommonException("error.noticeSend.codeNotFound");
         }
         if (sendSetting.getEmailTemplateId() == null) {
-            throw new CommonException("error.noticeSend.emailTemplateNotSet");
+            LOGGER.info("sendsetting no opposite email template,cann`t send email");
+            return;
+            //throw new CommonException("error.noticeSend.emailTemplateNotSet");
         }
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         if (template == null) {
@@ -191,8 +195,8 @@ public class EmailSendServiceImpl implements EmailSendService {
             helper.setFrom(new InternetAddress("\"" + MimeUtility.encodeText(configCache.getEmailConfig().getEmailSendName())
                     + "\"<" + configCache.getEmailConfig().getEmailAccount() + ">"));
             helper.setTo(record.getReceiveAccount());
-            helper.setSubject(MimeUtility.encodeText(record.getSendData().getTemplate().getEmailTitle(), ENCODE_UTF8, "B"));
-            helper.setText(templateRender.renderTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables()), true);
+            helper.setSubject(MimeUtility.encodeText(templateRender.renderTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables(), TemplateRender.TemplateType.TITLE), ENCODE_UTF8, "B"));
+            helper.setText(templateRender.renderTemplate(record.getSendData().getTemplate(), record.getSendData().getVariables(), TemplateRender.TemplateType.CONTENT), true);
             mailSender.send(msg);
             if (isManualRetry) {
                 recordMapper.updateRecordStatusAndIncreaseCount(record.getId(), RecordStatus.COMPLETE.getValue(), null, true, new Date());

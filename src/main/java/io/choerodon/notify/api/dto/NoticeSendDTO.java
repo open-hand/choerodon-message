@@ -13,6 +13,8 @@ public class NoticeSendDTO {
     @NotEmpty(message = "error.postNotify.codeEmpty")
     private String code;
 
+    private User fromUser;
+
     /**
      * 目标用户
      */
@@ -46,9 +48,23 @@ public class NoticeSendDTO {
         this.targetUsers = targetUsers;
     }
 
+    public User getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(User fromUser) {
+        this.fromUser = fromUser;
+    }
+
     public static class User {
 
         private Long id;
+
+        private String loginName;
+
+        private String realName;
+
+        private String iamgeUrl;
 
         private String email;
 
@@ -65,6 +81,38 @@ public class NoticeSendDTO {
         }
 
         public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getLoginName() {
+            return loginName;
+        }
+
+        public void setLoginName(String loginName) {
+            this.loginName = loginName;
+        }
+
+        public String getRealName() {
+            return realName;
+        }
+
+        public void setRealName(String realName) {
+            this.realName = realName;
+        }
+
+        public String getIamgeUrl() {
+            return iamgeUrl;
+        }
+
+        public void setIamgeUrl(String iamgeUrl) {
+            this.iamgeUrl = iamgeUrl;
+        }
+
+        public User(Long id, String loginName, String realName, String iamgeUrl, String email) {
+            this.id = id;
+            this.loginName = loginName;
+            this.realName = realName;
+            this.iamgeUrl = iamgeUrl;
             this.email = email;
         }
 
