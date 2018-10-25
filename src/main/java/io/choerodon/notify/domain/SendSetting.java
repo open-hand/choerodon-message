@@ -36,6 +36,8 @@ public class SendSetting extends AuditDomain {
     @Column(name = "fd_level")
     private String level;
 
+    private String pmType;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
@@ -73,6 +75,7 @@ public class SendSetting extends AuditDomain {
                 ", smsTemplateId=" + smsTemplateId +
                 ", pmTemplateId=" + pmTemplateId +
                 ", level='" + level + '\'' +
+                ", pmType='" + pmType + '\'' +
                 ", retryCount=" + retryCount +
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
@@ -141,6 +144,14 @@ public class SendSetting extends AuditDomain {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public String getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(String pmType) {
+        this.pmType = pmType;
     }
 
     public Integer getRetryCount() {

@@ -12,6 +12,8 @@ public class SendSettingUpdateDTO {
 
     private Long pmTemplateId;
 
+    private String pmType;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
@@ -51,6 +53,14 @@ public class SendSettingUpdateDTO {
 
     public void setPmTemplateId(Long pmTemplateId) {
         this.pmTemplateId = pmTemplateId;
+    }
+
+    public String getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(String pmType) {
+        this.pmType = pmType;
     }
 
     public Integer getRetryCount() {

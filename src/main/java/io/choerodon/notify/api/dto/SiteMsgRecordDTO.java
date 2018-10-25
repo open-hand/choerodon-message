@@ -26,13 +26,19 @@ public class SiteMsgRecordDTO {
     @NotEmpty(message = "error.siteMsgRecord.contentEmpty")
     private String content;
 
+    private String type;
+
     private Boolean read;
 
     private Boolean deleted;
 
+    private Long sendBy;
+
     private Date sendTime;
 
     private Long objectVersionNumber;
+
+    private UserDTO sendByUser;
 
     public static PropertyMap<SiteMsgRecordDTO, SiteMsgRecord> dto2Entity() {
         return new PropertyMap<SiteMsgRecordDTO, SiteMsgRecord>() {
@@ -53,10 +59,13 @@ public class SiteMsgRecordDTO {
                 ", userId=" + userId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
+                ", type='" + type + '\'' +
                 ", read=" + read +
                 ", deleted=" + deleted +
+                ", sendBy=" + sendBy +
                 ", sendTime=" + sendTime +
                 ", objectVersionNumber=" + objectVersionNumber +
+                ", sendByUser=" + sendByUser +
                 '}';
     }
 
@@ -92,6 +101,14 @@ public class SiteMsgRecordDTO {
         this.content = content;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public Boolean getRead() {
         return read;
     }
@@ -108,12 +125,28 @@ public class SiteMsgRecordDTO {
         this.deleted = deleted;
     }
 
+    public Long getSendBy() {
+        return sendBy;
+    }
+
+    public void setSendBy(Long sendBy) {
+        this.sendBy = sendBy;
+    }
+
     public Date getSendTime() {
         return sendTime;
     }
 
     public void setSendTime(Date sendTime) {
         this.sendTime = sendTime;
+    }
+
+    public UserDTO getSendByUser() {
+        return sendByUser;
+    }
+
+    public void setSendByUser(UserDTO sendByUser) {
+        this.sendByUser = sendByUser;
     }
 
     public Long getObjectVersionNumber() {

@@ -3,6 +3,7 @@ package io.choerodon.notify.api.service.impl;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
+import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.SiteMsgRecord;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service("pmWsSendService")
@@ -49,7 +51,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void send(String code, Map<String, Object> params, Set<Long> ids) {
+    public void send(String code, Map<String, Object> params, Set<Long> ids, Long sendBy) {
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
         if (code == null || sendSetting == null) {
             logger.info("no sendsetting,cann`t send station letter.");
@@ -71,6 +73,10 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                 String pmContent = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
                 String pmTitle = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.TITLE);
                 SiteMsgRecord record = new SiteMsgRecord(id, pmTitle, pmContent);
+                record.setSendBy(sendBy);
+                if (PmType.NOTICE.getValue().equals(sendSetting.getPmType())) {
+                    record.setType(PmType.NOTICE.getValue());
+                }
                 if (siteMsgRecordMapper.insert(record) != 1) {
                     throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
                 }

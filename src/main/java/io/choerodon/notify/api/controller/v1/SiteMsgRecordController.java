@@ -12,6 +12,7 @@ import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +37,12 @@ public class SiteMsgRecordController {
     @ApiOperation(value = "全局层查询用户站内信消息接口")
     public ResponseEntity<Page<SiteMsgRecordDTO>> pagingQuery(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                               @RequestParam("user_id") Long userId,
-                                                              @RequestParam(value = "read", required = false) Boolean isRead
+                                                              @RequestParam(value = "read", required = false) Boolean isRead,
+                                                              @ApiParam(name = "type", value = "站内信类型(msg/notice)", example = "msg")
+                                                              @RequestParam(required = false) String type
     ) {
         SiteMsgRecordValidator.validateCurrentUser(userId);
-        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, isRead, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, isRead, type, pageRequest), HttpStatus.OK);
     }
 
     @PutMapping("/batch_read")
