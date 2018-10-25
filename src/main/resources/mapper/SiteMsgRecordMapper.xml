@@ -48,6 +48,9 @@
         <if test="read != null">
             AND nsr.is_read = #{read}
         </if>
+        <if test="type != null">
+            AND nsr.type = #{type}
+        </if>
     </select>
 
 

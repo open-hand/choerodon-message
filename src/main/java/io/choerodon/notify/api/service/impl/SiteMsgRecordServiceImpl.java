@@ -49,7 +49,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
     @Override
     public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, PageRequest pageRequest) {
         Page<SiteMsgRecordDTO> recordDTOPage = PageHelper.doPageAndSort(pageRequest, () ->
-                siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead));
+                siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
         List<SiteMsgRecordDTO> recordDTOList = recordDTOPage.getContent();
         Set<Long> set = recordDTOList.stream().map(SiteMsgRecordDTO::getSendBy).collect(Collectors.toSet());
         Long[] ids = new Long[set.size()];
