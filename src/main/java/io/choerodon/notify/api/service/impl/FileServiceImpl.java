@@ -30,7 +30,7 @@ public class FileServiceImpl implements FileService {
     public List<String> uploadFile(HttpServletRequest request) {
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
         if (!(files != null && !files.isEmpty())) {
-            throw new CommonException("error.file.exits");
+            throw new CommonException("error.file.exist");
         }
         List<String> result = new ArrayList<>();
         for (MultipartFile multipartFile : files) {
