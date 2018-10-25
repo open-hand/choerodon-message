@@ -16,7 +16,8 @@ public interface SiteMsgRecordMapper extends BaseMapper<SiteMsgRecord> {
     List<SiteMsgRecordDTO> fulltextSearch(@Param("query") SiteMsgRecordQueryParam siteMsgRecordQueryParam);
 
     List<SiteMsgRecordDTO> selectByUserIdAndReadAndDeleted(@Param("userId") Long userId,
-                                                           @Param("read") Boolean read);
+                                                           @Param("read") Boolean read,
+                                                           @Param("type") String type);
 
     int selectCountOfUnRead(@Param("userId") Long userId);
 
