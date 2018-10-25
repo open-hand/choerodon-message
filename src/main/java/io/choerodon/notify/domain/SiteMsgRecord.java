@@ -3,6 +3,7 @@ package io.choerodon.notify.domain;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.notify.api.pojo.PmType;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -28,11 +29,15 @@ public class SiteMsgRecord extends AuditDomain {
 
     private String content;
 
+    private String type;
+
     @Column(name = "is_read")
     private Boolean read;
 
     @Column(name = "is_deleted")
     private Boolean deleted;
+
+    private Long sendBy;
 
     private Date sendTime;
 
@@ -43,8 +48,10 @@ public class SiteMsgRecord extends AuditDomain {
                 ", userId=" + userId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
+                ", type=" + type +
                 ", read=" + read +
                 ", deleted=" + deleted +
+                ", sendBy=" + sendBy +
                 ", sendTime=" + sendTime +
                 '}';
     }
@@ -81,6 +88,14 @@ public class SiteMsgRecord extends AuditDomain {
         this.content = content;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public Boolean getRead() {
         return read;
     }
@@ -95,6 +110,14 @@ public class SiteMsgRecord extends AuditDomain {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Long getSendBy() {
+        return sendBy;
+    }
+
+    public void setSendBy(Long sendBy) {
+        this.sendBy = sendBy;
     }
 
     public Date getSendTime() {
@@ -112,8 +135,10 @@ public class SiteMsgRecord extends AuditDomain {
         this.read = false;
         this.deleted = false;
         this.sendTime = new Date();
+        this.setType(PmType.MSG.getValue());
     }
 
     public SiteMsgRecord() {
+        this(null, null, null);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void sendWs(WsSendDTO dto) {
-        webSocketSendService.send(dto.getCode(), dto.getParams(), Collections.singleton(dto.getId()));
+        webSocketSendService.send(dto.getCode(), dto.getParams(), Collections.singleton(dto.getId()), null);
     }
 
     @Override
@@ -47,6 +48,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         Set<String> emails = dto.getTargetUsers().stream().map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
         emailSendService.sendEmail(dto.getCode(), dto.getParams(), emails);
         Set<Long> ids = dto.getTargetUsers().stream().map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
-        webSocketSendService.send(dto.getCode(), dto.getParams(), ids);
+        webSocketSendService.send(dto.getCode(), dto.getParams(), ids,
+                Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null));
     }
 }

@@ -11,6 +11,8 @@ public class SendSettingListDTO {
 
     private String level;
 
+    private String pmType;
+
     private String description;
 
     private String emailTemplateCode;
@@ -49,6 +51,14 @@ public class SendSettingListDTO {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public String getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(String pmType) {
+        this.pmType = pmType;
     }
 
     public String getDescription() {

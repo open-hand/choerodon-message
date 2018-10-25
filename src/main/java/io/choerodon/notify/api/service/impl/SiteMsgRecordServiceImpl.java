@@ -4,9 +4,11 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
+import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
@@ -16,7 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
 
@@ -31,15 +37,28 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
 
     private final MessageSender messageSender;
 
-    public SiteMsgRecordServiceImpl(SiteMsgRecordMapper siteMsgRecordMapper, MessageSender messageSender) {
+    private final UserFeignClient userFeignClient;
+
+    public SiteMsgRecordServiceImpl(SiteMsgRecordMapper siteMsgRecordMapper, MessageSender messageSender,
+                                    UserFeignClient userFeignClient) {
         this.siteMsgRecordMapper = siteMsgRecordMapper;
         this.messageSender = messageSender;
+        this.userFeignClient = userFeignClient;
     }
 
     @Override
-    public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, PageRequest pageRequest) {
-        return PageHelper.doPageAndSort(pageRequest, () ->
+    public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, PageRequest pageRequest) {
+        Page<SiteMsgRecordDTO> recordDTOPage = PageHelper.doPageAndSort(pageRequest, () ->
                 siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead));
+        List<SiteMsgRecordDTO> recordDTOList = recordDTOPage.getContent();
+        Set<Long> set = recordDTOList.stream().map(SiteMsgRecordDTO::getSendBy).collect(Collectors.toSet());
+        Long[] ids = new Long[set.size()];
+        ids = set.toArray(ids);
+        Map<Long, UserDTO> userMap = userFeignClient.listUsersByIds(ids).getBody().stream().collect(Collectors.toMap(UserDTO::getId, user -> user, (k1, k2) -> k1));
+        recordDTOPage.setContent(recordDTOList.stream().peek((recordDTO) -> {
+            recordDTO.setSendByUser(userMap.get(recordDTO.getSendBy()));
+        }).collect(Collectors.toList()));
+        return recordDTOPage;
     }
 
     @Override

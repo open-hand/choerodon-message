@@ -8,6 +8,7 @@ import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -64,6 +65,12 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (updateDTO.getIsSendInstantly() != null) {
             db.setIsSendInstantly(updateDTO.getIsSendInstantly());
         }
+        if (PmType.NOTICE.getValue().equals(updateDTO.getPmType())) {
+            db.setPmType(PmType.NOTICE.getValue());
+        }
+        if (PmType.MSG.getValue().equals(updateDTO.getPmType())) {
+            db.setPmType(PmType.MSG.getValue());
+        }
         if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
             throw new CommonException("error.sendSetting.update");
         }
@@ -86,9 +93,9 @@ public class SendSettingServiceImpl implements SendSettingService {
             if (query == null) {
                 sendSettingMapper.insertSelective(i);
             } else {
-                 query.setName(i.getName());
-                 query.setDescription(i.getDescription());
-                 sendSettingMapper.updateByPrimaryKeySelective(query);
+                query.setName(i.getName());
+                query.setDescription(i.getDescription());
+                sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });
     }

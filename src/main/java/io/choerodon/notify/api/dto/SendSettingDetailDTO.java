@@ -9,6 +9,8 @@ public class SendSettingDetailDTO {
 
     private String name;
 
+    private String pmType;
+
     private String description;
 
     private String emailTemplateCode;
@@ -55,6 +57,14 @@ public class SendSettingDetailDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(String pmType) {
+        this.pmType = pmType;
     }
 
     public String getDescription() {

@@ -2,8 +2,8 @@ package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
     changeSet(author: 'jcalaz@163.com', id: '2018-08-09-add-notify-send-setting') {
-        if(helper.dbType().isSupportSequence()){
-            createSequence(sequenceName: 'NOTIFY_SEND_SETTING_S', startValue:"1")
+        if (helper.dbType().isSupportSequence()) {
+            createSequence(sequenceName: 'NOTIFY_SEND_SETTING_S', startValue: "1")
         }
         createTable(tableName: "NOTIFY_SEND_SETTING") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
@@ -46,5 +46,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
     }
     changeSet(author: 'jcalaz@163.com', id: '2018-09-19-rename-column') {
         renameColumn(tableName: 'NOTIFY_SEND_SETTING', oldColumnName: 'LEVEL', newColumnName: 'FD_LEVEL', columnDataType: 'VARCHAR(16)', remarks: '所属层级')
+    }
+    changeSet(author: 'youquan.deng@hand-china.com', id: '2018-10-25-add-column') {
+        addColumn(tableName: "NOTIFY_SEND_SETTING") {
+            column(name: 'PM_TYPE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'FD_LEVEL')
+        }
     }
 }
