@@ -16,6 +16,12 @@ import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.data.redis.connection.RedisConnection
+import org.springframework.data.redis.connection.RedisConnectionFactory
+import org.springframework.data.redis.core.HashOperations
+import org.springframework.data.redis.core.SetOperations
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
@@ -49,6 +55,30 @@ class IntegrationTestConfiguration {
 
     @Autowired
     LiquibaseExecutor liquibaseExecutor
+
+    @Bean
+    RedisConnectionFactory connectionFactory() {
+        detachedMockFactory.Spy(RedisConnectionFactory)
+    }
+
+    @Bean
+    StringRedisTemplate redisTemplate() {
+        StringRedisTemplate template = Mockito.mock(StringRedisTemplate)
+        RedisConnectionFactory connectionFactory = Mockito.mock(RedisConnectionFactory)
+        RedisConnection connection = Mockito.mock(RedisConnection)
+        SetOperations<String, String> setOperations = Mockito.mock(SetOperations)
+        HashOperations<String, Object, Object> hashOperations = Mockito.mock(HashOperations)
+        ValueOperations<String, Object> valueOperations = Mockito.mock(ValueOperations)
+
+        Mockito.when(template.getConnectionFactory()).thenReturn(connectionFactory)
+        Mockito.when(connectionFactory.getConnection()).thenReturn(connection)
+
+        Mockito.when(template.opsForSet()).thenReturn(setOperations)
+        Mockito.when(template.opsForHash()).thenReturn(hashOperations)
+        Mockito.when(template.opsForValue()).thenReturn(valueOperations)
+
+        return template
+    }
 
     @Bean
     KafkaTemplate<byte[], byte[]> kafkaTemplate() {
