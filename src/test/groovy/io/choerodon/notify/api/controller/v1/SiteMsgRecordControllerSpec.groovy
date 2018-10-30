@@ -113,6 +113,10 @@ class SiteMsgRecordControllerSpec extends Specification {
         entity.getStatusCode().is2xxSuccessful()
         SiteMsgRecordQueryParam param = new SiteMsgRecordQueryParam()
         param.setRead(true)
+        param.setContent(null)
+        param.setDeleted(null)
+        param.setId(null)
+        param.setParams(null)
         recordMapper.fulltextSearch(param).size() == 2
     }
 

@@ -69,6 +69,9 @@ class IntegrationTestConfiguration {
         SetOperations<String, String> setOperations = Mockito.mock(SetOperations)
         HashOperations<String, Object, Object> hashOperations = Mockito.mock(HashOperations)
         ValueOperations<String, Object> valueOperations = Mockito.mock(ValueOperations)
+        Set<String> set = new HashSet<>()
+        set.add("api-service")
+        set.add("iam=service")
 
         Mockito.when(template.getConnectionFactory()).thenReturn(connectionFactory)
         Mockito.when(connectionFactory.getConnection()).thenReturn(connection)
@@ -76,7 +79,8 @@ class IntegrationTestConfiguration {
         Mockito.when(template.opsForSet()).thenReturn(setOperations)
         Mockito.when(template.opsForHash()).thenReturn(hashOperations)
         Mockito.when(template.opsForValue()).thenReturn(valueOperations)
-
+        Mockito.when(setOperations.members(Mockito.any())).thenReturn(set)
+        Mockito.when(valueOperations.get(Mockito.any())).thenReturn(1L)
         return template
     }
 
