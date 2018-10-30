@@ -12,8 +12,8 @@ class SubReceiveSitMsgHandlerSpec extends Specification {
     private RelationshipDefining relationshipDefining = Mock(RelationshipDefining)
     private MessageSender messageSender = Mock(MessageSender)
     private final SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
-    private SubReceiveSitMsgHandler subReceiveSitMsgHandler =
-            new SubReceiveSitMsgHandler(relationshipDefining, messageSender, siteMsgRecordMapper)
+    private SubReceiveMessageHandler subReceiveSitMsgHandler =
+            new SubReceiveMessageHandler(relationshipDefining, messageSender, siteMsgRecordMapper)
 
     def "Handle"() {
         given: "构造请求参数"

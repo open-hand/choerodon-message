@@ -5,6 +5,8 @@ import java.util.Set;
 
 public interface WebSocketSendService {
 
-    void send(String code, Map<String, Object> params, Set<Long> ids, Long sendBy);
+    void sendSiteMessage(String code, Map<String, Object> params, Set<Long> ids, Long sendBy);
+
+    void sendWebSocket(String code, String id, String message);
 
 }

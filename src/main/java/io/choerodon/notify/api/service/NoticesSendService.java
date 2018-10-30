@@ -9,7 +9,7 @@ public interface NoticesSendService {
 
     void sendEmail(EmailSendDTO dto);
 
-    void sendWs(WsSendDTO dto);
+    void sendSiteMessage(WsSendDTO dto);
 
     void sendNotice(NoticeSendDTO dto);
 

@@ -1,7 +1,9 @@
 package io.choerodon.notify.websocket.send;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.*;
 import io.choerodon.notify.websocket.relationship.RelationshipDefining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +61,16 @@ public class DefaultSmartMessageSender implements MessageSender {
     }
 
     @Override
+    public void sendRedis(String channel, String json) {
+        if (json == null) {
+            LOGGER.warn("error.messageOperator.sendRedis.payloadIsNull");
+            return;
+        }
+        redisTemplate.convertAndSend(channel, json);
+    }
+
+
+    @Override
     public void sendWebSocket(WebSocketSession session, String json) {
         if (session != null && json != null) {
             try {
@@ -81,7 +93,33 @@ public class DefaultSmartMessageSender implements MessageSender {
             relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, payload));
             relationshipDefining.getRedisChannelsByKey(key, true).forEach(redis -> this.sendRedis(redis, payload));
         }
+    }
 
+    @Override
+    public void sendByKey(String key, String type, String data) {
+        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(type)) {
+            return;
+        }
+        try {
+            JsonNode jsonNode = objectMapper.readTree(data);
+            ObjectNode root = objectMapper.createObjectNode();
+            root.set("key", new TextNode(key));
+            root.set("type", new TextNode(type));
+            if (data == null) {
+                root.set("data", NullNode.instance);
+            } else {
+                if (jsonNode instanceof ObjectNode || jsonNode instanceof ValueNode) {
+                    root.set("data", jsonNode);
+                } else if (jsonNode instanceof ArrayNode) {
+                    root.putArray("data").addAll((ArrayNode) jsonNode);
+                }
+            }
+            String json = root.toString();
+            relationshipDefining.getWebSocketSessionsByKey(key).forEach(session -> this.sendWebSocket(session, json));
+            relationshipDefining.getRedisChannelsByKey(key, true).forEach(redis -> this.sendRedis(redis, json));
+        } catch (IOException e) {
+            this.sendByKey(key, new WebSocketSendPayload<>(type, key, data));
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package io.choerodon.notify.websocket.notify;
 
-
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
 import io.choerodon.notify.websocket.relationship.RelationshipDefining;
@@ -16,7 +15,7 @@ import java.util.Map;
 import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
 
 @Component
-public class SubReceiveSitMsgHandler implements ReceiveMsgHandler<String> {
+public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
 
     private static final String SUB = "sub";
 
@@ -28,11 +27,13 @@ public class SubReceiveSitMsgHandler implements ReceiveMsgHandler<String> {
 
     private static final String SIT_MSG_KEY_PATH = "choerodon:msg:{code}:{id}";
 
+    private static final String SITE_MSG_CODE = "site-msg";
+
     private final AntPathMatcher matcher = new AntPathMatcher();
 
-    public SubReceiveSitMsgHandler(RelationshipDefining relationshipDefining,
-                                   MessageSender messageSender,
-                                   SiteMsgRecordMapper siteMsgRecordMapper) {
+    public SubReceiveMessageHandler(RelationshipDefining relationshipDefining,
+                                    MessageSender messageSender,
+                                    SiteMsgRecordMapper siteMsgRecordMapper) {
         this.relationshipDefining = relationshipDefining;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
@@ -51,11 +52,14 @@ public class SubReceiveSitMsgHandler implements ReceiveMsgHandler<String> {
         }
         if (matcher.match(SIT_MSG_KEY_PATH, key)) {
             Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, key);
-            String id = map.get("id");
-            if (id != null) {
-                int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(id));
-                if (unReadNum > 0) {
-                    messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
+            String code = map.get("code");
+            if (SITE_MSG_CODE.equals(code)) {
+                String id = map.get("id");
+                if (id != null) {
+                    int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(id));
+                    if (unReadNum > 0) {
+                        messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
+                    }
                 }
             }
         }
