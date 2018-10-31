@@ -34,17 +34,17 @@ class WebSocketWsSendServiceImplTest extends Specification {
         Long sendBy = 1L
 
         when: "调用方法"
-        webSocketSendService.send(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
         then: "校验结果"
         1 * sendSettingMapper.selectOne(_)
 
         when: "调用方法"
-        webSocketSendService.send(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
         then: "校验结果"
         1 * sendSettingMapper.selectOne(_) >> { new SendSetting() }
 
         when: "调用方法"
-        webSocketSendService.send(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
         then: "校验结果"
         1 * sendSettingMapper.selectOne(_) >> sendSetting
         1 * templateMapper.selectByPrimaryKey(_)
@@ -52,7 +52,7 @@ class WebSocketWsSendServiceImplTest extends Specification {
         exception.getCode().equals("error.pmTemplate.notExist")
 
         when: "调用方法"
-        webSocketSendService.send(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
         then: "校验结果"
         1 * sendSettingMapper.selectOne(_) >> sendSetting
         1 * templateMapper.selectByPrimaryKey(_) >> new Template()

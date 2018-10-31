@@ -24,7 +24,6 @@ class SubReceiveSitMsgHandlerSpec extends Specification {
         then: "校验结果"
         1 * relationshipDefining.contact(_,_)
         1 * relationshipDefining.getKeysBySession(_)
-        2 * messageSender.sendWebSocket(_,_)
-        1 * siteMsgRecordMapper.selectCountOfUnRead(_) >> 1
+        siteMsgRecordMapper.selectCountOfUnRead(_) >> 1
     }
 }
