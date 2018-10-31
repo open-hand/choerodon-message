@@ -45,7 +45,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         Set<Long> ids = dto.getTargetUsers().stream().map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         try {
-            webSocketSendService.send(dto.getCode(), dto.getParams(), ids,
+            webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids,
                     Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null));
         }catch (CommonException e){
             LOGGER.info("send station letter failed!", e);

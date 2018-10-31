@@ -4,14 +4,14 @@ import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
+import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -20,10 +20,16 @@ import java.util.HashMap;
 @Api("邮件，短信，站内信发送接口")
 public class NoticesSendController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendController.class);
+
     private NoticesSendService noticesSendService;
 
-    public NoticesSendController(NoticesSendService noticesSendService) {
+    private WebSocketSendService webSocketSendService;
+
+    public NoticesSendController(NoticesSendService noticesSendService,
+                                 WebSocketSendService webSocketSendService) {
         this.noticesSendService = noticesSendService;
+        this.webSocketSendService = webSocketSendService;
     }
 
     @PostMapping
