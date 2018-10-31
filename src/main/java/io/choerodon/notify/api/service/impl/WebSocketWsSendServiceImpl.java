@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Service("pmWsSendService")
@@ -51,7 +50,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void send(String code, Map<String, Object> params, Set<Long> ids, Long sendBy) {
+    public void sendSiteMessage(String code, Map<String, Object> params, Set<Long> ids, Long sendBy) {
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
         if (code == null || sendSetting == null) {
             logger.info("no sendsetting,cann`t send station letter.");
@@ -86,5 +85,11 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         } catch (IOException | TemplateException e) {
             throw new CommonException("error.templateRender.renderError", e);
         }
+    }
+
+    @Override
+    public void sendWebSocket(String code, String id, String message) {
+        String key = "choerodon:msg:" + code + ":" + id;
+        messageSender.sendByKey(key, code, message);
     }
 }

@@ -14,4 +14,8 @@ public interface MessageSender {
 
     void sendByKey(String key, WebSocketSendPayload<?> payload);
 
+    void sendRedis(String channel, String json);
+
+    void sendByKey(String key, String type, String data);
+
 }

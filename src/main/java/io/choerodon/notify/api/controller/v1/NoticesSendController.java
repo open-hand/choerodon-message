@@ -6,14 +6,14 @@ import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
+import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -23,10 +23,16 @@ import java.util.HashMap;
 @Api("邮件，短信，站内信发送接口")
 public class NoticesSendController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendController.class);
+
     private NoticesSendService noticesSendService;
 
-    public NoticesSendController(NoticesSendService noticesSendService) {
+    private WebSocketSendService webSocketSendService;
+
+    public NoticesSendController(NoticesSendService noticesSendService,
+                                 WebSocketSendService webSocketSendService) {
         this.noticesSendService = noticesSendService;
+        this.webSocketSendService = webSocketSendService;
     }
 
     @PostMapping
@@ -59,13 +65,26 @@ public class NoticesSendController {
     }
 
     @PostMapping("/ws")
-    @ApiOperation(value = "发送消息到webSocket")
+    @ApiOperation(value = "发送站内信到webSocket")
     @Permission(level = ResourceLevel.SITE)
-    public void postPm(@RequestBody @Valid WsSendDTO dto) {
+    public void postSiteMessage(@RequestBody @Valid WsSendDTO dto) {
         if (dto.getParams() == null) {
             dto.setParams(new HashMap<>(0));
         }
-        noticesSendService.sendWs(dto);
+        noticesSendService.sendSiteMessage(dto);
+    }
+
+    @PostMapping("/ws/{code}/{id}")
+    @ApiOperation(value = "发送自定义消息到webSocket")
+    @Permission(level = ResourceLevel.SITE)
+    public void postWebSocket(@PathVariable("code") String code,
+                              @PathVariable("id") String id,
+                              @RequestBody String message) {
+        if (StringUtils.isEmpty(message)) {
+            LOGGER.info("The message sent to webSocket is empty. code: {}, id: {}", code, id);
+        } else {
+            webSocketSendService.sendWebSocket(code, id, message);
+        }
     }
 
 }
