@@ -83,9 +83,10 @@ class DefaultSmartMessageSenderSpec extends Specification {
         WebSocketSendPayload<?> payload = new WebSocketSendPayload<>()
         when: "调用方法"
         messageSender.sendByKey("key", payload)
+        messageSender.sendByKey("key", "type", "{}")
         then: "校验结果"
         noExceptionThrown()
-        1 * relationshipDefining.getWebSocketSessionsByKey(_) >> set
-        1 * relationshipDefining.getRedisChannelsByKey(_, _) >> { new HashSet<>() }
+        2 * relationshipDefining.getWebSocketSessionsByKey(_) >> set
+        2 * relationshipDefining.getRedisChannelsByKey(_, _) >> { new HashSet<>() }
     }
 }
