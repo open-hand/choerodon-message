@@ -6,6 +6,9 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.web.socket.WebSocketSession
 import spock.lang.Specification
 
+import java.lang.reflect.Field
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  * @author dengyouquan
  * */
@@ -59,7 +62,12 @@ class DefaultRelationshipDefiningSpec extends Specification {
 
     def "RemoveWebSocketSessionContact"() {
         given: "构造请求参数"
+        SetOperations<String, Object> setOperations = Mock(SetOperations)
         WebSocketSession session = Mock(WebSocketSession)
+        Map<String, Set<WebSocketSession>> keySessionsMap = new ConcurrentHashMap<>()
+        Set<WebSocketSession> set = new HashSet<>()
+        set.add(session)
+        keySessionsMap.put("iam-service", set)
 
         when: "调用方法[null]"
         relationshipDefining.removeWebSocketSessionContact(null)
@@ -70,5 +78,14 @@ class DefaultRelationshipDefiningSpec extends Specification {
         relationshipDefining.removeWebSocketSessionContact(session)
         then: "校验结果"
         noExceptionThrown()
+
+        when: "调用方法"
+        Field field = relationshipDefining.getClass().getDeclaredField("keySessionsMap")
+        field.setAccessible(true)
+        field.set(relationshipDefining, keySessionsMap)
+        relationshipDefining.removeWebSocketSessionContact(session)
+        then: "校验结果"
+        noExceptionThrown()
+        1 * redisTemplate.opsForSet() >> setOperations
     }
 }

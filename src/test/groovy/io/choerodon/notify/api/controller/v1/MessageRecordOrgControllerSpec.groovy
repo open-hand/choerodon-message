@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.core.domain.Page
 import io.choerodon.core.exception.ExceptionResponse
 import io.choerodon.notify.IntegrationTestConfiguration
+import io.choerodon.notify.api.dto.RecordListDTO
 import io.choerodon.notify.domain.Record
 import io.choerodon.notify.infra.mapper.RecordMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -92,6 +93,14 @@ class MessageRecordOrgControllerSpec extends Specification {
         params.put("organization_id", 1L)
         params.put("id", records.get(0).getId())
         needClean = true
+        RecordListDTO dto = new RecordListDTO()
+        dto.setId(1L)
+        dto.setRetryCount(1)
+        dto.setStatus("OK")
+        dto.setEmail("email")
+        dto.setTemplateType("type")
+        dto.setFailedReason("fail")
+        dto.setIsManualRetry(false)
 
         when: "调用方法"
         //组织层没有邮件模板,

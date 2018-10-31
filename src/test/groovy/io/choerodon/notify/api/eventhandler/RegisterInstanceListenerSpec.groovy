@@ -7,10 +7,16 @@ import io.choerodon.notify.api.dto.RegisterInstancePayloadDTO
 import io.choerodon.notify.api.service.EmailTemplateService
 import io.choerodon.notify.api.service.SendSettingService
 import io.choerodon.notify.infra.config.NotifyProperties
+import io.choerodon.swagger.notify.NotifyScanData
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
+
+import java.lang.reflect.Field
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
@@ -40,7 +46,19 @@ class RegisterInstanceListenerSpec extends Specification {
 
         when: "调用方法"
         listener.handle(upRecord)
-
         then: "校验结果"
+        noExceptionThrown()
+
+        when: "调用方法[mock restTemplate]"
+        NotifyScanData scanData = new NotifyScanData()
+        ResponseEntity<NotifyScanData> entity = new ResponseEntity<>(scanData, HttpStatus.OK)
+        Field field = listener.getClass().getDeclaredField("restTemplate")
+        RestTemplate restTemplate = Mock(RestTemplate)
+        restTemplate.getForEntity(_, _) >> entity
+        field.setAccessible(true)
+        field.set(listener, restTemplate)
+        listener.handle(upRecord)
+        then: "校验结果"
+        noExceptionThrown()
     }
 }

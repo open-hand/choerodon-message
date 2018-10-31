@@ -2,9 +2,7 @@ package io.choerodon.notify.api.controller.v1;
 
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.swagger.annotation.Permission;
@@ -15,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 
 @RestController
@@ -50,41 +47,4 @@ public class NoticesSendController {
         }
         noticesSendService.sendNotice(dto);
     }
-
-    @PostMapping("/emails")
-    @ApiOperation(value = "发送邮件")
-    @Permission(level = ResourceLevel.SITE)
-    public void postEmail(@RequestBody EmailSendDTO dto) {
-        if (StringUtils.isEmpty(dto.getCode())) {
-            throw new FeignException("error.noticeSend.codeEmpty");
-        }
-        if (StringUtils.isEmpty(dto.getDestinationEmail())) {
-            throw new FeignException("error.noticeSend.emailEmpty");
-        }
-        noticesSendService.sendEmail(dto);
-    }
-
-    @PostMapping("/ws")
-    @ApiOperation(value = "发送站内信到webSocket")
-    @Permission(level = ResourceLevel.SITE)
-    public void postSiteMessage(@RequestBody @Valid WsSendDTO dto) {
-        if (dto.getParams() == null) {
-            dto.setParams(new HashMap<>(0));
-        }
-        noticesSendService.sendSiteMessage(dto);
-    }
-
-    @PostMapping("/ws/{code}/{id}")
-    @ApiOperation(value = "发送自定义消息到webSocket")
-    @Permission(level = ResourceLevel.SITE)
-    public void postWebSocket(@PathVariable("code") String code,
-                              @PathVariable("id") String id,
-                              @RequestBody String message) {
-        if (StringUtils.isEmpty(message)) {
-            LOGGER.info("The message sent to webSocket is empty. code: {}, id: {}", code, id);
-        } else {
-            webSocketSendService.sendWebSocket(code, id, message);
-        }
-    }
-
 }

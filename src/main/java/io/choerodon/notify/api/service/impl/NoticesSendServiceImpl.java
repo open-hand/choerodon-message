@@ -2,9 +2,7 @@ package io.choerodon.notify.api.service.impl;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
-import io.choerodon.notify.api.dto.EmailSendDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.dto.WsSendDTO;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
@@ -13,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,16 +27,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
-    }
-
-    @Override
-    public void sendEmail(EmailSendDTO dto) {
-        emailSendService.sendEmail(dto.getCode(), dto.getVariables(), Collections.singleton(dto.getDestinationEmail()));
-    }
-
-    @Override
-    public void sendSiteMessage(WsSendDTO dto) {
-        webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), Collections.singleton(dto.getId()), null);
     }
 
     @Override
