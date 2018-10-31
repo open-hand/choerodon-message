@@ -47,4 +47,18 @@ public class NoticesSendController {
         }
         noticesSendService.sendNotice(dto);
     }
+
+    @PostMapping("/ws/{code}/{id}")
+    @ApiOperation(value = "发送自定义消息到webSocket")
+    @Permission(level = ResourceLevel.SITE)
+    public void postWebSocket(@PathVariable("code") String code,
+                              @PathVariable("id") String id,
+                              @RequestBody String message) {
+        if (StringUtils.isEmpty(message)) {
+            LOGGER.info("The message sent to webSocket is empty. code: {}, id: {}", code, id);
+        } else {
+            webSocketSendService.sendWebSocket(code, id, message);
+        }
+    }
+
 }
