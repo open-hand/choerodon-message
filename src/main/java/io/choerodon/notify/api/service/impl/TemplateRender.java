@@ -22,10 +22,6 @@ public class TemplateRender {
             return value;
         }
 
-        public void setValue(String value) {
-            this.value = value;
-        }
-
         TemplateType(String value) {
             this.value = value;
         }
