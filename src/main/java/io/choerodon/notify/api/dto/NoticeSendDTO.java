@@ -13,6 +13,9 @@ public class NoticeSendDTO {
     @NotEmpty(message = "error.postNotify.codeEmpty")
     private String code;
 
+    /**
+     * 发送者
+     */
     private User fromUser;
 
     /**
@@ -20,7 +23,7 @@ public class NoticeSendDTO {
      */
     private List<User> targetUsers;
     /**
-     * 模版渲染参数
+     * 模版渲染参数(标题和内容渲染都在此参数中)
      */
     private Map<String, Object> params;
 
@@ -64,7 +67,7 @@ public class NoticeSendDTO {
 
         private String realName;
 
-        private String iamgeUrl;
+        private String imageUrl;
 
         private String email;
 
@@ -100,19 +103,19 @@ public class NoticeSendDTO {
             this.realName = realName;
         }
 
-        public String getIamgeUrl() {
-            return iamgeUrl;
+        public String getImageUrl() {
+            return imageUrl;
         }
 
-        public void setIamgeUrl(String iamgeUrl) {
-            this.iamgeUrl = iamgeUrl;
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
         }
 
-        public User(Long id, String loginName, String realName, String iamgeUrl, String email) {
+        public User(Long id, String loginName, String realName, String imageUrl, String email) {
             this.id = id;
             this.loginName = loginName;
             this.realName = realName;
-            this.iamgeUrl = iamgeUrl;
+            this.imageUrl = imageUrl;
             this.email = email;
         }
 
