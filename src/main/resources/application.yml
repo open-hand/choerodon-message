@@ -25,13 +25,6 @@ spring:
     url: jdbc:mysql://localhost:3306/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: choerodon
     password: 123456
-  kafka: #使用原生spring kafka需要配置
-    bootstrap-servers: localhost:9092
-    producer:
-      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-    consumer:
-      group-id: notify-service
-      auto-offset-reset: latest
   cloud:
     bus:
       enabled: true
@@ -90,12 +83,16 @@ choerodon:
       poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
   notify:
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
-    skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
-    fetch-time: 5
   ws:
     paths: /choerodon:msg/**
     oauth: false
     heart-beat-interval-ms: 10000
+  eureka:
+    event:
+      max-cache-size: 300 # 存储的最大失败数量
+      retry-time: 5 # 自动重试次数
+      retry-interval: 3 # 自动重试间隔(秒)
+      skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server # 跳过的服务
 logging:
   level:
     javax.mail: info

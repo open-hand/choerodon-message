@@ -57,6 +57,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-eureka-event</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
 
         <!--choerodon starters-->
         <dependency>

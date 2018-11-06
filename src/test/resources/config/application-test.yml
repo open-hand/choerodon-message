@@ -34,5 +34,3 @@ choerodon:
       poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
   notify:
     init-spring-email-config: false #h2 数据库未初始化，不能启用
-    skip-services: register-server, api-gateway, gateway-helper, oauth-server, config-server, event-store-service
-    fetch-time: 5
