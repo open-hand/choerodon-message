@@ -2,9 +2,6 @@ package io.choerodon.notify.infra.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Arrays;
-import java.util.List;
-
 @ConfigurationProperties(prefix = "choerodon.notify")
 public class NotifyProperties {
 
@@ -14,13 +11,6 @@ public class NotifyProperties {
 
     private boolean initSpringEmailConfig = true;
 
-    private List<String> skipServices = Arrays.asList("register-server", "api-gateway",
-            "gateway-helper", "oauth-server", "config-server", "event-store-service");
-
-    private Integer fetchTime = 5;
-
-    private Boolean isLocal = false;
-
     private Integer asynSendNoticesThreadNum = 5;
 
     public boolean isInitSpringEmailConfig() {
@@ -29,30 +19,6 @@ public class NotifyProperties {
 
     public void setInitSpringEmailConfig(boolean initSpringEmailConfig) {
         this.initSpringEmailConfig = initSpringEmailConfig;
-    }
-
-    public List<String> getSkipServices() {
-        return skipServices;
-    }
-
-    public void setSkipServices(List<String> skipServices) {
-        this.skipServices = skipServices;
-    }
-
-    public Integer getFetchTime() {
-        return fetchTime;
-    }
-
-    public void setFetchTime(Integer fetchTime) {
-        this.fetchTime = fetchTime;
-    }
-
-    public Boolean getLocal() {
-        return isLocal;
-    }
-
-    public void setLocal(Boolean local) {
-        isLocal = local;
     }
 
     public Integer getAsynSendNoticesThreadNum() {
