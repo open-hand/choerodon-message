@@ -105,15 +105,12 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
      * @param sourceType
      */
     private void validatorLevel(final String sourceType) {
-        boolean validSourceType = false;
         for (ResourceLevel level : ResourceLevel.values()) {
             if (level.value().equalsIgnoreCase(sourceType) && !sourceType.equalsIgnoreCase(ResourceLevel.USER.value())) {
                 return;
             }
         }
-        if (!validSourceType) {
-            throw new CommonException("error.receiveSetting.sourceType");
-        }
+        throw new CommonException("error.receiveSetting.sourceType");
     }
 
     @Override

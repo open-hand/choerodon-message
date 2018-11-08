@@ -65,7 +65,8 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         sb.append("pagingQueryByUserId===>totalTime:").append(endTime - startTime)
                 .append("ms,query sitemsgs:").append(dbQueryTime - startTime)
                 .append("ms,feignTime:").append(endTime - dbQueryTime).append("ms");
-        logger.info(sb.toString());
+        String timeInfo = sb.toString();
+        logger.info(timeInfo);
         return recordDTOPage;
     }
 
