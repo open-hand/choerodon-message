@@ -103,9 +103,14 @@ class NoticesSendControllerSpec extends Specification {
         configMapper.deleteByPrimaryKey(config)
     }
 
-    def "PostEmail"() {
-    }
+    def "PostWebSocket"() {
+        given: "构造请求参数"
+        String message = "message"
 
-    def "PostPm"() {
+        when: "调用方法"
+        def entity = restTemplate.postForEntity(BASE_PATH + "/ws/{code}/{id}", message, Void, "code", "2")
+
+        then: "校验结果"
+        entity.statusCode.is2xxSuccessful()
     }
 }

@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.dto;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,8 +8,8 @@ import java.util.List;
  * @author dengyouquan
  **/
 public class OrganizationProjectDTO {
-    private List<Organization> organizationList = Collections.emptyList();
-    private List<Project> projectList = Collections.emptyList();
+    private List<Organization> organizationList = new ArrayList<>();
+    private List<Project> projectList = new ArrayList<>();
 
     public List<Organization> getOrganizationList() {
         return organizationList;
