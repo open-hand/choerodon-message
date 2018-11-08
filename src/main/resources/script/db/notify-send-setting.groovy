@@ -52,4 +52,9 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: 'PM_TYPE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'FD_LEVEL')
         }
     }
+    changeSet(author: 'youquandeng1@gmail.com', id: '2018-11-07-add-column') {
+        addColumn(tableName: "NOTIFY_SEND_SETTING") {
+            column(name: 'IS_ALLOW_CONFIG', type: 'TINYINT UNSIGNED', defaultValue: "1", remarks: '是否允许配置通知设置。1表示可以，0不可以', afterColumn: 'PM_TYPE')
+        }
+    }
 }

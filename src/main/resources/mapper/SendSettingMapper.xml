@@ -22,7 +22,10 @@
         LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
         LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
-        WHERE nts.fd_level = #{level}
+        WHERE 1 = 1
+        <if test="level != null">
+            AND nts.fd_level = #{level}
+        </if>
         <if test="code != null">
             AND nts.code LIKE concat(concat('%',#{code}),'%')
         </if>

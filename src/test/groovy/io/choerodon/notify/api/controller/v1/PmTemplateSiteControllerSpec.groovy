@@ -40,14 +40,14 @@ class PmTemplateSiteControllerSpec extends Specification {
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 7
+        entity.getBody().size() == 2
 
         when: "调用方法"
         entity = restTemplate.getForEntity(BASE_PATH + "?name={name}&type={type}&code={code}&isPredefined={isPredefined}", Page, params)
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 1
+        entity.getBody().size() == 0
     }
 
     def "ListNames"() {
@@ -60,14 +60,14 @@ class PmTemplateSiteControllerSpec extends Specification {
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 7
+        entity.getBody().size() == 2
 
         when: "调用方法"
         entity = restTemplate.getForEntity(BASE_PATH + "/names?business_type={business_type}", List, params)
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 1
+        entity.getBody().size() == 0
     }
 
     def "Query"() {

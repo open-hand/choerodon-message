@@ -40,10 +40,23 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
+    public Set<BusinessTypeDTO> listNames() {
+        return sendSettingMapper.selectAll().stream()
+                .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
+    }
+
+    @Override
     public Page<SendSettingListDTO> page(final String level, final String name, final String code,
                                          final String description, final String params, final PageRequest pageRequest) {
         return PageHelper.doPageAndSort(pageRequest,
                 () -> sendSettingMapper.fulltextSearch(level, code, name, description, params));
+    }
+
+    @Override
+    public Page<SendSettingListDTO> page(final String name, final String code,
+                                         final String description, final String params, final PageRequest pageRequest) {
+        return PageHelper.doPageAndSort(pageRequest,
+                () -> sendSettingMapper.fulltextSearch(null, code, name, description, params));
     }
 
     @Override

@@ -15,7 +15,12 @@ public interface SendSettingService {
 
     Set<BusinessTypeDTO> listNames(String level);
 
+    Set<BusinessTypeDTO> listNames();
+
     Page<SendSettingListDTO> page(String level, String name, String code,
+                                  String description, String params, PageRequest pageRequest);
+
+    Page<SendSettingListDTO> page(String name, String code,
                                   String description, String params, PageRequest pageRequest);
 
     SendSetting update(SendSettingUpdateDTO updateDTO);

@@ -23,8 +23,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import java.util.Set;
 
-import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
-
 @RestController
 @RequestMapping("v1/notices/send_settings")
 @Api("全局层发送设置接口")
@@ -40,7 +38,7 @@ public class SendSettingSiteController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层获取业务类型名称列表")
     public ResponseEntity<Set<BusinessTypeDTO>> listNames() {
-        return new ResponseEntity<>(sendSettingService.listNames(LEVEL_SITE), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 
     @GetMapping
@@ -52,7 +50,7 @@ public class SendSettingSiteController {
                                                              @RequestParam(required = false) String code,
                                                              @RequestParam(required = false) String description,
                                                              @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(sendSettingService.page(LEVEL_SITE, name, code, description, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.page(name, code, description, params, pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
