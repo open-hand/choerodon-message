@@ -6,7 +6,6 @@ import freemarker.template.TemplateException;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;

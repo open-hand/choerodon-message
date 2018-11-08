@@ -29,15 +29,16 @@ public class ReceiveSettingDTO {
     public static PropertyMap<ReceiveSettingDTO, ReceiveSetting> dto2Entity() {
         return new PropertyMap<ReceiveSettingDTO, ReceiveSetting>() {
             protected void configure() {
-
+                //因为ReceiveSetting 和 ReceiveSettingDTO 字段完全相同，我们使用默认转换
             }
         };
     }
 
+
     public static PropertyMap<ReceiveSetting, ReceiveSettingDTO> entity2Dto() {
         return new PropertyMap<ReceiveSetting, ReceiveSettingDTO>() {
             protected void configure() {
-
+                //因为ReceiveSetting 和 ReceiveSettingDTO 字段完全相同，我们使用默认转换
             }
         };
     }
