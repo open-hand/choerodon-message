@@ -38,12 +38,13 @@ public class SendSetting extends AuditDomain {
 
     private String pmType;
 
+    private Boolean isAllowConfig;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
 
     private Boolean isManualRetry;
-
 
     public SendSetting(String code) {
         this.code = code;
@@ -76,6 +77,7 @@ public class SendSetting extends AuditDomain {
                 ", pmTemplateId=" + pmTemplateId +
                 ", level='" + level + '\'' +
                 ", pmType='" + pmType + '\'' +
+                ", isAllowConfig=" + isAllowConfig +
                 ", retryCount=" + retryCount +
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
@@ -176,5 +178,13 @@ public class SendSetting extends AuditDomain {
 
     public void setIsManualRetry(Boolean manualRetry) {
         isManualRetry = manualRetry;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public void setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
     }
 }

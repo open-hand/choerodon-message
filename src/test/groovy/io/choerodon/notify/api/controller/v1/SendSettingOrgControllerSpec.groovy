@@ -42,7 +42,7 @@ class SendSettingOrgControllerSpec extends Specification {
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 0
+        entity.getBody().size() == 3
 
         when: "调用方法"
         entity = restTemplate.getForEntity(BASE_PATH + "/organizations/{organization_id}?name={name}&type={type}&code={code}&isPredefined={isPredefined}", Page, params)
@@ -62,7 +62,7 @@ class SendSettingOrgControllerSpec extends Specification {
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 0
+        entity.getBody().size() == 3
     }
 
     def "Query"() {

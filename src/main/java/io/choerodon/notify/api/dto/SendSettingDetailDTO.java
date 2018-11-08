@@ -33,6 +33,8 @@ public class SendSettingDetailDTO {
 
     private Boolean isManualRetry;
 
+    private Boolean isAllowConfig;
+
     private Long objectVersionNumber;
 
     public Long getId() {
@@ -161,5 +163,13 @@ public class SendSettingDetailDTO {
 
     public void setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public void setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
     }
 }

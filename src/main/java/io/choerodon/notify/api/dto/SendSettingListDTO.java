@@ -21,6 +21,8 @@ public class SendSettingListDTO {
 
     private String pmTemplateCode;
 
+    private Boolean isAllowConfig;
+
     public Long getId() {
         return id;
     }
@@ -91,5 +93,13 @@ public class SendSettingListDTO {
 
     public void setPmTemplateCode(String pmTemplateCode) {
         this.pmTemplateCode = pmTemplateCode;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public void setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
     }
 }
