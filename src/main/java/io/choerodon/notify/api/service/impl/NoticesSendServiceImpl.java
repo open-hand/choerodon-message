@@ -58,7 +58,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("send email failed!", e);
         }
 
-        Set<Long> ids =getTargetUsers(dto, MessageType.PM).stream().map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
+        Set<Long> ids = getTargetUsers(dto, MessageType.PM).stream().map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         try {
             webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids,
                     Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null));
@@ -68,7 +68,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     /**
-     * 得到没有禁用接收通知的用户
+     * 如果该发送设置允许配置接收通知
+     * 则得到没有禁用接收通知的用户
+     * 否则得到全部用户
      *
      * @param dto
      * @param messageType 指定通知类型
@@ -79,6 +81,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         if (dto.getCode() == null || sendSetting == null) {
             LOGGER.info("no sendsetting,cann`t send email.");
             return Collections.emptyList();
+        }
+        if (!sendSetting.getAllowConfig()) {
+            return dto.getTargetUsers();
         }
         if (dto.getSourceId() == null) {
             dto.setSourceId(0L);
