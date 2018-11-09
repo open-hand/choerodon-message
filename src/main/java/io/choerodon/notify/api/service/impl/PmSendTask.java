@@ -57,7 +57,7 @@ public class PmSendTask {
     }
 
     @JobTask(maxRetryCount = 1, code = "sendStationLetter", params = {
-            @JobParam(name = "code", defaultValue = "addFunction", description = "发送设置编码]"),
+            @JobParam(name = "code", defaultValue = "addFunction", description = "发送设置编码"),
             @JobParam(name = "variables", defaultValue = "{'content':'定时任务'}", description = "站内信模板内容的渲染参数")
     }, description = "发送站内信")
     public void sendStationLetter(Map<String, Object> map) {
