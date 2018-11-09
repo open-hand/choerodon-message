@@ -15,6 +15,7 @@
         nts.fd_level,
         nts.pm_type,
         nts.description,
+        nts.is_allow_config,
         ntemail.code AS email_template_code,
         ntsms.code AS sms_template_code,
         ntpm.code AS pm_template_code
@@ -61,6 +62,7 @@
         nts.retry_count,
         nts.is_send_instantly,
         nts.is_manual_retry,
+        nts.is_allow_config,
         nts.object_version_number,
         ntemail.id AS email_template_id,
         ntemail.code AS email_template_code,
@@ -73,5 +75,28 @@
         LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
         where nts.id = #{id}
+    </select>
+
+    <select id="queryByLevelAndAllowConfig" resultMap="SendSettingDetailDTO">
+        SELECT
+        nts.id,
+        nts.code,
+        nts.name,
+        nts.description,
+        nts.fd_level,
+        nts.pm_type,
+        nts.retry_count,
+        nts.is_send_instantly,
+        nts.is_manual_retry,
+        nts.is_allow_config,
+        nts.object_version_number
+        FROM notify_send_setting nts
+        where 1 = 1
+        <if test="level != null">
+            AND nts.fd_level = #{level}
+        </if>
+        <if test="allowConfig != null">
+            AND nts.is_allow_config = #{allowConfig}
+        </if>
     </select>
 </mapper>

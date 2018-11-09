@@ -10,6 +10,7 @@ import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.api.validator.CommonValidator;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
@@ -17,6 +18,7 @@ import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,5 +113,13 @@ public class SendSettingServiceImpl implements SendSettingService {
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });
+    }
+
+    @Override
+    public List<SendSettingListDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
+        if (level != null) {
+            CommonValidator.validatorLevel(level);
+        }
+        return sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
     }
 }

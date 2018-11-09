@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -69,5 +70,10 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.update(updateDTO), HttpStatus.OK);
     }
 
-
+    @GetMapping("/list")
+    @Permission(permissionLogin = true)
+    @ApiOperation(value = "根据层级查询未禁用通知配置的发送设置列表")
+    public ResponseEntity<List<SendSettingListDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type", required = false) String level) {
+        return new ResponseEntity<>(sendSettingService.queryByLevelAndAllowConfig(level, true), HttpStatus.OK);
+    }
 }
