@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.OrganizationProjectDTO;
 import io.choerodon.notify.api.dto.ReceiveSettingDTO;
 import io.choerodon.notify.api.service.ReceiveSettingService;
+import io.choerodon.notify.api.validator.CommonValidator;
 import io.choerodon.notify.domain.ReceiveSetting;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.feign.UserFeignClient;
@@ -76,7 +77,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
     @Override
     public void updateByUserIdAndSourceTypeAndSourceId(final Long userId, final String sourceType, final Long sourceId, final String messageType, final boolean disable) {
         if (userId == null) return;
-        validatorLevel(sourceType);
+        CommonValidator.validatorLevel(sourceType);
         /*
             没有校验sourceId是否存在，需要发feign，对性能有影响，因此不校验
             1. 前端不会发不存在的sourceId过来
@@ -97,20 +98,6 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
                 }
             });
         }
-    }
-
-    /**
-     * 校验层级是否在ResourceLevel中(不包括user)
-     *
-     * @param sourceType
-     */
-    private void validatorLevel(final String sourceType) {
-        for (ResourceLevel level : ResourceLevel.values()) {
-            if (level.value().equalsIgnoreCase(sourceType) && !sourceType.equalsIgnoreCase(ResourceLevel.USER.value())) {
-                return;
-            }
-        }
-        throw new CommonException("error.receiveSetting.sourceType");
     }
 
     @Override
