@@ -2,6 +2,7 @@ package io.choerodon.notify.api.validator;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.notify.api.pojo.MessageType;
 
 /**
  * @author dengyouquan
@@ -18,6 +19,20 @@ public class CommonValidator {
                 return;
             }
         }
-        throw new CommonException("error.receiveSetting.sourceType");
+        throw new CommonException("error.notify.sourceType");
+    }
+
+    /**
+     * 校验消息类型是否在MessageType中
+     *
+     * @param messageType
+     */
+    public static void validatorMessageType(final String messageType) {
+        for (MessageType type : MessageType.values()) {
+            if (type.getValue().equalsIgnoreCase(messageType)) {
+                return;
+            }
+        }
+        throw new CommonException("error.notify.messageType");
     }
 }
