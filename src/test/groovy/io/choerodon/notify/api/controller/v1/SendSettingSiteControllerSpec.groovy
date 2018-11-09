@@ -49,7 +49,7 @@ class SendSettingSiteControllerSpec extends Specification {
         params.put("isPredefined", true)
 
         when: "调用方法[全查询]"
-        def entity = restTemplate.getForEntity(BASE_PATH , Page, params)
+        def entity = restTemplate.getForEntity(BASE_PATH, Page, params)
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
@@ -93,5 +93,18 @@ class SendSettingSiteControllerSpec extends Specification {
         entity.getStatusCode().is2xxSuccessful()
         entity.getBody().getId().equals(sendSetting.getId())
         entity.getBody().getEmailTemplateId().equals(dto.getEmailTemplateId())
+    }
+
+    def "ListLevelAndAllowConfig"() {
+        given: "构造请求参数"
+        def params = new HashMap<String, Object>()
+        params.put("source_type", "site")
+
+        when: "调用方法[全查询]"
+        def entity = restTemplate.getForEntity(BASE_PATH + "/list", List, params)
+
+        then: "校验结果"
+        entity.getStatusCode().is2xxSuccessful()
+        entity.getBody().size() == 7
     }
 }
