@@ -133,6 +133,6 @@ class ReceiveSettingControllerSpec extends Specification {
         entity = restTemplate.exchange(BASE_PATH + "?message_type={messageType}&disable={disable}&source_id={sourceId}&source_type={sourceType}", HttpMethod.PUT, httpEntity, ExceptionResponse, paramsMap)
         then: "校验参数"
         entity.statusCode.is2xxSuccessful()
-        entity.getBody().getCode().equals("error.receiveSetting.sourceType")
+        entity.getBody().getCode().equals("error.notify.messageType")
     }
 }
