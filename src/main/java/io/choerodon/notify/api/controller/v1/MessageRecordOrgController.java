@@ -21,7 +21,6 @@ import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
 
 @RestController
 @RequestMapping("v1/records")
-@Deprecated
 public class MessageRecordOrgController {
 
     private MessageRecordService messageRecordService;
