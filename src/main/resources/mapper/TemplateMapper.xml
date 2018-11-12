@@ -23,9 +23,12 @@
         nss.name AS type,
         nt.is_predefined AS isPredefined
         FROM notify_template nt
-        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
+        LEFT JOIN notify_send_setting nss on nss.code = nt.business_type
         WHERE nt.message_type = 'pm'
-        AND nss.fd_level = #{level}
+        AND 1 = 1
+        <if test="level != null">
+            AND nss.fd_level = #{level}
+        </if>
         <if test="type != null">
             AND nss.name LIKE concat(concat('%',#{type}),'%')
         </if>
@@ -43,7 +46,7 @@
             AND(
             nt.code LIKE concat(concat('%',#{params}),'%') OR
             nt.name LIKE concat(concat('%',#{params}),'%') OR
-            nss.name  LIKE concat(concat('%',#{params}),'%')
+            nss.name LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>
@@ -56,9 +59,12 @@
         nss.name AS type,
         nt.is_predefined AS isPredefined
         FROM notify_template nt
-        LEFT JOIN notify_send_setting nss on nss.code =  nt.business_type
+        LEFT JOIN notify_send_setting nss on nss.code = nt.business_type
         WHERE nt.message_type = 'email'
-        AND nss.fd_level = #{level}
+        AND 1 = 1
+        <if test="level != null">
+            AND nss.fd_level = #{level}
+        </if>
         <if test="type != null">
             AND nss.name LIKE concat(concat('%',#{type}),'%')
         </if>
@@ -76,7 +82,7 @@
             AND(
             nt.code LIKE concat(concat('%',#{params}),'%') OR
             nt.name LIKE concat(concat('%',#{params}),'%') OR
-            nss.name  LIKE concat(concat('%',#{params}),'%')
+            nss.name LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>
@@ -87,12 +93,35 @@
         nt.code,
         nt.name
         FROM notify_template nt
-        INNER JOIN notify_send_setting nss on nss.code =  nt.business_type
+        INNER JOIN notify_send_setting nss on nss.code = nt.business_type
         <if test="type != null">
             AND nss.code = #{type}
         </if>
-        WHERE nss.fd_level = #{level}
+        WHERE 1 = 1
+        <if test="level != null">
+            AND nss.fd_level = #{level}
+        </if>
     </select>
+
+    <select id="selectNamesByLevelAndTypeAnyMessageType" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
+        SELECT
+        nt.id,
+        nt.code,
+        nt.name
+        FROM notify_template nt
+        INNER JOIN notify_send_setting nss on nss.code = nt.business_type
+        <if test="type != null">
+            AND nss.code = #{type}
+        </if>
+        WHERE 1 = 1
+        <if test="level != null">
+            AND nss.fd_level = #{level}
+        </if>
+        <if test="messageType != null">
+            AND nt.message_type = #{messageType}
+        </if>
+    </select>
+
 
     <select id="selectLevelByCode" resultType="java.lang.String">
         SELECT

@@ -46,7 +46,7 @@ public class PmTemplateSiteController {
                                                            @RequestParam(required = false) Boolean isPredefined,
                                                            @RequestParam(required = false) String params) {
         TemplateQueryDTO query = new TemplateQueryDTO(name, code, type, isPredefined, params, pageRequest);
-        return new ResponseEntity<>(templateService.pageByLevel(query, LEVEL_SITE), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.pageByLevel(query, null), HttpStatus.OK);
     }
 
 
@@ -54,7 +54,7 @@ public class PmTemplateSiteController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层查询所有站内信模版名")
     public ResponseEntity<List<TemplateNamesDTO>> listNames(@RequestParam(required = false, name = "business_type") String businessType) {
-        return new ResponseEntity<>(templateService.listNames(LEVEL_SITE, businessType), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.listNames(null, businessType), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -86,7 +86,7 @@ public class PmTemplateSiteController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层更新站内信模版")
     public ResponseEntity<PmTemplateDTO> update(@PathVariable Long id,
-                                                   @RequestBody @Valid PmTemplateDTO template) {
+                                                @RequestBody @Valid PmTemplateDTO template) {
         template.setId(id);
         template.setIsPredefined(null);
         if (template.getObjectVersionNumber() == null) {

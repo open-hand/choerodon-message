@@ -52,7 +52,8 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         //没有校验接收通知设置中，层级是否一致，
         // 即sendSettingId中对应的level和接收通知设置中level不一定一致
         List<ReceiveSetting> updateSettings = settingDTOList.stream().
-                map(settingDTO -> modelMapper.map(settingDTO, ReceiveSetting.class)).collect(Collectors.toList());
+                map(settingDTO -> modelMapper.map(settingDTO, ReceiveSetting.class))
+                .peek(receiveSetting -> receiveSetting.setUserId(userId)).collect(Collectors.toList());
         ReceiveSetting receiveSetting = new ReceiveSetting();
         receiveSetting.setUserId(userId);
         List<ReceiveSetting> dbSettings = receiveSettingMapper.select(receiveSetting);
@@ -61,16 +62,16 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         insertSetting.removeAll(dbSettings);
         //insertSetting是应该插入的元素
         insertSetting.forEach(t -> {
-            //如果不是当前用户id，则跳过
-            if (userId != null && userId.equals(t.getUserId()) && receiveSettingMapper.insert(t) != 1) {
+            t.setUserId(userId);
+            if (receiveSettingMapper.insert(t) != 1) {
                 throw new CommonException("error.receiveSetting.update");
             }
         });
         //移除数据库dbSettings和updateSettings中不同的元素，这些是应该删除的对象
         dbSettings.removeAll(updateSettings);
         dbSettings.forEach(t -> {
-            //如果不是当前用户id，则跳过
-            if (userId != null && userId.equals(t.getUserId()) && receiveSettingMapper.delete(t) != 1) {
+            t.setUserId(userId);
+            if (receiveSettingMapper.delete(t) != 1) {
                 throw new CommonException("error.receiveSetting.update");
             }
         });

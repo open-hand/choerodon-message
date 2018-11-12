@@ -27,6 +27,7 @@ import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
 @RestController
 @RequestMapping("v1/notices/emails/templates")
 @Api("组织层邮件模版接口")
+@Deprecated
 public class EmailTemplateOrgController {
 
     private EmailTemplateService templateService;

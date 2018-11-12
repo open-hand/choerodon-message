@@ -8,8 +8,6 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +19,6 @@ import java.util.List;
 @RequestMapping("v1/notices/receive_setting")
 @Api("个人配置是否接收通知接口")
 public class ReceiveSettingController {
-    private final Logger logger = LoggerFactory.getLogger(ReceiveSettingController.class);
     private ReceiveSettingService receiveSettingService;
 
     public ReceiveSettingController(ReceiveSettingService receiveSettingService) {
@@ -41,7 +38,6 @@ public class ReceiveSettingController {
     @ApiOperation(value = "更新当前用户所有接收通知配置（前端传输当前用户所有禁用的接收通知配置）")
     public void update(@RequestBody List<ReceiveSettingDTO> settingDTOList) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
-        logger.info("update user(id:" + userId + ") receive setting.");
         receiveSettingService.update(userId, settingDTOList);
     }
 

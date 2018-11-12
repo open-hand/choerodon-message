@@ -8,6 +8,9 @@ import io.choerodon.notify.api.pojo.MessageType;
  * @author dengyouquan
  **/
 public class CommonValidator {
+    private CommonValidator() {
+    }
+
     /**
      * 校验层级是否在ResourceLevel中(不包括user)
      *
