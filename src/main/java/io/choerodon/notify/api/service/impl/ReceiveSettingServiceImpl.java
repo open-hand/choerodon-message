@@ -60,14 +60,16 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         insertSetting.removeAll(dbSettings);
         //insertSetting是应该插入的元素
         insertSetting.forEach(t -> {
-            if (receiveSettingMapper.insert(t) != 1) {
+            //如果不是当前用户id，则跳过
+            if (userId != null && userId.equals(t.getUserId()) && receiveSettingMapper.insert(t) != 1) {
                 throw new CommonException("error.receiveSetting.update");
             }
         });
         //移除数据库dbSettings和updateSettings中不同的元素，这些是应该删除的对象
         dbSettings.removeAll(updateSettings);
         dbSettings.forEach(t -> {
-            if (receiveSettingMapper.delete(t) != 1) {
+            //如果不是当前用户id，则跳过
+            if (userId != null && userId.equals(t.getUserId()) && receiveSettingMapper.delete(t) != 1) {
                 throw new CommonException("error.receiveSetting.update");
             }
         });
