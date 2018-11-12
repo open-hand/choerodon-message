@@ -12,7 +12,7 @@
         <if test="type != null">
             AND nss.code = #{type}
         </if>
-        WHERE nt.message_type = #{messageType}
+        WHERE 1 = 1
         <if test="level != null">
             AND nss.fd_level = #{level}
         </if>
