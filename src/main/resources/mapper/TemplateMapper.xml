@@ -12,7 +12,13 @@
         <if test="type != null">
             AND nss.code = #{type}
         </if>
-        WHERE nss.fd_level = #{level} AND nt.message_type = #{messageType}
+        WHERE nt.message_type = #{messageType}
+        <if test="level != null">
+            AND nss.fd_level = #{level}
+        </if>
+        <if test="messageType != null">
+            AND nt.message_type = #{messageType}
+        </if>
     </select>
 
     <select id="fulltextSearchStationLetter" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
@@ -102,26 +108,6 @@
             AND nss.fd_level = #{level}
         </if>
     </select>
-
-    <select id="selectNamesByLevelAndTypeAnyMessageType" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">
-        SELECT
-        nt.id,
-        nt.code,
-        nt.name
-        FROM notify_template nt
-        INNER JOIN notify_send_setting nss on nss.code = nt.business_type
-        <if test="type != null">
-            AND nss.code = #{type}
-        </if>
-        WHERE 1 = 1
-        <if test="level != null">
-            AND nss.fd_level = #{level}
-        </if>
-        <if test="messageType != null">
-            AND nt.message_type = #{messageType}
-        </if>
-    </select>
-
 
     <select id="selectLevelByCode" resultType="java.lang.String">
         SELECT
