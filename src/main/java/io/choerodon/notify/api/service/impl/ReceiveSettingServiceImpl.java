@@ -48,6 +48,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
     @Override
     @Transactional
     public void update(final Long userId, final List<ReceiveSettingDTO> settingDTOList) {
+        if (userId == null) return;
         //没有校验接收通知设置中，层级是否一致，
         // 即sendSettingId中对应的level和接收通知设置中level不一定一致
         List<ReceiveSetting> updateSettings = settingDTOList.stream().
