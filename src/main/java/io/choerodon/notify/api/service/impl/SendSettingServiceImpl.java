@@ -110,6 +110,7 @@ public class SendSettingServiceImpl implements SendSettingService {
             } else {
                 query.setName(i.getName());
                 query.setDescription(i.getDescription());
+                query.setLevel(i.getLevel());
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });
