@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +51,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     @Override
     public void sendNotice(NoticeSendDTO dto) {
         List<NoticeSendDTO.User> users = getTargetUsers(dto, MessageType.EMAIL);
-        Set<String> emails = users.stream().map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
+        Set<String> emails = users.stream().filter(t -> !StringUtils.isEmpty(t.getEmail()))
+                .map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
         //捕获异常,防止邮件发送失败，影响站内信发送
         try {
             emailSendService.sendEmail(dto.getCode(), dto.getParams(), emails);
@@ -58,7 +60,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("send email failed!", e);
         }
 
-        Set<Long> ids = getTargetUsers(dto, MessageType.PM).stream().map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
+        Set<Long> ids = getTargetUsers(dto, MessageType.PM).stream().filter(t -> t.getId() != null)
+                .map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         try {
             webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids,
                     Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null));
