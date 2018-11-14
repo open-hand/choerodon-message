@@ -49,9 +49,10 @@ public class SendSettingSiteController {
     public ResponseEntity<Page<SendSettingListDTO>> pageSite(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                              @RequestParam(required = false) String name,
                                                              @RequestParam(required = false) String code,
+                                                             @RequestParam(required = false) String level,
                                                              @RequestParam(required = false) String description,
                                                              @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(sendSettingService.page(name, code, description, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.page(level, name, code, description, params, pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
