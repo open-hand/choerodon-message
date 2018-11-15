@@ -71,7 +71,7 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.update(updateDTO), HttpStatus.OK);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/allow_config")
     @Permission(permissionLogin = true)
     @ApiOperation(value = "根据层级查询未禁用通知配置的发送设置列表")
     public ResponseEntity<List<SendSettingListDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type", required = false) String level) {
