@@ -46,6 +46,8 @@ env:
     SPRING_REDIS_HOST: localhost
     SPRING_REDIS_PORT: 6379
     SPRING_REDIS_DATABASE: 2
+
+    JAVA_OPTS: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 metrics:
   path: /prometheus
   group: spring-boot
