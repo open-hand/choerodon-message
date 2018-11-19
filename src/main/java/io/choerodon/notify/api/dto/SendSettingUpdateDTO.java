@@ -16,6 +16,8 @@ public class SendSettingUpdateDTO {
 
     private Integer retryCount;
 
+    private Boolean isAllowConfig;
+
     private Boolean isSendInstantly;
 
     private Boolean isManualRetry;
@@ -69,6 +71,14 @@ public class SendSettingUpdateDTO {
 
     public void setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public void setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
     }
 
     public Boolean getIsSendInstantly() {
