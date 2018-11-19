@@ -86,6 +86,9 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (PmType.MSG.getValue().equals(updateDTO.getPmType())) {
             db.setPmType(PmType.MSG.getValue());
         }
+        if (updateDTO.getAllowConfig() != null) {
+            db.setAllowConfig(updateDTO.getAllowConfig());
+        }
         if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
             throw new CommonException("error.sendSetting.update");
         }
