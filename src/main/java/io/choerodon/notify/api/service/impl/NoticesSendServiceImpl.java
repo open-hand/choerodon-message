@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -70,26 +71,40 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("sendsetting no opposite email template and pm template,cann`t send notice");
             return;
         }
+        trySendEmail(dto, sendSetting, haveEmailTemplate);
+        trySendSiteMessage(dto, sendSetting, havePmTemplate);
+    }
+
+    /**
+     * 取得需要发送邮件的emails
+     *
+     * @param dto
+     * @param sendSetting
+     * @return
+     */
+    private Set<String> getNeedSendEmail(NoticeSendDTO dto, SendSetting sendSetting) {
+        List<UserDTO> needQueryUserDTOS = new ArrayList<>();
         //取得User中email为空的id
         Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getEmail() == null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         //取得User中email不为空的email
         Set<String> existsEmails = dto.getTargetUsers().stream().filter(user -> user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
         Long[] userIds = needQueryUserIds.toArray(new Long[needQueryUserIds.size()]);
-        List<UserDTO> userDTOS = userFeignClient.listUsersByIds(userIds).getBody();
-        //取得未禁用接收通知或者不允许禁用接收邮件通知的所有用户
-        List<UserDTO> emailUserDTOS = getTargetUsers(dto, sendSetting, userDTOS, MessageType.EMAIL);
-        Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(t -> t != null).collect(Collectors.toSet());
-        emails.addAll(existsEmails);
-        trySendEmail(dto, sendSetting, haveEmailTemplate, emails);
-        //取得未禁用接收通知或者不允许禁用接收站内信通知的所有用户
-        List<UserDTO> pmUserDTOS = getTargetUsers(dto, sendSetting, userDTOS, MessageType.PM);
-        Set<Long> ids = pmUserDTOS.stream().map(UserDTO::getId).filter(t -> t != null).collect(Collectors.toSet());
-        trySendSiteMessage(dto, sendSetting, havePmTemplate, ids);
+        if (!needQueryUserIds.isEmpty()) {
+            needQueryUserDTOS = userFeignClient.listUsersByIds(userIds).getBody();
+            //取得未禁用接收邮件通知或者不允许禁用接收邮件通知的所有用户
+            List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, needQueryUserDTOS);
+            Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(t -> t != null).collect(Collectors.toSet());
+            existsEmails.addAll(emails);
+        }
+        return existsEmails;
     }
 
-    private void trySendSiteMessage(NoticeSendDTO dto, SendSetting sendSetting, final boolean havePmTemplate, Set<Long> ids) {
+    private void trySendSiteMessage(NoticeSendDTO dto, SendSetting sendSetting, final boolean havePmTemplate) {
         try {
             if (havePmTemplate) {
+                //取得未禁用接收站内信通知或者不允许禁用接收站内信通知的所有用户
+                List<NoticeSendDTO.User> pmUserDTOS = getPmTargetUsers(dto, sendSetting, dto.getTargetUsers());
+                Set<Long> ids = pmUserDTOS.stream().map(NoticeSendDTO.User::getId).filter(t -> t != null).collect(Collectors.toSet());
                 webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids,
                         Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null), sendSetting);
             } else {
@@ -100,10 +115,11 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
     }
 
-    private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final boolean haveEmailTemplate, Set<String> emails) {
+    private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final boolean haveEmailTemplate) {
         //捕获异常,防止邮件发送失败，影响站内信发送
         try {
             if (haveEmailTemplate) {
+                Set<String> emails = getNeedSendEmail(dto, sendSetting);
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), emails, sendSetting);
             } else {
                 LOGGER.info("sendsetting no opposite email template,cann`t send email");
@@ -115,21 +131,40 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     /**
      * 如果发送设置允许配置通知
-     * 得到没有禁用接收通知的用户
+     * 得到没有禁用接收邮件通知的用户
      * 否则得到全部用户
      *
      * @param dto
      * @param sendSetting
-     * @param userDTOS
-     * @param messageType
+     * @param users
      * @return
      */
-    private List<UserDTO> getTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final List<UserDTO> userDTOS, final MessageType messageType) {
+    private List<UserDTO> getEmailTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final List<UserDTO> users) {
         if (!sendSetting.getAllowConfig()) {
-            return userDTOS;
+            return users;
         }
-        return userDTOS.stream().filter(user -> {
-            ReceiveSetting setting = new ReceiveSetting(sendSetting.getId(), messageType.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
+        return users.stream().filter(user -> {
+            ReceiveSetting setting = new ReceiveSetting(sendSetting.getId(), MessageType.EMAIL.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
+            return receiveSettingMapper.selectCount(setting) == 0;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 如果发送设置允许配置通知
+     * 得到没有禁用接收站内信通知的用户
+     * 否则得到全部用户
+     *
+     * @param dto
+     * @param sendSetting
+     * @param users
+     * @return
+     */
+    private List<NoticeSendDTO.User> getPmTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final List<NoticeSendDTO.User> users) {
+        if (!sendSetting.getAllowConfig()) {
+            return users;
+        }
+        return users.stream().filter(user -> {
+            ReceiveSetting setting = new ReceiveSetting(sendSetting.getId(), MessageType.PM.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
             return receiveSettingMapper.selectCount(setting) == 0;
         }).collect(Collectors.toList());
     }
