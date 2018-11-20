@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -72,26 +70,46 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("sendsetting no opposite email template and pm template,cann`t send notice");
             return;
         }
-        Long[] userIds = dto.getTargetUsersIds().toArray(new Long[dto.getTargetUsersIds().size()]);
+        //取得User中email为空的id
+        Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getEmail() == null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
+        //取得User中email不为空的email
+        Set<String> existsEmails = dto.getTargetUsers().stream().filter(user -> user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
+        Long[] userIds = needQueryUserIds.toArray(new Long[needQueryUserIds.size()]);
         List<UserDTO> userDTOS = userFeignClient.listUsersByIds(userIds).getBody();
+        //取得未禁用接收通知或者不允许禁用接收邮件通知的所有用户
         List<UserDTO> emailUserDTOS = getTargetUsers(dto, sendSetting, userDTOS, MessageType.EMAIL);
         Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(t -> t != null).collect(Collectors.toSet());
+        emails.addAll(existsEmails);
+        trySendEmail(dto, sendSetting, haveEmailTemplate, emails);
+        //取得未禁用接收通知或者不允许禁用接收站内信通知的所有用户
+        List<UserDTO> pmUserDTOS = getTargetUsers(dto, sendSetting, userDTOS, MessageType.PM);
+        Set<Long> ids = pmUserDTOS.stream().map(UserDTO::getId).filter(t -> t != null).collect(Collectors.toSet());
+        trySendSiteMessage(dto, sendSetting, havePmTemplate, ids);
+    }
+
+    private void trySendSiteMessage(NoticeSendDTO dto, SendSetting sendSetting, final boolean havePmTemplate, Set<Long> ids) {
+        try {
+            if (havePmTemplate) {
+                webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids,
+                        Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null), sendSetting);
+            } else {
+                LOGGER.info("sendsetting no opposite pm template,cann`t send pm");
+            }
+        } catch (CommonException e) {
+            LOGGER.info("send station letter failed!", e);
+        }
+    }
+
+    private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final boolean haveEmailTemplate, Set<String> emails) {
         //捕获异常,防止邮件发送失败，影响站内信发送
         try {
             if (haveEmailTemplate) {
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), emails, sendSetting);
+            } else {
+                LOGGER.info("sendsetting no opposite email template,cann`t send email");
             }
         } catch (CommonException e) {
             LOGGER.info("send email failed!", e);
-        }
-        List<UserDTO> pmUserDTOS = getTargetUsers(dto, sendSetting, userDTOS, MessageType.PM);
-        Set<Long> ids = pmUserDTOS.stream().map(UserDTO::getId).filter(t -> t != null).collect(Collectors.toSet());
-        try {
-            if (havePmTemplate) {
-                webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), ids, dto.getFromUserId(), sendSetting);
-            }
-        } catch (CommonException e) {
-            LOGGER.info("send station letter failed!", e);
         }
     }
 
@@ -106,12 +124,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * @param messageType
      * @return
      */
-    private List<UserDTO> getTargetUsers(NoticeSendDTO dto, SendSetting sendSetting, List<UserDTO> userDTOS, MessageType messageType) {
+    private List<UserDTO> getTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final List<UserDTO> userDTOS, final MessageType messageType) {
         if (!sendSetting.getAllowConfig()) {
             return userDTOS;
-        }
-        if (dto.getSourceId() == null) {
-            dto.setSourceId(0L);
         }
         return userDTOS.stream().filter(user -> {
             ReceiveSetting setting = new ReceiveSetting(sendSetting.getId(), messageType.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
