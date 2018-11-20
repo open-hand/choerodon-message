@@ -39,8 +39,11 @@ public class NoticesSendController {
         if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.postNotify.codeEmpty");
         }
-        if (dto.getTargetUsersIds() == null || dto.getTargetUsersIds().isEmpty()) {
+        if (dto.getTargetUsers() == null || dto.getTargetUsers().isEmpty()) {
             return;
+        }
+        if (dto.getSourceId() == null) {
+            dto.setSourceId(0L);
         }
         if (dto.getParams() == null) {
             dto.setParams(new HashMap<>(0));
