@@ -80,7 +80,7 @@ class IntegrationTestConfiguration {
         Mockito.when(template.opsForHash()).thenReturn(hashOperations)
         Mockito.when(template.opsForValue()).thenReturn(valueOperations)
         Mockito.when(setOperations.members(Mockito.any())).thenReturn(set)
-        Mockito.when(valueOperations.get(Mockito.any())).thenReturn(1L)
+        Mockito.when(valueOperations.get(Mockito.any())).thenReturn("1")
         return template
     }
 

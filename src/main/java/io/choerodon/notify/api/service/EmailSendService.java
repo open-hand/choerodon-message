@@ -2,6 +2,7 @@ package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.domain.Record;
+import io.choerodon.notify.domain.SendSetting;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 public interface EmailSendService {
 
-    void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails);
+    void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails, SendSetting sendSetting);
 
     void sendRecord(Record record, boolean isManualRetry);
 

@@ -1,9 +1,7 @@
 package io.choerodon.notify.api.service.impl
 
-import freemarker.template.TemplateException
+
 import io.choerodon.core.exception.CommonException
-import io.choerodon.notify.api.dto.EmailConfigDTO
-import io.choerodon.notify.api.exception.EmailSendException
 import io.choerodon.notify.api.pojo.MessageType
 import io.choerodon.notify.api.pojo.RecordSendData
 import io.choerodon.notify.api.service.EmailSendService
@@ -13,9 +11,7 @@ import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.cache.ConfigCache
 import io.choerodon.notify.infra.mapper.RecordMapper
-import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
-import io.choerodon.notify.infra.utils.ConvertUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mail.MailAuthenticationException
 import org.springframework.mail.MailSendException
@@ -29,14 +25,13 @@ import java.util.concurrent.Executor
  * @author dengyouquan
  * */
 class EmailSendServiceImplSpec extends Specification {
-    private SendSettingMapper sendSettingMapper = Mock(SendSettingMapper)
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private ConfigCache configCache = Mock(ConfigCache)
     private TemplateRender templateRender = Mock(TemplateRender)
     private RecordMapper recordMapper = Mock(RecordMapper)
     private EmailQueueObservable emailQueueObservable = new EmailQueueObservable()
     private Executor executor = Mock(Executor)
-    private EmailSendService emailSendService = new EmailSendServiceImpl(sendSettingMapper,
+    private EmailSendService emailSendService = new EmailSendServiceImpl(
             templateMapper, configCache, recordMapper, emailQueueObservable,
             templateRender, executor)
     @Autowired
@@ -65,40 +60,31 @@ class EmailSendServiceImplSpec extends Specification {
         sendSetting.setRetryCount(1)
         Template template = new Template()
 
-        when: "调用方法[sendSetting为空]"
-        emailSendService.sendEmail(code, params, targetEmails)
-        then: "校验结果"
-        1 * sendSettingMapper.selectOne(_) >> null
-        0 * _
-
         when: "调用方法[template为空]"
-        emailSendService.sendEmail(code, params, targetEmails)
+        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
         then: "校验结果"
         def exception = thrown(CommonException)
         exception.getCode().equals("error.emailTemplate.notExist")
-        1 * sendSettingMapper.selectOne(_) >> { sendSetting }
         1 * templateMapper.selectByPrimaryKey(_) >> null
         0 * _
 
         when: "调用方法[template Title Content为空]"
-        emailSendService.sendEmail(code, params, targetEmails)
+        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
         then: "校验结果"
         exception = thrown(CommonException)
         exception.getCode().equals("error.emailTemplate.notValid")
-        1 * sendSettingMapper.selectOne(_) >> { sendSetting }
         1 * templateMapper.selectByPrimaryKey(_) >> template
         0 * _
 
         when: "调用方法[异常NullPointerException]"
         template.setEmailContent("email content")
         template.setEmailTitle("email title")
-        emailSendService.sendEmail(code, params, targetEmails)
+        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
         then: "校验结果"
         //在sendFailedHandler中调用updateRecordStatusAndIncreaseCount会触发一个空指针
         //由于此方法接受的参数为long，而实际record.getId为null，但是record的id是insert后主键回写
         //包装类自动拆箱成基本类型会触发空指针异常，所以我们测试就止步于此
         thrown(NullPointerException)
-        1 * sendSettingMapper.selectOne(_) >> { sendSetting }
         1 * templateMapper.selectByPrimaryKey(_) >> template
         3 * configCache.getEmailConfig() >> config
         1 * recordMapper.insert(_) >> 1

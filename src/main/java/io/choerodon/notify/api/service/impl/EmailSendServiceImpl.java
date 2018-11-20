@@ -14,9 +14,9 @@ import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
 import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import org.slf4j.Logger;
@@ -48,8 +48,6 @@ public class EmailSendServiceImpl implements EmailSendService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendService.class);
 
-    private final SendSettingMapper sendSettingMapper;
-
     private final TemplateMapper templateMapper;
 
     private final ConfigCache configCache;
@@ -67,14 +65,12 @@ public class EmailSendServiceImpl implements EmailSendService {
     private final Executor executor;
 
 
-    public EmailSendServiceImpl(SendSettingMapper sendSettingMapper,
-                                TemplateMapper templateMapper,
+    public EmailSendServiceImpl(TemplateMapper templateMapper,
                                 ConfigCache configCache,
                                 RecordMapper recordMapper,
                                 EmailQueueObservable emailQueueObservable,
                                 TemplateRender templateRender,
                                 @Qualifier("asyncSendNoticeExecutor") Executor executor) {
-        this.sendSettingMapper = sendSettingMapper;
         this.templateMapper = templateMapper;
         this.configCache = configCache;
         this.recordMapper = recordMapper;
@@ -85,23 +81,9 @@ public class EmailSendServiceImpl implements EmailSendService {
 
 
     @Override
-    public void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails) {
-        SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
-        if (code == null || sendSetting == null) {
-            LOGGER.info("no sendsetting,cann`t send email.");
-            return;
-        }
-        if (sendSetting.getEmailTemplateId() == null) {
-            LOGGER.info("sendsetting no opposite email template,cann`t send email");
-            return;
-        }
+    public void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails, SendSetting sendSetting) {
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
-        if (template == null) {
-            throw new CommonException("error.emailTemplate.notExist");
-        }
-        if (StringUtils.isEmpty(template.getEmailContent()) || StringUtils.isEmpty(template.getEmailTitle())) {
-            throw new CommonException("error.emailTemplate.notValid");
-        }
+        validatorEmailTemplate(template);
         targetEmails.forEach(t -> {
             Record record = new Record();
             record.setStatus(null);
@@ -121,6 +103,15 @@ public class EmailSendServiceImpl implements EmailSendService {
                 emailQueueObservable.emit(record);
             }
         });
+    }
+
+    private void validatorEmailTemplate(Template template) {
+        if (template == null) {
+            throw new CommonException("error.emailTemplate.notExist");
+        }
+        if (StringUtils.isEmpty(template.getEmailContent()) || StringUtils.isEmpty(template.getEmailTitle())) {
+            throw new CommonException("error.emailTemplate.notValid");
+        }
     }
 
     @Override
