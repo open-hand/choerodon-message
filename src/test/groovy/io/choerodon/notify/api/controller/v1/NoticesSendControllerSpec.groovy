@@ -3,17 +3,25 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.EmailConfigDTO
 import io.choerodon.notify.api.dto.NoticeSendDTO
+import io.choerodon.notify.api.dto.UserDTO
+import io.choerodon.notify.api.service.NoticesSendService
+import io.choerodon.notify.api.service.WebSocketSendService
+import io.choerodon.notify.api.service.impl.NoticesSendServiceImpl
 import io.choerodon.notify.domain.Config
 import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.ConfigMapper
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -35,17 +43,34 @@ class NoticesSendControllerSpec extends Specification {
     private TemplateMapper templateMapper
     @Autowired
     private ConfigMapper configMapper
+    @Autowired
+    private NoticesSendServiceImpl noticesSendService
+    @Autowired
+    private WebSocketSendService webSocketSendService
+    @Autowired
+    private NoticesSendController noticesSendController
+
+    def setup() {
+        given: "mock"
+        UserFeignClient userFeignClient = Mockito.mock(UserFeignClient)
+        List<UserDTO> userDTOS = new ArrayList<>()
+        userDTOS.add(new UserDTO(id: 1L, email: "123@qq.com"))
+        ResponseEntity<List<UserDTO>> entity = new ResponseEntity<>(userDTOS, HttpStatus.OK)
+        Mockito.when(userFeignClient.listUsersByIds(Mockito.any())).thenReturn(entity)
+
+        noticesSendService.setUserFeignClient(userFeignClient)
+        noticesSendController = new NoticesSendController(noticesSendService, webSocketSendService)
+    }
 
     def "PostNotice"() {
         given: "构造请求参数"
+        def userId = 1L
         NoticeSendDTO noticeSendDTO = new NoticeSendDTO()
         noticeSendDTO.setCode("addUser")
-        NoticeSendDTO.User user = new NoticeSendDTO.User()
-        user.setId(1L)
-        noticeSendDTO.setFromUser(user)
-        List<NoticeSendDTO.User> users = new ArrayList<>()
-        users.add(user)
-        noticeSendDTO.setTargetUsers(users)
+        noticeSendDTO.setFromUserId(1L)
+        List<Long> ids = new ArrayList<>()
+        ids.add(userId)
+        noticeSendDTO.setTargetUsersIds(ids)
         Map<String, Object> paramsMap = new HashMap<>()
         paramsMap.put("addCount", 1L)
         noticeSendDTO.setParams(paramsMap)
@@ -91,7 +116,7 @@ class NoticesSendControllerSpec extends Specification {
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
         recordMapper.selectAll().size() == 1
-        recordMapper.selectAll().get(0).getUserId().equals(user.getId())
+        recordMapper.selectAll().get(0).getUserId().equals(userId)
 
         when: "调用方法"
         noticeSendDTO.setCode("forgetPassword")

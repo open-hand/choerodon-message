@@ -32,29 +32,24 @@ class WebSocketWsSendServiceImplTest extends Specification {
         SendSetting sendSetting = new SendSetting()
         sendSetting.setPmTemplateId(1L)
         Long sendBy = 1L
+        Template template = new Template()
+        template.setPmContent("content")
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
         then: "校验结果"
-        1 * sendSettingMapper.selectOne(_)
+        1 * templateMapper.selectByPrimaryKey(_) >> template
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
         then: "校验结果"
-        1 * sendSettingMapper.selectOne(_) >> { new SendSetting() }
-
-        when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
-        then: "校验结果"
-        1 * sendSettingMapper.selectOne(_) >> sendSetting
         1 * templateMapper.selectByPrimaryKey(_)
         def exception = thrown(CommonException)
         exception.getCode().equals("error.pmTemplate.notExist")
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
         then: "校验结果"
-        1 * sendSettingMapper.selectOne(_) >> sendSetting
         1 * templateMapper.selectByPrimaryKey(_) >> new Template()
         exception = thrown(CommonException)
         exception.getCode().equals("error.pmTemplate.contentNull")

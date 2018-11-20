@@ -48,11 +48,9 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
 
     @Override
     public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, PageRequest pageRequest) {
-        long startTime = System.currentTimeMillis();
         Page<SiteMsgRecordDTO> recordDTOPage = PageHelper.doPageAndSort(pageRequest, () ->
                 siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
         List<SiteMsgRecordDTO> recordDTOList = recordDTOPage.getContent();
-        long dbQueryTime = System.currentTimeMillis();
         Set<Long> set = recordDTOList.stream().map(SiteMsgRecordDTO::getSendBy).collect(Collectors.toSet());
         Long[] ids = new Long[set.size()];
         ids = set.toArray(ids);
@@ -60,13 +58,6 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         recordDTOPage.setContent(recordDTOList.stream().peek((recordDTO) -> {
             recordDTO.setSendByUser(userMap.get(recordDTO.getSendBy()));
         }).collect(Collectors.toList()));
-        long endTime = System.currentTimeMillis();
-        StringBuilder sb = new StringBuilder();
-        sb.append("pagingQueryByUserId===>totalTime:").append(endTime - startTime)
-                .append("ms,query sitemsgs:").append(dbQueryTime - startTime)
-                .append("ms,feignTime:").append(endTime - dbQueryTime).append("ms");
-        String timeInfo = sb.toString();
-        logger.info(timeInfo);
         return recordDTOPage;
     }
 
