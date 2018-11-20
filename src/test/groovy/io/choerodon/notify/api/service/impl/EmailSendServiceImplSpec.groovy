@@ -11,7 +11,6 @@ import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.cache.ConfigCache
 import io.choerodon.notify.infra.mapper.RecordMapper
-import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mail.MailAuthenticationException
@@ -26,14 +25,13 @@ import java.util.concurrent.Executor
  * @author dengyouquan
  * */
 class EmailSendServiceImplSpec extends Specification {
-    private SendSettingMapper sendSettingMapper = Mock(SendSettingMapper)
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private ConfigCache configCache = Mock(ConfigCache)
     private TemplateRender templateRender = Mock(TemplateRender)
     private RecordMapper recordMapper = Mock(RecordMapper)
     private EmailQueueObservable emailQueueObservable = new EmailQueueObservable()
     private Executor executor = Mock(Executor)
-    private EmailSendService emailSendService = new EmailSendServiceImpl(sendSettingMapper,
+    private EmailSendService emailSendService = new EmailSendServiceImpl(
             templateMapper, configCache, recordMapper, emailQueueObservable,
             templateRender, executor)
     @Autowired

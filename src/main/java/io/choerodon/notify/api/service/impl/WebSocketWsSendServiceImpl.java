@@ -8,13 +8,10 @@ import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,7 +21,6 @@ import java.util.Set;
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketWsSendServiceImpl.class);
     public static final String MSG_TYPE_PM = "site-msg";
 
     private final TemplateRender templateRender;
@@ -35,18 +31,15 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     private final MessageSender messageSender;
 
-    private final SendSettingMapper sendSettingMapper;
 
     public WebSocketWsSendServiceImpl(TemplateRender templateRender,
                                       TemplateMapper templateMapper,
                                       MessageSender messageSender,
-                                      SiteMsgRecordMapper siteMsgRecordMapper,
-                                      SendSettingMapper sendSettingMapper) {
+                                      SiteMsgRecordMapper siteMsgRecordMapper) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
-        this.sendSettingMapper = sendSettingMapper;
     }
 
     @Override

@@ -17,7 +17,6 @@ import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import org.slf4j.Logger;
@@ -49,8 +48,6 @@ public class EmailSendServiceImpl implements EmailSendService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendService.class);
 
-    private final SendSettingMapper sendSettingMapper;
-
     private final TemplateMapper templateMapper;
 
     private final ConfigCache configCache;
@@ -68,14 +65,12 @@ public class EmailSendServiceImpl implements EmailSendService {
     private final Executor executor;
 
 
-    public EmailSendServiceImpl(SendSettingMapper sendSettingMapper,
-                                TemplateMapper templateMapper,
+    public EmailSendServiceImpl(TemplateMapper templateMapper,
                                 ConfigCache configCache,
                                 RecordMapper recordMapper,
                                 EmailQueueObservable emailQueueObservable,
                                 TemplateRender templateRender,
                                 @Qualifier("asyncSendNoticeExecutor") Executor executor) {
-        this.sendSettingMapper = sendSettingMapper;
         this.templateMapper = templateMapper;
         this.configCache = configCache;
         this.recordMapper = recordMapper;

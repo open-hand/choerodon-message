@@ -4,7 +4,6 @@ import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
-import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import io.choerodon.notify.websocket.send.MessageSender
@@ -18,11 +17,10 @@ class WebSocketWsSendServiceImplTest extends Specification {
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
     private MessageSender messageSender = Mock(MessageSender)
-    private SendSettingMapper sendSettingMapper = Mock(SendSettingMapper)
     private WebSocketSendService webSocketSendService =
             new WebSocketWsSendServiceImpl(templateRender,
                     templateMapper, messageSender,
-                    siteMsgRecordMapper, sendSettingMapper)
+                    siteMsgRecordMapper)
 
     def "Send"() {
         given: "构造参数"
