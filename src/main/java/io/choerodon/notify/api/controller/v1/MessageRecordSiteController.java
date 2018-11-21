@@ -41,7 +41,7 @@ public class MessageRecordSiteController {
                                                          @RequestParam(required = false) Integer retryStatus,
                                                          @RequestParam(required = false) String failedReason,
                                                          @RequestParam(required = false) String params) {
-        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryStatus, failedReason, params, LEVEL_SITE);
+        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryStatus, failedReason, params, null);
         param.setPageRequest(pageRequest);
         return new ResponseEntity<>(messageRecordService.pageEmail(param), HttpStatus.OK);
     }
