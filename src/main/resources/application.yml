@@ -85,5 +85,4 @@ logging:
   level:
     javax.mail: info
     io.choerodon.notify.service.impl.PmSendTask: info
-    io.choerodon.notify: debug
 
