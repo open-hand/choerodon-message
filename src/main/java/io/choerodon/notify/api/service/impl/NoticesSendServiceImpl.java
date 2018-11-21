@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,20 +80,30 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * @return
      */
     private Set<String> getNeedSendEmail(NoticeSendDTO dto, SendSetting sendSetting) {
-        List<UserDTO> needQueryUserDTOS = new ArrayList<>();
-        //取得User中email为空的id
-        Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
-        //取得User中email不为空的email
-        Set<String> existsEmails = dto.getTargetUsers().stream().filter(user -> user.getId() == null && user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
-        Long[] userIds = needQueryUserIds.toArray(new Long[needQueryUserIds.size()]);
+        List<UserDTO> needQueryUserDTOS = null;
+        //取得User中id不为空但是email为空的id，将发起feign调用
+        Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null && user.getEmail() == null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
+        //取得User中id不为空且email不为空的id，处理成UserDTO
+        List<UserDTO> notNeedQueryUsers = dto.getTargetUsers().stream().filter(user -> user.getId() != null && user.getEmail() != null).map(user -> {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(user.getId());
+            user.setEmail(user.getEmail());
+            return userDTO;
+        }).collect(Collectors.toList());
+        //取得User中id空，但是email不为空的email
+        Set<String> onlyEmails = dto.getTargetUsers().stream().filter(user -> user.getId() == null && user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
+        Long[] userIds = needQueryUserIds.toArray(new Long[0]);
         if (!needQueryUserIds.isEmpty()) {
             needQueryUserDTOS = userFeignClient.listUsersByIds(userIds).getBody();
-            //取得未禁用接收邮件通知或者不允许禁用接收邮件通知的所有用户
-            List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, needQueryUserDTOS);
-            Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(t -> t != null).collect(Collectors.toSet());
-            existsEmails.addAll(emails);
         }
-        return existsEmails;
+        //将不需要查询的user加入查询出来的user
+        if (needQueryUserDTOS != null) {
+            needQueryUserDTOS.addAll(notNeedQueryUsers);
+        }
+        List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, needQueryUserDTOS);
+        Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(Objects::nonNull).collect(Collectors.toSet());
+        onlyEmails.addAll(emails);
+        return onlyEmails;
     }
 
     private void trySendSiteMessage(NoticeSendDTO dto, SendSetting sendSetting, final boolean havePmTemplate) {
