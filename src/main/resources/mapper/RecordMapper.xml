@@ -15,7 +15,10 @@
         FROM notify_record rc
         LEFT JOIN notify_send_setting nts ON nts.code = rc.business_type
         LEFT JOIN notify_template tl ON rc.template_id = tl.id
-        WHERE nts.fd_level = #{query.level} AND rc.status IS NOT NULL
+        WHERE rc.status IS NOT NULL
+        <if test="query.level != null">
+            AND nts.fd_level = #{query.level}
+        </if>
         <if test="query.status != null">
             AND rc.status LIKE concat(concat('%',#{query.status}),'%')
         </if>

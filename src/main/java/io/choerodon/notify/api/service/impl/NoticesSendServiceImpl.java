@@ -92,6 +92,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }).collect(Collectors.toList());
         //取得User中id空，但是email不为空的email
         Set<String> onlyEmails = dto.getTargetUsers().stream().filter(user -> user.getId() == null && user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
+        String onlyEmailsString = onlyEmails.toString();
+        LOGGER.info("userDTO no id and only email:{}", onlyEmailsString);
         Long[] userIds = needQueryUserIds.toArray(new Long[0]);
         if (!needQueryUserIds.isEmpty()) {
             needQueryUserDTOS = userFeignClient.listUsersByIds(userIds).getBody();
@@ -100,8 +102,12 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         if (needQueryUserDTOS != null) {
             notNeedQueryUsers.addAll(needQueryUserDTOS);
         }
+        String notNeedQueryUsersUserString = notNeedQueryUsers.stream().map(UserDTO::getEmail).collect(Collectors.toSet()).toString();
+        LOGGER.info("total user email:{}", notNeedQueryUsersUserString);
         List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, notNeedQueryUsers);
         if (emailUserDTOS != null) {
+            String emailUserDTOSString = emailUserDTOS.stream().map(UserDTO::getEmail).collect(Collectors.toSet()).toString();
+            LOGGER.info("need receive user email:{}", emailUserDTOSString);
             Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(Objects::nonNull).collect(Collectors.toSet());
             onlyEmails.addAll(emails);
         }
