@@ -87,7 +87,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         List<UserDTO> notNeedQueryUsers = dto.getTargetUsers().stream().filter(user -> user.getId() != null && user.getEmail() != null).map(user -> {
             UserDTO userDTO = new UserDTO();
             userDTO.setId(user.getId());
-            user.setEmail(user.getEmail());
+            userDTO.setEmail(user.getEmail());
             return userDTO;
         }).collect(Collectors.toList());
         //取得User中id空，但是email不为空的email
