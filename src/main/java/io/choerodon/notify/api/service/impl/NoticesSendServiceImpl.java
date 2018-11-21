@@ -85,9 +85,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private Set<String> getNeedSendEmail(NoticeSendDTO dto, SendSetting sendSetting) {
         List<UserDTO> needQueryUserDTOS = new ArrayList<>();
         //取得User中email为空的id
-        Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getEmail() == null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
+        Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         //取得User中email不为空的email
-        Set<String> existsEmails = dto.getTargetUsers().stream().filter(user -> user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
+        Set<String> existsEmails = dto.getTargetUsers().stream().filter(user -> user.getId() == null && user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
         Long[] userIds = needQueryUserIds.toArray(new Long[needQueryUserIds.size()]);
         if (!needQueryUserIds.isEmpty()) {
             needQueryUserDTOS = userFeignClient.listUsersByIds(userIds).getBody();
