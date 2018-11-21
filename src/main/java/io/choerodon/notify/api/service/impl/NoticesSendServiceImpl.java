@@ -98,11 +98,13 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         //将不需要查询的user加入查询出来的user
         if (needQueryUserDTOS != null) {
-            needQueryUserDTOS.addAll(notNeedQueryUsers);
+            notNeedQueryUsers.addAll(needQueryUserDTOS);
         }
-        List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, needQueryUserDTOS);
-        Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(Objects::nonNull).collect(Collectors.toSet());
-        onlyEmails.addAll(emails);
+        List<UserDTO> emailUserDTOS = getEmailTargetUsers(dto, sendSetting, notNeedQueryUsers);
+        if (emailUserDTOS != null) {
+            Set<String> emails = emailUserDTOS.stream().map(UserDTO::getEmail).filter(Objects::nonNull).collect(Collectors.toSet());
+            onlyEmails.addAll(emails);
+        }
         return onlyEmails;
     }
 
