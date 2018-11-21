@@ -1,17 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.choerodon.notify.api.dto.EmailTemplateDTO;
-import io.choerodon.notify.api.dto.TemplateQueryDTO;
-import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.api.service.EmailTemplateService;
-import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
+import java.util.List;
+import javax.validation.Valid;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -19,10 +10,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
-import java.util.List;
-
-import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_SITE;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.notify.api.dto.EmailTemplateDTO;
+import io.choerodon.notify.api.dto.TemplateNamesDTO;
+import io.choerodon.notify.api.dto.TemplateQueryDTO;
+import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.swagger.annotation.CustomPageRequest;
+import io.choerodon.swagger.annotation.Permission;
 
 @RestController
 @RequestMapping("v1/notices/emails/templates")
@@ -64,10 +63,10 @@ public class EmailTemplateSiteController {
         return new ResponseEntity<>(templateService.query(id), HttpStatus.OK);
     }
 
-    @GetMapping("/check")
+    @PostMapping("/check")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层检查编码")
-    public void check(@RequestParam("code") String code) {
+    public void check(@RequestBody String code) {
         templateService.check(code);
     }
 
