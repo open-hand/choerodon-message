@@ -1,7 +1,6 @@
 package io.choerodon.notify
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netflix.appinfo.InstanceInfo
 import io.choerodon.core.oauth.CustomUserDetails
 import io.choerodon.liquibase.LiquibaseConfig
 import io.choerodon.liquibase.LiquibaseExecutor
@@ -10,12 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.cloud.client.ServiceInstance
-import org.springframework.cloud.client.discovery.DiscoveryClient
-import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.connection.RedisConnection
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.HashOperations
@@ -27,7 +22,6 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.security.jwt.JwtHelper
 import org.springframework.security.jwt.crypto.sign.MacSigner
 import org.springframework.security.jwt.crypto.sign.Signer
@@ -82,11 +76,6 @@ class IntegrationTestConfiguration {
         Mockito.when(setOperations.members(Mockito.any())).thenReturn(set)
         Mockito.when(valueOperations.get(Mockito.any())).thenReturn("1")
         return template
-    }
-
-    @Bean
-    KafkaTemplate<byte[], byte[]> kafkaTemplate() {
-        detachedMockFactory.Mock(KafkaTemplate)
     }
 
     @PostConstruct

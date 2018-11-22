@@ -22,5 +22,5 @@ management:
 security:
   basic:
     enabled: false
-  ignored: /choerodon:msg/**
+  ignored: /choerodon:msg/**, /choerodon/**
 
