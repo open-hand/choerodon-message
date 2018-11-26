@@ -91,7 +91,7 @@ class EmailTemplateSiteControllerSpec extends Specification {
         params.put("code", "forgetPassword")
 
         when: "调用方法[全查询]"
-        def entity = restTemplate.getForEntity(BASE_PATH + "/check?code={code}", Void, params)
+        def entity = restTemplate.postForEntity(BASE_PATH + "/check?code={code}", void, Void, params)
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()

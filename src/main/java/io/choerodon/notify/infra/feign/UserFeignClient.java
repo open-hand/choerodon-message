@@ -25,6 +25,9 @@ public interface UserFeignClient {
     @PostMapping("/v1/users/ids")
     ResponseEntity<List<UserDTO>> listUsersByIds(@RequestBody Long[] ids);
 
+    @PostMapping("/v1/users/emails")
+    ResponseEntity<List<UserDTO>> listUsersByEmails(@RequestBody String[] emails);
+
     @GetMapping("/v1/users/{id}/organization_project")
     ResponseEntity<OrganizationProjectDTO> queryByUserIdOrganizationProject(@PathVariable("id") Long id);
 }

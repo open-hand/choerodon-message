@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
+import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.exception.EmailSendException;
-import io.choerodon.notify.api.pojo.EmailSendError;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.api.pojo.RecordSendData;
-import io.choerodon.notify.api.pojo.RecordStatus;
+import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Config;
@@ -36,10 +34,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -81,18 +76,18 @@ public class EmailSendServiceImpl implements EmailSendService {
 
 
     @Override
-    public void sendEmail(String code, Map<String, Object> params, Set<String> targetEmails, SendSetting sendSetting) {
+    public void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSetting sendSetting) {
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         validatorEmailTemplate(template);
-        targetEmails.forEach(t -> {
+        targetUsers.forEach(user -> {
             Record record = new Record();
             record.setStatus(null);
             record.setRetryCount(0);
             record.setMessageType(MessageType.EMAIL.getValue());
-            record.setReceiveAccount(t);
+            record.setReceiveAccount(user.getEmail());
             record.setBusinessType(sendSetting.getCode());
             record.setTemplateId(template.getId());
-            record.setVariables(ConvertUtils.convertMapToJson(objectMapper, params));
+            record.setVariables(ConvertUtils.convertMapToJson(objectMapper, DefaultAutowiredField.autowiredDefaultParams(params, user)));
             record.setSendData(new RecordSendData(template, params, createEmailSender(), sendSetting.getRetryCount()));
             if (recordMapper.insert(record) != 1) {
                 throw new CommonException("error.noticeSend.recordInsert");

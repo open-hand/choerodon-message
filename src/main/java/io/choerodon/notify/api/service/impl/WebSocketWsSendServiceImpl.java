@@ -3,6 +3,8 @@ package io.choerodon.notify.api.service.impl;
 import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
+import io.choerodon.notify.api.dto.UserDTO;
+import io.choerodon.notify.api.pojo.DefaultAutowiredField;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
@@ -15,6 +17,7 @@ import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,27 +46,32 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void sendSiteMessage(String code, Map<String, Object> params, Set<Long> ids, Long sendBy, SendSetting sendSetting) {
+    public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, SendSetting sendSetting) {
         Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
         validatorPmTemplate(template);
-        try {
-            for (Long id : ids) {
-                String pmContent = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
-                String pmTitle = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.TITLE);
-                SiteMsgRecord record = new SiteMsgRecord(id, pmTitle, pmContent);
-                record.setSendBy(sendBy);
-                if (PmType.NOTICE.getValue().equals(sendSetting.getPmType())) {
-                    record.setType(PmType.NOTICE.getValue());
+        targetUsers.forEach(user -> {
+            try {
+                //userId为空，则是email没有对应的id，因此不发送站内信
+                if (user.getId() != null) {
+                    Map<String, Object> userParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
+                    String pmContent = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
+                    String pmTitle = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
+                    SiteMsgRecord record = new SiteMsgRecord(user.getId(), pmTitle, pmContent);
+                    record.setSendBy(sendBy);
+                    if (PmType.NOTICE.getValue().equals(sendSetting.getPmType())) {
+                        record.setType(PmType.NOTICE.getValue());
+                    }
+                    if (siteMsgRecordMapper.insert(record) != 1) {
+                        throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
+                    }
+                    String key = "choerodon:msg:site-msg:" + user.getId();
+                    messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
                 }
-                if (siteMsgRecordMapper.insert(record) != 1) {
-                    throw new FeignException("error.pmSendService.send.siteMsgRecordInsertError");
-                }
-                String key = "choerodon:msg:site-msg:" + id;
-                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            } catch (IOException | TemplateException e) {
+                throw new CommonException("error.templateRender.renderError", e);
             }
-        } catch (IOException | TemplateException e) {
-            throw new CommonException("error.templateRender.renderError", e);
-        }
+        });
+
     }
 
     private void validatorPmTemplate(Template template) {
