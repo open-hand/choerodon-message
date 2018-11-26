@@ -27,6 +27,7 @@ class PmTemplateSiteControllerSpec extends Specification {
     private TestRestTemplate restTemplate
     @Autowired
     private TemplateMapper templateMapper
+
     def "PageSite"() {
         given: "构造请求参数"
         def params = new HashMap<String, Object>()
@@ -89,7 +90,7 @@ class PmTemplateSiteControllerSpec extends Specification {
         params.put("code", "addUser")
 
         when: "调用方法[全查询]"
-        def entity = restTemplate.getForEntity(BASE_PATH + "/check?code={code}", Void, params)
+        def entity = restTemplate.postForEntity(BASE_PATH + "/check?code={code}", void, Void, params)
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()

@@ -1,5 +1,7 @@
 package io.choerodon.notify.api.dto;
 
+import java.util.Objects;
+
 /**
  * @author dengyouquan
  */
@@ -53,5 +55,22 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserDTO userDTO = (UserDTO) o;
+        return Objects.equals(id, userDTO.id) &&
+                Objects.equals(loginName, userDTO.loginName) &&
+                Objects.equals(realName, userDTO.realName) &&
+                Objects.equals(imageUrl, userDTO.imageUrl) &&
+                Objects.equals(email, userDTO.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, loginName, realName, imageUrl, email);
     }
 }

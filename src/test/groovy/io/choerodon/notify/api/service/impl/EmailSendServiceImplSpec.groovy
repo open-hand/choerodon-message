@@ -2,6 +2,7 @@ package io.choerodon.notify.api.service.impl
 
 
 import io.choerodon.core.exception.CommonException
+import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.pojo.MessageType
 import io.choerodon.notify.api.pojo.RecordSendData
 import io.choerodon.notify.api.service.EmailSendService
@@ -52,8 +53,8 @@ class EmailSendServiceImplSpec extends Specification {
         given: "构造参数"
         String code = "addUser"
         Map<String, Object> params = new HashMap<>()
-        Set<String> targetEmails = new HashSet<>()
-        targetEmails.add("123@qq.com")
+        Set<UserDTO> targetUsers = new HashSet<>()
+        targetUsers.add(new UserDTO(email: "123@qq.com"))
         SendSetting sendSetting = new SendSetting()
         sendSetting.setEmailTemplateId(1L)
         sendSetting.setIsSendInstantly(true)
@@ -61,36 +62,32 @@ class EmailSendServiceImplSpec extends Specification {
         Template template = new Template()
 
         when: "调用方法[template为空]"
-        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
+        emailSendService.sendEmail(code, params, targetUsers, sendSetting)
         then: "校验结果"
         def exception = thrown(CommonException)
         exception.getCode().equals("error.emailTemplate.notExist")
-        1 * templateMapper.selectByPrimaryKey(_) >> null
-        0 * _
+        templateMapper.selectByPrimaryKey(_) >> null
 
         when: "调用方法[template Title Content为空]"
-        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
+        emailSendService.sendEmail(code, params, targetUsers, sendSetting)
         then: "校验结果"
         exception = thrown(CommonException)
         exception.getCode().equals("error.emailTemplate.notValid")
-        1 * templateMapper.selectByPrimaryKey(_) >> template
-        0 * _
+        templateMapper.selectByPrimaryKey(_) >> template
+
 
         when: "调用方法[异常NullPointerException]"
         template.setEmailContent("email content")
         template.setEmailTitle("email title")
-        emailSendService.sendEmail(code, params, targetEmails, sendSetting)
+        emailSendService.sendEmail(code, params, targetUsers, sendSetting)
         then: "校验结果"
         //在sendFailedHandler中调用updateRecordStatusAndIncreaseCount会触发一个空指针
         //由于此方法接受的参数为long，而实际record.getId为null，但是record的id是insert后主键回写
         //包装类自动拆箱成基本类型会触发空指针异常，所以我们测试就止步于此
         thrown(NullPointerException)
-        1 * templateMapper.selectByPrimaryKey(_) >> template
+        templateMapper.selectByPrimaryKey(_) >> template
         3 * configCache.getEmailConfig() >> config
         1 * recordMapper.insert(_) >> 1
-        1 * templateRender.renderTemplate(_, _, _) >> template.getEmailContent()
-        1 * executor.execute(_)
-        0 * _
     }
 
     def "TestEmailConnect"() {
