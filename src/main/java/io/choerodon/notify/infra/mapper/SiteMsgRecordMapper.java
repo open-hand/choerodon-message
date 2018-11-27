@@ -21,5 +21,5 @@ public interface SiteMsgRecordMapper extends BaseMapper<SiteMsgRecord> {
 
     int selectCountOfUnRead(@Param("userId") Long userId);
 
-
+    void batchInsert(@Param("records") List<SiteMsgRecord> records);
 }

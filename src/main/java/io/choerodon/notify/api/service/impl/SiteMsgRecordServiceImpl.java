@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,12 +97,18 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void insertRecord(Template template, String pmContent, Long[] ids) {
         AtomicInteger count = new AtomicInteger();
+        List<SiteMsgRecord> records = new LinkedList<>();
         for (Long id : ids) {
             SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pmContent);
-            //oracle 不支持 insertList
-            siteMsgRecordMapper.insert(record);
+            records.add(record);
+            if (records.size() >= 999) {
+                siteMsgRecordMapper.batchInsert(records);
+                records.clear();
+            }
             count.incrementAndGet();
         }
+        siteMsgRecordMapper.batchInsert(records);
+        records.clear();
         logger.info("PmSendTask insert database count:{}", count);
     }
 }
