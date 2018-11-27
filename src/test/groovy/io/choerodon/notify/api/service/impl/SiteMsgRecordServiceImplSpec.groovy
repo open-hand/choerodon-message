@@ -76,6 +76,6 @@ class SiteMsgRecordServiceImplSpec extends Specification {
         siteMsgRecordService.insertRecord(template, pmContent, ids)
 
         then: "校验结果"
-        1 * siteMsgRecordMapper.insert(_)
+        1 * siteMsgRecordMapper.batchInsert(_)
     }
 }
