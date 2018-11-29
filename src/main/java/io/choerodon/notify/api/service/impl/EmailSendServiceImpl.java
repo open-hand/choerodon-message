@@ -87,8 +87,9 @@ public class EmailSendServiceImpl implements EmailSendService {
             record.setReceiveAccount(user.getEmail());
             record.setBusinessType(sendSetting.getCode());
             record.setTemplateId(template.getId());
-            record.setVariables(ConvertUtils.convertMapToJson(objectMapper, DefaultAutowiredField.autowiredDefaultParams(params, user)));
-            record.setSendData(new RecordSendData(template, params, createEmailSender(), sendSetting.getRetryCount()));
+            Map<String, Object> newParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
+            record.setVariables(ConvertUtils.convertMapToJson(objectMapper, newParams));
+            record.setSendData(new RecordSendData(template, newParams, createEmailSender(), sendSetting.getRetryCount()));
             if (recordMapper.insert(record) != 1) {
                 throw new CommonException("error.noticeSend.recordInsert");
             }

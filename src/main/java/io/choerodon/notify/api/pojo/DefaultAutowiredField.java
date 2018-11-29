@@ -28,7 +28,7 @@ public enum DefaultAutowiredField {
      * @param user
      * @return
      */
-    public static Map<String, Object> autowiredDefaultParams(Map<String, Object> params, UserDTO user) {
+    public static Map<String, Object> autowiredDefaultParams(final Map<String, Object> params, final UserDTO user) {
         Map<String, Object> userParams = new HashMap<>(params);
         userParams.put(DefaultAutowiredField.USER_NAME.value(), user.getRealName());
         userParams.put(DefaultAutowiredField.LOGIN_NAME.value(), user.getLoginName());
