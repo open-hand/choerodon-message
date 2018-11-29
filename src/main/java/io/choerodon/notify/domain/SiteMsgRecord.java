@@ -135,6 +135,8 @@ public class SiteMsgRecord extends AuditDomain {
         this.read = false;
         this.deleted = false;
         this.sendTime = new Date();
+        this.setCreationDate(new Date());
+        this.setLastUpdateDate(new Date());
         this.setType(PmType.MSG.getValue());
     }
 

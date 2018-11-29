@@ -9,26 +9,32 @@
     </resultMap>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO notify_sitemsg_record(USER_ID,TITLE,CONTENT,TYPE,SEND_BY) VALUES
+        INSERT INTO notify_sitemsg_record(USER_ID,TITLE,CONTENT,TYPE,SEND_BY
+        ,SEND_TIME,CREATION_DATE,LAST_UPDATE_DATE) VALUES
         <foreach collection="records" item="r" separator=",">
-            (#{r.userId},#{r.title},#{r.content},#{r.type},#{r.sendBy})
+            (#{r.userId},#{r.title},#{r.content},#{r.type},#{r.sendBy}
+            ,#{r.sendTime},#{r.creationDate},#{r.lastUpdateDate})
         </foreach>
     </insert>
 
     <insert id="batchInsert" databaseId="mysql" parameterType="java.util.List">
-        INSERT INTO notify_sitemsg_record(USER_ID,TITLE,CONTENT,TYPE,SEND_BY) VALUES
+        INSERT INTO notify_sitemsg_record(USER_ID,TITLE,CONTENT,TYPE,SEND_BY
+        ,SEND_TIME,CREATION_DATE,LAST_UPDATE_DATE) VALUES
         <foreach collection="records" item="r" separator=",">
-            (#{r.userId},#{r.title},#{r.content},#{r.type},#{r.sendBy})
+            (#{r.userId},#{r.title},#{r.content},#{r.type},#{r.sendBy}
+            ,#{r.sendTime},#{r.creationDate},#{r.lastUpdateDate})
         </foreach>
     </insert>
 
     <insert id="batchInsert" databaseId="oracle" parameterType="java.util.List">
-        INSERT INTO notify_sitemsg_record(ID,USER_ID,TITLE,CONTENT,TYPE,SEND_BY)
+        INSERT INTO notify_sitemsg_record(ID,USER_ID,TITLE,CONTENT,TYPE,SEND_BY
+        ,SEND_TIME,CREATION_DATE,LAST_UPDATE_DATE)
         select NOTIFY_SITEMSG_RECORD_S.NEXTVAL,T.* from(
         <foreach collection="records" item="r" index="index"
                  separator="UNION">
             SELECT
             #{r.userId},#{r.title},#{r.content},#{r.type},#{r.sendBy}
+            ,#{r.sendTime},#{r.creationDate},#{r.lastUpdateDate}
             from dual
         </foreach>
         ) T
