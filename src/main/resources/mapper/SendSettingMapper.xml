@@ -89,8 +89,17 @@
         nts.is_send_instantly,
         nts.is_manual_retry,
         nts.is_allow_config,
-        nts.object_version_number
+        nts.object_version_number,
+        ntemail.id AS email_template_id,
+        ntemail.code AS email_template_code,
+        ntsms.id AS sms_template_id,
+        ntsms.code AS sms_template_code,
+        ntpm.id AS pm_template_id,
+        ntpm.code AS pm_template_code
         FROM notify_send_setting nts
+        LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
+        LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
+        LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
         where 1 = 1
         <if test="level != null">
             AND nts.fd_level = #{level}

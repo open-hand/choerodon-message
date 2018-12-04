@@ -30,5 +30,5 @@ public interface SendSettingService {
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
-    List<SendSettingListDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
+    List<SendSettingDetailDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
 }
