@@ -18,7 +18,7 @@ public interface SendSettingMapper extends BaseMapper<SendSetting> {
 
     SendSettingDetailDTO selectById(@Param("id") Long id);
 
-    List<SendSettingListDTO> queryByLevelAndAllowConfig(@Param("level") String level,
+    List<SendSettingDetailDTO> queryByLevelAndAllowConfig(@Param("level") String level,
                                                 @Param("allowConfig") boolean allowConfig);
 
 }

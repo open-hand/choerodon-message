@@ -120,10 +120,12 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public List<SendSettingListDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
+    public List<SendSettingDetailDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
         if (level != null) {
             CommonValidator.validatorLevel(level);
         }
-        return sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
+        List<SendSettingDetailDTO> list = sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
+        return list.stream().filter(s -> s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null)
+                .collect(Collectors.toList());
     }
 }
