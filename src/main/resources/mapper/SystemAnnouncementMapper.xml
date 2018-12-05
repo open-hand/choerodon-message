@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.SystemAnnouncementMapper">
+
+    <select id="fulltextSearch" resultType="io.choerodon.notify.api.dto.SystemAnnouncementDTO">
+        SELECT *
+        FROM notify_system_announcement
+        WHERE 1 = 1
+        <if test="title != null">
+            AND title LIKE concat(concat('%',#{param}), '%')
+        </if>
+        <if test="content != null">
+            AND content LIKE concat(concat('%',#{param}), '%')
+        </if>
+        <if test="param != null">
+            AND(
+            title LIKE concat(concat('%',#{param}), '%') OR
+            content LIKE concat(concat('%',#{param}), '%')
+            )
+        </if>
+    </select>
+
+</mapper>
