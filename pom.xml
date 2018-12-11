@@ -16,7 +16,7 @@
     </parent>
     <!--choerodon-starters dependency-->
     <properties>
-        <choerodon.starters.version>0.8.0.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.8.1.RELEASE</choerodon.starters.version>
     </properties>
     <dependencies>
         <!--spring boot-->
