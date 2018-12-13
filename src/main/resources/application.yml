@@ -47,6 +47,10 @@ hystrix:
 ribbon:
   ReadTimeout: 5000
   ConnectTimeout: 5000
+iam-service:
+  ribbon:
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
 file-service:
   ribbon:
     ReadTimeout: 15000
