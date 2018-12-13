@@ -2,6 +2,11 @@ package io.choerodon.notify.api.service.impl;
 
 import java.util.Date;
 
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -11,8 +16,6 @@ import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 import io.choerodon.notify.api.service.SystemAnnouncementService;
 import io.choerodon.notify.domain.SystemAnnouncement;
 import io.choerodon.notify.infra.mapper.SystemAnnouncementMapper;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
 
 
 /**
@@ -24,6 +27,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     private SystemAnnouncementMapper announcementMapper;
 
+    private static final Logger logger = LoggerFactory.getLogger(SystemAnnouncementServiceImpl.class);
+
     public SystemAnnouncementServiceImpl(SystemAnnouncementMapper announcementMapper) {
         this.announcementMapper = announcementMapper;
         modelMapper.addMappings(ReceiveSettingDTO.entity2Dto());
@@ -33,7 +38,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public SystemAnnouncementDTO create(SystemAnnouncementDTO dto) {
+        logger.info("iam send system announcement create info at:" + dto.getSendDate());
         dto.setSendDate(new Date());
+        logger.info("notify create system announcement,sendDate:" + dto.getSendDate());
         SystemAnnouncement systemAnnouncement = modelMapper.map(dto, SystemAnnouncement.class);
         if (announcementMapper.insert(systemAnnouncement) != 1) {
             throw new CommonException("error.systemAnnouncement.create");
