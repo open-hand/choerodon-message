@@ -1,5 +1,7 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.Date;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -31,6 +33,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public SystemAnnouncementDTO create(SystemAnnouncementDTO dto) {
+        dto.setSendDate(new Date());
         SystemAnnouncement systemAnnouncement = modelMapper.map(dto, SystemAnnouncement.class);
         if (announcementMapper.insert(systemAnnouncement) != 1) {
             throw new CommonException("error.systemAnnouncement.create");
