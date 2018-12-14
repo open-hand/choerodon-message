@@ -1,5 +1,16 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
@@ -13,13 +24,6 @@ import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class NoticesSendServiceImpl implements NoticesSendService {
@@ -111,7 +115,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 取得需要发送通知的用户
      */
     private Set<UserDTO> getNeedSendUsers(final NoticeSendDTO dto) {
-        LOGGER.info("start:get "+dto.getTargetUsers().size()+" target users");
+        LOGGER.info("start:get " + dto.getTargetUsers().size() + " target users");
         Set<UserDTO> users = new HashSet<>();
         //取得User中id不为空的id，将发起feign调用
         Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
@@ -127,17 +131,17 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             //注册组织时没有真正的用户，只有email,因此伪造一个UserDTO
             //TODO 如果用户太多，需要多次查询
             List<UserDTO> emailUsers = userFeignClient.listUsersByEmails(emails).getBody();
-            LOGGER.info("get "+emailUsers.size()+" target users,only have email's info");
             Set<String> queryEmails = emailUsers.stream().map(UserDTO::getEmail).collect(Collectors.toSet());
             List<UserDTO> onlyEmailUsers = needQueryEmails.stream().filter(s -> !queryEmails.contains(s)).map(email -> {
                 UserDTO userDTO = new UserDTO();
                 userDTO.setEmail(email);
                 return userDTO;
             }).collect(Collectors.toList());
+            LOGGER.info("get " + onlyEmailUsers.size() + " target users,only have email's info");
             users.addAll(emailUsers);
             users.addAll(onlyEmailUsers);
         }
-        LOGGER.info("end:get "+users.size()+" target users");
+        LOGGER.info("end:get " + users.size() + " target users");
         return users.stream().filter(userDTO -> userDTO.getId() != null).collect(Collectors.toSet());
     }
 
