@@ -111,6 +111,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 取得需要发送通知的用户
      */
     private Set<UserDTO> getNeedSendUsers(final NoticeSendDTO dto) {
+        LOGGER.info("start:get "+dto.getTargetUsers().size()+" target users");
         Set<UserDTO> users = new HashSet<>();
         //取得User中id不为空的id，将发起feign调用
         Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
@@ -126,6 +127,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             //注册组织时没有真正的用户，只有email,因此伪造一个UserDTO
             //TODO 如果用户太多，需要多次查询
             List<UserDTO> emailUsers = userFeignClient.listUsersByEmails(emails).getBody();
+            LOGGER.info("get "+emailUsers.size()+" target users,only have email's info");
             Set<String> queryEmails = emailUsers.stream().map(UserDTO::getEmail).collect(Collectors.toSet());
             List<UserDTO> onlyEmailUsers = needQueryEmails.stream().filter(s -> !queryEmails.contains(s)).map(email -> {
                 UserDTO userDTO = new UserDTO();
@@ -135,6 +137,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             users.addAll(emailUsers);
             users.addAll(onlyEmailUsers);
         }
+        LOGGER.info("end:get "+users.size()+" target users");
         return users.stream().filter(userDTO -> userDTO.getId() != null).collect(Collectors.toSet());
     }
 
