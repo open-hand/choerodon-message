@@ -18,7 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,7 +138,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             users.addAll(emailUsers);
             users.addAll(onlyEmailUsers);
         }
-        return users.stream().filter(userDTO -> userDTO.getId() != null).collect(Collectors.toSet());
+        return users;
     }
 
 
