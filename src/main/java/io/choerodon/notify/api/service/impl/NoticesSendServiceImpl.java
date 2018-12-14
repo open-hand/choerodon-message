@@ -58,14 +58,15 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     public void sendNotice(NoticeSendDTO dto) {
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
-            LOGGER.info("no sendsetting,cann`t send notice.");
+            LOGGER.info("no sendSetting : {}, can`t send notice. sendUsers: {}", dto.getCode(), dto.getTargetUsers());
             return;
         }
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
         boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
         //如果没有任何模板，则不发起feign调用
         if (!haveEmailTemplate && !havePmTemplate) {
-            LOGGER.info("sendsetting no opposite email template and pm template,cann`t send notice");
+            LOGGER.info("sendsetting '{}' no opposite email template and pm template, cann`t send notice. sendUsers: {}",
+                    dto.getCode(), dto.getTargetUsers());
             return;
         }
         //取得需要发送通知用户
@@ -82,7 +83,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.EMAIL);
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
             } else {
-                LOGGER.info("sendsetting no opposite email template,cann`t send email");
+                LOGGER.info("sendsetting '{}' no opposite email template, cann`t send email. sendUsers: {}",
+                        dto.getCode(), dto.getTargetUsers());
             }
         } catch (CommonException e) {
             LOGGER.info("send email failed!", e);
@@ -97,7 +99,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
                         Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null), sendSetting);
             } else {
-                LOGGER.info("sendsetting no opposite pm template,cann`t send pm");
+                LOGGER.info("sendsetting '{}' no opposite pm template ,cann`t send pm. sendUsers: {}",
+                        dto.getCode(), dto.getTargetUsers());
             }
         } catch (CommonException e) {
             LOGGER.info("send station letter failed!", e);
@@ -106,10 +109,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     /**
      * 取得需要发送通知的用户
-     *
-     * @param dto
-     * @param sendSetting
-     * @return
      */
     private Set<UserDTO> getNeedSendUsers(final NoticeSendDTO dto) {
         Set<UserDTO> users = new HashSet<>();
@@ -144,12 +143,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 如果发送设置允许配置通知
      * 则得到没有禁用接收通知的用户
      * 否则得到全部用户
-     *
-     * @param dto
-     * @param sendSetting
-     * @param users
-     * @param type
-     * @return
      */
     private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final Set<UserDTO> users, final MessageType type) {
         if (!sendSetting.getAllowConfig()) {
