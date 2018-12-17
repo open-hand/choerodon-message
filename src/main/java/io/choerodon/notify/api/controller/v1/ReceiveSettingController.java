@@ -1,16 +1,18 @@
 package io.choerodon.notify.api.controller.v1;
 
-import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.notify.api.dto.ReceiveSettingDTO;
-import io.choerodon.notify.api.service.ReceiveSettingService;
-import io.choerodon.notify.api.validator.CommonValidator;
-import io.choerodon.swagger.annotation.Permission;
+import java.util.List;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.oauth.DetailsHelper;
+import io.choerodon.notify.api.dto.ReceiveSettingDTO;
+import io.choerodon.notify.api.service.ReceiveSettingService;
+import io.choerodon.notify.api.validator.CommonValidator;
+import io.choerodon.swagger.annotation.Permission;
 
 /**
  * @author dengyouquan
@@ -26,7 +28,7 @@ public class ReceiveSettingController {
     }
 
     @GetMapping
-    @Permission(permissionLogin = true)
+    @Permission(permissionLogin = true, level = ResourceLevel.SITE)
     @ApiOperation(value = "查询当前用户所有接收通知配置")
     public List<ReceiveSettingDTO> queryByUserId() {
         Long userId = DetailsHelper.getUserDetails().getUserId();
@@ -34,7 +36,7 @@ public class ReceiveSettingController {
     }
 
     @PutMapping("/all")
-    @Permission(permissionLogin = true)
+    @Permission(permissionLogin = true, level = ResourceLevel.SITE)
     @ApiOperation(value = "更新当前用户所有接收通知配置（前端传输当前用户所有禁用的接收通知配置）")
     public void update(@RequestBody List<ReceiveSettingDTO> settingDTOList) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
@@ -42,7 +44,7 @@ public class ReceiveSettingController {
     }
 
     @PutMapping
-    @Permission(permissionLogin = true)
+    @Permission(permissionLogin = true, level = ResourceLevel.SITE)
     @ApiOperation(value = "根据组织或项目或平台或全部更新当前用户接收通知配置")
     public void updateByUserId(@ApiParam(name = "消息类型", value = "消息类型", example = "pm/email/sms")
                                @RequestParam("message_type") String messageType,
