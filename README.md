@@ -21,6 +21,9 @@ support for sms and station letter, now this service is only used to send email.
 
 ## Dependencies
 
+- Mysql
+- redis
+
 ## Links
 
 * [Change Log](./CHANGELOG.zh-CN.md)
