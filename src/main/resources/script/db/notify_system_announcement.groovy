@@ -26,4 +26,14 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_system_announcement.groovy'
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+
+    changeSet(author: 'longhe1996@icloud.com', id: '2018-12-17-add-column-is_send_notices') {
+        addColumn(tableName: "NOTIFY_SYSTEM_ANNOUNCEMENT") {
+            column(name: "IS_SEND_NOTICES", type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否发送站内信。1.发送站内信，0：不发送站内信', afterColumn: 'SEND_DATE') {
+                constraints(nullable: false)
+            }
+            column(name: "STATUS", type: "VARCHAR(16)", remarks: '系统公告的状态：COMPLETED（已完成）WAITING（等待发送）', afterColumn: 'IS_SEND_NOTICES')
+            column(name: 'SCHEDULE_TASK_ID', type: 'BIGINT UNSIGNED', remarks: '公告关联任务ID', afterColumn: 'STATUS')
+        }
+    }
 }
