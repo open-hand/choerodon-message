@@ -1,6 +1,7 @@
 package io.choerodon.notify.infra.feign;
 
 import io.choerodon.notify.infra.config.FeignConfig;
+import io.choerodon.notify.infra.feign.fallback.FileFeignClientFallback;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

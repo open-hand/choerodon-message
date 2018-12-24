@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface WebSocketSendService {
 
-    void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, SendSetting sendSetting);
+    void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSetting sendSetting);
 
     void sendWebSocket(String code, String id, String message);
 }

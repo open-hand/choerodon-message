@@ -34,11 +34,17 @@ public class SiteMsgRecordDTO {
 
     private Long sendBy;
 
+    private String senderType;
+
     private Date sendTime;
 
     private Long objectVersionNumber;
 
     private UserDTO sendByUser;
+
+    private ProjectDTO sendByProject;
+
+    private OrganizationDTO sendByOrganization;
 
     public static PropertyMap<SiteMsgRecordDTO, SiteMsgRecord> dto2Entity() {
         return new PropertyMap<SiteMsgRecordDTO, SiteMsgRecord>() {
@@ -51,23 +57,6 @@ public class SiteMsgRecordDTO {
         };
     }
 
-
-    @Override
-    public String toString() {
-        return "SiteMsgRecordDTO{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", type='" + type + '\'' +
-                ", read=" + read +
-                ", deleted=" + deleted +
-                ", sendBy=" + sendBy +
-                ", sendTime=" + sendTime +
-                ", objectVersionNumber=" + objectVersionNumber +
-                ", sendByUser=" + sendByUser +
-                '}';
-    }
 
     public Long getId() {
         return id;
@@ -155,5 +144,49 @@ public class SiteMsgRecordDTO {
 
     public void setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
+    }
+
+    public String getSenderType() {
+        return senderType;
+    }
+
+    public void setSenderType(String senderType) {
+        this.senderType = senderType;
+    }
+
+    public ProjectDTO getSendByProject() {
+        return sendByProject;
+    }
+
+    public void setSendByProject(ProjectDTO sendByProject) {
+        this.sendByProject = sendByProject;
+    }
+
+    public OrganizationDTO getSendByOrganization() {
+        return sendByOrganization;
+    }
+
+    public void setSendByOrganization(OrganizationDTO sendByOrganization) {
+        this.sendByOrganization = sendByOrganization;
+    }
+
+    @Override
+    public String toString() {
+        return "SiteMsgRecordDTO{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", type='" + type + '\'' +
+                ", read=" + read +
+                ", deleted=" + deleted +
+                ", sendBy=" + sendBy +
+                ", senderType='" + senderType + '\'' +
+                ", sendTime=" + sendTime +
+                ", objectVersionNumber=" + objectVersionNumber +
+                ", sendByUser=" + sendByUser +
+                ", sendByProject=" + sendByProject +
+                ", sendByOrganization=" + sendByOrganization +
+                '}';
     }
 }

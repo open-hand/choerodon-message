@@ -2,6 +2,8 @@ package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.domain.Page
 import io.choerodon.mybatis.pagehelper.domain.PageRequest
+import io.choerodon.notify.api.dto.OrganizationDTO
+import io.choerodon.notify.api.dto.ProjectDTO
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO
 import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.service.SiteMsgRecordService
@@ -54,6 +56,8 @@ class SiteMsgRecordServiceImplSpec extends Specification {
         Page<SiteMsgRecordDTO> page = new Page()
         page.setContent(list)
         ResponseEntity<List<UserDTO>> entity = new ResponseEntity<>(users, HttpStatus.OK)
+        ResponseEntity<List<OrganizationDTO>> organizationEntity = new ResponseEntity<>(new ArrayList<OrganizationDTO>(), HttpStatus.OK)
+        ResponseEntity<List<ProjectDTO>> projectEntity = new ResponseEntity<>(new ArrayList<ProjectDTO>(), HttpStatus.OK)
         PageRequest request = new PageRequest(0, 10)
 
         when: "调用方法"
@@ -62,6 +66,8 @@ class SiteMsgRecordServiceImplSpec extends Specification {
         then: "校验结果"
         1 * siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(_, _, _) >> page
         1 * userFeignClient.listUsersByIds(_) >> entity
+        1 * userFeignClient.listOrganizationsByIds(_) >> organizationEntity
+        1 * userFeignClient.listProjectsByIds(_) >> projectEntity
     }
 
     def "InsertRecord"() {
