@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -22,7 +23,7 @@ import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 
 /**
- * @author dengyouquan,Eugen
+ * @author dengyouquan, Eugen
  **/
 @RestController
 @RequestMapping(value = "/v1/system_notice")
@@ -33,11 +34,18 @@ public class SystemAnnouncementController {
         this.systemAnnouncementService = systemAnnouncementService;
     }
 
+    public void setSystemAnnouncementService(SystemAnnouncementService systemAnnouncementService) {
+        this.systemAnnouncementService = systemAnnouncementService;
+    }
+
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementDTO> create(@RequestBody @Valid SystemAnnouncementDTO dto) {
         dto.setStatus(SystemAnnouncementDTO.AnnouncementStatus.WAITING.value());
+        if (dto.getSendDate().getTime() < System.currentTimeMillis()) {
+            throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
+        }
         if (dto.getSendDate() == null) {
             dto.setSendDate(new Date());
         }

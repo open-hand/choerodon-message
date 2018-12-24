@@ -36,4 +36,8 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_system_announcement.groovy'
             column(name: 'SCHEDULE_TASK_ID', type: 'BIGINT UNSIGNED', remarks: '公告关联任务ID', afterColumn: 'STATUS')
         }
     }
+
+    changeSet(author: 'longhe1996@icloud.com', id: '2018-12-24-add-default_value-is_send_notices') {
+        addNotNullConstraint(tableName: 'NOTIFY_SYSTEM_ANNOUNCEMENT', columnName: 'STATUS', defaultNullValue: 'COMPLETED', columnDataType: 'VARCHAR(16)')
+    }
 }
