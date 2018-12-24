@@ -34,19 +34,19 @@ class WebSocketWsSendServiceImplTest extends Specification {
         template.setPmContent("content")
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, "user", sendSetting)
         then: "校验结果"
         1 * templateMapper.selectByPrimaryKey(_) >> template
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, "user", sendSetting)
         then: "校验结果"
         1 * templateMapper.selectByPrimaryKey(_)
         def exception = thrown(CommonException)
         exception.getCode().equals("error.pmTemplate.notExist")
 
         when: "调用方法"
-        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, sendSetting)
+        webSocketSendService.sendSiteMessage(code, params, ids, sendBy, "user", sendSetting)
         then: "校验结果"
         1 * templateMapper.selectByPrimaryKey(_) >> new Template()
         exception = thrown(CommonException)

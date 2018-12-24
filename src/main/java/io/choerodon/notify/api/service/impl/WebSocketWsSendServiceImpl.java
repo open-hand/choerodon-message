@@ -45,7 +45,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, SendSetting sendSetting) {
+    public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSetting sendSetting) {
         Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
         validatorPmTemplate(template);
         List<SiteMsgRecord> records = new LinkedList<>();
@@ -63,6 +63,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                     String pmTitle = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
                     SiteMsgRecord record = new SiteMsgRecord(user.getId(), pmTitle, pmContent);
                     record.setSendBy(sendBy);
+                    record.setSenderType(senderType);
                     if (PmType.NOTICE.getValue().equals(sendSetting.getPmType())) {
                         record.setType(PmType.NOTICE.getValue());
                     }

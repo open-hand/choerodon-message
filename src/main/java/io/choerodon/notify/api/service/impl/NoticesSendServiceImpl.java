@@ -10,6 +10,7 @@ import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.ReceiveSetting;
 import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -18,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,8 +97,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             if (havePmTemplate) {
                 //得到需要发送站内信的用户
                 Set<UserDTO> needSendPmUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.PM);
+                Map<String, Long> sender = new HashMap<>(5);
+                String senderType = getSenderDetail(dto, sender, sendSetting);
                 webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
-                        Optional.ofNullable(dto.getFromUser()).map(NoticeSendDTO.User::getId).orElse(null), sendSetting);
+                        sender.get(senderType), senderType, sendSetting);
             } else {
                 LOGGER.info("sendsetting '{}' no opposite pm template ,cann`t send pm. sendUsers: {}",
                         dto.getCode(), dto.getTargetUsers());
@@ -108,6 +108,35 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         } catch (CommonException e) {
             LOGGER.info("send station letter failed!", e);
         }
+    }
+
+    /**
+     * sender type is user/project/organization/site
+     *
+     * @param dto NoticeSendDTO
+     * @return sender type
+     */
+    private String getSenderDetail(NoticeSendDTO dto, Map<String, Long> map, SendSetting sendSetting) {
+        NoticeSendDTO.User user = dto.getFromUser();
+        //设置默认发送者为平台
+        String senderType = SenderType.SITE.value();
+        map.put(senderType, 0L);
+        if (user == null) {
+            String sendSettingLevel = sendSetting.getLevel();
+            if (SenderType.ORGANIZATION.value().equals(sendSettingLevel)) {
+                senderType = sendSettingLevel;
+                Long organizationId = dto.getSourceId();
+                map.put(senderType, organizationId);
+            } else if (SenderType.PROJECT.value().equals(sendSettingLevel)) {
+                senderType = sendSettingLevel;
+                Long projectId = dto.getSourceId();
+                map.put(senderType, projectId);
+            }
+        } else {
+            senderType = SenderType.USER.value();
+            map.put(senderType, user.getId());
+        }
+        return senderType;
     }
 
     /**

@@ -3,27 +3,27 @@ package io.choerodon.notify.api.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.notify.api.dto.OrganizationDTO;
+import io.choerodon.notify.api.dto.ProjectDTO;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
 
@@ -49,17 +49,71 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
 
     @Override
     public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, PageRequest pageRequest) {
-        Page<SiteMsgRecordDTO> recordDTOPage = PageHelper.doPageAndSort(pageRequest, () ->
+        Page<SiteMsgRecordDTO> recordPage = PageHelper.doPageAndSort(pageRequest, () ->
                 siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
-        List<SiteMsgRecordDTO> recordDTOList = recordDTOPage.getContent();
-        Set<Long> set = recordDTOList.stream().map(SiteMsgRecordDTO::getSendBy).collect(Collectors.toSet());
-        Long[] ids = new Long[set.size()];
-        ids = set.toArray(ids);
-        Map<Long, UserDTO> userMap = userFeignClient.listUsersByIds(ids).getBody().stream().collect(Collectors.toMap(UserDTO::getId, user -> user, (k1, k2) -> k1));
-        recordDTOPage.setContent(recordDTOList.stream().peek((recordDTO) -> {
-            recordDTO.setSendByUser(userMap.get(recordDTO.getSendBy()));
-        }).collect(Collectors.toList()));
-        return recordDTOPage;
+        List<SiteMsgRecordDTO> records = recordPage.getContent();
+        Map<String, Set<Long>> senderMap = getSenderMap(records);
+        processSendBy(records, senderMap);
+        return recordPage;
+    }
+
+    private void processSendBy(List<SiteMsgRecordDTO> records, Map<String, Set<Long>> senderMap) {
+        List<OrganizationDTO> organizations = userFeignClient.listOrganizationsByIds(senderMap.get(SenderType.ORGANIZATION.value())).getBody();
+        List<ProjectDTO> projects = userFeignClient.listProjectsByIds(senderMap.get(SenderType.PROJECT.value())).getBody();
+        Set<Long> userIdSet = senderMap.get(SenderType.USER.value());
+        List<UserDTO> users = userFeignClient.listUsersByIds(userIdSet.toArray(new Long[userIdSet.size()])).getBody();
+        MultiKeyMap multiKeyMap = new MultiKeyMap();
+        organizations.forEach(org -> multiKeyMap.put(SenderType.ORGANIZATION.value(), org.getId(), org));
+        projects.forEach(pro -> multiKeyMap.put(SenderType.PROJECT.value(), pro.getId(), pro));
+        users.forEach(user -> multiKeyMap.put(SenderType.USER.value(), user.getId(), user));
+        records.stream().parallel().forEach(record -> {
+            Object sender = multiKeyMap.get(record.getSenderType(), record.getSendBy());
+            if (sender == null) {
+                fullInDefaultSender(record);
+            } else {
+                setSendBy(record, sender);
+            }
+        });
+    }
+
+    private void setSendBy(SiteMsgRecordDTO record, Object sender) {
+        if (SenderType.ORGANIZATION.value().equals(record.getSenderType())) {
+            record.setSendByOrganization((OrganizationDTO) sender);
+        }
+        if (SenderType.PROJECT.value().equals(record.getSenderType())) {
+            record.setSendByProject((ProjectDTO) sender);
+        }
+        if (SenderType.USER.value().equals(record.getSenderType())) {
+            record.setSendByUser((UserDTO) sender);
+        }
+    }
+
+    private Map<String, Set<Long>> getSenderMap(List<SiteMsgRecordDTO> records) {
+        Map<String, Set<Long>> senderMap = new HashMap<>();
+        senderMap.put(SenderType.ORGANIZATION.value(), new HashSet<>());
+        senderMap.put(SenderType.PROJECT.value(), new HashSet<>());
+        senderMap.put(SenderType.USER.value(), new HashSet<>());
+        for (SiteMsgRecordDTO record : records) {
+            String senderType = record.getSenderType();
+            Long sendBy = record.getSendBy();
+            if (sendBy == null) {
+                fullInDefaultSender(record);
+            } else if (sendBy.equals(0L)) {
+                logger.warn("illegal id of sender because of id = 0, so set site as default sender, siteMsgRecord id = {}", record.getId());
+                fullInDefaultSender(record);
+            } else {
+                Set<Long> ids = senderMap.get(senderType);
+                if (ids != null) {
+                    ids.add(sendBy);
+                }
+            }
+        }
+        return senderMap;
+    }
+
+    private void fullInDefaultSender(SiteMsgRecordDTO record) {
+        record.setSendBy(0L);
+        record.setSenderType(SenderType.SITE.value());
     }
 
     @Override

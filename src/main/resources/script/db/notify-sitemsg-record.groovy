@@ -42,4 +42,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
             column(name: 'SEND_BY', type: 'BIGINT UNSIGNED', remarks: '触发此站内信的用户id', afterColumn: 'IS_DELETED')
         }
     }
+
+    changeSet(author: 'superleader8@gmail.com', id: '2018-12-21-add-column') {
+        addColumn(tableName: "NOTIFY_SITEMSG_RECORD") {
+            column(name: 'SENDER_TYPE', type: 'VARCHAR(32)', defaultValue: "user", remarks: '发送者的类型，包含site/organization/project/user四种类型，默认值是user', afterColumn: 'SEND_BY')
+        }
+        renameColumn(tableName: 'NOTIFY_SITEMSG_RECORD', oldColumnName: 'SEND_BY', newColumnName: 'SEND_BY', columnDataType: 'BIGINT UNSIGNED', remarks: '触发此站内信的发送者的id')
+    }
 }

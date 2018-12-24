@@ -39,22 +39,9 @@ public class SiteMsgRecord extends AuditDomain {
 
     private Long sendBy;
 
-    private Date sendTime;
+    private String senderType;
 
-    @Override
-    public String toString() {
-        return "SiteMsgRecord{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", type=" + type +
-                ", read=" + read +
-                ", deleted=" + deleted +
-                ", sendBy=" + sendBy +
-                ", sendTime=" + sendTime +
-                '}';
-    }
+    private Date sendTime;
 
     public Long getId() {
         return id;
@@ -142,5 +129,29 @@ public class SiteMsgRecord extends AuditDomain {
 
     public SiteMsgRecord() {
         this(null, null, null);
+    }
+
+    @Override
+    public String toString() {
+        return "SiteMsgRecord{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", type='" + type + '\'' +
+                ", read=" + read +
+                ", deleted=" + deleted +
+                ", sendBy=" + sendBy +
+                ", senderType='" + senderType + '\'' +
+                ", sendTime=" + sendTime +
+                '}';
+    }
+
+    public String getSenderType() {
+        return senderType;
+    }
+
+    public void setSenderType(String senderType) {
+        this.senderType = senderType;
     }
 }
