@@ -1,18 +1,21 @@
 package io.choerodon.notify.websocket.notify;
 
-import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
-import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
-import io.choerodon.notify.websocket.relationship.RelationshipDefining;
-import io.choerodon.notify.websocket.send.MessageSender;
-import io.choerodon.notify.websocket.send.WebSocketSendPayload;
+import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
+
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Map;
-
-import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
+import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
+import io.choerodon.notify.websocket.receive.ReceiveMsgHandler;
+import io.choerodon.notify.websocket.relationship.DefaultRelationshipDefining;
+import io.choerodon.notify.websocket.relationship.RelationshipDefining;
+import io.choerodon.notify.websocket.send.MessageSender;
+import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 
 @Component
 public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
@@ -20,6 +23,7 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
     private static final String SUB = "sub";
 
     private RelationshipDefining relationshipDefining;
+    private WebSocketSendService webSocketSendService;
 
     private MessageSender messageSender;
 
@@ -33,10 +37,12 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
 
     public SubReceiveMessageHandler(RelationshipDefining relationshipDefining,
                                     MessageSender messageSender,
-                                    SiteMsgRecordMapper siteMsgRecordMapper) {
+                                    SiteMsgRecordMapper siteMsgRecordMapper,
+                                    WebSocketSendService webSocketSendService) {
         this.relationshipDefining = relationshipDefining;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
+        this.webSocketSendService = webSocketSendService;
     }
 
     @Override
@@ -60,6 +66,11 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                     if (unReadNum > 0) {
                         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
                     }
+                    //今日访问人数+1，在线人数+1,发送在线信息
+                    DefaultRelationshipDefining.addNumberOfVisitorsToday(id);
+                    DefaultRelationshipDefining.addOnlineCount();
+                    webSocketSendService.sendVisitorsInfo(DefaultRelationshipDefining.getOnlineCount(),
+                            DefaultRelationshipDefining.getNumberOfVisitorsToday().size());
                 }
             }
         }

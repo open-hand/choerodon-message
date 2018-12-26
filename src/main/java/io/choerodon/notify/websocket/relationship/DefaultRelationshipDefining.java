@@ -1,14 +1,17 @@
 package io.choerodon.notify.websocket.relationship;
 
-import io.choerodon.notify.websocket.register.RedisChannelRegister;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.websocket.register.RedisChannelRegister;
 
 public class DefaultRelationshipDefining implements RelationshipDefining {
 
@@ -21,6 +24,13 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     private StringRedisTemplate redisTemplate;
 
     private RedisChannelRegister redisChannelRegister;
+
+    private static Integer onlineCount = 0;
+
+    private static Set<String> numberOfVisitorsToday = new HashSet<>();
+
+    @Autowired
+    private WebSocketSendService webSocketWsSendService;
 
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
                                        RedisChannelRegister redisChannelRegister) {
@@ -85,6 +95,34 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
                 redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
             }
         }
+        //在线人数-1,发消息
+        subOnlineCount();
+        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday().size());
+    }
+
+
+    public static synchronized Integer getOnlineCount() {
+        return onlineCount;
+    }
+
+    public static synchronized void addOnlineCount() {
+        DefaultRelationshipDefining.onlineCount++;
+    }
+
+    public static synchronized void subOnlineCount() {
+        DefaultRelationshipDefining.onlineCount--;
+    }
+
+    public static synchronized Set<String> getNumberOfVisitorsToday() {
+        return numberOfVisitorsToday;
+    }
+
+    public static synchronized void addNumberOfVisitorsToday(String id) {
+        DefaultRelationshipDefining.numberOfVisitorsToday.add(id);
+    }
+
+    public static synchronized void clearNumberOfVisitorsToday() {
+        DefaultRelationshipDefining.numberOfVisitorsToday.clear();
     }
 
 
