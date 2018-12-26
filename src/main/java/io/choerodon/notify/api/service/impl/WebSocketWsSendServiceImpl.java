@@ -1,6 +1,13 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import freemarker.template.TemplateException;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.DefaultAutowiredField;
@@ -13,18 +20,11 @@ import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     public static final String MSG_TYPE_PM = "site-msg";
-
+    public static final String ONLINE_INFO_TYPE = "online-info";
     private final TemplateRender templateRender;
 
     private final TemplateMapper templateMapper;
@@ -33,15 +33,18 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     private final MessageSender messageSender;
 
+    private StringRedisTemplate redisTemplate;
 
     public WebSocketWsSendServiceImpl(TemplateRender templateRender,
                                       TemplateMapper templateMapper,
                                       MessageSender messageSender,
-                                      SiteMsgRecordMapper siteMsgRecordMapper) {
+                                      SiteMsgRecordMapper siteMsgRecordMapper,
+                                      StringRedisTemplate redisTemplate) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -97,5 +100,34 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     public void sendWebSocket(String code, String id, String message) {
         String key = "choerodon:msg:" + code + ":" + id;
         messageSender.sendByKey(key, code, message);
+    }
+
+
+    @Override
+    public void sendVisitorsInfo(Integer currentOnlines, Integer numberOfVisitorsToday) {
+        Map<String, Object> visitorsInfo = new HashMap<>();
+        visitorsInfo.put("CurrentOnliners", currentOnlines);
+        visitorsInfo.put("numberOfVisitorsToday", numberOfVisitorsToday);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        List<String> times = new ArrayList<>();
+        List<String> data = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            String time = dateFormat.format(calendar.getTime());
+            times.add(time);
+            if (i != 23) {
+                String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
+                data.add(onlinersOnThatTime);
+            }
+            calendar.add(Calendar.HOUR, -1);
+        }
+        Collections.reverse(times);
+        Collections.reverse(data);
+        visitorsInfo.put("time", times);
+        visitorsInfo.put("data", data);
+        String key = "choerodon:msg:online-info";
+        messageSender.sendByKey(key, new WebSocketSendPayload<>(ONLINE_INFO_TYPE, key, visitorsInfo));
     }
 }
