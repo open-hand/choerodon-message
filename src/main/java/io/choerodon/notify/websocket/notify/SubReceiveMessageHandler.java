@@ -4,6 +4,8 @@ import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MS
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
@@ -19,6 +21,7 @@ import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 
 @Component
 public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubReceiveMessageHandler.class);
 
     private static final String SUB = "sub";
 
@@ -67,6 +70,7 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
                     }
                     //今日访问人数+1，在线人数+1,发送在线信息
+                    LOGGER.info("add onliners infomation.");
                     DefaultRelationshipDefining.addNumberOfVisitorsToday(id);
                     DefaultRelationshipDefining.addOnlineCount();
                     webSocketSendService.sendVisitorsInfo(DefaultRelationshipDefining.getOnlineCount(),
