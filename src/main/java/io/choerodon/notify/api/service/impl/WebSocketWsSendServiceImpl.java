@@ -119,6 +119,9 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             times.add(time);
             if (i != 23) {
                 String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
+                if (onlinersOnThatTime == null) {
+                    onlinersOnThatTime = "0";
+                }
                 data.add(onlinersOnThatTime);
             }
             calendar.add(Calendar.HOUR, -1);
