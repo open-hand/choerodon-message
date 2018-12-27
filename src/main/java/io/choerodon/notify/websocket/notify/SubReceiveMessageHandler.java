@@ -21,8 +21,6 @@ import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 
 @Component
 public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SubReceiveMessageHandler.class);
-
     private static final String SUB = "sub";
 
     private RelationshipDefining relationshipDefining;
@@ -37,15 +35,18 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
     private static final String SITE_MSG_CODE = "site-msg";
 
     private final AntPathMatcher matcher = new AntPathMatcher();
+    private DefaultRelationshipDefining defaultRelationshipDefining;
 
     public SubReceiveMessageHandler(RelationshipDefining relationshipDefining,
                                     MessageSender messageSender,
                                     SiteMsgRecordMapper siteMsgRecordMapper,
-                                    WebSocketSendService webSocketSendService) {
+                                    WebSocketSendService webSocketSendService,
+                                    DefaultRelationshipDefining defaultRelationshipDefining) {
         this.relationshipDefining = relationshipDefining;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
         this.webSocketSendService = webSocketSendService;
+        this.defaultRelationshipDefining = defaultRelationshipDefining;
     }
 
     @Override
@@ -70,11 +71,10 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
                     }
                     //今日访问人数+1，在线人数+1,发送在线信息
-                    LOGGER.info("add onliners infomation.");
-                    DefaultRelationshipDefining.addNumberOfVisitorsToday(id);
-                    DefaultRelationshipDefining.addOnlineCount();
-                    webSocketSendService.sendVisitorsInfo(DefaultRelationshipDefining.getOnlineCount(),
-                            DefaultRelationshipDefining.getNumberOfVisitorsToday().size());
+                    defaultRelationshipDefining.addNumberOfVisitorsToday(id);
+                    defaultRelationshipDefining.addOnlineCount(session.getId());
+                    webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
+                            defaultRelationshipDefining.getNumberOfVisitorsToday());
                 }
             }
         }

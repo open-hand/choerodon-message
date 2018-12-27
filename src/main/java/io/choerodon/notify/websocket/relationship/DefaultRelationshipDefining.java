@@ -25,9 +25,9 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private RedisChannelRegister redisChannelRegister;
 
-    private static Integer onlineCount = 0;
+    private static final String NUMBER_OF_VISITORS_TODAY = "NumberOfVisitorsToday";
 
-    private static Set<String> numberOfVisitorsToday = new HashSet<>();
+    private static final String ONLINE_COUNT = "OnlineCount";
 
     @Autowired
     private WebSocketSendService webSocketWsSendService;
@@ -96,34 +96,34 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             }
         }
         //在线人数-1,发消息
-        subOnlineCount();
-        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday().size());
+        subOnlineCount(delSession.getId());
+        LOGGER.info("webSocket disconnect,delete session,sessionId is {},The number of people online minus 1.", delSession.getId());
+        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
     }
 
 
-    public static synchronized Integer getOnlineCount() {
-        return onlineCount;
+    public synchronized Integer getOnlineCount() {
+        return redisTemplate.opsForSet().members(ONLINE_COUNT).size();
     }
 
-    public static synchronized void addOnlineCount() {
-        DefaultRelationshipDefining.onlineCount++;
+    public synchronized void addOnlineCount(String sessionId) {
+        redisTemplate.opsForSet().add(ONLINE_COUNT, sessionId);
     }
 
-    public static synchronized void subOnlineCount() {
-        DefaultRelationshipDefining.onlineCount--;
+    public synchronized void subOnlineCount(String sessionId) {
+        redisTemplate.opsForSet().remove(ONLINE_COUNT, sessionId);
+
     }
 
-    public static synchronized Set<String> getNumberOfVisitorsToday() {
-        return numberOfVisitorsToday;
+    public synchronized Integer getNumberOfVisitorsToday() {
+        return redisTemplate.opsForSet().members(NUMBER_OF_VISITORS_TODAY).size();
     }
 
-    public static synchronized void addNumberOfVisitorsToday(String id) {
-        DefaultRelationshipDefining.numberOfVisitorsToday.add(id);
+    public synchronized void addNumberOfVisitorsToday(String id) {
+        redisTemplate.opsForSet().add(NUMBER_OF_VISITORS_TODAY, id);
     }
 
-    public static synchronized void clearNumberOfVisitorsToday() {
-        DefaultRelationshipDefining.numberOfVisitorsToday.clear();
+    public synchronized void clearNumberOfVisitorsToday() {
+        redisTemplate.delete(NUMBER_OF_VISITORS_TODAY);
     }
-
-
 }
