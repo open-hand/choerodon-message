@@ -21,15 +21,22 @@ public class HourlyStorageUtils {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    private DefaultRelationshipDefining defaultRelationshipDefining;
+
+    public HourlyStorageUtils(DefaultRelationshipDefining defaultRelationshipDefining) {
+        this.defaultRelationshipDefining = defaultRelationshipDefining;
+    }
+
     /**
      * 每小时redis记录当前在线人数
      */
     @Scheduled(cron = "0 0 * * * ?")
     public void HourlyStorageSchedule() {
-        Integer onlineCount = DefaultRelationshipDefining.getOnlineCount();
+        Integer onlineCount = defaultRelationshipDefining.getOnlineCount();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
         String date = dateFormat.format(new Date());
         redisTemplate.opsForValue().set(date, onlineCount.toString(), 24, TimeUnit.HOURS);
+        LOGGER.info("Record the number of people online at " + date);
     }
 
     /**
@@ -37,6 +44,7 @@ public class HourlyStorageUtils {
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void clearNumberOfVisitorsTodaySchedule() {
-        DefaultRelationshipDefining.clearNumberOfVisitorsToday();
+        defaultRelationshipDefining.clearNumberOfVisitorsToday();
+        LOGGER.info("Clear the number of visitors");
     }
 }
