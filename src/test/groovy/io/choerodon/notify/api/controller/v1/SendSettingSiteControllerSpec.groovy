@@ -105,6 +105,5 @@ class SendSettingSiteControllerSpec extends Specification {
 
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().size() == 1
     }
 }

@@ -36,6 +36,10 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     @Autowired
     private WebSocketSendService webSocketWsSendService;
 
+    public void setWebSocketWsSendService(WebSocketSendService webSocketWsSendService) {
+        this.webSocketWsSendService = webSocketWsSendService;
+    }
+
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
                                        RedisChannelRegister redisChannelRegister) {
         this.redisTemplate = redisTemplate;

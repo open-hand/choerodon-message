@@ -49,7 +49,7 @@ public class HourlyStorageUtils {
     }
 
     /**
-     * 每天凌晨2点清空今日访问人数
+     * 每天凌晨2点清空今日在线人数
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void clearOnlineCountSchedule() {

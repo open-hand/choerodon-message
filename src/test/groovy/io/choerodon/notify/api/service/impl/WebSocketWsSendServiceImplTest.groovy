@@ -7,6 +7,8 @@ import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import io.choerodon.notify.websocket.send.MessageSender
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 import spock.lang.Specification
 
 /**
@@ -17,10 +19,11 @@ class WebSocketWsSendServiceImplTest extends Specification {
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
     private MessageSender messageSender = Mock(MessageSender)
+    private StringRedisTemplate redisTemplate = Mock(StringRedisTemplate)
     private WebSocketSendService webSocketSendService =
             new WebSocketWsSendServiceImpl(templateRender,
                     templateMapper, messageSender,
-                    siteMsgRecordMapper)
+                    siteMsgRecordMapper, redisTemplate)
 
     def "Send"() {
         given: "构造参数"
@@ -52,4 +55,22 @@ class WebSocketWsSendServiceImplTest extends Specification {
         exception = thrown(CommonException)
         exception.getCode().equals("error.pmTemplate.contentNull")
     }
+
+
+    def "sendVisitorsInfo"() {
+        given: "参数准备"
+        def currentOnlines = 1
+        def numberOfVisitorsToday = 1
+        and: "mock"
+        ValueOperations<String, Object> valueOperations = Mock(ValueOperations)
+        valueOperations.get(_) >> { return null }
+        when: "调用方法"
+        webSocketSendService.sendVisitorsInfo(currentOnlines, numberOfVisitorsToday)
+        then: "方法检验"
+        noExceptionThrown()
+        24 * redisTemplate.opsForValue() >> { return valueOperations }
+    }
 }
+
+
+
