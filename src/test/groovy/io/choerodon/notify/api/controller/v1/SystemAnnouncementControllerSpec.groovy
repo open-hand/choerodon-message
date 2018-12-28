@@ -13,7 +13,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Stepwise
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
@@ -42,6 +41,7 @@ class SystemAnnouncementControllerSpec extends Specification {
         systemAnnouncementDTO.setContent("test-1,发送站内信，时间为现在")
         systemAnnouncementDTO.setTitle("test-1")
         systemAnnouncementDTO.setSendNotices(true)
+        systemAnnouncementDTO.setSendDate(new Date())
     }
 
     def "Create"() {
@@ -52,7 +52,6 @@ class SystemAnnouncementControllerSpec extends Specification {
         then: "无异常抛出，状态码良好"
         announcements.statusCode.is2xxSuccessful()
         noExceptionThrown()
-        1 * systemAnnouncementService.create(_)
     }
 
     def "PagingQuery"() {
