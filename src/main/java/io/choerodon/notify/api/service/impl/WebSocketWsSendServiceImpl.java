@@ -117,13 +117,11 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         for (int i = 0; i < 24; i++) {
             String time = dateFormat.format(calendar.getTime());
             times.add(time);
-            if (i != 23) {
-                String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
-                if (onlinersOnThatTime == null) {
-                    onlinersOnThatTime = "0";
-                }
-                data.add(onlinersOnThatTime);
+            String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
+            if (onlinersOnThatTime == null) {
+                onlinersOnThatTime = "0";
             }
+            data.add(onlinersOnThatTime);
             calendar.add(Calendar.HOUR, -1);
         }
         Collections.reverse(times);
