@@ -120,33 +120,32 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     }
 
 
-    public synchronized Integer getOnlineCount() {
+    public Integer getOnlineCount() {
         return redisTemplate.keys(ONLINE_COUNT + "*").size();
     }
 
-    public synchronized void addOnlineCount(String id, String sessionId) {
+    public void addOnlineCount(String id, String sessionId) {
         redisTemplate.opsForSet().add(ONLINE_COUNT + ":" + id, sessionId);
     }
 
-    public synchronized void subOnlineCount(String id, String sessionId) {
+    public void subOnlineCount(String id, String sessionId) {
         redisTemplate.opsForSet().remove(ONLINE_COUNT + ":" + id, sessionId);
-
     }
 
-    public synchronized void clearOnlineCount() {
+    public void clearOnlineCount() {
         redisTemplate.delete(redisTemplate.keys(ONLINE_COUNT + "*"));
     }
 
 
-    public synchronized Integer getNumberOfVisitorsToday() {
+    public Integer getNumberOfVisitorsToday() {
         return redisTemplate.opsForSet().members(NUMBER_OF_VISITORS_TODAY).size();
     }
 
-    public synchronized void addNumberOfVisitorsToday(String id) {
+    public void addNumberOfVisitorsToday(String id) {
         redisTemplate.opsForSet().add(NUMBER_OF_VISITORS_TODAY, id);
     }
 
-    public synchronized void clearNumberOfVisitorsToday() {
+    public void clearNumberOfVisitorsToday() {
         redisTemplate.delete(NUMBER_OF_VISITORS_TODAY);
     }
 }
