@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -40,9 +41,17 @@ public class DefaultSmartMessageSender implements MessageSender {
         }
         if (session != null && session.isOpen()) {
             try {
-                session.sendMessage(new TextMessage(objectMapper.writeValueAsBytes(payload)));
+                TextMessage textMessage = new TextMessage(objectMapper.writeValueAsBytes(payload));
+                session.sendMessage(textMessage);
             } catch (IOException e) {
                 LOGGER.warn("error.messageOperator.sendWebSocket.IOException, payload: {}", payload, e);
+                try {
+                    if (e.getMessage().contains("Channel is closed")) {
+                        session.close(CloseStatus.NORMAL);
+                    }
+                } catch (IOException e1) {
+                    LOGGER.warn("error.messageOperator.sendWebSocket.sessionCloseIOException, payload: {}", payload, e1);
+                }
             }
         }
     }
@@ -77,6 +86,13 @@ public class DefaultSmartMessageSender implements MessageSender {
                 session.sendMessage(new TextMessage(json));
             } catch (IOException e) {
                 LOGGER.warn("error.messageOperator.sendWebSocket.IOException, json: {}", json, e);
+                try {
+                    if (e.getMessage().contains("Channel is closed")) {
+                        session.close(CloseStatus.NORMAL);
+                    }
+                } catch (IOException e1) {
+                    LOGGER.warn("error.messageOperator.sendWebSocket.sessionCloseIOException, json: {}", json, e1);
+                }
             }
         }
     }
