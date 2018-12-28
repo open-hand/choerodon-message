@@ -22,6 +22,7 @@ import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 @Component
 public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
     private static final String SUB = "sub";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubReceiveMessageHandler.class);
 
     private RelationshipDefining relationshipDefining;
     private WebSocketSendService webSocketSendService;
@@ -71,8 +72,9 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                         messageSender.sendWebSocket(session, new WebSocketSendPayload<>(MSG_TYPE_PM, key, unReadNum));
                     }
                     //今日访问人数+1，在线人数+1,发送在线信息
+                    LOGGER.info("Get sitMsg's subscription,sessionId: {}", session.getId());
                     defaultRelationshipDefining.addNumberOfVisitorsToday(id);
-                    defaultRelationshipDefining.addOnlineCount(session.getId());
+                    defaultRelationshipDefining.addOnlineCount(id, session.getId());
                     webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
                             defaultRelationshipDefining.getNumberOfVisitorsToday());
                 }
