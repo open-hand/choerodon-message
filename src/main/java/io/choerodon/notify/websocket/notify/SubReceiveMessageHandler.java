@@ -32,6 +32,7 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
     private final SiteMsgRecordMapper siteMsgRecordMapper;
 
     private static final String SIT_MSG_KEY_PATH = "choerodon:msg:{code}:{id}";
+    public static final String ONLINE_INFO_KEY_PATH = "choerodon:msg:online-info";
 
     private static final String SITE_MSG_CODE = "site-msg";
 
@@ -79,6 +80,9 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                             defaultRelationshipDefining.getNumberOfVisitorsToday());
                 }
             }
+        } else if (matcher.match(ONLINE_INFO_KEY_PATH, key)) {
+            webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
+                    defaultRelationshipDefining.getNumberOfVisitorsToday());
         }
     }
 
