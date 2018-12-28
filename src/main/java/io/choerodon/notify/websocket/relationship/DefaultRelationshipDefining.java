@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -18,6 +19,9 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     private static final Logger LOGGER = LoggerFactory.getLogger(RelationshipDefining.class);
 
     private Map<String, Set<WebSocketSession>> keySessionsMap = new ConcurrentHashMap<>();
+    private static final String SIT_MSG_KEY_PATH = "choerodon:msg:{code}:{id}";
+    private static final String SITE_MSG_CODE = "site-msg";
+    private final AntPathMatcher matcher = new AntPathMatcher();
 
     private Map<WebSocketSession, Set<String>> sessionKeysMap = new ConcurrentHashMap<>();
 
@@ -86,6 +90,23 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         }
         sessionKeysMap.remove(delSession);
         Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionsMap.entrySet().iterator();
+        //获取用户Id
+        keySessionsMap.forEach((k, v) -> {
+            String userId = "";
+            if (matcher.match(SIT_MSG_KEY_PATH, k)) {
+                Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, k);
+                String code = map.get("code");
+                if (SITE_MSG_CODE.equals(code)) {
+                    userId = map.get("id");
+                }
+            }
+            //在线人数-1,发消息
+            subOnlineCount(userId, delSession.getId());
+            LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
+            webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+        });
+
+
         while (it.hasNext()) {
             Map.Entry<String, Set<WebSocketSession>> next = it.next();
             Set<WebSocketSession> sessions = next.getValue();
@@ -95,25 +116,27 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
                 redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
             }
         }
-        //在线人数-1,发消息
-        subOnlineCount(delSession.getId());
-        LOGGER.info("webSocket disconnect,delete session,sessionId is {},The number of people online minus 1.", delSession.getId());
-        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+
     }
 
 
     public synchronized Integer getOnlineCount() {
-        return redisTemplate.opsForSet().members(ONLINE_COUNT).size();
+        return redisTemplate.keys(ONLINE_COUNT + "*").size();
     }
 
-    public synchronized void addOnlineCount(String sessionId) {
-        redisTemplate.opsForSet().add(ONLINE_COUNT, sessionId);
+    public synchronized void addOnlineCount(String id, String sessionId) {
+        redisTemplate.opsForSet().add(ONLINE_COUNT + ":" + id, sessionId);
     }
 
-    public synchronized void subOnlineCount(String sessionId) {
-        redisTemplate.opsForSet().remove(ONLINE_COUNT, sessionId);
+    public synchronized void subOnlineCount(String id, String sessionId) {
+        redisTemplate.opsForSet().remove(ONLINE_COUNT + ":" + id, sessionId);
 
     }
+
+    public synchronized void clearOnlineCount() {
+        redisTemplate.delete(redisTemplate.keys(ONLINE_COUNT + "*"));
+    }
+
 
     public synchronized Integer getNumberOfVisitorsToday() {
         return redisTemplate.opsForSet().members(NUMBER_OF_VISITORS_TODAY).size();

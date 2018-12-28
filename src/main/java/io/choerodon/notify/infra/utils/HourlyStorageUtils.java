@@ -40,11 +40,20 @@ public class HourlyStorageUtils {
     }
 
     /**
-     * 每到午夜清空今日访问人数
+     * 每日零点清空今日访问人数
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void clearNumberOfVisitorsTodaySchedule() {
         defaultRelationshipDefining.clearNumberOfVisitorsToday();
         LOGGER.info("Clear the number of visitors");
+    }
+
+    /**
+     * 每天凌晨2点清空今日访问人数
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void clearOnlineCountSchedule() {
+        defaultRelationshipDefining.clearOnlineCount();
+        LOGGER.info("Clear the number of onliners");
     }
 }
