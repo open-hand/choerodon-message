@@ -67,6 +67,17 @@ public class SystemAnnouncementController {
         return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, content, param, status, sendNotices), HttpStatus.OK);
     }
 
+    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @ApiOperation(value = "分页查询已发送的系统公告")
+    @CustomPageRequest
+    @GetMapping("/completed")
+    public ResponseEntity<Page<SystemAnnouncementDTO>> pagingQuery(@ApiIgnore
+                                                                   @SortDefault(value = "send_date", direction = Sort.Direction.DESC)
+                                                                           PageRequest pageRequest) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null, null, null,
+                SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value(), null), HttpStatus.OK);
+    }
+
 
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "查看系统公告详情")
