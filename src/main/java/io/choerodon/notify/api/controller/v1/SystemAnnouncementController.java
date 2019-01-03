@@ -71,7 +71,7 @@ public class SystemAnnouncementController {
     @ApiOperation(value = "分页查询已发送的系统公告")
     @CustomPageRequest
     @GetMapping("/completed")
-    public ResponseEntity<Page<SystemAnnouncementDTO>> pagingQuery(@ApiIgnore
+    public ResponseEntity<Page<SystemAnnouncementDTO>> pagingQueryCompleted(@ApiIgnore
                                                                    @SortDefault(value = "send_date", direction = Sort.Direction.DESC)
                                                                            PageRequest pageRequest) {
         return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null, null, null,
