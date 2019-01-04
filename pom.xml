@@ -16,7 +16,7 @@
     </parent>
     <!--choerodon-starters dependency-->
     <properties>
-        <choerodon.starters.version>0.8.1.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.9.0.RELEASE</choerodon.starters.version>
         <powermock.version>1.7.4</powermock.version>
     </properties>
     <dependencies>
