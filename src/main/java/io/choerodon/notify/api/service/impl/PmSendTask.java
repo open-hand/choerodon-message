@@ -63,14 +63,14 @@ public class PmSendTask {
     @TimedTask(name = "删除“添加新功能”的发送设置", description = "删除“添加新功能”的发送设置", oneExecution = true, repeatCount = 0,
             repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.SECONDS, repeatInterval = 100, params = {})
     @JobTask(code = "deleteAddFunctionSendSetting", description = "删除“添加新功能”的发送设置")
-    public void deleteSendSetting() {
+    public void deleteSendSetting(Map<String, Object> map) {
         SendSetting sendSetting = new SendSetting();
         sendSetting.setCode("addFunction");
         int delete = sendSettingMapper.delete(sendSetting);
         Template template = new Template();
         template.setCode("addFunction-preset");
         int delete1 = templateMapper.delete(template);
-        logger.info("delete 'addFunction' send setting,{} row,delete 'addFunction-preset' template.{} row",delete,delete1);
+        logger.info("delete 'addFunction' send setting,{} row,delete 'addFunction-preset' template.{} row", delete, delete1);
     }
 
     public void sendStationLetter(Map<String, Object> map) {
