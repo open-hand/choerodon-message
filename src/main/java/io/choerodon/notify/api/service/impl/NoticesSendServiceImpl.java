@@ -59,15 +59,14 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     public void sendNotice(NoticeSendDTO dto) {
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
-            LOGGER.info("no sendSetting : {}, can`t send notice. sendUsers: {}", dto.getCode(), dto.getTargetUsers());
+            LOGGER.info("no sendSetting : {}, can`t send notice.", dto.getCode());
             return;
         }
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
         boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
         //如果没有任何模板，则不发起feign调用
         if (!haveEmailTemplate && !havePmTemplate) {
-            LOGGER.info("sendsetting '{}' no opposite email template and pm template, cann`t send notice. sendUsers: {}",
-                    dto.getCode(), dto.getTargetUsers());
+            LOGGER.info("sendSetting '{}' no opposite email template and pm template, can`t send notice.", dto.getCode());
             return;
         }
         //取得需要发送通知用户
@@ -84,8 +83,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.EMAIL);
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
             } else {
-                LOGGER.info("sendsetting '{}' no opposite email template, cann`t send email. sendUsers: {}",
-                        dto.getCode(), dto.getTargetUsers());
+                LOGGER.info("sendSetting '{}' no opposite email template, can`t send email.", dto.getCode());
             }
         } catch (CommonException e) {
             LOGGER.info("send email failed!", e);
@@ -102,8 +100,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
                         sender.get(senderType), senderType, sendSetting);
             } else {
-                LOGGER.info("sendsetting '{}' no opposite pm template ,cann`t send pm. sendUsers: {}",
-                        dto.getCode(), dto.getTargetUsers());
+                LOGGER.info("sendSetting '{}' no opposite pm template, can`t send pm.", dto.getCode());
             }
         } catch (CommonException e) {
             LOGGER.info("send station letter failed!", e);
