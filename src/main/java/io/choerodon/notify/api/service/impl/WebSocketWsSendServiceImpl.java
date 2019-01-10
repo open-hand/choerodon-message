@@ -5,7 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import freemarker.template.TemplateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 
 import io.choerodon.core.exception.CommonException;
@@ -23,6 +26,7 @@ import io.choerodon.notify.websocket.send.WebSocketSendPayload;
 
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketSendService.class);
     public static final String MSG_TYPE_PM = "site-msg";
     public static final String ONLINE_INFO_TYPE = "online-info";
     private final TemplateRender templateRender;
@@ -56,8 +60,9 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             try {
                 //userId为空，则是email没有对应的id，因此不发送站内信
                 //oracle可以批量插入超过1000条,但是超过太多则耗时长
-                if (records.size() >= 999) {
-                    siteMsgRecordMapper.batchInsert(records);
+                if (records.size() >= 99) {
+                    int num = siteMsgRecordMapper.batchInsert(records);
+                    LOGGER.info("Batch insert siteMsgRecord num: {}", num);
                     records.clear();
                 }
                 if (user.getId() != null) {
@@ -74,6 +79,8 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                 }
             } catch (IOException | TemplateException e) {
                 throw new CommonException("error.templateRender.renderError", e);
+            } catch (BadSqlGrammarException e) {
+                throw new CommonException("error.siteMsgContent.renderError", e);
             }
         });
         siteMsgRecordMapper.batchInsert(records);
