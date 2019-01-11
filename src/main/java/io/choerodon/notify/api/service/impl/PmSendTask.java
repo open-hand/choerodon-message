@@ -1,10 +1,22 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
-import io.choerodon.asgard.schedule.annotation.JobParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.SendSetting;
@@ -15,14 +27,6 @@ import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author dengyouquan
@@ -56,10 +60,19 @@ public class PmSendTask {
         objectMapper = new ObjectMapper();
     }
 
-    @JobTask(maxRetryCount = 1, code = "sendStationLetter", params = {
-            @JobParam(name = "code", defaultValue = "addFunction", description = "发送设置编码"),
-            @JobParam(name = "variables", defaultValue = "{'content':'定时任务'}", description = "站内信模板内容的渲染参数")
-    }, description = "全局层发送站内信")
+    @TimedTask(name = "删除“添加新功能”的发送设置", description = "删除“添加新功能”的发送设置", oneExecution = true, repeatCount = 0,
+            repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.SECONDS, repeatInterval = 100, params = {})
+    @JobTask(code = "deleteAddFunctionSendSetting", description = "删除“添加新功能”的发送设置")
+    public void deleteSendSetting(Map<String, Object> map) {
+        SendSetting sendSetting = new SendSetting();
+        sendSetting.setCode("addFunction");
+        int delete = sendSettingMapper.delete(sendSetting);
+        Template template = new Template();
+        template.setCode("addFunction-preset");
+        int delete1 = templateMapper.delete(template);
+        logger.info("delete 'addFunction' send setting,{} row,delete 'addFunction-preset' template.{} row", delete, delete1);
+    }
+
     public void sendStationLetter(Map<String, Object> map) {
         String code = Optional.ofNullable((String) map.get("code")).orElseThrow(() -> new CommonException("error.PmSendTask.codeEmpty"));
         String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("");
