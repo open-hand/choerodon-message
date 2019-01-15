@@ -31,4 +31,6 @@ public interface SendSettingService {
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
     List<SendSettingDetailDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
+
+    void delete(Long id);
 }

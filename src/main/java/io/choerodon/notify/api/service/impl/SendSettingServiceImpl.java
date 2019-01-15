@@ -1,5 +1,12 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -15,12 +22,6 @@ import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
@@ -127,5 +128,14 @@ public class SendSettingServiceImpl implements SendSettingService {
         List<SendSettingDetailDTO> list = sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
         return list.stream().filter(s -> s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public void delete(Long id) {
+        if (sendSettingMapper.selectByPrimaryKey(id) == null) {
+            throw new CommonException("error.sendSetting.notExist");
+        }
+        sendSettingMapper.deleteByPrimaryKey(id);
     }
 }

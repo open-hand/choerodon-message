@@ -1,6 +1,18 @@
 package io.choerodon.notify.api.controller.v1;
 
+import java.util.List;
+import java.util.Set;
+import javax.validation.Valid;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -13,16 +25,6 @@ import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -76,5 +78,13 @@ public class SendSettingSiteController {
     @ApiOperation(value = "根据层级查询未禁用通知配置的发送设置列表")
     public ResponseEntity<List<SendSettingDetailDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type", required = false) String level) {
         return new ResponseEntity<>(sendSettingService.queryByLevelAndAllowConfig(level, true), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @ApiOperation(value = "根据Id删除发送设置")
+    public ResponseEntity delSendSetting(@PathVariable Long id) {
+        sendSettingService.delete(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
