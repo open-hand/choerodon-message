@@ -102,12 +102,16 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
                 String code = map.get("code");
                 if (SITE_MSG_CODE.equals(code)) {
                     userId = map.get("id");
+                    LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
+                    //在线人数-1,发消息
+                    Integer origin = getOnlineCount();
+                    subOnlineCount(userId, delSession.getId());
+                    if (getOnlineCount() != origin) {
+                        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+                    }
                 }
             }
-            //在线人数-1,发消息
-            subOnlineCount(userId, delSession.getId());
-            LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
-            webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+
         });
 
 
