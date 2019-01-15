@@ -74,10 +74,13 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                     }
                     //今日访问人数+1，在线人数+1,发送在线信息
                     LOGGER.info("Get sitMsg's subscription,sessionId: {}", session.getId());
+                    Integer originCount = defaultRelationshipDefining.getOnlineCount();
                     defaultRelationshipDefining.addNumberOfVisitorsToday(id);
                     defaultRelationshipDefining.addOnlineCount(id, session.getId());
-                    webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
-                            defaultRelationshipDefining.getNumberOfVisitorsToday());
+                    if (defaultRelationshipDefining.getOnlineCount() != originCount) {
+                        webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
+                                defaultRelationshipDefining.getNumberOfVisitorsToday());
+                    }
                 }
             }
         } else if (matcher.match(ONLINE_INFO_KEY_PATH, key)) {
