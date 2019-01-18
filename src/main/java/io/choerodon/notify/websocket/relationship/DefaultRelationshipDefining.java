@@ -1,8 +1,7 @@
 package io.choerodon.notify.websocket.relationship;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
+import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.websocket.register.RedisChannelRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
-import io.choerodon.notify.api.service.WebSocketSendService;
-import io.choerodon.notify.websocket.register.RedisChannelRegister;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultRelationshipDefining implements RelationshipDefining {
 
@@ -126,7 +125,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         while (it.hasNext()) {
             Map.Entry<String, Set<WebSocketSession>> next = it.next();
             Set<WebSocketSession> sessions = next.getValue();
-            sessions.removeIf(t -> t.equals(delSession));
+            sessions.removeIf(t -> t.getId().equals(delSession.getId()));
             if (sessions.isEmpty()) {
                 it.remove();
                 redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
