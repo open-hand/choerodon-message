@@ -1,8 +1,8 @@
 package io.choerodon.notify.websocket.relationship;
 
-import org.springframework.web.socket.WebSocketSession;
-
 import java.util.Set;
+
+import org.springframework.web.socket.WebSocketSession;
 
 public interface RelationshipDefining {
 
@@ -31,4 +31,8 @@ public interface RelationshipDefining {
      */
     void removeWebSocketSessionContact(WebSocketSession session);
 
+    /**
+     * 解除于该webSocket,key与session的联系
+     */
+    void removeKeyContact(WebSocketSession session, String key);
 }
