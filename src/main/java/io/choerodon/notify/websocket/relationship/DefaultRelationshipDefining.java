@@ -88,6 +88,14 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
     }
 
     @Override
+    public void removeKeyContact(WebSocketSession session, String key) {
+        Set<WebSocketSession> webSocketSessions = keySessionsMap.computeIfAbsent(key, k -> new HashSet<>());
+        webSocketSessions.remove(session);
+        Set<String> subKeys = sessionKeysMap.computeIfAbsent(session, k -> new HashSet<>());
+        subKeys.remove(key);
+    }
+
+    @Override
     public void removeWebSocketSessionContact(WebSocketSession delSession) {
         if (delSession == null) {
             return;
