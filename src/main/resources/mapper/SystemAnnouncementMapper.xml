@@ -4,6 +4,7 @@
 
     <resultMap id="systemAnnouncementDTO" type="io.choerodon.notify.api.dto.SystemAnnouncementDTO">
         <id column="id" property="id"></id>
+        <result column="is_sticky" property="sticky" jdbcType="BOOLEAN"/>
         <result column="is_send_notices" property="sendNotices" jdbcType="BOOLEAN"/>
     </resultMap>
 
@@ -33,4 +34,32 @@
         </if>
     </select>
 
+    <select id="selectLastestSticky" resultType="io.choerodon.notify.domain.SystemAnnouncement">
+        SELECT
+            *
+        FROM
+            notify_system_announcement
+        WHERE
+            IS_STICKY = 1
+        AND
+            SYSDATE() BETWEEN SEND_DATE AND END_DATE
+        ORDER BY ID DESC LIMIT 1
+    </select>
+
+
+    <select id="selectLastestSticky" databaseId="oracle" resultType="io.choerodon.notify.domain.SystemAnnouncement">
+    <![CDATA[
+      SELECT * FROM (
+            SELECT
+                *
+            FROM
+                notify_system_announcement
+            WHERE
+                IS_STICKY = 1
+            AND
+                SYSDATE() BETWEEN SEND_DATE AND END_DATE
+            ORDER BY ID DESC
+      ) WHERE ROWNUM <= 1
+    ]]>
+    </select>
 </mapper>

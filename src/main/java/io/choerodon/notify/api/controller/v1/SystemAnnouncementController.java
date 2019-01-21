@@ -49,6 +49,9 @@ public class SystemAnnouncementController {
         if (dto.getSendDate() == null) {
             dto.setSendDate(new Date());
         }
+        if(dto.getSticky()!=null && dto.getSticky() && dto.getEndDate()==null){
+            throw new CommonException("error.create.system.announcement.endDate.is.null");
+        }
         return new ResponseEntity<>(systemAnnouncementService.create(dto), HttpStatus.OK);
     }
 
@@ -99,5 +102,12 @@ public class SystemAnnouncementController {
     @PutMapping("/update")
     public ResponseEntity<SystemAnnouncementDTO> update(@RequestBody @Validated SystemAnnouncementDTO dto) {
         return new ResponseEntity<>(systemAnnouncementService.update(dto, ResourceLevel.SITE, 0L), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @ApiOperation(value = "查询当前需悬浮显示的最新公告")
+    @GetMapping("/new_sticky")
+    public ResponseEntity<SystemAnnouncementDTO> getNewSticky() {
+        return new ResponseEntity<>(systemAnnouncementService.getLatestSticky(), HttpStatus.OK);
     }
 }

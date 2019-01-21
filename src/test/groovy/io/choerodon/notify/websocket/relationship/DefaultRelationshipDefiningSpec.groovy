@@ -92,7 +92,7 @@ class DefaultRelationshipDefiningSpec extends Specification {
         relationshipDefining.removeWebSocketSessionContact(session)
         then: "校验结果"
         noExceptionThrown()
-        3 * redisTemplate.opsForSet() >> setOperations
-        1 * redisTemplate.keys(_) >> new HashSet<String>()
+        redisTemplate.opsForSet() >> setOperations
+        redisTemplate.keys(_) >> new HashSet<String>()
     }
 }
