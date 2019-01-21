@@ -34,6 +34,12 @@ public class SystemAnnouncementDTO {
     private String status;
     @ApiModelProperty(value = "关联任务Id")
     private Long ScheduleTaskId;
+    @ApiModelProperty(value = "是否顶部悬浮显示")
+    private Boolean sticky;
+    @ApiModelProperty(value = "悬浮显示结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endDate;
+
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
 
@@ -131,5 +137,21 @@ public class SystemAnnouncementDTO {
 
     public void setScheduleTaskId(Long scheduleTaskId) {
         ScheduleTaskId = scheduleTaskId;
+    }
+
+    public Boolean getSticky() {
+        return sticky;
+    }
+
+    public void setSticky(Boolean sticky) {
+        this.sticky = sticky;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }

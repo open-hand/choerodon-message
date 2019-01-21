@@ -17,4 +17,6 @@ public interface SystemAnnouncementMapper extends BaseMapper<SystemAnnouncement>
                                                @Param("status") String status,
                                                @Param("isSendNotices") Boolean sendNotices,
                                                @Param("param") String param);
+
+    SystemAnnouncement selectLastestSticky();
 }

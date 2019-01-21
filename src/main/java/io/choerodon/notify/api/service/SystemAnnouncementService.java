@@ -7,7 +7,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 
 /**
- * @author dengyouquan
+ * @author dengyouquan , Eugen
  **/
 public interface SystemAnnouncementService {
 
@@ -36,7 +36,7 @@ public interface SystemAnnouncementService {
      * @param title
      * @param content
      * @param param
-     * @return
+     * @return 分页结果
      */
     Page<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String content, String param, String status, Boolean sendNotices);
 
@@ -44,7 +44,7 @@ public interface SystemAnnouncementService {
      * 根据id获取系统公告详情
      *
      * @param id
-     * @return
+     * @return 系统公告详情
      */
     SystemAnnouncementDTO getDetailById(Long id);
 
@@ -68,4 +68,11 @@ public interface SystemAnnouncementService {
      */
     void sendSystemNotification(ResourceLevel sourceType, Long sourceId, Long systemNocificationId);
 
+    /**
+     * 获取当前需悬浮显示的最新的系统公告
+     *
+     * @return 系统公告
+     */
+    SystemAnnouncementDTO getLatestSticky();
 }
+

@@ -40,4 +40,13 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_system_announcement.groovy'
     changeSet(author: 'longhe1996@icloud.com', id: '2018-12-24-add-default_value-is_send_notices') {
         addNotNullConstraint(tableName: 'NOTIFY_SYSTEM_ANNOUNCEMENT', columnName: 'STATUS', defaultNullValue: 'COMPLETED', columnDataType: 'VARCHAR(16)')
     }
+
+    changeSet(author: 'longhe1996@icloud.com', id: '2019-01-21-add-column-IS_STICKY-and-END_DATE') {
+        addColumn(tableName: "NOTIFY_SYSTEM_ANNOUNCEMENT") {
+            column(name: "IS_STICKY", type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否在顶部悬浮显示。1.是，0：不是', afterColumn: 'IS_SEND_NOTICES') {
+                constraints(nullable: false)
+            }
+            column(name: "END_DATE", type: "DATETIME", remarks: '顶部悬浮显示的结束时间', afterColumn: 'SEND_DATE')
+        }
+    }
 }

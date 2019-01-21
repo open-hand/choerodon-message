@@ -28,6 +28,9 @@ public class SystemAnnouncement extends AuditDomain {
     private String status;
     @Column(name = "SCHEDULE_TASK_ID")
     private Long scheduleTaskId;
+    @Column(name = "IS_STICKY")
+    private Boolean sticky;
+    private Date endDate;
 
     public Long getId() {
         return id;
@@ -83,5 +86,21 @@ public class SystemAnnouncement extends AuditDomain {
 
     public void setScheduleTaskId(Long scheduleTaskId) {
         this.scheduleTaskId = scheduleTaskId;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Boolean getSticky() {
+        return sticky;
+    }
+
+    public void setSticky(Boolean sticky) {
+        this.sticky = sticky;
     }
 }

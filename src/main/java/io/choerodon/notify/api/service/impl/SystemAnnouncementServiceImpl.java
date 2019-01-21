@@ -186,4 +186,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         }
     }
 
+
+    @Override
+    public SystemAnnouncementDTO getLatestSticky() {
+        return modelMapper.map(announcementMapper.selectLastestSticky(), SystemAnnouncementDTO.class);
+    }
 }

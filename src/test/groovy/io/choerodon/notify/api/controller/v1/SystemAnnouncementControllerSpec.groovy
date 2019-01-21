@@ -42,6 +42,7 @@ class SystemAnnouncementControllerSpec extends Specification {
         systemAnnouncementDTO.setTitle("test-1")
         systemAnnouncementDTO.setSendNotices(true)
         systemAnnouncementDTO.setSendDate(new Date())
+        systemAnnouncementDTO.setSticky(false)
     }
 
     def "Create"() {
