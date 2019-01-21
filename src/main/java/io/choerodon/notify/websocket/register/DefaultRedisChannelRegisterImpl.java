@@ -65,7 +65,7 @@ public class DefaultRedisChannelRegisterImpl implements RedisChannelRegister {
                         return;
                     }
                     String instanceRegisterKey = REGISTER_PREFIX + t;
-                    Long lastUpdateTime = Long.parseLong(redisTemplate.opsForValue().get(instanceRegisterKey));
+                    long lastUpdateTime = Long.parseLong(redisTemplate.opsForValue().get(instanceRegisterKey));
                     if (System.currentTimeMillis() - lastUpdateTime > 2 * HEART_BEAT_INTERVAL) {
                         removeDeathChannel(t);
                     }
