@@ -1,5 +1,6 @@
 package io.choerodon.notify.infra.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -18,5 +19,5 @@ public interface SystemAnnouncementMapper extends BaseMapper<SystemAnnouncement>
                                                @Param("isSendNotices") Boolean sendNotices,
                                                @Param("param") String param);
 
-    SystemAnnouncement selectLastestSticky();
+    SystemAnnouncementDTO selectLastestSticky(@Param("currentTime") Date currentTime);
 }

@@ -34,7 +34,7 @@
         </if>
     </select>
 
-    <select id="selectLastestSticky" resultType="io.choerodon.notify.domain.SystemAnnouncement">
+    <select id="selectLastestSticky" resultMap="systemAnnouncementDTO">
         SELECT
             *
         FROM
@@ -42,12 +42,12 @@
         WHERE
             IS_STICKY = 1
         AND
-            SYSDATE() BETWEEN SEND_DATE AND END_DATE
+            #{currentTime} BETWEEN SEND_DATE AND END_DATE
         ORDER BY ID DESC LIMIT 1
     </select>
 
 
-    <select id="selectLastestSticky" databaseId="oracle" resultType="io.choerodon.notify.domain.SystemAnnouncement">
+    <select id="selectLastestSticky" databaseId="oracle" resultMap="systemAnnouncementDTO">
     <![CDATA[
       SELECT * FROM (
             SELECT
@@ -57,7 +57,7 @@
             WHERE
                 IS_STICKY = 1
             AND
-                SYSDATE() BETWEEN SEND_DATE AND END_DATE
+                #{currentTime} BETWEEN SEND_DATE AND END_DATE
             ORDER BY ID DESC
       ) WHERE ROWNUM <= 1
     ]]>
