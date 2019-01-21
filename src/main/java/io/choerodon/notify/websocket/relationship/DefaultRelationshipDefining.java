@@ -95,21 +95,21 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionsMap.entrySet().iterator();
         //获取用户Id
         keySessionsMap.forEach((k, v) -> {
-            String userId = "";
             if (matcher.match(SIT_MSG_KEY_PATH, k)) {
                 Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, k);
                 String code = map.get("code");
                 if (SITE_MSG_CODE.equals(code)) {
-                    userId = map.get("id");
+                    String userId = map.get("id");
+                    LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
+                    //在线人数-1,发消息
+                    Integer origin = getOnlineCount();
+                    subOnlineCount(userId, delSession.getId());
+                    if (!getOnlineCount().equals(origin)) {
+                        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+                    }
                 }
             }
-            //在线人数-1,发消息
-            subOnlineCount(userId, delSession.getId());
-            LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
-            webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
         });
-
-
         while (it.hasNext()) {
             Map.Entry<String, Set<WebSocketSession>> next = it.next();
             Set<WebSocketSession> sessions = next.getValue();
