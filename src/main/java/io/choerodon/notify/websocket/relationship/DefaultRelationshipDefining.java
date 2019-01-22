@@ -1,8 +1,7 @@
 package io.choerodon.notify.websocket.relationship;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
+import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.websocket.register.RedisChannelRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
 
-import io.choerodon.notify.api.service.WebSocketSendService;
-import io.choerodon.notify.websocket.register.RedisChannelRegister;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultRelationshipDefining implements RelationshipDefining {
 
@@ -104,29 +103,25 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
         Iterator<Map.Entry<String, Set<WebSocketSession>>> it = keySessionsMap.entrySet().iterator();
         //获取用户Id
         keySessionsMap.forEach((k, v) -> {
-            String userId = "";
             if (matcher.match(SIT_MSG_KEY_PATH, k)) {
                 Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, k);
                 String code = map.get("code");
                 if (SITE_MSG_CODE.equals(code)) {
-                    userId = map.get("id");
+                    String userId = map.get("id");
                     LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
                     //在线人数-1,发消息
                     Integer origin = getOnlineCount();
                     subOnlineCount(userId, delSession.getId());
-                    if (getOnlineCount() != origin) {
+                    if (!getOnlineCount().equals(origin)) {
                         webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
                     }
                 }
             }
-
         });
-
-
         while (it.hasNext()) {
             Map.Entry<String, Set<WebSocketSession>> next = it.next();
             Set<WebSocketSession> sessions = next.getValue();
-            sessions.removeIf(t -> t.equals(delSession));
+            sessions.removeIf(t -> t.getId().equals(delSession.getId()));
             if (sessions.isEmpty()) {
                 it.remove();
                 redisTemplate.opsForSet().remove(redisChannelRegister.channelName(), next.getKey());
