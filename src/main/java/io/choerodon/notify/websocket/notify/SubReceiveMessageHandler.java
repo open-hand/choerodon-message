@@ -77,7 +77,7 @@ public class SubReceiveMessageHandler implements ReceiveMsgHandler<String> {
                     Integer originCount = defaultRelationshipDefining.getOnlineCount();
                     defaultRelationshipDefining.addNumberOfVisitorsToday(id);
                     defaultRelationshipDefining.addOnlineCount(id, session.getId());
-                    if (defaultRelationshipDefining.getOnlineCount() != originCount) {
+                    if (!originCount.equals(defaultRelationshipDefining.getOnlineCount())) {
                         webSocketSendService.sendVisitorsInfo(defaultRelationshipDefining.getOnlineCount(),
                                 defaultRelationshipDefining.getNumberOfVisitorsToday());
                     }

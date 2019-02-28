@@ -5,18 +5,13 @@ import io.choerodon.notify.websocket.handshake.AuthHandshakeInterceptor;
 import io.choerodon.notify.websocket.handshake.WebSocketHandshakeInterceptor;
 import io.choerodon.notify.websocket.notify.ReceiveRedisMessageListener;
 import io.choerodon.notify.websocket.register.RedisChannelRegister;
-import io.choerodon.notify.websocket.relationship.DefaultRelationshipDefining;
-import io.choerodon.notify.websocket.relationship.RelationshipDefining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -32,7 +27,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
 @EnableWebSocket
-@EnableConfigurationProperties(ChoerodonWebSocketProperties.class)
 public class ChoerodonWebSocketConfigure implements WebSocketConfigurer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChoerodonWebSocketConfigure.class);
@@ -81,14 +75,4 @@ public class ChoerodonWebSocketConfigure implements WebSocketConfigurer {
 
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public RelationshipDefining relationshipDefiningInter(StringRedisTemplate redisTemplate, RedisChannelRegister redisChannelRegister) {
-        return new DefaultRelationshipDefining(redisTemplate, redisChannelRegister);
-    }
-
-    @Bean(name = "registerHeartBeat")
-    public ScheduledExecutorService registerHeartBeat() {
-        return Executors.newScheduledThreadPool(1);
-    }
 }

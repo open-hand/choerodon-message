@@ -9,6 +9,7 @@ spring:
       charset: UTF-8
       force: true
       enabled: true
+  servlet:
     multipart:
       max-file-size: 30MB
       max-request-size: 30MB
@@ -63,8 +64,9 @@ choerodon:
   schedule:
     consumer:
       enabled: true # 启用任务调度消费端
-      thread-num: 3 # 任务调度消费线程数
       poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
+      core-thread-num: 1
+      max-thread-num: 2
   notify:
     init-spring-email-config: true # 是否根据spring.mail的配置初始化email配置
   ws:

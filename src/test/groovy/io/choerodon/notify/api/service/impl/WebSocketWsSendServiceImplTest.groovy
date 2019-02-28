@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.exception.CommonException
+import io.choerodon.notify.api.service.VisitorsInfoObservable
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
@@ -23,7 +24,7 @@ class WebSocketWsSendServiceImplTest extends Specification {
     private WebSocketSendService webSocketSendService =
             new WebSocketWsSendServiceImpl(templateRender,
                     templateMapper, messageSender,
-                    siteMsgRecordMapper, redisTemplate)
+                    siteMsgRecordMapper, redisTemplate, Mock(VisitorsInfoObservable))
 
     def "Send"() {
         given: "构造参数"

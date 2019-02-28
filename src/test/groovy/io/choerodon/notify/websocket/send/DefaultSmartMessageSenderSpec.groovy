@@ -58,7 +58,9 @@ class DefaultSmartMessageSenderSpec extends Specification {
 
     def "SendWebSocket1"() {
         given: "构造参数"
-        WebSocketSession session = Mock(WebSocketSession)
+        WebSocketSession session = Mock(WebSocketSession) {
+            isOpen() >> true
+        }
 
         when: "调用方法"
         messageSender.sendWebSocket(session, "json")

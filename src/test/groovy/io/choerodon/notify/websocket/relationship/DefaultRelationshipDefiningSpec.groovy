@@ -1,5 +1,6 @@
 package io.choerodon.notify.websocket.relationship
 
+import io.choerodon.notify.api.service.VisitorsInfoObservable
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.websocket.register.RedisChannelRegister
 import org.springframework.data.redis.core.SetOperations
@@ -18,7 +19,7 @@ class DefaultRelationshipDefiningSpec extends Specification {
     private RedisChannelRegister redisChannelRegister = Mock(RedisChannelRegister)
     private WebSocketSendService webSocketSendService=Mock(WebSocketSendService)
     private DefaultRelationshipDefining relationshipDefining =
-            new DefaultRelationshipDefining(redisTemplate, redisChannelRegister)
+            new DefaultRelationshipDefining(redisTemplate, redisChannelRegister, Mock(VisitorsInfoObservable))
 
     def "GetWebSocketSessionsByKey"() {
         when: "调用方法"
@@ -72,27 +73,11 @@ class DefaultRelationshipDefiningSpec extends Specification {
         set.add(session)
         keySessionsMap.put("iam-service", set)
 
-        relationshipDefining.setWebSocketWsSendService(webSocketSendService)
-
 
         when: "调用方法[null]"
         relationshipDefining.removeWebSocketSessionContact(null)
         then: "校验结果"
         noExceptionThrown()
 
-        when: "调用方法"
-        relationshipDefining.removeWebSocketSessionContact(session)
-        then: "校验结果"
-        noExceptionThrown()
-
-        when: "调用方法"
-        Field field = relationshipDefining.getClass().getDeclaredField("keySessionsMap")
-        field.setAccessible(true)
-        field.set(relationshipDefining, keySessionsMap)
-        relationshipDefining.removeWebSocketSessionContact(session)
-        then: "校验结果"
-        noExceptionThrown()
-        redisTemplate.opsForSet() >> setOperations
-        redisTemplate.keys(_) >> new HashSet<String>()
     }
 }
