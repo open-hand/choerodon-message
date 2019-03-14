@@ -1,20 +1,12 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import freemarker.template.TemplateException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.stereotype.Service;
-
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.DefaultAutowiredField;
 import io.choerodon.notify.api.pojo.PmType;
+import io.choerodon.notify.api.pojo.VisitorsInfo;
+import io.choerodon.notify.api.service.VisitorsInfoObservable;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.SiteMsgRecord;
@@ -23,9 +15,18 @@ import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.websocket.send.MessageSender;
 import io.choerodon.notify.websocket.send.WebSocketSendPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service("pmWsSendService")
-public class WebSocketWsSendServiceImpl implements WebSocketSendService {
+public class WebSocketWsSendServiceImpl implements WebSocketSendService, Observer {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketSendService.class);
     public static final String MSG_TYPE_PM = "site-msg";
     public static final String ONLINE_INFO_TYPE = "online-info";
@@ -39,16 +40,19 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     private StringRedisTemplate redisTemplate;
 
+
     public WebSocketWsSendServiceImpl(TemplateRender templateRender,
                                       TemplateMapper templateMapper,
                                       MessageSender messageSender,
                                       SiteMsgRecordMapper siteMsgRecordMapper,
-                                      StringRedisTemplate redisTemplate) {
+                                      StringRedisTemplate redisTemplate,
+                                      VisitorsInfoObservable visitorsInfoObservable) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
         this.redisTemplate = redisTemplate;
+        visitorsInfoObservable.addObserver(this);
     }
 
     @Override
@@ -109,7 +113,6 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         messageSender.sendByKey(key, code, message);
     }
 
-
     @Override
     public void sendVisitorsInfo(Integer currentOnlines, Integer numberOfVisitorsToday) {
         Map<String, Object> visitorsInfo = new HashMap<>();
@@ -137,5 +140,13 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         visitorsInfo.put("data", data);
         String key = "choerodon:msg:online-info";
         messageSender.sendByKey(key, new WebSocketSendPayload<>(ONLINE_INFO_TYPE, key, visitorsInfo));
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (arg instanceof VisitorsInfo) {
+            VisitorsInfo info = (VisitorsInfo) arg;
+            this.sendVisitorsInfo(info.currentOnlines, info.numberOfVisitorsToday);
+        }
     }
 }

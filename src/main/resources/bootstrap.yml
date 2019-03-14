@@ -13,14 +13,8 @@ spring:
       uri: localhost:8010
       enabled: false
 management:
-  port: 18086
-  security:
-    enabled: false
+  server:
+    port: 18086
   health:
     mail:
       enabled: false
-security:
-  basic:
-    enabled: false
-  ignored: /choerodon:msg/**, /choerodon/**
-

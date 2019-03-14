@@ -18,7 +18,9 @@ class SubReceiveSitMsgHandlerSpec extends Specification {
 
     private WebSocketSendService webSocketSendService = Mock(WebSocketSendService)
 
-    private DefaultRelationshipDefining defaultRelationshipDefining = Mock(DefaultRelationshipDefining)
+    private DefaultRelationshipDefining defaultRelationshipDefining = Mock(DefaultRelationshipDefining) {
+        getOnlineCount() >> 1
+    }
     private SubReceiveMessageHandler subReceiveSitMsgHandler =
             new SubReceiveMessageHandler(relationshipDefining, messageSender, siteMsgRecordMapper, webSocketSendService, defaultRelationshipDefining)
 

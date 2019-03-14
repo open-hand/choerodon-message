@@ -1,11 +1,12 @@
 package io.choerodon.notify.websocket.relationship;
 
-import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.api.pojo.VisitorsInfo;
+import io.choerodon.notify.api.service.VisitorsInfoObservable;
 import io.choerodon.notify.websocket.register.RedisChannelRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketSession;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelationshipDefining.class);
@@ -32,17 +34,14 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
 
     private static final String ONLINE_COUNT = "OnlineCount";
 
-    @Autowired
-    private WebSocketSendService webSocketWsSendService;
-
-    public void setWebSocketWsSendService(WebSocketSendService webSocketWsSendService) {
-        this.webSocketWsSendService = webSocketWsSendService;
-    }
+    private VisitorsInfoObservable visitorsInfoObservable;
 
     public DefaultRelationshipDefining(StringRedisTemplate redisTemplate,
-                                       RedisChannelRegister redisChannelRegister) {
+                                       RedisChannelRegister redisChannelRegister,
+                                       VisitorsInfoObservable visitorsInfoObservable) {
         this.redisTemplate = redisTemplate;
         this.redisChannelRegister = redisChannelRegister;
+        this.visitorsInfoObservable = visitorsInfoObservable;
     }
 
 
@@ -113,7 +112,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
                     Integer origin = getOnlineCount();
                     subOnlineCount(userId, delSession.getId());
                     if (!getOnlineCount().equals(origin)) {
-                        webSocketWsSendService.sendVisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday());
+                        visitorsInfoObservable.sendEvent(new VisitorsInfo(getOnlineCount(), getNumberOfVisitorsToday()));
                     }
                 }
             }
