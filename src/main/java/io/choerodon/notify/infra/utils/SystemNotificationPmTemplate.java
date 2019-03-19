@@ -9,7 +9,7 @@ import io.choerodon.core.notify.PmTemplate;
 @NotifyBusinessType(code = "systemNotification", name = "系统公告", level = Level.SITE,
         description = "系统全平台公告", isManualRetry = true)
 @Component
-public class SystemNotificationTemplate implements PmTemplate {
+public class SystemNotificationPmTemplate implements PmTemplate {
     @Override
     public String businessTypeCode() {
         return "systemNotification";
