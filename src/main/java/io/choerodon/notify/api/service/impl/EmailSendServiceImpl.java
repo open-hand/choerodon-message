@@ -34,7 +34,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +80,7 @@ public class EmailSendServiceImpl implements EmailSendService {
 
     @Override
     public void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSetting sendSetting) {
+        LOGGER.trace("SendEmail code:{} to users: {}", code, targetUsers);
         io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         validatorEmailTemplate(template);
         targetUsers.forEach(user -> {

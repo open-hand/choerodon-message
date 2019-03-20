@@ -73,4 +73,15 @@ public class UserDTO {
     public int hashCode() {
         return Objects.hash(id, loginName, realName, imageUrl, email);
     }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "id=" + id +
+                ", loginName='" + loginName + '\'' +
+                ", realName='" + realName + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
