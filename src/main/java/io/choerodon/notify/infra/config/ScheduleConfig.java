@@ -23,8 +23,7 @@ public class ScheduleConfig {
         return taskScheduler;
     }
 
-    @Bean
-    @Qualifier("notify-executor")
+    @Bean(name = "notify-executor")
     public AsyncTaskExecutor asyncSendNoticeExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix("send-notify-executor");
