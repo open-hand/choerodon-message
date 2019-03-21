@@ -8,7 +8,7 @@ import io.choerodon.core.notify.EmailTemplate;
 public class SystemNotificationEmailTemplate implements EmailTemplate {
     @Override
     public String businessTypeCode() {
-        return "systemNotification";
+        return "";
     }
 
     @Override
