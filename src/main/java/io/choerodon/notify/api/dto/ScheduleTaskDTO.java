@@ -171,7 +171,8 @@ public class ScheduleTaskDTO {
         this.executeStrategy = executeStrategy;
     }
 
-    public ScheduleTaskDTO() {
+    public ScheduleTaskDTO(Long methodId) {
+        this.methodId = methodId;
     }
 
     public ScheduleTaskDTO(Long methodId, Map<String, Object> params, String name, String description, Date startTime, Long[] assignUserIds) {
