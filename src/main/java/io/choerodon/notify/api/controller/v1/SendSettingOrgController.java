@@ -1,7 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -12,7 +13,6 @@ import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class SendSettingOrgController {
 
     @GetMapping("organizations/{organization_id}")
     @CustomPageRequest
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "组织层分页查询发送设置列表")
     public ResponseEntity<Page<SendSettingListDTO>> pageOrganization(@PathVariable("organization_id") long id,
                                                                      @ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
@@ -50,14 +50,14 @@ public class SendSettingOrgController {
     }
 
     @GetMapping("/names/organizations/{organization_id}")
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "组织层获取业务类型名称列表")
     public ResponseEntity<Set<BusinessTypeDTO>> listNames(@PathVariable("organization_id") long id) {
         return new ResponseEntity<>(sendSettingService.listNames(LEVEL_ORG), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/organizations/{organization_id}")
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "组织层查看发送设置详情")
     public ResponseEntity<SendSettingDetailDTO> query(@PathVariable("organization_id") long orgId,
                                                       @PathVariable Long id) {
@@ -65,7 +65,7 @@ public class SendSettingOrgController {
     }
 
     @PutMapping("/{id}/organizations/{organization_id}")
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "组织层更新发送设置")
     public ResponseEntity<SendSetting> update(@PathVariable("organization_id") long orgId,
                                               @PathVariable Long id,

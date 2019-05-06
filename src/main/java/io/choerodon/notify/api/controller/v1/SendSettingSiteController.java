@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.Valid;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -24,7 +25,6 @@ import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -38,7 +38,7 @@ public class SendSettingSiteController {
     }
 
     @GetMapping("/names")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层获取业务类型名称列表")
     public ResponseEntity<Set<BusinessTypeDTO>> listNames() {
         return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
@@ -46,7 +46,7 @@ public class SendSettingSiteController {
 
     @GetMapping
     @CustomPageRequest
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层分页查询发送设置列表")
     public ResponseEntity<Page<SendSettingListDTO>> pageSite(@ApiIgnore @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                              @RequestParam(required = false) String name,
@@ -58,14 +58,14 @@ public class SendSettingSiteController {
     }
 
     @GetMapping("/{id}")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层查看发送设置详情")
     public ResponseEntity<SendSettingDetailDTO> query(@PathVariable Long id) {
         return new ResponseEntity<>(sendSettingService.query(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层更新发送设置")
     public ResponseEntity<SendSetting> update(@PathVariable Long id,
                                               @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
@@ -81,7 +81,7 @@ public class SendSettingSiteController {
     }
 
     @DeleteMapping("/{id}")
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "根据Id删除发送设置")
     public ResponseEntity delSendSetting(@PathVariable Long id) {
         sendSettingService.delete(id);

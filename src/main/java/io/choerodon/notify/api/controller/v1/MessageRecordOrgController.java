@@ -1,7 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -9,7 +10,6 @@ import io.choerodon.notify.api.dto.RecordListDTO;
 import io.choerodon.notify.api.pojo.RecordQueryParam;
 import io.choerodon.notify.api.service.MessageRecordService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class MessageRecordOrgController {
         this.messageRecordService = messageRecordService;
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(type = ResourceType.ORGANIZATION)
     @GetMapping("/emails/organizations/{organization_id}")
     @ApiOperation(value = "组织层分页查询邮件消息记录")
     @CustomPageRequest
@@ -46,7 +46,7 @@ public class MessageRecordOrgController {
         return new ResponseEntity<>(messageRecordService.pageEmail(param), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @GetMapping("/emails/{id}/retry/organizations/{organization_id}")
     @ApiOperation(value = "组织层重试发送邮件")
     public void manualRetrySendEmail(@PathVariable long id,

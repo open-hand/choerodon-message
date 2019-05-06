@@ -1,11 +1,11 @@
 package io.choerodon.notify.api.controller.v1;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class NoticesSendController {
      */
     @PostMapping
     @ApiOperation(value = "发送邮件，站内信，短信")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     public void postNotice(@RequestBody NoticeSendDTO dto) {
         if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.postNotify.codeEmpty");
@@ -59,7 +59,7 @@ public class NoticesSendController {
 
     @PostMapping("/ws/{code}/{id}")
     @ApiOperation(value = "发送自定义消息到webSocket")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     public void postWebSocket(@PathVariable("code") String code,
                               @PathVariable("id") String id,
                               @RequestBody String message) {

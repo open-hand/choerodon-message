@@ -3,6 +3,8 @@ package io.choerodon.notify.api.controller.v1;
 import java.util.Date;
 import javax.validation.Valid;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,6 @@ import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 import io.choerodon.notify.api.service.SystemAnnouncementService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.choerodon.swagger.annotation.Permission;
 
 /**
  * @author dengyouquan, Eugen
@@ -38,7 +39,7 @@ public class SystemAnnouncementController {
         this.systemAnnouncementService = systemAnnouncementService;
     }
 
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementDTO> create(@RequestBody @Valid SystemAnnouncementDTO dto) {
@@ -55,7 +56,7 @@ public class SystemAnnouncementController {
         return new ResponseEntity<>(systemAnnouncementService.create(dto), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "分页查询系统公告")
     @CustomPageRequest
     @GetMapping("/all")
@@ -70,7 +71,7 @@ public class SystemAnnouncementController {
         return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, content, param, status, sendNotices), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "分页查询已发送的系统公告")
     @CustomPageRequest
     @GetMapping("/completed")
@@ -82,7 +83,7 @@ public class SystemAnnouncementController {
     }
 
 
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "查看系统公告详情")
     @GetMapping("/{id}")
     public ResponseEntity<SystemAnnouncementDTO> getDetail(@PathVariable("id") Long id) {
@@ -90,21 +91,21 @@ public class SystemAnnouncementController {
     }
 
 
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "删除系统公告")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
         systemAnnouncementService.delete(id);
     }
 
-    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "更新系统公告")
     @PutMapping("/update")
     public ResponseEntity<SystemAnnouncementDTO> update(@RequestBody @Validated SystemAnnouncementDTO dto) {
         return new ResponseEntity<>(systemAnnouncementService.update(dto, ResourceLevel.SITE, 0L), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "查询当前需悬浮显示的最新公告")
     @GetMapping("/new_sticky")
     public ResponseEntity<SystemAnnouncementDTO> getNewSticky() {
