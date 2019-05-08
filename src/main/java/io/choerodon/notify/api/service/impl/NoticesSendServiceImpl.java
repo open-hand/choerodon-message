@@ -64,15 +64,31 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
         boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
+        boolean haveSMSTemplate = sendSetting.getSmsTemplateId() != null;
         //如果没有任何模板，则不发起feign调用
-        if (!haveEmailTemplate && !havePmTemplate) {
-            LOGGER.info("sendSetting '{}' no opposite email template and pm template, can`t send notice.", dto.getCode());
+        if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate) {
+            LOGGER.info("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
         //取得需要发送通知用户
         Set<UserDTO> users = getNeedSendUsers(dto);
-        trySendEmail(dto, sendSetting, users, haveEmailTemplate);
-        trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
+        boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
+        if (doCustomizedSending) {
+            if (dto.isSendingEmail()) {
+                trySendEmail(dto, sendSetting, users, haveEmailTemplate);
+            }
+            if (dto.isSendingSiteMessage()) {
+                trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
+            }
+            if (dto.isSendingSMS()) {
+                //todo sending SMS
+            }
+
+        } else {
+            trySendEmail(dto, sendSetting, users, haveEmailTemplate);
+            trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
+            //todo sending SMS
+        }
     }
 
     private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
