@@ -1,10 +1,8 @@
 package io.choerodon.notify.api.controller.v1
 
 import io.choerodon.notify.IntegrationTestConfiguration
-import io.choerodon.notify.api.dto.EmailConfigDTO
 import io.choerodon.notify.api.dto.NoticeSendDTO
 import io.choerodon.notify.api.dto.UserDTO
-import io.choerodon.notify.api.service.NoticesSendService
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.api.service.impl.NoticesSendServiceImpl
 import io.choerodon.notify.domain.Config
@@ -67,10 +65,10 @@ class NoticesSendControllerSpec extends Specification {
         def userId = 1L
         NoticeSendDTO noticeSendDTO = new NoticeSendDTO()
         noticeSendDTO.setCode("addUser")
-        NoticeSendDTO.User user = new NoticeSendDTO.User()
+        io.choerodon.core.notify.NoticeSendDTO.User user = new io.choerodon.core.notify.NoticeSendDTO.User()
         user.setId(1L)
         noticeSendDTO.setFromUser(user)
-        List<NoticeSendDTO.User> users = new ArrayList<>()
+        List<io.choerodon.core.notify.NoticeSendDTO.User> users = new ArrayList<>()
         users.add(user)
         noticeSendDTO.setTargetUsers(users)
         Map<String, Object> paramsMap = new HashMap<>()
