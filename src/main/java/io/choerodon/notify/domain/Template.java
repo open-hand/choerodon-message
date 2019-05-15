@@ -1,11 +1,11 @@
 package io.choerodon.notify.domain;
 
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
+
+import io.choerodon.mybatis.entity.BaseDTO;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,13 +13,11 @@ import javax.persistence.Table;
  * 消息模板实体
  * 包括邮件,站内信模板和短信模版
  */
-@ModifyAudit
-@VersionAudit
 @Table(name = "notify_template")
-public class Template extends AuditDomain {
+public class Template extends BaseDTO {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String code;

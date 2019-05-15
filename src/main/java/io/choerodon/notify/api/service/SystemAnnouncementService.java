@@ -1,9 +1,8 @@
 package io.choerodon.notify.api.service;
 
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 
 /**
@@ -32,13 +31,14 @@ public interface SystemAnnouncementService {
     /**
      * 分页查询系统公告
      *
-     * @param pageRequest
+     * @param page
+     * @param size
      * @param title
      * @param content
      * @param param
      * @return 分页结果
      */
-    Page<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String content, String param, String status, Boolean sendNotices);
+    PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String param, String status, Boolean sendNotices);
 
     /**
      * 根据id获取系统公告详情

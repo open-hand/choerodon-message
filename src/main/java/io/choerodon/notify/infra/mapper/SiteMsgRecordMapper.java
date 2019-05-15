@@ -1,6 +1,6 @@
 package io.choerodon.notify.infra.mapper;
 
-import io.choerodon.mybatis.common.BaseMapper;
+import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam;
 import io.choerodon.notify.domain.SiteMsgRecord;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author dengyouquan
  **/
-public interface SiteMsgRecordMapper extends BaseMapper<SiteMsgRecord> {
+public interface SiteMsgRecordMapper extends Mapper<SiteMsgRecord> {
 
     List<SiteMsgRecordDTO> fulltextSearch(@Param("query") SiteMsgRecordQueryParam siteMsgRecordQueryParam);
 

@@ -1,26 +1,19 @@
 package io.choerodon.notify.domain;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.mybatis.entity.BaseDTO;
 import io.choerodon.notify.api.pojo.PmType;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * @author dengyouquan
  * 站内信消息记录表
  **/
-@ModifyAudit
-@VersionAudit
 @Table(name = "notify_sitemsg_record")
-public class SiteMsgRecord extends AuditDomain {
+public class SiteMsgRecord extends BaseDTO {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long userId;

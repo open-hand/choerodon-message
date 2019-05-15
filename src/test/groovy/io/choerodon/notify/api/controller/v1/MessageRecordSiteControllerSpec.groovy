@@ -49,7 +49,11 @@ class MessageRecordSiteControllerSpec extends Specification {
             }
 
             when: ""
-            def num = recordMapper.insertList(records)
+            int num = 0
+            for (Record record: records) {
+                num++
+                recordMapper.insert(record)
+            }
 
             then: ""
             num == count

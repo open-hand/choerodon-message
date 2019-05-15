@@ -3,22 +3,19 @@ package io.choerodon.notify.api.controller.v1;
 import java.util.Date;
 import javax.validation.Valid;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.constant.PageConstant;
 import io.choerodon.base.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 import io.choerodon.notify.api.service.SystemAnnouncementService;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -50,7 +47,7 @@ public class SystemAnnouncementController {
         if (dto.getSendDate() == null) {
             dto.setSendDate(new Date());
         }
-        if(dto.getSticky()!=null && dto.getSticky() && dto.getEndDate()==null){
+        if (dto.getSticky() != null && dto.getSticky() && dto.getEndDate() == null) {
             throw new CommonException("error.create.system.announcement.endDate.is.null");
         }
         return new ResponseEntity<>(systemAnnouncementService.create(dto), HttpStatus.OK);
@@ -58,27 +55,24 @@ public class SystemAnnouncementController {
 
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "分页查询系统公告")
-    @CustomPageRequest
     @GetMapping("/all")
-    public ResponseEntity<Page<SystemAnnouncementDTO>> pagingQuery(@ApiIgnore
-                                                                   @SortDefault(value = "send_date", direction = Sort.Direction.DESC)
-                                                                           PageRequest pageRequest,
-                                                                   @RequestParam(required = false) String title,
-                                                                   @RequestParam(required = false) String content,
-                                                                   @RequestParam(required = false) String status,
-                                                                   @RequestParam(required = false) Boolean sendNotices,
-                                                                   @RequestParam(required = false) String param) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, content, param, status, sendNotices), HttpStatus.OK);
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
+                                                                       @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+                                                                       @RequestParam(required = false) String title,
+                                                                       @RequestParam(required = false) String content,
+                                                                       @RequestParam(required = false) String status,
+                                                                       @RequestParam(required = false) Boolean sendNotices,
+                                                                       @RequestParam(required = false) String param) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(page, size, title, content, param, status, sendNotices), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "分页查询已发送的系统公告")
     @CustomPageRequest
     @GetMapping("/completed")
-    public ResponseEntity<Page<SystemAnnouncementDTO>> pagingQueryCompleted(@ApiIgnore
-                                                                   @SortDefault(value = "send_date", direction = Sort.Direction.DESC)
-                                                                           PageRequest pageRequest) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null, null, null,
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
+                                                                                @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(page, size, null, null, null,
                 SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value(), null), HttpStatus.OK);
     }
 

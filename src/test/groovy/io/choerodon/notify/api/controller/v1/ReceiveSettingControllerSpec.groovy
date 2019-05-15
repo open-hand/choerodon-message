@@ -65,10 +65,14 @@ class ReceiveSettingControllerSpec extends Specification {
             }
 
             when: "插入数据"
-            int result = mapper.insertList(settingList)
+            int num = 0
+            for (ReceiveSetting receiveSetting: settingList) {
+                mapper.insert(receiveSetting)
+                num++
+            }
 
             then: "校验参数"
-            result == count
+            num == count
         }
     }
 

@@ -1,23 +1,18 @@
 package io.choerodon.notify.domain;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import io.choerodon.mybatis.entity.BaseDTO;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 /**
  * @author dengyouquan
  **/
-@ModifyAudit
-@VersionAudit
 @Table(name = "notify_receive_setting")
-public class ReceiveSetting {
+public class ReceiveSetting extends BaseDTO {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long sendSettingId;
     private String messageType;

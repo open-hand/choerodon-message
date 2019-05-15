@@ -3,6 +3,8 @@ package io.choerodon.notify.api.service.impl;
 
 import java.util.*;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +12,9 @@ import org.springframework.stereotype.Component;
 
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
-import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 import io.choerodon.notify.api.service.SystemAnnouncementService;
@@ -116,9 +115,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
 
     @Override
-    public Page<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String content, String param, String status, Boolean sendNotices) {
-        return PageHelper.doPageAndSort(pageRequest, () ->
-                announcementMapper.fulltextSearch(title, content, status, sendNotices, param));
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String param, String status, Boolean sendNotices) {
+        return PageHelper.startPage(page, size)
+                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, content, status, sendNotices, param));
+
     }
 
     @Override

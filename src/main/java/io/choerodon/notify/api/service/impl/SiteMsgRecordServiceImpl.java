@@ -1,8 +1,7 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.notify.api.dto.OrganizationDTO;
 import io.choerodon.notify.api.dto.ProjectDTO;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
@@ -48,13 +47,12 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
     }
 
     @Override
-    public Page<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, PageRequest pageRequest) {
-        Page<SiteMsgRecordDTO> recordPage = PageHelper.doPageAndSort(pageRequest, () ->
-                siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
-        List<SiteMsgRecordDTO> records = recordPage.getContent();
+    public PageInfo<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, int page, int size) {
+        PageInfo<SiteMsgRecordDTO> result = PageHelper.startPage(page, size).doSelectPageInfo(() -> siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
+        List<SiteMsgRecordDTO> records = result.getList();
         Map<String, Set<Long>> senderMap = getSenderMap(records);
         processSendBy(records, senderMap);
-        return recordPage;
+        return result;
     }
 
     private void processSendBy(List<SiteMsgRecordDTO> records, Map<String, Set<Long>> senderMap) {
@@ -148,6 +146,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
+    @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void insertRecord(Template template, String pmContent, Long[] ids) {
         AtomicInteger count = new AtomicInteger();

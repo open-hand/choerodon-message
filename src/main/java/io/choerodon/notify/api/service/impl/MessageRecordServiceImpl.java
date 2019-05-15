@@ -1,9 +1,9 @@
 package io.choerodon.notify.api.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.notify.api.dto.RecordListDTO;
 import io.choerodon.notify.api.pojo.RecordQueryParam;
 import io.choerodon.notify.api.pojo.RecordSendData;
@@ -36,9 +36,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     }
 
     @Override
-    public Page<RecordListDTO> pageEmail(final RecordQueryParam query) {
-        return PageHelper.doPageAndSort(query.getPageRequest(), () ->
-                recordMapper.fulltextSearchEmail(query));
+    public PageInfo<RecordListDTO> pageEmail(final RecordQueryParam query, int page, int size) {
+        return PageHelper.startPage(page, size).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(query));
     }
 
     @Override

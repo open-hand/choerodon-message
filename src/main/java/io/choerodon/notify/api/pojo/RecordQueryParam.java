@@ -1,9 +1,7 @@
 package io.choerodon.notify.api.pojo;
 
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 public class RecordQueryParam {
-    private PageRequest pageRequest;
     private String status;
     private String email;
     private String templateType;
@@ -25,14 +23,6 @@ public class RecordQueryParam {
         this.failedReason = failedReason;
         this.params = params;
         this.level = level;
-    }
-
-    public PageRequest getPageRequest() {
-        return pageRequest;
-    }
-
-    public void setPageRequest(PageRequest pageRequest) {
-        this.pageRequest = pageRequest;
     }
 
     public String getStatus() {

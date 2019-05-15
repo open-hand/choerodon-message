@@ -2,12 +2,12 @@ package io.choerodon.notify.domain;
 
 import java.util.Date;
 
-import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.mybatis.entity.BaseDTO;
 
 /**
  * feign 调用时候使用
  */
-public class QuartzTask extends AuditDomain {
+public class QuartzTask extends BaseDTO {
 
     private Long id;
 

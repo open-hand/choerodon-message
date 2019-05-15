@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-mybatis-mapper</artifactId>
+            <artifactId>choerodon-starter-mybatis</artifactId>
             <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
@@ -85,6 +85,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>1.5.9.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
         <!--mail-->

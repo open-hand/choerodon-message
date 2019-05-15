@@ -1,24 +1,17 @@
 package io.choerodon.notify.domain;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.mybatis.entity.BaseDTO;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 消息业务类型
  */
-@ModifyAudit
-@VersionAudit
 @Table(name = "notify_send_setting")
-public class SendSetting extends AuditDomain {
+public class SendSetting extends BaseDTO {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String code;

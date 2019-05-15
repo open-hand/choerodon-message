@@ -32,6 +32,7 @@
             status LIKE concat(concat('%',#{param}), '%')
             )
         </if>
+        order by send_date desc
     </select>
 
     <select id="selectLastestSticky" resultMap="systemAnnouncementDTO">
