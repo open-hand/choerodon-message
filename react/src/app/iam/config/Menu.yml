@@ -5,13 +5,13 @@
   site:
     - "send-setting":
         icon: mail_set
-        Routes: /notify/send-setting
+        Routes: /iam/send-setting
         sort: 1
         permission:
         - 'notify-service.send-setting-site.pageSite'
     - "mail-template":
         icon: application_model
-        Routes: /notify/mail-template
+        Routes: /iam/mail-template
         sort: 2
         permission:
         - 'notify-service.email-template-site.pageSite'
@@ -21,7 +21,7 @@
         - 'notify-service.send-setting-site.listNames'
     - "inmail-template":
         icon: inmail_template
-        Routes: /notify/inmail-template
+        Routes: /iam/inmail-template
         sort: 3
         permission:
         - 'notify-service.pm-template-site.pageSite'
@@ -31,7 +31,7 @@
         - 'notify-service.send-setting-site.listNames'
     - "mail-setting":
         icon: contact_mail
-        Routes: /notify/mail-setting
+        Routes: /iam/mail-setting
         sort: 4
         permission:
         - 'notify-service.config.selectEmail'
@@ -39,13 +39,13 @@
         - 'notify-service.config.updateEmail'
     - "msg-record":
         icon: speaker_notes
-        Routes: /notify/msg-record
+        Routes: /iam/msg-record
         sort: 5
         permission:
         - 'notify-service.message-record-site.pageEmail'
     - "announcement":
         icon: volume_up
-        Routes: /notify/announcement
+        Routes: /iam/announcement
         sort: 6
         permission:
         - 'notify-service.system-announcement.pagingQuery'
@@ -60,7 +60,7 @@
   user:
     - "user-msg":
         icon: message_notification
-        Routes: /notify/user-msg
+        Routes: /iam/user-msg
         sort: 6
         permission:
           - 'notify-service.site-msg-record.pagingQuery'
@@ -69,7 +69,7 @@
           - 'notify-service.system-announcement.pagingQueryCompleted'
     - "receive-setting":
         icon: settings
-        Routes: /notify/receive-setting
+        Routes: /iam/receive-setting
         sort: 7
         permission:
           - 'notify-service.receive-setting.queryByUserId'
