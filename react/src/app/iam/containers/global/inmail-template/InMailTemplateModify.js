@@ -72,7 +72,7 @@ export default class InMailTemplateModify extends Component {
       } else {
         InMailTemplateStore.setCurrentDetail(data);
         this.setState({
-          editorContent: data.content,
+          editorContent: data.list,
         });
       }
     });

@@ -72,7 +72,7 @@ export default class MailTemplateModify extends Component {
       } else {
         MailTemplateStore.setCurrentDetail(data);
         this.setState({
-          editorContent: data.content,
+          editorContent: data.list,
         });
       }
     });
