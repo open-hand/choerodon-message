@@ -105,7 +105,7 @@ export default class SendSetting extends Component {
     }
 
     SendSettingStore.loadData(pagination, filters, sort, params, this.setting.type, this.setting.orgId).then((data) => {
-      SendSettingStore.setData(data.content);
+      SendSettingStore.setData(data.list);
       this.setState({
         pagination: {
           current: data.pageNum,

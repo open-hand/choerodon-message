@@ -112,9 +112,9 @@ class AnnouncementStore {
       params: params.join(','),
       sort: sorter.join(','),
     })}`)
-      .then(action(({ failed, content, total }) => {
+      .then(action(({ failed, list, total }) => {
         if (!failed) {
-          this.announcementData = content;
+          this.announcementData = list;
           this.announcementData.forEach((data) => {
             data.textContent = htmlDecode(data.content.replace(imgPartten, '[图片]').replace(htmlTagParttrn, ''));
           });
