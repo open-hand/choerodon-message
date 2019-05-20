@@ -11,6 +11,7 @@ import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.ReceiveSetting;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.enums.SenderType;
+import io.choerodon.notify.infra.feign.SmsFeignClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,16 +35,20 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private SendSettingMapper sendSettingMapper;
     private UserFeignClient userFeignClient;
 
+    private SmsFeignClient smsFeignClient;
+
     public NoticesSendServiceImpl(EmailSendService emailSendService,
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService,
                                   ReceiveSettingMapper receiveSettingMapper,
                                   SendSettingMapper sendSettingMapper,
-                                  UserFeignClient userFeignClient) {
+                                  UserFeignClient userFeignClient,
+                                  SmsFeignClient smsFeignClient) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
         this.receiveSettingMapper = receiveSettingMapper;
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
+        this.smsFeignClient = smsFeignClient;
     }
 
     //单元测试
@@ -70,9 +76,16 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
-        //取得需要发送通知用户
-        Set<UserDTO> users = getNeedSendUsers(dto);
+
         boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
+        if (dto.isSendingSMS()) {
+            smsFeignClient.send(dto);
+        }
+        //取得需要发送通知用户
+        if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
+            return;
+        }
+        Set<UserDTO> users = getNeedSendUsers(dto);
         if (doCustomizedSending) {
             if (dto.isSendingEmail()) {
                 trySendEmail(dto, sendSetting, users, haveEmailTemplate);
@@ -80,14 +93,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             if (dto.isSendingSiteMessage()) {
                 trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
             }
-            if (dto.isSendingSMS()) {
-                //todo sending SMS
-            }
-
         } else {
             trySendEmail(dto, sendSetting, users, haveEmailTemplate);
             trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
-            //todo sending SMS
         }
     }
 

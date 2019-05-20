@@ -1,5 +1,6 @@
-package io.choerodon.notify.infra.feign;
+package io.choerodon.notify.infra.feign.fallback;
 
+import io.choerodon.notify.infra.feign.AsgardFeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
