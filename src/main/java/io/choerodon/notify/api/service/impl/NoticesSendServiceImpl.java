@@ -63,6 +63,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void sendNotice(NoticeSendDTO dto) {
+        if (dto.isSendingSMS()) {
+            smsFeignClient.send(dto);
+        }
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
             LOGGER.info("no sendSetting : {}, can`t send notice.", dto.getCode());
@@ -76,11 +79,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             LOGGER.info("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
-
         boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
-        if (dto.isSendingSMS()) {
-            smsFeignClient.send(dto);
-        }
+
         //取得需要发送通知用户
         if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
             return;

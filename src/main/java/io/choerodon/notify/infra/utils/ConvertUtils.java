@@ -50,15 +50,19 @@ public class ConvertUtils {
         template.setName(scanData.getName());
         template.setIsPredefined(true);
         template.setBusinessType(scanData.getBusinessType());
-        if(scanData.getType().equals(NotifyType.EMAIL.getValue())){
+        if (scanData.getType().equals(NotifyType.EMAIL.getValue())) {
             template.setEmailTitle(scanData.getTitle());
             template.setMessageType(MessageType.EMAIL.getValue());
             template.setEmailContent(scanData.getContent());
         }
-        if(scanData.getType().equals(NotifyType.PM.getValue())){
+        if (scanData.getType().equals(NotifyType.PM.getValue())) {
             template.setPmTitle(scanData.getTitle());
             template.setMessageType(MessageType.PM.getValue());
             template.setPmContent(scanData.getContent());
+        }
+        if (scanData.getType().equals(NotifyType.SMS.getValue())) {
+            template.setMessageType(NotifyType.SMS.getValue());
+            template.setSmsContent(scanData.getContent());
         }
         return template;
     }
