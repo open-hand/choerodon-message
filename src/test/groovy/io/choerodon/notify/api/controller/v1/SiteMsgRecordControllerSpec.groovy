@@ -56,7 +56,11 @@ class SiteMsgRecordControllerSpec extends Specification {
             }
 
             when: "调用方法"
-            def num = recordMapper.insertList(records)
+            int num = 0
+            for (SiteMsgRecord siteMsgRecord: records) {
+                recordMapper.insert(siteMsgRecord)
+                num++
+            }
 
             then: "校验插入是否成功"
             num == count

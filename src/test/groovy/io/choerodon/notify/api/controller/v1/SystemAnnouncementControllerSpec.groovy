@@ -63,7 +63,7 @@ class SystemAnnouncementControllerSpec extends Specification {
         then: "无异常抛出，状态码正确"
         noExceptionThrown()
         page.statusCode.is2xxSuccessful()
-        1 * systemAnnouncementService.pagingQuery(_, _, _, _, _, _)
+        1 * systemAnnouncementService.pagingQuery(_, _, _, _, _, _,_)
     }
 
     def "GetDetail"() {

@@ -43,6 +43,7 @@
             rc.failed_reason LIKE concat(concat('%',#{query.params}),'%')
             )
         </if>
+        order by rc.id desc
     </select>
 
     <update id="updateRecordStatusAndIncreaseCount">

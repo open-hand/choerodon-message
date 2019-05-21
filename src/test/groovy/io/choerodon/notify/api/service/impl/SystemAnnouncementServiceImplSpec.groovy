@@ -3,8 +3,6 @@ package io.choerodon.notify.api.service.impl
 import io.choerodon.core.exception.CommonException
 import io.choerodon.core.iam.ResourceLevel
 import io.choerodon.core.oauth.DetailsHelper
-import io.choerodon.mybatis.pagehelper.domain.PageRequest
-import io.choerodon.mybatis.pagehelper.domain.Sort
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO
 import io.choerodon.notify.api.service.utils.SpockUtils
 import io.choerodon.notify.domain.QuartzTask
@@ -132,10 +130,8 @@ class SystemAnnouncementServiceImplSpec extends Specification {
         def status = "status"
         def sendNotices = false
         and: "构造pageRequest"
-        def order = new Sort.Order("send_date")
-        def pageRequest = new PageRequest(1, 2, new Sort(order))
         when: "方法调用"
-        systemAnnouncementService.pagingQuery(pageRequest, title, content, params, status, sendNotices)
+        systemAnnouncementService.pagingQuery(1,2, title, content, params, status, sendNotices)
         then: "结果比对"
         noExceptionThrown()
     }

@@ -1,8 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
-import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.notify.api.service.FileService;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "上传文件")
     @PostMapping
     public ResponseEntity<List<String>> uploadFile(HttpServletRequest request) {

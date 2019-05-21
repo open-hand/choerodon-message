@@ -1,6 +1,5 @@
 package io.choerodon.notify.api.pojo;
 
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author dengyouquan
@@ -19,17 +18,15 @@ public class SiteMsgRecordQueryParam {
 
     private Boolean deleted;
 
-    private PageRequest pageRequest;
 
     private String params;
 
     public SiteMsgRecordQueryParam() {
     }
 
-    public SiteMsgRecordQueryParam(Long userId, Boolean deleted, PageRequest pageRequest) {
+    public SiteMsgRecordQueryParam(Long userId, Boolean deleted) {
         this.userId = userId;
         this.deleted = deleted;
-        this.pageRequest = pageRequest;
     }
 
     public Long getId() {
@@ -78,14 +75,6 @@ public class SiteMsgRecordQueryParam {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public PageRequest getPageRequest() {
-        return pageRequest;
-    }
-
-    public void setPageRequest(PageRequest pageRequest) {
-        this.pageRequest = pageRequest;
     }
 
     public String getParams() {

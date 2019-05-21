@@ -1,11 +1,11 @@
 package io.choerodon.notify.api.controller.v1;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.service.ConfigService;
 import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class ConfigController {
     }
 
     @PostMapping("/email")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "创建邮箱配置")
     public ResponseEntity<EmailConfigDTO> createEmail(@RequestBody @Valid EmailConfigDTO config) {
         config.setObjectVersionNumber(null);
@@ -48,7 +48,7 @@ public class ConfigController {
     }
 
     @PutMapping("/email")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "更新邮箱配置")
     public ResponseEntity<EmailConfigDTO> updateEmail(@RequestBody EmailConfigDTO configDTO) {
         if (!StringUtils.isEmpty(configDTO.getAccount()) && !Pattern.matches(EMAIL_REGULAR_EXPRESSION, configDTO.getAccount())) {
@@ -64,14 +64,14 @@ public class ConfigController {
     }
 
     @GetMapping("/email")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "查询邮箱配置")
     public ResponseEntity<EmailConfigDTO> selectEmail() {
         return new ResponseEntity<>(configService.selectEmail(), HttpStatus.OK);
     }
 
     @PostMapping("/email/test")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "测试邮箱连接")
     public void testEmailConnect(@RequestBody @Valid EmailConfigDTO config) {
         if (config.getSsl() == null) {

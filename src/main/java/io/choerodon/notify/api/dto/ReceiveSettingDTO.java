@@ -28,8 +28,38 @@ public class ReceiveSettingDTO {
 
     public static PropertyMap<ReceiveSettingDTO, ReceiveSetting> dto2Entity() {
         return new PropertyMap<ReceiveSettingDTO, ReceiveSetting>() {
+            @Override
             protected void configure() {
-                //因为ReceiveSetting 和 ReceiveSettingDTO 字段完全相同，我们使用默认转换
+                skip().setCreatedBy(null);
+                skip().setCreationDate(null);
+                skip().setLastUpdateDate(null);
+                skip().setLastUpdatedBy(null);
+                skip().setObjectVersionNumber(null);
+
+                skip().set__id(null);
+                skip().set__tls(null);
+                skip().set__status(null);
+                skip().setSortname(null);
+                skip().setSortorder(null);
+                skip().set_token(null);
+                skip().setRequestId(null);
+                skip().setProgramId(null);
+                skip().setAttributeCategory(null);
+                skip().setAttribute1(null);
+                skip().setAttribute2(null);
+                skip().setAttribute3(null);
+                skip().setAttribute4(null);
+                skip().setAttribute5(null);
+                skip().setAttribute6(null);
+                skip().setAttribute7(null);
+                skip().setAttribute8(null);
+                skip().setAttribute9(null);
+                skip().setAttribute10(null);
+                skip().setAttribute11(null);
+                skip().setAttribute12(null);
+                skip().setAttribute13(null);
+                skip().setAttribute14(null);
+                skip().setAttribute15(null);
             }
         };
     }

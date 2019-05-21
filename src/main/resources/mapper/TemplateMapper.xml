@@ -55,6 +55,7 @@
             nss.name LIKE concat(concat('%',#{params}),'%')
             )
         </if>
+        order by nt.id desc
     </select>
 
     <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
@@ -91,6 +92,7 @@
             nss.name LIKE concat(concat('%',#{params}),'%')
             )
         </if>
+        order by nt.id desc
     </select>
 
     <select id="selectNamesByLevelAndType" resultType="io.choerodon.notify.api.dto.TemplateNamesDTO">

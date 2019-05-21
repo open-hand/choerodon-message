@@ -1,11 +1,11 @@
 package io.choerodon.notify.api.controller.v1;
 
+import io.choerodon.base.annotation.Permission;
+import io.choerodon.base.enums.ResourceType;
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -36,17 +36,18 @@ public class NoticesSendController {
      * NoticeSendDTO中目前未传输loginName 和 realName，
      * 所以发送通知前需要发起feign调用，可以在NoticeSendDTO加入这些字段
      * 则可以发送部分站内信时不需要feign调用
+     *
      * @param dto
      */
     @PostMapping
     @ApiOperation(value = "发送邮件，站内信，短信")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     public void postNotice(@RequestBody NoticeSendDTO dto) {
         if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.postNotify.codeEmpty");
         }
-        if (dto.getTargetUsers() == null || dto.getTargetUsers().isEmpty()) {
-            return;
+        if (dto.getSourceId() == null && dto.isSendingSMS()) {
+            throw new FeignException("error.postNotify.sourceId.null");
         }
         if (dto.getSourceId() == null) {
             dto.setSourceId(0L);
@@ -59,7 +60,7 @@ public class NoticesSendController {
 
     @PostMapping("/ws/{code}/{id}")
     @ApiOperation(value = "发送自定义消息到webSocket")
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(type = ResourceType.SITE)
     public void postWebSocket(@PathVariable("code") String code,
                               @PathVariable("id") String id,
                               @RequestBody String message) {

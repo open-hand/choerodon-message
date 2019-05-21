@@ -221,7 +221,7 @@ public class ScheduleTaskDTO {
         }
     }
 
-    public static enum TriggerEventStrategy {
+    public enum TriggerEventStrategy {
         STOP,
         SERIAL,
         PARALLEL;

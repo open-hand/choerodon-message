@@ -1,5 +1,6 @@
 package io.choerodon.notify.infra.feign;
 
+import io.choerodon.notify.infra.feign.fallback.AsgardFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

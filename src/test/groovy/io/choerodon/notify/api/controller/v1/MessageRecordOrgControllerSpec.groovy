@@ -16,8 +16,7 @@ import spock.lang.Specification
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan*  */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 class MessageRecordOrgControllerSpec extends Specification {
@@ -50,7 +49,11 @@ class MessageRecordOrgControllerSpec extends Specification {
             }
 
             when: ""
-            def num = recordMapper.insertList(records)
+            int num = 0
+            for (Record record : records) {
+                num++
+                recordMapper.insert(record)
+            }
 
             then: ""
             num == count

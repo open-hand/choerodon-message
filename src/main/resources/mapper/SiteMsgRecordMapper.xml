@@ -83,6 +83,7 @@
         <if test="type != null">
             AND nsr.type = #{type}
         </if>
+        order by nsr.id desc
     </select>
 
 

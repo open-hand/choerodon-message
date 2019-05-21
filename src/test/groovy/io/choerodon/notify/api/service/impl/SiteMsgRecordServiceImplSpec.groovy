@@ -1,7 +1,6 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.domain.Page
-import io.choerodon.mybatis.pagehelper.domain.PageRequest
 import io.choerodon.notify.api.dto.OrganizationDTO
 import io.choerodon.notify.api.dto.ProjectDTO
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO
@@ -58,10 +57,9 @@ class SiteMsgRecordServiceImplSpec extends Specification {
         ResponseEntity<List<UserDTO>> entity = new ResponseEntity<>(users, HttpStatus.OK)
         ResponseEntity<List<OrganizationDTO>> organizationEntity = new ResponseEntity<>(new ArrayList<OrganizationDTO>(), HttpStatus.OK)
         ResponseEntity<List<ProjectDTO>> projectEntity = new ResponseEntity<>(new ArrayList<ProjectDTO>(), HttpStatus.OK)
-        PageRequest request = new PageRequest(0, 10)
 
         when: "调用方法"
-        siteMsgRecordService.pagingQueryByUserId(1L, true, "type", request)
+        siteMsgRecordService.pagingQueryByUserId(1L, true, "type", 0,10)
 
         then: "校验结果"
         1 * siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(_, _, _) >> page

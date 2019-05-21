@@ -1,9 +1,9 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.NotifyType;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
@@ -49,11 +49,15 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public Page<TemplateQueryDTO> pageByLevel(TemplateQueryDTO query, String level) {
-        return PageHelper.doPageAndSort(query.getPageRequest(),
-                () -> templateMapper.fulltextSearchEmail(query.getCode(), query.getName(),
-                        query.getType(), query.getParams(), query.getIsPredefined(), level));
-
+    public PageInfo<TemplateQueryDTO> pageByLevel(TemplateQueryDTO query, String level, int page, int size) {
+        return PageHelper
+                .startPage(page, size)
+                .doSelectPageInfo(
+                        () -> templateMapper
+                                .fulltextSearchEmail(
+                                        query.getCode(), query.getName(),
+                                        query.getType(), query.getParams(),
+                                        query.getIsPredefined(), level));
     }
 
     @Override

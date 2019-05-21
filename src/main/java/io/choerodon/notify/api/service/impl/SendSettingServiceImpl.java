@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
@@ -49,16 +48,16 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public Page<SendSettingListDTO> page(final String level, final String name, final String code,
-                                         final String description, final String params, final PageRequest pageRequest) {
-        return PageHelper.doPageAndSort(pageRequest,
+    public PageInfo<SendSettingListDTO> page(final String level, final String name, final String code,
+                                             final String description, final String params, int page, int size) {
+        return PageHelper.startPage(page, size).doSelectPageInfo(
                 () -> sendSettingMapper.fulltextSearch(level, code, name, description, params));
     }
 
     @Override
-    public Page<SendSettingListDTO> page(final String name, final String code,
-                                         final String description, final String params, final PageRequest pageRequest) {
-        return PageHelper.doPageAndSort(pageRequest,
+    public PageInfo<SendSettingListDTO> page(final String name, final String code,
+                                             final String description, final String params, int page, int size) {
+        return PageHelper.startPage(page, size).doSelectPageInfo(
                 () -> sendSettingMapper.fulltextSearch(null, code, name, description, params));
     }
 

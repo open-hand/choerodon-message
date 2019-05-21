@@ -33,3 +33,5 @@ gitlabci/.generated
 
 /bin
 src/main/resources/application-default.yml
+node_modules
+lib

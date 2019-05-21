@@ -44,6 +44,7 @@
             nts.description LIKE concat(concat('%',#{params}),'%')
             )
         </if>
+        order by nts.id desc
     </select>
 
     <resultMap id="SendSettingDetailDTO" type="io.choerodon.notify.api.dto.SendSettingDetailDTO">

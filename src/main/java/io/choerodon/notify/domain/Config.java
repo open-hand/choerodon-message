@@ -1,26 +1,24 @@
 package io.choerodon.notify.domain;
 
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.choerodon.mybatis.domain.AuditDomain;
+
+import io.choerodon.mybatis.entity.BaseDTO;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
  * 邮箱服务器，短信服务器的配置
  */
-@ModifyAudit
-@VersionAudit
 @Table(name = "notify_config")
-public class Config extends AuditDomain {
+public class Config extends BaseDTO {
 
     public static final String EMAIL_PROTOCOL_SMTP = "SMTP";
     public static final String EMAIL_SSL_SMTP = "mail.smtp.ssl.enable";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String emailAccount;
     private String emailPassword;

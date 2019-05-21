@@ -1,7 +1,6 @@
 package io.choerodon.notify.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.notify.domain.Template;
 import org.modelmapper.PropertyMap;
 
@@ -20,21 +19,17 @@ public class TemplateQueryDTO {
     @JsonIgnore
     private String params;
 
-    @JsonIgnore
-    private PageRequest pageRequest;
-
-
-    public TemplateQueryDTO(String name, String code, String type, Boolean isPredefined, String params, PageRequest pageRequest) {
+    public TemplateQueryDTO(String name, String code, String type, Boolean isPredefined, String params) {
         this.name = name;
         this.code = code;
         this.type = type;
         this.isPredefined = isPredefined;
         this.params = params;
-        this.pageRequest = pageRequest;
     }
 
     public static PropertyMap<TemplateQueryDTO, Template> dto2Entity() {
         return new PropertyMap<TemplateQueryDTO, Template>() {
+            @Override
             protected void configure() {
                 skip().setMessageType(null);
                 skip().setSmsContent(null);
@@ -47,6 +42,32 @@ public class TemplateQueryDTO {
                 skip().setPmContent(null);
                 skip().setLastUpdateDate(null);
                 skip().setLastUpdatedBy(null);
+
+                skip().set__id(null);
+                skip().set__tls(null);
+                skip().set__status(null);
+                skip().setSortname(null);
+                skip().setSortorder(null);
+                skip().set_token(null);
+                skip().setRequestId(null);
+                skip().setProgramId(null);
+                skip().setAttributeCategory(null);
+                skip().setAttribute1(null);
+                skip().setAttribute2(null);
+                skip().setAttribute3(null);
+                skip().setAttribute4(null);
+                skip().setAttribute5(null);
+                skip().setAttribute6(null);
+                skip().setAttribute7(null);
+                skip().setAttribute8(null);
+                skip().setAttribute9(null);
+                skip().setAttribute10(null);
+                skip().setAttribute11(null);
+                skip().setAttribute12(null);
+                skip().setAttribute13(null);
+                skip().setAttribute14(null);
+                skip().setAttribute15(null);
+
                 map().setBusinessType(source.getType());
             }
         };
@@ -54,10 +75,10 @@ public class TemplateQueryDTO {
 
     public static PropertyMap<Template, TemplateQueryDTO> entity2Dto() {
         return new PropertyMap<Template, TemplateQueryDTO>() {
+            @Override
             protected void configure() {
                 map().setType(source.getBusinessType());
                 skip().setParams(null);
-                skip().setPageRequest(null);
             }
         };
     }
@@ -111,13 +132,5 @@ public class TemplateQueryDTO {
 
     public void setParams(String params) {
         this.params = params;
-    }
-
-    public PageRequest getPageRequest() {
-        return pageRequest;
-    }
-
-    public void setPageRequest(PageRequest pageRequest) {
-        this.pageRequest = pageRequest;
     }
 }
