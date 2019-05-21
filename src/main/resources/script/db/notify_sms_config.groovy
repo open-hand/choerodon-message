@@ -28,18 +28,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_sms_config.groovy') {
             column(name: 'SECRET_KEY', type: 'VARCHAR(255)', remarks: '短信服务器密钥') {
                 constraints(nullable: false)
             }
-            column(name: 'CONTENT_FIELD', type: 'VARCHAR(64)', remarks: 'content对应的接口字段名') {
-                constraints(nullable: false)
-            }
-            column(name: 'PHONE_FIELD', type: 'VARCHAR(64)', remarks: '手机号对应字段') {
-                constraints(nullable: false)
-            }
-            column(name: 'SIGNATURE_FIELD', type: 'VARCHAR(64)', remarks: '签名对应字段') {
-                constraints(nullable: false)
-            }
-            column(name: 'BUSINESS_CODE_FIELD', type: 'VARCHAR(64)', remarks: '业务代码映射字段') {
-                constraints(nullable: false)
-            }
+            column(name: 'CONTENT_FIELD', type: 'VARCHAR(64)', remarks: 'content对应的接口字段名')
+            column(name: 'PHONE_FIELD', type: 'VARCHAR(64)', remarks: '手机号对应字段')
+            column(name: 'SIGNATURE_FIELD', type: 'VARCHAR(64)', remarks: '签名对应字段')
+            column(name: 'BUSINESS_CODE_FIELD', type: 'VARCHAR(64)', remarks: '业务代码映射字段')
 
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1") {
                 constraints(nullable: true)
