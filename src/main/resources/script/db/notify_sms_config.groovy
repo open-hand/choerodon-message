@@ -46,4 +46,15 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_sms_config.groovy') {
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+
+    changeSet(author: 'superlee', id: '2019-05-22-modify-sms-config') {
+        addColumn(tableName: 'NOTIFY_SMS_CONFIG') {
+            column(name: "ASYNC_FLAG", type: "BIGINT UNSIGNED", defaultValue: "0", afterColumn: 'HOST_PORT') {
+                constraints(nullable: true)
+            }
+        }
+        dropColumn(columnName: 'SEND_TYPE', tableName: 'NOTIFY_SMS_CONFIG')
+        dropColumn(columnName: 'SINGLE_SEND_API', tableName: 'NOTIFY_SMS_CONFIG')
+        renameColumn(columnDataType: 'VARCHAR(255)', oldColumnName: 'BATCH_SEND_API', newColumnName: 'SYNC_SEND_API', remarks: '同步发送调用api', tableName: 'NOTIFY_SMS_CONFIG')
+    }
 }
