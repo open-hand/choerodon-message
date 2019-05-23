@@ -1142,7 +1142,7 @@ const zh_CN = {
   'sendsetting.pmtemplate.receive': '允许配置接收',
 
   // 消息记录
-  'msgrecord.header.title': '消息记录',
+  'msgrecord.header.title': '发送记录',
   'msgrecord.status': '状态',
   'msgrecord.email': '接收邮箱',
   'msgrecord.templateType': '模板类型',
