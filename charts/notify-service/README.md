@@ -69,7 +69,7 @@ choerodon.io/metrics-path: {{ .Values.metrics.path | quote }}
 --- |  --- 
 service.enabled | 是否创建service
 preJob.preConfig.enabled | 是否初始化manager_service数据库
-preJob.preInitDB.enabled | 	是否初始化iam_service数据库
+preJob.preInitDB.enabled | 	是否初始化notify_service数据库
 env.open.SPRING_DATASOURCE_URL | 数据库链接地址
 env.open.SPRING_DATASOURCE_USERNAME | 数据库用户名
 env.open.SPRING_DATASOURCE_PASSWORD | 数据库密码
