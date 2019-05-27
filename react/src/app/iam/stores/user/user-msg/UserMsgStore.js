@@ -219,7 +219,7 @@ class UserMsgStore {
   @action
   readMsg(data) {
     data = data === undefined ? [...this.selectMsg] : data;
-    return axios.put(`/notify/v1/notices/sitemsgs/batch_read?user_id=${this.userInfo.id}`, JSON.stringify(data));
+    return axios.put(`/notify/v1/notices/sitemsgs/batch_read?user_id=${this.userInfo.id}`, data);
   }
 
   /**
