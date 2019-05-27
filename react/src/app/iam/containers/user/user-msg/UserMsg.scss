@@ -4,7 +4,7 @@
   &-tab-container {
     overflow: visible;
 
-    .ant-list-pagination {
+    .c7n-list-pagination {
       float: right;
       text-align: left;
     }
@@ -16,7 +16,7 @@
 
   &-collapse {
     width: 100%;
-    .ant-collapse-expand-icon {
+    .c7n-collapse-expand-icon {
       position: absolute;
       right: 16px;
       top: 15px;
@@ -26,7 +26,7 @@
         line-height: 1.2;
       }
     }
-    .ant-checkbox {
+    .c7n-checkbox {
       color: rgba(0, 0, 0, 0.65);
       &-wrapper + span {
         padding: 0;
@@ -34,7 +34,7 @@
     }
     &-panel {
       // display: flex;
-      .ant-collapse-content {
+      .c7n-collapse-content {
         img {
           max-width: 100%;
         }
@@ -42,7 +42,7 @@
         @include template;
       }
     }
-    .ant-collapse-header {
+    .c7n-collapse-header {
       line-height: 24px;
       color: #000;
     }
@@ -68,13 +68,13 @@
     }
   }
 
-  &-list .ant-list-item {
+  &-list .c7n-list-item {
     padding: 0;
     margin-top: 16px;
   }
   &-list {
     //width: calc(100% - 113px);
-    .ant-spin-spinning {
+    .c7n-spin-spinning {
       opacity: 1;
       display: inline-block;
       height: 100%;
@@ -82,14 +82,14 @@
       width: 100%;
       z-index: 4;
     }
-    .ant-list-item:last-child {
-      .ant-card {
+    .c7n-list-item:last-child {
+      .c7n-card {
         border-bottom: 2px solid #e8e8e8;
       }
       border-bottom: 0;
     }
     .c7n-unread-line {
-      .ant-card-head {
+      .c7n-card-head {
         &:before {
           position: absolute;
           left: 0;
@@ -168,15 +168,15 @@
     margin: 16px 0;
     margin-right: 0;
     // box-shadow: 0 3px 3px rgba(0, 0, 0, 0.12);
-    .ant-card-body {
+    .c7n-card-body {
       display: block;
       width: 76vw;
       margin: 0 auto;
     }
-    .ant-card-head {
+    .c7n-card-head {
       background: rgba(0, 0, 0, 0.12);
       height: 48px;
-      .ant-card-head-title {
+      .c7n-card-head-title {
         line-height: 24px;
         white-space: normal !important;
         .c7n-iam-user-msg-read-title,
@@ -191,7 +191,7 @@
     span {
        // color: white;
     }
-    .ant-checkbox-inner {
+    .c7n-checkbox-inner {
       // background-color: #5266d4;
       // border-color: white;
     }
@@ -203,13 +203,13 @@
     background: rgba(255, 255, 255, 0.29);
     box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.20);
     // margin-top: 16px;
-    .ant-card-body {
+    .c7n-card-body {
       display: none;
     }
     span:nth-child(3) {
       padding-left: 72px;
     }
-    .ant-card-head {
+    .c7n-card-head {
       border-bottom: 0;
       cursor: pointer;
       height: 36px;
@@ -220,10 +220,10 @@
         padding: 9px 0;
         font-weight: normal;
       }
-      .ant-checkbox {
+      .c7n-checkbox {
         color: rgba(0, 0, 0, 0.56);
       }
-      .ant-checkbox-wrapper + span, .ant-checkbox + span {
+      .c7n-checkbox-wrapper + span, .c7n-checkbox + span {
         line-height: 20px;
         vertical-align: text-bottom;
       }
