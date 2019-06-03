@@ -80,7 +80,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             sessions.add(session);
             Set<String> subKeys = sessionKeysMap.computeIfAbsent(session, k -> new HashSet<>());
             subKeys.add(key);
-            LOGGER.debu("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
+            LOGGER.debug("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
         }
         redisTemplate.opsForSet().add(redisChannelRegister.channelName(), key);
     }
