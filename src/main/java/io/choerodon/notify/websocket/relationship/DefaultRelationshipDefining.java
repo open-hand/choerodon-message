@@ -80,7 +80,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
             sessions.add(session);
             Set<String> subKeys = sessionKeysMap.computeIfAbsent(session, k -> new HashSet<>());
             subKeys.add(key);
-            LOGGER.info("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
+            LOGGER.debu("webSocket subscribe sessionId is {}, subKeys is {}", session.getId(), subKeys);
         }
         redisTemplate.opsForSet().add(redisChannelRegister.channelName(), key);
     }
@@ -107,7 +107,7 @@ public class DefaultRelationshipDefining implements RelationshipDefining {
                 String code = map.get("code");
                 if (SITE_MSG_CODE.equals(code)) {
                     String userId = map.get("id");
-                    LOGGER.info("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
+                    LOGGER.debug("webSocket disconnect,delete user:{}'s sessionId:{}", userId, delSession.getId());
                     //在线人数-1,发消息
                     Integer origin = getOnlineCount();
                     subOnlineCount(userId, delSession.getId());

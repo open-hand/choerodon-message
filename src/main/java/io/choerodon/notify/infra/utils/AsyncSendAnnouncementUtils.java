@@ -1,18 +1,17 @@
 package io.choerodon.notify.infra.utils;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Future;
-
+import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.service.NoticesSendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.service.NoticesSendService;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 @Service
 public class AsyncSendAnnouncementUtils {
@@ -36,7 +35,7 @@ public class AsyncSendAnnouncementUtils {
      */
     @Async("notify-executor")
     public Future<String> sendNoticeToAll(Long fromUserId, List<Long> userIds, String code, Map<String, Object> params, Long sourceId) {
-        logger.info("ready : send Notice:'{}' to " + userIds.size() + " users.", code);
+        logger.debug("ready : send Notice:'{}' to " + userIds.size() + " users.", code);
         if (userIds == null || userIds.isEmpty()) return new AsyncResult<>("userId is null");
         long beginTime = System.currentTimeMillis();
         NoticeSendDTO noticeSendDTO = new NoticeSendDTO();
@@ -53,9 +52,9 @@ public class AsyncSendAnnouncementUtils {
             users.add(user);
         });
         noticeSendDTO.setTargetUsers(users);
-        logger.info("start : send Notice:'{}' to " + users.size() + " users.", code);
+        logger.debug("start : send Notice:'{}' to " + users.size() + " users.", code);
         noticesSendService.sendNotice(noticeSendDTO);
-        logger.info("end : send Notice:'{}' to " + userIds.size() + " users.", code);
+        logger.debug("end : send Notice:'{}' to " + userIds.size() + " users.", code);
         return new AsyncResult<>((System.currentTimeMillis() - beginTime) / 1000 + "s");
     }
 }

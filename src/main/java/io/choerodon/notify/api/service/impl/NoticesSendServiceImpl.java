@@ -68,7 +68,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
-            LOGGER.info("no sendSetting : {}, can`t send notice.", dto.getCode());
+            LOGGER.warn("no sendSetting : {}, can`t send notice.", dto.getCode());
             return;
         }
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
@@ -76,7 +76,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         boolean haveSMSTemplate = sendSetting.getSmsTemplateId() != null;
         //如果没有任何模板，则不发起feign调用
         if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate) {
-            LOGGER.info("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
+            LOGGER.warn("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
         boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
@@ -107,10 +107,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.EMAIL);
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
             } else {
-                LOGGER.info("sendSetting '{}' no opposite email template, can`t send email.", dto.getCode());
+                LOGGER.warn("sendSetting '{}' no opposite email template, can`t send email.", dto.getCode());
             }
         } catch (CommonException e) {
-            LOGGER.info("send email failed!", e);
+            LOGGER.error("send email failed!", e);
         }
     }
 
@@ -124,10 +124,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
                         sender.get(senderType), senderType, sendSetting);
             } else {
-                LOGGER.info("sendSetting '{}' no opposite pm template, can`t send pm.", dto.getCode());
+                LOGGER.warn("sendSetting '{}' no opposite pm template, can`t send pm.", dto.getCode());
             }
         } catch (CommonException e) {
-            LOGGER.info("send station letter failed!", e);
+            LOGGER.error("send station letter failed!", e);
         }
     }
 
