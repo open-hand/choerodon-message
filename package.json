@@ -1,12 +1,12 @@
 {
   "name": "@choerodon/notify",
   "routeName": "notify",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "description": "",
   "main": "./lib/src/app/iam/containers/IAMIndex.js",
   "dependencies": {
-    "@choerodon/boot": "0.17.x",
-    "@choerodon/master": "0.17.x",
+    "@choerodon/boot": "0.18.x",
+    "@choerodon/master": "0.18.x",
     "react-quill": "^1.3.3"
   },
   "files": [
