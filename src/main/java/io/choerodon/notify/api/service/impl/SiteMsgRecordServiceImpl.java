@@ -162,6 +162,6 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         }
         siteMsgRecordMapper.batchInsert(records);
         records.clear();
-        logger.info("PmSendTask insert database count:{}", count);
+        logger.debug("PmSendTask insert database count:{}", count);
     }
 }

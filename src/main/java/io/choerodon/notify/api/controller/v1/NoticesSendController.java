@@ -65,7 +65,7 @@ public class NoticesSendController {
                               @PathVariable("id") String id,
                               @RequestBody String message) {
         if (StringUtils.isEmpty(message)) {
-            LOGGER.info("The message sent to webSocket is empty. code: {}, id: {}", code, id);
+            LOGGER.warn("The message sent to webSocket is empty. code: {}, id: {}", code, id);
         } else {
             webSocketSendService.sendWebSocket(code, id, message);
         }

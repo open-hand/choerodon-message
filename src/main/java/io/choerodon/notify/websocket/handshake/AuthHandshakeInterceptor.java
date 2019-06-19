@@ -42,12 +42,12 @@ public class AuthHandshakeInterceptor implements WebSocketHandshakeInterceptor {
                 return responseEntity.getStatusCode().is2xxSuccessful();
 
             } else {
-                LOGGER.info("reject webSocket connect, header must have 'Authorization' access-token");
+                LOGGER.warn("reject webSocket connect, header must have 'Authorization' access-token");
                 return false;
             }
 
         } catch (RestClientException e) {
-            LOGGER.info("reject webSocket connect, redirect request to oauth-server error", e);
+            LOGGER.error("reject webSocket connect, redirect request to oauth-server error", e);
             return false;
         }
     }
