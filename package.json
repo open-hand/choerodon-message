@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/notify",
   "routeName": "notify",
-  "version": "0.18.2",
+  "version": "0.18.0",
   "description": "",
   "main": "./lib/src/app/iam/containers/IAMIndex.js",
   "dependencies": {
