@@ -130,7 +130,7 @@ export default class UserMsg extends Component {
 
   handleBatchRead = () => {
     if (UserMsgStore.getSelectMsg.size > 0) {
-      UserMsgStore.readMsg(UserMsgStore.getSelectMsg).then(() => this.refresh());
+      UserMsgStore.readMsg().then(() => this.refresh());
     }
   };
 
