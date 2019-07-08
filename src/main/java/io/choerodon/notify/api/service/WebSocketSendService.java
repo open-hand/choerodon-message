@@ -12,6 +12,4 @@ public interface WebSocketSendService {
 
     void sendWebSocket(String code, String id, String message);
 
-    void sendVisitorsInfo(Integer currentOnlines, Integer numberOfVisitorsToday);
-
 }
