@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.notify.websocket.relationship.DefaultRelationshipDefining;
+import io.choerodon.websocket.relationship.DefaultRelationshipDefining;
 
 @Service
 public class HourlyStorageUtils {

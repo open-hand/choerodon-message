@@ -5,16 +5,14 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.DefaultAutowiredField;
 import io.choerodon.notify.api.pojo.PmType;
-import io.choerodon.notify.api.pojo.VisitorsInfo;
-import io.choerodon.notify.api.service.VisitorsInfoObservable;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.websocket.send.MessageSender;
-import io.choerodon.notify.websocket.send.WebSocketSendPayload;
+import io.choerodon.websocket.send.MessageSender;
+import io.choerodon.websocket.send.WebSocketSendPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,14 +20,12 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service("pmWsSendService")
-public class WebSocketWsSendServiceImpl implements WebSocketSendService, Observer {
+public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketSendService.class);
     public static final String MSG_TYPE_PM = "site-msg";
-    public static final String ONLINE_INFO_TYPE = "online-info";
     private final TemplateRender templateRender;
 
     private final TemplateMapper templateMapper;
@@ -38,21 +34,14 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService, Observe
 
     private final MessageSender messageSender;
 
-    private StringRedisTemplate redisTemplate;
-
-
     public WebSocketWsSendServiceImpl(TemplateRender templateRender,
                                       TemplateMapper templateMapper,
                                       MessageSender messageSender,
-                                      SiteMsgRecordMapper siteMsgRecordMapper,
-                                      StringRedisTemplate redisTemplate,
-                                      VisitorsInfoObservable visitorsInfoObservable) {
+                                      SiteMsgRecordMapper siteMsgRecordMapper) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
         this.messageSender = messageSender;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
-        this.redisTemplate = redisTemplate;
-        visitorsInfoObservable.addObserver(this);
     }
 
     @Override
@@ -111,42 +100,5 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService, Observe
     public void sendWebSocket(String code, String id, String message) {
         String key = "choerodon:msg:" + code + ":" + id;
         messageSender.sendByKey(key, code, message);
-    }
-
-    @Override
-    public void sendVisitorsInfo(Integer currentOnlines, Integer numberOfVisitorsToday) {
-        Map<String, Object> visitorsInfo = new HashMap<>();
-        visitorsInfo.put("CurrentOnliners", currentOnlines);
-        visitorsInfo.put("numberOfVisitorsToday", numberOfVisitorsToday);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        List<String> times = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-        for (int i = 0; i < 24; i++) {
-            String time = dateFormat.format(calendar.getTime());
-            times.add(time);
-            String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
-            if (onlinersOnThatTime == null) {
-                onlinersOnThatTime = "0";
-            }
-            data.add(onlinersOnThatTime);
-            calendar.add(Calendar.HOUR, -1);
-        }
-        Collections.reverse(times);
-        Collections.reverse(data);
-        visitorsInfo.put("time", times);
-        visitorsInfo.put("data", data);
-        String key = "choerodon:msg:online-info";
-        messageSender.sendByKey(key, new WebSocketSendPayload<>(ONLINE_INFO_TYPE, key, visitorsInfo));
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        if (arg instanceof VisitorsInfo) {
-            VisitorsInfo info = (VisitorsInfo) arg;
-            this.sendVisitorsInfo(info.currentOnlines, info.numberOfVisitorsToday);
-        }
     }
 }

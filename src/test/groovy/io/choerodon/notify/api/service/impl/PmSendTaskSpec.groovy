@@ -8,7 +8,7 @@ import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
-import io.choerodon.notify.websocket.send.MessageSender
+import io.choerodon.websocket.send.MessageSender
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification

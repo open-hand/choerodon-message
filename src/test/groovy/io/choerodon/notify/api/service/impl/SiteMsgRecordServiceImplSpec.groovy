@@ -9,7 +9,7 @@ import io.choerodon.notify.api.service.SiteMsgRecordService
 import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
-import io.choerodon.notify.websocket.send.MessageSender
+import io.choerodon.websocket.send.MessageSender
 import org.springframework.beans.BeanUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
