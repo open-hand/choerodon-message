@@ -1,6 +1,5 @@
 package io.choerodon.notify.api.service.impl
 
-import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.api.service.SiteMsgRecordService
 import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
@@ -8,7 +7,7 @@ import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
-import io.choerodon.websocket.send.MessageSender
+import io.choerodon.websocket.helper.WebSocketHelper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
@@ -19,13 +18,13 @@ import spock.lang.Specification
 class PmSendTaskSpec extends Specification {
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private TemplateRender templateRender = Mock(TemplateRender)
-    private MessageSender messageSender = Mock(MessageSender)
+    private WebSocketHelper webSocketHelper = Mock(WebSocketHelper)
     private SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
     private SendSettingMapper sendSettingMapper = Mock(SendSettingMapper)
     private SiteMsgRecordService siteMsgRecordService = Mock(SiteMsgRecordService)
     private UserFeignClient userFeignClient = Mock(UserFeignClient)
     private PmSendTask pmSendTask = new PmSendTask(templateMapper, templateRender,
-            messageSender, userFeignClient, siteMsgRecordMapper,
+            webSocketHelper, userFeignClient, siteMsgRecordMapper,
             siteMsgRecordService, sendSettingMapper)
 
     def "SendStationLetter"() {

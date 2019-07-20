@@ -11,11 +11,10 @@ import io.choerodon.notify.domain.SiteMsgRecord;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.websocket.send.MessageSender;
+import io.choerodon.websocket.helper.WebSocketHelper;
 import io.choerodon.websocket.send.WebSocketSendPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 
@@ -32,15 +31,15 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     private final SiteMsgRecordMapper siteMsgRecordMapper;
 
-    private final MessageSender messageSender;
+    private final WebSocketHelper webSocketHelper;
 
     public WebSocketWsSendServiceImpl(TemplateRender templateRender,
                                       TemplateMapper templateMapper,
-                                      MessageSender messageSender,
+                                      WebSocketHelper webSocketHelper,
                                       SiteMsgRecordMapper siteMsgRecordMapper) {
         this.templateRender = templateRender;
         this.templateMapper = templateMapper;
-        this.messageSender = messageSender;
+        this.webSocketHelper = webSocketHelper;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
     }
 
@@ -82,7 +81,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         if (sendSetting.getIsSendInstantly() != null && sendSetting.getIsSendInstantly()) {
             targetUsers.forEach(user -> {
                 String key = "choerodon:msg:site-msg:" + user.getId();
-                messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
+                webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
             });
         }
     }
@@ -99,6 +98,6 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     @Override
     public void sendWebSocket(String code, String id, String message) {
         String key = "choerodon:msg:" + code + ":" + id;
-        messageSender.sendByKey(key, code, message);
+        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(code, key, message));
     }
 }
