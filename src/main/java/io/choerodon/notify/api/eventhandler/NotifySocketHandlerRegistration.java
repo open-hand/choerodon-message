@@ -38,7 +38,7 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
 
     @Override
     public String path() {
-        return "/notify";
+        return "/choerodon/msg";
     }
 
     @Override
