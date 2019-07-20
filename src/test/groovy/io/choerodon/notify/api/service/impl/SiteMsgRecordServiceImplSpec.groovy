@@ -9,7 +9,7 @@ import io.choerodon.notify.api.service.SiteMsgRecordService
 import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
-import io.choerodon.websocket.send.MessageSender
+import io.choerodon.websocket.helper.WebSocketHelper
 import org.springframework.beans.BeanUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,10 +20,10 @@ import spock.lang.Specification
  * */
 class SiteMsgRecordServiceImplSpec extends Specification {
     private final SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
-    private final MessageSender messageSender = Mock(MessageSender)
+    private final WebSocketHelper webSocketHelper = Mock(WebSocketHelper)
     private final UserFeignClient userFeignClient = Mock(UserFeignClient)
     private SiteMsgRecordService siteMsgRecordService =
-            new SiteMsgRecordServiceImpl(siteMsgRecordMapper, messageSender, userFeignClient)
+            new SiteMsgRecordServiceImpl(siteMsgRecordMapper, webSocketHelper, userFeignClient)
 
     def "PagingQueryByUserId"() {
         given: "构造请求参数"

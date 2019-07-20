@@ -7,10 +7,8 @@ import io.choerodon.notify.domain.SendSetting
 import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
-import io.choerodon.websocket.VisitorsInfoObservable
-import io.choerodon.websocket.send.MessageSender
+import io.choerodon.websocket.helper.WebSocketHelper
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.data.redis.core.ValueOperations
 import spock.lang.Specification
 
 /**
@@ -20,10 +18,9 @@ class WebSocketWsSendServiceImplTest extends Specification {
     private TemplateRender templateRender = Mock(TemplateRender)
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private SiteMsgRecordMapper siteMsgRecordMapper = Mock(SiteMsgRecordMapper)
-    private MessageSender messageSender = Mock(MessageSender)
+    private WebSocketHelper webSocketHelper = Mock(WebSocketHelper)
     private StringRedisTemplate redisTemplate = Mock(StringRedisTemplate)
-    private WebSocketSendService webSocketSendService =
-            new WebSocketWsSendServiceImpl(templateRender, templateMapper, messageSender, siteMsgRecordMapper)
+    private WebSocketSendService webSocketSendService = new WebSocketWsSendServiceImpl(templateRender, templateMapper, webSocketHelper, siteMsgRecordMapper)
 
     def "Send"() {
         given: "构造参数"

@@ -12,7 +12,7 @@ import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
-import io.choerodon.websocket.send.MessageSender;
+import io.choerodon.websocket.helper.WebSocketHelper;
 import io.choerodon.websocket.send.WebSocketSendPayload;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
@@ -35,14 +35,15 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
 
     private final SiteMsgRecordMapper siteMsgRecordMapper;
 
-    private final MessageSender messageSender;
+    private final WebSocketHelper webSocketHelper;
 
     private final UserFeignClient userFeignClient;
 
-    public SiteMsgRecordServiceImpl(SiteMsgRecordMapper siteMsgRecordMapper, MessageSender messageSender,
+    public SiteMsgRecordServiceImpl(SiteMsgRecordMapper siteMsgRecordMapper,
+                                    WebSocketHelper webSocketHelper,
                                     UserFeignClient userFeignClient) {
         this.siteMsgRecordMapper = siteMsgRecordMapper;
-        this.messageSender = messageSender;
+        this.webSocketHelper = webSocketHelper;
         this.userFeignClient = userFeignClient;
     }
 
@@ -127,7 +128,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             }
         }
         String key = "choerodon:msg:site-msg:" + userId;
-        messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
+        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
     @Override
@@ -143,7 +144,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             }
         }
         String key = "choerodon:msg:site-msg:" + userId;
-        messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
+        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
     @Override

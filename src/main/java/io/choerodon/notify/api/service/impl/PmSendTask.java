@@ -14,7 +14,7 @@ import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.websocket.send.MessageSender;
+import io.choerodon.websocket.helper.WebSocketHelper;
 import io.choerodon.websocket.send.WebSocketSendPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class PmSendTask {
     private static final String MSG_TYPE_PM = "site-msg";
     private final TemplateMapper templateMapper;
     private final TemplateRender templateRender;
-    private final MessageSender messageSender;
+    private final WebSocketHelper webSocketHelper;
     private final SiteMsgRecordMapper siteMsgRecordMapper;
     private final SendSettingMapper sendSettingMapper;
     private final SiteMsgRecordService siteMsgRecordService;
@@ -45,13 +45,13 @@ public class PmSendTask {
     private final UserFeignClient userFeignClient;
 
     public PmSendTask(TemplateMapper templateMapper, TemplateRender templateRender,
-                      MessageSender messageSender, UserFeignClient userFeignClient,
+                      WebSocketHelper webSocketHelper, UserFeignClient userFeignClient,
                       SiteMsgRecordMapper siteMsgRecordMapper,
                       SiteMsgRecordService siteMsgRecordService,
                       SendSettingMapper sendSettingMapper) {
         this.templateMapper = templateMapper;
         this.templateRender = templateRender;
-        this.messageSender = messageSender;
+        this.webSocketHelper = webSocketHelper;
         this.userFeignClient = userFeignClient;
         this.siteMsgRecordMapper = siteMsgRecordMapper;
         this.siteMsgRecordService = siteMsgRecordService;
@@ -118,7 +118,7 @@ public class PmSendTask {
         AtomicInteger count = new AtomicInteger();
         for (Long id : ids) {
             String key = CHOERODON_MSG_SIT_MSG + id;
-            messageSender.sendByKey(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
             count.incrementAndGet();
         }
         logger.debug("PmSendTask send websocket completed.count:{}", count);
