@@ -107,13 +107,13 @@ export default function Tab() {
       return (
         <div>平台</div>
       );
-    } else if (record.data.level === 'organisition') {
+    } else if (record.data.level === 'organization') {
       return (
-        <div>平台1</div>
+        <div>组织</div>
       );
-    } else if (record.data.level === 'common') {
+    } else if (record.data.level === 'project') {
       return (
-        <div>平台2</div>
+        <div>项目</div>
       );
     }
   }
