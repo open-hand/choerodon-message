@@ -33,6 +33,9 @@ public class SendSetting extends BaseDTO {
 
     private Boolean isAllowConfig;
 
+    @Column(name = "is_enabled")
+    private Boolean enabled;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
@@ -179,5 +182,13 @@ public class SendSetting extends BaseDTO {
 
     public void setAllowConfig(Boolean allowConfig) {
         isAllowConfig = allowConfig;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
