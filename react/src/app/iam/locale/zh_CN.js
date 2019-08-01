@@ -212,10 +212,31 @@ const pageDetail = {
   'global.inmailtemplate.modify.link': `${docServer}/user-guide/system-configuration/message/email-template/`,
 
 
+  'global.notifySetting.connect.success': '连接成功',
   // 邮箱配置
-  'global.mailsetting.title': '平台"{name}"的邮箱配置',
-  'global.mailsetting.description': '邮箱配置用于管理发件邮箱的账号信息与邮件服务器信息。',
-  'global.mailsetting.link': `${docServer}/user-guide/system-configuration/message/email-config/`,
+  'global.notifySetting.mailsetting.title': '平台"{name}"的邮箱配置',
+  'global.notifySetting.mailsetting.description': '邮箱配置用于管理发件邮箱的账号信息与邮件服务器信息。',
+  'global.notifySetting.mailsetting.link': `${docServer}/user-guide/system-configuration/message/email-config/`,
+  'global.notifySetting.mailsetting.account': '邮箱账号',
+  'global.notifySetting.mailsetting.password': '密码',
+  'global.notifySetting.mailsetting.sendName': '发件人签名',
+  'global.notifySetting.mailsetting.protocal': '服务器类型',
+  'global.notifySetting.mailsetting.host': '服务器地址',
+  'global.notifySetting.mailsetting.ssl': '是否使用ssl',
+  'global.notifySetting.mailsetting.port': '端口号',
+
+  // 短信配置
+  'global.notifySetting.smssetting.title': '平台"{name}"的短信配置',
+  'global.notifySetting.smssetting.description': '短信配置用于管理短信发送短信域名、短信服务器的获取的配置。目前只支持国内短信。',
+  'global.notifySetting.smssetting.link': `${docServer}/user-guide/system-configuration/message/sms-config/`,
+  'global.notifySetting.smssetting.signature': '短信签名',
+  'global.notifySetting.smssetting.hostAddress': '短信服务器地址',
+  'global.notifySetting.smssetting.hostPort': '短信服务器端口',
+  'global.notifySetting.smssetting.sendType': '调用方式',
+  'global.notifySetting.smssetting.batchSendApi': '批量调用地址',
+  'global.notifySetting.smssetting.singleSendApi': '单体调用地址',
+  'global.notifySetting.smssetting.asyncSendApi': '异步调用地址',
+  'global.notifySetting.smssetting.secretKey': '短信服务器密钥',
 
   // 事务定义
   'global.saga.title': '平台"{name}"的事务定义',
@@ -405,6 +426,22 @@ const pageDetail = {
   'organization.mailtemplate.modify.title': '修改邮件模板"{name}"',
   'organization.mailtemplate.modify.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模版统一了用户接收的邮件内容。',
   'organization.mailtemplate.modify.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
+
+
+  // 短信模版
+  'smstemplate.delete.owncontent': '确定要删除短信模板"{name}"吗？',
+
+  'global.smstemplate.title': '平台"{name}"的短信模板',
+  'global.smstemplate.description': '由特定的事件触发后，系统自动发送短信给用户，短信模板统一了用户接收的短信内容。',
+  'global.smstemplate.link': `${docServer}/user-guide/system-configuration/tenant/sms-template/`,
+
+  'global.smstemplate.create.title': '在平台"{name}"中创建短信模板',
+  'global.smstemplate.create.description': '由特定的事件触发后，系统自动发送短信给用户，短信模板统一了用户接收的短信内容。',
+  'global.smstemplate.create.link': `${docServer}/user-guide/system-configuration/tenant/sms-template/`,
+
+  'global.smstemplate.modify.title': '修改短信模板"{name}"',
+  'global.smstemplate.modify.description': '由特定的事件触发后，系统自动发送短信给用户，短信模板统一了用户接收的短信内容。',
+  'global.smstemplate.modify.link': `${docServer}/user-guide/system-configuration/tenant/sms-template/`,
 
   // 站内信模板
   'organization.inmailtemplate.title': '组织"{name}"的站内信模板',
@@ -932,10 +969,10 @@ const zh_CN = {
   'taskdetail.empty': '无',
   'taskdetail.number.pattern': '请输入数字',
   'taskdetail.execute-strategy': '超时策略',
-  'taskdetail.execute-strategy.tips': '超时策略：\n' +
-    '阻塞： 下次触发时间若上次触发任务未完成，则暂停定时任务，任务不再被执行\n' +
-    '串行： 下次触发时间若上次触发任务未完成，两次任务可按照触发时间依次被执行\n' +
-    '并行： 下次触发时间若上次触发任务未完成，两次任务可以同时被执行',
+  'taskdetail.execute-strategy.tips': '超时策略：\n'
+    + '阻塞： 下次触发时间若上次触发任务未完成，则暂停定时任务，任务不再被执行\n'
+    + '串行： 下次触发时间若上次触发任务未完成，两次任务可按照触发时间依次被执行\n'
+    + '并行： 下次触发时间若上次触发任务未完成，两次任务可以同时被执行',
   'taskdetail.execute-strategy.required': '请选择超时策略',
   'taskdetail.stop': '阻塞',
   'taskdetail.serial': '串行',
@@ -1176,6 +1213,7 @@ const zh_CN = {
   'mailtemplate.mail.content': '邮件内容',
   'mailtemplate.code.exist': '模板编码已存在，请输入其他模板编码',
   'mailtemplate.mailcontent.tip.link': `${docServer}/user-guide/system-configuration/message/variable-description/`,
+  // eslint-disable-next-line no-template-curly-in-string
   'mailtemplate.mailcontent.tip': '模板中的参数变量通过`${}`进行替换，在发送时，将`${}`替换成对应的实际变量。登录名:${loginName}',
   'mailtemplate.mailcontent.required': '邮件模板内容不可为空',
 
@@ -1201,6 +1239,7 @@ const zh_CN = {
   'inmailtemplate.title.required': '请输入站内信标题',
   'inmailtemplate.mail.content': '站内信内容',
   'inmailtemplate.code.exist': '模板编码已存在，请输入其他模板编码',
+  // eslint-disable-next-line no-template-curly-in-string
   'inmailtemplate.mailcontent.tip': '模板中的参数变量通过`${}`进行替换，在发送时，将`${}`替换成对应的实际变量。登录名:${loginName}',
   'inmailtemplate.mailcontent.required': '站内信模板内容不可为空',
 
