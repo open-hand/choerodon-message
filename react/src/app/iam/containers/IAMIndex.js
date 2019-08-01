@@ -15,7 +15,7 @@ const receiveSetting = asyncRouter(() => import('./user/receive-setting'));
 const smsTemplate = asyncRouter(() => import('./global/sms-template'));
 const smsSetting = asyncRouter(() => import('./NotifySetting/sms-setting'));
 const notifySetting = asyncRouter(() => import('./NotifySetting'));
-
+const notifySettingContent = asyncRouter(() => import('./global/setting-content'));
 @inject('AppState')
 class IAMIndex extends React.Component {
   render() {
@@ -38,6 +38,7 @@ class IAMIndex extends React.Component {
             <Route path={`${match.url}/receive-setting`} component={receiveSetting} />
             <Route path={`${match.url}/user-msg`} component={userMsg} />
             <Route path={`${match.url}/notify-setting`} component={notifySetting} />
+            <Route path={`${match.url}/send-setting-content`} component={notifySettingContent} />
             <Route path="*" component={nomatch} />
           </Switch>
           <ModalContainer />
