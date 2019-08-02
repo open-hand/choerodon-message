@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Button, Table, Modal, Tooltip, Form, DatePicker, Input, Radio } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { Content, Header, Page, Permission, Breadcrumb } from '@choerodon/boot';
+import { Content, Header, Page, Permission, Breadcrumb, Action } from '@choerodon/boot';
 import './Announcement.scss';
 import StatusTag from '../../components/statusTag';
 import Editor from '../../components/editor';
@@ -201,6 +201,12 @@ export default class Announcement extends Component {
             {text}
           </MouseOverWrapper>
         ),
+      }, {
+        title: '',
+        width: '14%',
+        key: 'action',
+        align: 'right',
+        render: this.renderAction,
       },
       {
         title: <FormattedMessage id={`${intlPrefix}.content`} />,
@@ -233,61 +239,32 @@ export default class Announcement extends Component {
             {text}
           </MouseOverWrapper>
         ),
-      }, {
-        title: '',
-        width: '14%',
-        key: 'action',
-        align: 'right',
-        render: this.renderAction,
-      },
+      }, 
     ];
   }
 
-  renderAction = (text, record) => (
-    <React.Fragment>
-      {
-          record.status === 'WAITING' && (
-            <Permission service={['notify-service.system-announcement.update']}>
-              <Tooltip
-                title={<FormattedMessage id="modify" />}
-                placement="bottom"
-              >
-                <Button
-                  size="small"
-                  icon="mode_edit"
-                  shape="circle"
-                  onClick={() => this.handleOpen('modify', record)}
-                />
-              </Tooltip>
-            </Permission>
-          )
-        }
-      <Tooltip
-        title={<FormattedMessage id="announcement.detail" />}
-        placement="bottom"
-      >
-        <Button
-          shape="circle"
-          icon="find_in_page"
-          size="small"
-          onClick={() => this.handleOpen('detail', record)}
-        />
-      </Tooltip>
-      <Permission service={['notify-service.system-announcement.delete']}>
-        <Tooltip
-          title={<FormattedMessage id="delete" />}
-          placement="bottom"
-        >
-          <Button
-            size="small"
-            icon="delete_forever"
-            shape="circle"
-            onClick={() => this.handleDelete(record)}
-          />
-        </Tooltip>
-      </Permission>
-    </React.Fragment>
-  );
+  renderAction = (text, record) => {
+    const actionDatas = [];
+    if (record.status === 'WAITING') {
+      actionDatas.push({
+        service: ['notify-service.system-announcement.update'],
+        text: <FormattedMessage id="modify" />,
+        action: () => this.handleOpen('modify', record),
+      });
+    }
+    actionDatas.push({
+      text: '详情',
+      action: () => this.handleOpen('detail', record),
+    });
+    actionDatas.push({
+      service: ['notify-service.system-announcement.delete'],
+      text: <FormattedMessage id="delete" />,
+      action: () => this.handleDelete(record),
+    });
+    return (
+      <Action data={actionDatas} />
+    );
+  };
 
   renderSidebarOkText() {
     const { AnnouncementStore: { selectType } } = this.props;
