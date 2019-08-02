@@ -3,7 +3,7 @@
   "routeName": "notify",
   "version": "0.18.0",
   "description": "",
-  "main": "./lib/src/app/iam/containers/IAMIndex.js",
+  "main": "./react/src/app/iam/containers/IAMIndex.js",
   "dependencies": {
     "react-quill": "^1.3.3"
   },
@@ -11,12 +11,12 @@
     "lib"
   ],
   "peerDependencies": {
-    "@choerodon/boot": "0.18.x",
-    "@choerodon/master": "0.18.x"
+    "@choerodon/boot": "0.19.x",
+    "@choerodon/master": "0.19.x"
   },
   "devDependencies": {
-    "@choerodon/boot": "0.18.x",
-    "@choerodon/master": "0.18.x",
+    "@choerodon/boot": "0.19.x",
+    "@choerodon/master": "0.19.x",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
