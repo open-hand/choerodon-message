@@ -15,7 +15,6 @@ configure({ enforceActions: false });
 
 // 匹配html界面为空白的正则。
 const patternHTMLEmpty = /^(((<[^>]+>)*\s*)|&nbsp;|\s)*$/g;
-const inputWidth = '512px';
 const iconType = {
   COMPLETED: 'COMPLETED',
   SENDING: 'RUNNING',
@@ -221,7 +220,7 @@ export default class Announcement extends Component {
         render: status => (
           <StatusTag
             name={intl.formatMessage({ id: status ? `announcement.${status.toLowerCase()}` : 'announcement.completed' })}
-            colorCode={status ? iconType[status] : iconType.COMPLETED}
+            colorCode={status || iconType.COMPLETED}
           />
         ),
       }, {
@@ -449,7 +448,6 @@ export default class Announcement extends Component {
               <DatePicker
                 className="c7n-iam-announcement-siderbar-content-datepicker"
                 label={<FormattedMessage id="announcement.send.date" />}
-                style={{ width: inputWidth }}
                 format="YYYY-MM-DD HH:mm:ss"
                 disabledDate={this.disabledStartDate}
                 disabledTime={this.disabledDateStartTime}
@@ -502,7 +500,6 @@ export default class Announcement extends Component {
                   <DatePicker
                     className="c7n-iam-announcement-siderbar-content-datepicker"
                     label={<FormattedMessage id="announcement.end-date" />}
-                    style={{ width: inputWidth }}
                     format="YYYY-MM-DD HH:mm:ss"
                     disabledDate={this.disabledEndDate}
                     disabledTime={this.disabledDateEndTime}
@@ -525,7 +522,7 @@ export default class Announcement extends Component {
               }],
               initialValue: isModify ? currentRecord.title : undefined,
             })(
-              <Input autoComplete="off" style={{ width: inputWidth }} label={<FormattedMessage id="announcement.title" />} />,
+              <Input autoComplete="off" label={<FormattedMessage id="announcement.title" />} />,
             )}
           </FormItem>
         </Form>
@@ -550,10 +547,8 @@ export default class Announcement extends Component {
         <div><span>{intl.formatMessage({ id: 'status' })}：</span>
           <div className="inline">
             <StatusTag
-              style={{ fontSize: 14, color: 'rgba(0,0,0,0.65)' }}
-              mode="icon"
               name={intl.formatMessage({ id: status ? `announcement.${status.toLowerCase()}` : 'announcement.completed' })}
-              colorCode={iconType[status]}
+              colorCode={status}
             />
           </div>
         </div>
@@ -617,6 +612,7 @@ export default class Announcement extends Component {
             filterBarPlaceholder={intl.formatMessage({ id: 'filtertable' })}
           />
           <Sidebar
+            className="c7n-iam-announcement-sidebar"
             title={<FormattedMessage id={`${intlPrefix}.sidebar.title.${selectType}`} />}
             onOk={this.handleOk}
             okText={this.renderSidebarOkText()}

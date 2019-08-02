@@ -9,6 +9,7 @@ const Color = {
   COMPLETED: '#00BFA5',
   NON_CONSUMER: '#00BFA5',
   DEFAULT: '#b8b8b8',
+  WAITING: '#ffb100',
 };
 
 const IconType = {
@@ -42,8 +43,8 @@ export default class StatusTag extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     return !(nextProps.name === this.props.name
-      && nextProps.color === this.props.color &&
-    nextProps.colorCode === this.props.colorCode);
+      && nextProps.color === this.props.color
+    && nextProps.colorCode === this.props.colorCode);
   }
 
   renderIconMode() {
