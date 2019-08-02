@@ -35,3 +35,4 @@ gitlabci/.generated
 src/main/resources/application-default.yml
 node_modules
 lib
+package-lock.json
