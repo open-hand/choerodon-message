@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { asyncRouter, nomatch } from '@choerodon/boot';
 
 const index = asyncRouter(() => (import('./Announcement')), {
-  AnnouncementStore: () => import('../../../stores/global/announcement'),
+  AnnouncementStore: () => import('../../stores/global/announcement'),
 });
 // const detail = asyncRouter(() => import('./APIDetail'));
 

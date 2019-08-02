@@ -5,11 +5,11 @@ import moment from 'moment';
 import { Button, Table, Modal, Tooltip, Form, DatePicker, Input, Radio } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { Content, Header, Page, Permission } from '@choerodon/boot';
+import { Content, Header, Page, Permission, Breadcrumb } from '@choerodon/boot';
 import './Announcement.scss';
-import StatusTag from '../../../components/statusTag';
-import Editor from '../../../components/editor';
-import MouseOverWrapper from '../../../components/mouseOverWrapper';
+import StatusTag from '../../components/statusTag';
+import Editor from '../../components/editor';
+import MouseOverWrapper from '../../components/mouseOverWrapper';
 
 configure({ enforceActions: false });
 
@@ -209,7 +209,7 @@ export default class Announcement extends Component {
         key: 'textContent',
         className: 'nowarp',
       }, {
-        title: <FormattedMessage id={'status'} />,
+        title: <FormattedMessage id="status" />,
         dataIndex: 'status',
         key: 'status',
         width: '12%',
@@ -220,10 +220,10 @@ export default class Announcement extends Component {
         filteredValue: filters.status || [],
         render: status => (
           <StatusTag
-            mode="icon"
             name={intl.formatMessage({ id: status ? `announcement.${status.toLowerCase()}` : 'announcement.completed' })}
             colorCode={status ? iconType[status] : iconType.COMPLETED}
-          />),
+          />
+        ),
       }, {
         title: <FormattedMessage id={`${intlPrefix}.send-time`} />,
         dataIndex: 'sendDate',
@@ -321,9 +321,10 @@ export default class Announcement extends Component {
       return current < moment().subtract(1, 'days');
     }
   };
+
   /* 时间选择器处理 -- start */
   disabledStartDate = (sendDate) => {
-    const endDate = this.state.endDate;
+    const { endDate } = this.state;
     if (!sendDate || !endDate) {
       return false;
     }
@@ -335,7 +336,7 @@ export default class Announcement extends Component {
   };
 
   disabledEndDate = (endDate) => {
-    const sendDate = this.state.sendDate;
+    const { sendDate } = this.state;
     if (!endDate || !sendDate) {
       return false;
     }
@@ -489,29 +490,31 @@ export default class Announcement extends Component {
             )}
           </FormItem>
           {
-            getFieldValue('sticky') ? <FormItem {...formItemLayout}>
-              {getFieldDecorator('endDate', {
-                rules: [{
-                  required: true,
-                  message: '请输入结束显示时间',
-                }],
-                initialValue: isModify && currentRecord.endDate ? moment(currentRecord.endDate) : undefined,
-              })(
-                <DatePicker
-                  className="c7n-iam-announcement-siderbar-content-datepicker"
-                  label={<FormattedMessage id="announcement.end-date" />}
-                  style={{ width: inputWidth }}
-                  format="YYYY-MM-DD HH:mm:ss"
-                  disabledDate={this.disabledEndDate}
-                  disabledTime={this.disabledDateEndTime}
-                  showTime={{ defaultValue: moment() }}
-                  getCalendarContainer={that => that}
-                  onChange={this.onEndChange}
-                  onOpenChange={this.clearEndTimes}
-                />,
-              )
+            getFieldValue('sticky') ? (
+              <FormItem {...formItemLayout}>
+                {getFieldDecorator('endDate', {
+                  rules: [{
+                    required: true,
+                    message: '请输入结束显示时间',
+                  }],
+                  initialValue: isModify && currentRecord.endDate ? moment(currentRecord.endDate) : undefined,
+                })(
+                  <DatePicker
+                    className="c7n-iam-announcement-siderbar-content-datepicker"
+                    label={<FormattedMessage id="announcement.end-date" />}
+                    style={{ width: inputWidth }}
+                    format="YYYY-MM-DD HH:mm:ss"
+                    disabledDate={this.disabledEndDate}
+                    disabledTime={this.disabledDateEndTime}
+                    showTime={{ defaultValue: moment() }}
+                    getCalendarContainer={that => that}
+                    onChange={this.onEndChange}
+                    onOpenChange={this.clearEndTimes}
+                  />,
+                )
               }
-            </FormItem> : null
+              </FormItem>
+            ) : null
           }
           <FormItem {...formItemLayout}>
             {getFieldDecorator('title', {
@@ -581,7 +584,7 @@ export default class Announcement extends Component {
           'notify-service.system-announcement.delete',
         ]}
       >
-        <Header title={<FormattedMessage id={`${intlPrefix}.header.title`} />}>
+        <Header>
           <Permission service={['notify-service.system-announcement.create']}>
             <Button
               onClick={() => this.handleOpen('create')}
@@ -598,9 +601,9 @@ export default class Announcement extends Component {
             <FormattedMessage id="refresh" />
           </Button>
         </Header>
+        <Breadcrumb title={<FormattedMessage id={`${intlPrefix}.header.title`} />} />
         <Content
-          code={intlPrefix}
-          values={{ name: this.announcementType.intlValue }}
+          title=" "
         >
           <Table
             loading={loading}

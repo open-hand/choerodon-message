@@ -6,8 +6,8 @@ import './Editor.scss';
 import { Modal, Input, Button, Form, Tabs, Upload, Icon } from 'choerodon-ui';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-const TabPane = Tabs.TabPane;
-const Dragger = Upload.Dragger;
+const { TabPane } = Tabs;
+const { Dragger } = Upload;
 const FormItem = Form.Item;
 const limitSize = 5120;
 const Align = Quill.import('attributors/style/align');
@@ -28,16 +28,10 @@ const CustomToolbar = () => (
       <button className="ql-bold" />
       <button className="ql-italic" />
       <button className="ql-underline" />
-    </span>
-    <span className="ql-formats">
       <button className="ql-list" value="ordered" />
       <button className="ql-list" value="bullet" />
-    </span>
-    <span className="ql-formats">
       <select className="ql-align" />
       <select className="ql-color" />
-    </span>
-    <span className="ql-formats">
       <select className="ql-header">
         <option selected />
         <option value="1">H1</option>
@@ -75,8 +69,6 @@ const CustomToolbar = () => (
         <option value="18px" />
         <option value="20px" />
       </select>
-    </span>
-    <span className="ql-formats">
       <button className="ql-link" />
       <button className="ql-image" />
       <button className="ql-code-block" />
@@ -306,21 +298,23 @@ export default class Editor extends Component {
       <React.Fragment>
         <Dragger className="c7n-iam-editor-dragger" {...props}>
           {
-            localSrc ? (<React.Fragment>
-              <div style={{ backgroundImage: `url(${localSrc})` }} className="c7n-iam-editor-dragger-preview-pic" />
-            </React.Fragment>) : (
+            localSrc ? (
               <React.Fragment>
-                <Icon type="inbox" />
-                <h3 className="c7n-iam-editor-dragger-text">
+                <div style={{ backgroundImage: `url(${localSrc})` }} className="c7n-iam-editor-dragger-preview-pic" />
+                            </React.Fragment>
+            ) : (
+              <React.Fragment>
+    <Icon type="inbox" />
+    <h3 className="c7n-iam-editor-dragger-text">
                   <FormattedMessage id="editor.dragger.text" />
                 </h3>
-                <h4 className="c7n-iam-editor-dragger-hint">
+    <h4 className="c7n-iam-editor-dragger-hint">
                   <FormattedMessage
                     id="editor.dragger.hint"
                     values={{ size: `${limitSize / 1024}M`, access: 'PNG、JPG、JPEG、GIF' }}
                   />
                 </h4>
-              </React.Fragment>
+  </React.Fragment>
             )
           }
         </Dragger>
