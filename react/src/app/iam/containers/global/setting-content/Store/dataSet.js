@@ -7,13 +7,11 @@ export default function () {
       name: 'messageType',
       type: 'string',
       label: '消息类型',
-      required: true,
     },
     {
       name: 'introduce',
       type: 'string',
       label: '说明',
-      required: true,
     },
     {
       name: 'level',
@@ -22,27 +20,24 @@ export default function () {
     },
     {
       name: 'enabled',
-      type: 'string',
+      type: 'boolean',
       label: '状态',
     },
     {
       name: 'allowConfig',
-      type: 'string',
+      type: 'boolean',
       label: '允许配置接收',
-      required: true,
     },
     ],
     queryFields: [{
       name: 'messageType',
       type: 'string',
       label: '消息类型',
-      required: true,
     },
     {
       name: 'introduce',
       type: 'string',
       label: '说明',
-      required: true,
     },
 
     {
@@ -59,7 +54,6 @@ export default function () {
       name: 'allowConfig',
       type: 'string',
       label: '允许配置接收',
-      required: true,
     },
     ],
     transport: {
