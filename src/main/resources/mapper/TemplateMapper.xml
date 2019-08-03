@@ -119,4 +119,38 @@
         WHERE nt.code = #{code} AND nt.message_type = #{messageType}
     </select>
 
+    <select id="pagedSearch" resultType="io.choerodon.notify.domain.Template">
+        SELECT
+        nt.id,
+        nt.code,
+        nt.name,
+        nss.name AS businessType,
+        nt.is_predefined AS isPredefined
+        FROM notify_template nt
+        LEFT JOIN notify_send_setting nss on nss.code = nt.business_type
+        WHERE nt.message_type = 'sms'
+        AND 1 = 1
+        <if test="templateQuery.type != null">
+            AND nss.name LIKE concat(concat('%',#{templateQuery.type}),'%')
+        </if>
+        <if test="templateQuery.code != null">
+            AND nt.code LIKE concat(concat('%',#{templateQuery.code}),'%')
+        </if>
+        <if test="templateQuery.name != null">
+            AND nt.name LIKE concat(concat('%',#{templateQuery.name}),'%')
+        </if>
+        <if test="templateQuery.predefined != null">
+            AND nt.is_predefined = #{templateQuery.predefined}
+        </if>
+
+        <if test="templateQuery.params != null">
+            AND(
+            nt.code LIKE concat(concat('%',#{templateQuery.params}),'%') OR
+            nt.name LIKE concat(concat('%',#{templateQuery.params}),'%') OR
+            nss.name LIKE concat(concat('%',#{templateQuery.params}),'%')
+            )
+        </if>
+        order by nt.id desc
+    </select>
+
 </mapper>

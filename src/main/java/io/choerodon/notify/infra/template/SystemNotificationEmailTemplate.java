@@ -1,18 +1,14 @@
-package io.choerodon.notify.infra.utils;
+package io.choerodon.notify.infra.template;
 
 import org.springframework.stereotype.Component;
 
-import io.choerodon.core.notify.Level;
-import io.choerodon.core.notify.NotifyBusinessType;
-import io.choerodon.core.notify.PmTemplate;
+import io.choerodon.core.notify.EmailTemplate;
 
-@NotifyBusinessType(code = "systemNotification", name = "系统公告", level = Level.SITE,
-        description = "系统全平台公告", isManualRetry = true)
 @Component
-public class SystemNotificationPmTemplate implements PmTemplate {
+public class SystemNotificationEmailTemplate implements EmailTemplate {
     @Override
     public String businessTypeCode() {
-        return "systemNotification";
+        return "";
     }
 
     @Override
