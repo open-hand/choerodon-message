@@ -4,6 +4,7 @@ import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.PmTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
+import io.choerodon.notify.api.query.TemplateQuery;
 import io.choerodon.notify.domain.Template;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,6 +28,13 @@ public interface TemplateMapper extends Mapper<Template> {
     List<TemplateNamesDTO> selectNamesByLevelAndType(@Param("level") String level, @Param("type") String businessType);
 
     String selectLevelByCode(@Param("code") String code, @Param("messageType") String messageType);
+
+    /**
+     * 模糊查询短信模版
+     * @param templateQuery
+     * @return
+     */
+    List<Template> pagedSearch(@Param("templateQuery") TemplateQuery templateQuery);
 
 
 }
