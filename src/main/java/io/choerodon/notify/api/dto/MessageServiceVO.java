@@ -12,6 +12,9 @@ public class MessageServiceVO {
     @ApiModelProperty(value = "发送设置主键")
     private Long id;
 
+    @ApiModelProperty(value = "模版编码")
+    private String code;
+
     // 对应notify_send_setting.name
     @ApiModelProperty(value = "消息类型")
     private String messageType;
@@ -40,6 +43,15 @@ public class MessageServiceVO {
 
     public MessageServiceVO setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public MessageServiceVO setCode(String code) {
+        this.code = code;
         return this;
     }
 

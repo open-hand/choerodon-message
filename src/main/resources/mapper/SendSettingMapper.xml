@@ -114,6 +114,7 @@
     <select id="doFTR" resultType="io.choerodon.notify.api.dto.MessageServiceVO">
         SELECT
         id,
+        code,
         NAME AS message_type,
         description AS introduce,
         fd_level AS LEVEL,
