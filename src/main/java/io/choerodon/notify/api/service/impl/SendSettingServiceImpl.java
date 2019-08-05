@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
 
-    private static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
+    public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
     private SendSettingMapper sendSettingMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
@@ -92,7 +92,7 @@ public class SendSettingServiceImpl implements SendSettingService {
             db.setAllowConfig(updateDTO.getAllowConfig());
         }
         if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
-            throw new CommonException("error.sendSetting.update");
+            throw new CommonException("error.send.setting.update");
         }
         return sendSettingMapper.selectByPrimaryKey(db.getId());
     }
