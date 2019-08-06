@@ -5,6 +5,7 @@
   "description": "",
   "main": "./react/index.js",
   "dependencies": {
+    "choerodon-ui": "^0.8.0",
     "react-quill": "^1.3.3"
   },
   "files": [

@@ -1,7 +1,9 @@
 import React, { Component, useContext } from 'react';
 import { Table, Button } from 'choerodon-ui/pro';
-import { Action, axios } from '@choerodon/boot';
+import { Tag } from 'choerodon-ui';
+import { Action, axios, Content, Header, Page } from '@choerodon/boot';
 import Store from './Store/index';
+
 import './TableMessage.less';
 
 const { Column } = Table;
@@ -75,13 +77,13 @@ export default function Tab() {
     if (record.get('enabled')) {
       return (
         <div>
-          <Button disabled className="start">启用</Button>
+          <Tag className="start">启用</Tag>
         </div>
       );
     } else {
       return (
         <div>
-          <Button disabled className="forbidden">禁用</Button>
+          <Tag className="forbidden">禁用</Tag>
         </div>
       );
     }
@@ -119,15 +121,17 @@ export default function Tab() {
     }
   }
   return (
-    <div>
+    <page>
       <header><div className="title">消息服务</div></header>
-      <Table className="messageService" dataSet={sendSettingDataSet}>
-        <Column className="column1" name="messageType" renderer={getNameMethod} />
-        <Column name="introduce" />
-        <Column name="level" renderer={getLevel} />
-        <Column width={130} name="enabled" renderer={getEnabled} />
-        <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
-      </Table>
-    </div>
+      <Content>
+        <Table className="messageService" dataSet={sendSettingDataSet}>
+          <Column className="column1" name="messageType" renderer={getNameMethod} />
+          <Column name="introduce" />
+          <Column name="level" renderer={getLevel} />
+          <Column width={130} name="enabled" renderer={getEnabled} />
+          <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
+        </Table>
+      </Content>
+    </page>
   );
 }

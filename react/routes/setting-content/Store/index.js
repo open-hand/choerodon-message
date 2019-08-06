@@ -4,6 +4,7 @@ import { DataSet } from 'choerodon-ui/pro';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import SendSettingDataSet from './dataSet';
+import LevelDataSet from './LevelDataSet';
 
 const Store = createContext();
 
@@ -12,7 +13,8 @@ export default Store;
 export const StoreProvider = withRouter(injectIntl(inject('AppState')(
   (props) => {
     const { AppState: { currentMenuType: { type, id } }, intl, children } = props;
-    const sendSettingDataSet = new DataSet(SendSettingDataSet());
+    const levelDataSet = new DataSet(LevelDataSet());
+    const sendSettingDataSet = new DataSet(SendSettingDataSet(levelDataSet));
     const value = {
       ...props,
       sendSettingDataSet,
