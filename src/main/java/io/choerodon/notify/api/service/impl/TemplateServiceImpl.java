@@ -37,7 +37,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public PageInfo<TemplateVO> pagingTemplateByMessageType(Template filterDTO, String[] params, PageRequest pageRequest) {
         Long currentId = getCurrentId(filterDTO.getBusinessType(), filterDTO.getMessageType());
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(
+        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(
                 () -> templateMapper.doFTR(filterDTO, currentId, params));
     }
 
@@ -159,7 +159,7 @@ public class TemplateServiceImpl implements TemplateService {
      * @param businessType 触发类型 即 发送设置code
      * @return
      */
-    private Long getCurrentId(String messageType, String businessType) {
+    private Long getCurrentId(String businessType, String messageType) {
         SendSetting sendSetting = new SendSetting();
         sendSetting.setCode(businessType);
         sendSetting = sendSettingMapper.selectOne(sendSetting);
