@@ -3,7 +3,7 @@
   "routeName": "notify",
   "version": "0.18.0",
   "description": "",
-  "main": "./react/src/app/iam/containers/IAMIndex.js",
+  "main": "./react/index.js",
   "dependencies": {
     "choerodon-ui": "^0.8.0",
     "react-quill": "^1.3.3"

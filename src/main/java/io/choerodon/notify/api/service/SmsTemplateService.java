@@ -1,6 +1,9 @@
 package io.choerodon.notify.api.service;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
+import io.choerodon.notify.api.query.TemplateQuery;
+import io.choerodon.notify.domain.Template;
 
 import java.util.List;
 
@@ -18,4 +21,54 @@ public interface SmsTemplateService {
      * @return
      */
     List<TemplateNamesDTO> listNames(String level, String businessType);
+
+    /**
+     * 分页查询短信模版
+     *
+     * @param page
+     * @param size
+     * @param templateQuery
+     * @return
+     */
+    PageInfo<Template> pagedSearch(int page, int size, TemplateQuery templateQuery);
+
+    /**
+     * 根据id查询模版
+     *
+     * @param id
+     * @return
+     */
+    Template query(Long id);
+
+
+    /**
+     * 根据id更新模版
+     *
+     * @param id
+     * @param templateDTO
+     * @return
+     */
+    Template update(Long id, Template templateDTO);
+
+    /**
+     * 创建短信模版
+     *
+     * @param templateDTO
+     * @return
+     */
+    Template create(Template templateDTO);
+
+    /**
+     * code重名校验
+     *
+     * @param code
+     */
+    void check(String code);
+
+    /**
+     * 根据id删除模版，只能删除自定义模版
+     *
+     * @param id
+     */
+    void delete(Long id);
 }

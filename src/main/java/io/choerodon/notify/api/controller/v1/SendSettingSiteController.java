@@ -1,26 +1,26 @@
 package io.choerodon.notify.api.controller.v1;
 
-import java.util.List;
-import java.util.Set;
-import javax.validation.Valid;
-
 import com.github.pagehelper.PageInfo;
 import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
+import io.choerodon.base.domain.PageRequest;
+import io.choerodon.base.domain.Sort;
 import io.choerodon.base.enums.ResourceType;
+import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.mybatis.annotation.SortDefault;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
-import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.domain.SendSetting;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -42,15 +42,33 @@ public class SendSettingSiteController {
 
     @GetMapping
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层分页查询发送设置列表")
-    public ResponseEntity<PageInfo<SendSettingListDTO>> pageSite(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                                 @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
-                                                                 @RequestParam(required = false) String name,
-                                                                 @RequestParam(required = false) String code,
-                                                                 @RequestParam(required = false) String level,
-                                                                 @RequestParam(required = false) String description,
-                                                                 @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(sendSettingService.page(level, name, code, description, params, page, size), HttpStatus.OK);
+    @ApiOperation(value = "全局层分页查询消息服务列表")
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<MessageServiceVO>> pageSite(@ApiIgnore
+                                                               @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                               @RequestParam(required = false) String messageType,
+                                                               @RequestParam(required = false) String introduce,
+                                                               @RequestParam(required = false) String level,
+                                                               @RequestParam(required = false) Boolean enabled,
+                                                               @RequestParam(required = false) Boolean allowConfig,
+                                                               @RequestParam(required = false) String params) {
+        SendSetting filterDTO = new SendSetting();
+        if (messageType != null) {
+            filterDTO.setName(messageType);
+        }
+        if (introduce != null) {
+            filterDTO.setDescription(introduce);
+        }
+        if (level != null) {
+            filterDTO.setLevel(level);
+        }
+        if (enabled != null) {
+            filterDTO.setEnabled(enabled);
+        }
+        if (allowConfig != null) {
+            filterDTO.setAllowConfig(allowConfig);
+        }
+        return new ResponseEntity<>(sendSettingService.pagingAll(filterDTO, params, pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -82,5 +100,50 @@ public class SendSettingSiteController {
     public ResponseEntity delSendSetting(@PathVariable Long id) {
         sendSettingService.delete(id);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+
+    @PutMapping("/{id}/enabled")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "根据id启用消息服务")
+    public ResponseEntity<MessageServiceVO> enabled(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.enabled(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/disabled")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "根据id停用消息服务")
+    public ResponseEntity<MessageServiceVO> disabled(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.disabled(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/allow_configuration")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "允许配置接受设置")
+    public ResponseEntity<MessageServiceVO> allowConfig(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.allowConfiguration(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/forbidden_configuration")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "禁止配置接受设置")
+    public ResponseEntity<MessageServiceVO> forbiddenConfig(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.forbiddenConfiguration(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/email_send_setting")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "获取邮件内容的发送设置信息")
+    public ResponseEntity<EmailSendSettingVO> getEmailSendSetting(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.getEmailSendSetting(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/email_send_setting")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "修改邮件内容的发送设置信息")
+    public ResponseEntity<EmailSendSettingVO> updateEmailSendSetting(@PathVariable("id") Long id,
+                                                                     @RequestBody EmailSendSettingVO updateVO) {
+        updateVO.setId(id);
+        return new ResponseEntity<>(sendSettingService.updateEmailSendSetting(updateVO), HttpStatus.OK);
     }
 }

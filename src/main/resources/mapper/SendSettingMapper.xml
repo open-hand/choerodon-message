@@ -109,4 +109,41 @@
             AND nts.is_allow_config = #{allowConfig}
         </if>
     </select>
+
+
+    <select id="doFTR" resultType="io.choerodon.notify.api.dto.MessageServiceVO">
+        SELECT
+        id,
+        code,
+        NAME AS message_type,
+        description AS introduce,
+        fd_level AS LEVEL,
+        is_enabled as enabled,
+        is_allow_config AS allowConfig,
+        object_version_number
+        FROM
+        notify_send_setting
+        WHERE 1 = 1
+        <if test="filterDTO.level != null">
+            AND fd_level = #{filterDTO.level}
+        </if>
+        <if test="filterDTO.name != null">
+            AND name LIKE concat(concat('%',#{filterDTO.name}),'%')
+        </if>
+        <if test="filterDTO.description != null">
+            AND description LIKE concat(concat('%',#{filterDTO.description}),'%')
+        </if>
+        <if test="filterDTO.enabled != null">
+            AND is_enabled = #{filterDTO.enabled}
+        </if>
+        <if test="filterDTO.allowConfig != null">
+            AND is_allow_config = #{filterDTO.allowConfig}
+        </if>
+        <if test="params != null">
+            AND(
+            name LIKE concat(concat('%',#{params}),'%') OR
+            description LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+    </select>
 </mapper>

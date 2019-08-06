@@ -7,11 +7,11 @@ import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
+import io.choerodon.notify.api.service.SmsService;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.ReceiveSetting;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.enums.SenderType;
-import io.choerodon.notify.infra.feign.SmsFeignClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -35,20 +35,20 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private SendSettingMapper sendSettingMapper;
     private UserFeignClient userFeignClient;
 
-    private SmsFeignClient smsFeignClient;
+    private SmsService smsService;
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService,
                                   ReceiveSettingMapper receiveSettingMapper,
                                   SendSettingMapper sendSettingMapper,
                                   UserFeignClient userFeignClient,
-                                  SmsFeignClient smsFeignClient) {
+                                  SmsService smsService) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
         this.receiveSettingMapper = receiveSettingMapper;
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
-        this.smsFeignClient = smsFeignClient;
+        this.smsService = smsService;
     }
 
     //单元测试
@@ -64,7 +64,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     @Override
     public void sendNotice(NoticeSendDTO dto) {
         if (dto.isSendingSMS()) {
-            smsFeignClient.send(dto);
+            smsService.send(dto);
         }
         SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {

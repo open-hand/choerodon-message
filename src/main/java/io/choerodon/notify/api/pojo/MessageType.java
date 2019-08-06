@@ -14,4 +14,15 @@ public enum MessageType {
     public String getValue() {
         return value;
     }
+
+    public static boolean isInclude(String key) {
+        boolean include = false;
+        for (MessageType e : MessageType.values()) {
+            if (e.getValue().equalsIgnoreCase(key)) {
+                include = true;
+                break;
+            }
+        }
+        return include;
+    }
 }
