@@ -2,7 +2,7 @@
 
 ## 主要功能
 
-`notify-service` 是一种通知服务，用于发送电子邮件、短信或者是电台信件。
+`notify-service` 是一种通知服务，用于发送电子邮件、短信或者是站内信。
 
 ## 服务配置
 
@@ -165,6 +165,10 @@
   ```
 
 - 启动项目，项目根目录下运行 `mvn spring-boot:run` 命令，或者在本地集成环境中运行 `Spring Boot` 启动类 `src/main/java/io/choerodon/notify/NotifyApplication.java`
+
+## 更新日志
+
+- [更新日志](./CHANGELOG.zh-CN.md)
 
 ## 如何参与
 
