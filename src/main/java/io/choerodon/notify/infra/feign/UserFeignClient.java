@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * @author dengyouquan
  **/
-@FeignClient(name = "iam-service",
+@FeignClient(name = "base-service",
         configuration = FeignConfig.class,
         fallback = UserFeignClientFallback.class)
 public interface UserFeignClient {
