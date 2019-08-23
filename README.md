@@ -58,7 +58,7 @@
    ribbon:
      ReadTimeout: 5000
      ConnectTimeout: 5000
-   iam-service:
+   base-service:
      ribbon:
        ReadTimeout: 30000
        ConnectTimeout: 30000
