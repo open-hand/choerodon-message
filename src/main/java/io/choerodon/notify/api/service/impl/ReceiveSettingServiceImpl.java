@@ -114,7 +114,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
             //如果是禁用，则不需要接收通知，向数据库插入记录
             SendSetting query = new SendSetting();
             query.setAllowConfig(true);
-            //feign调用，从iam-service查询用户所在所有项目和组织
+            //feign调用，从base-service查询用户所在所有项目和组织
             final OrganizationProjectDTO organizationProjectDTO =
                     userFeignClient.queryByUserIdOrganizationProject(userId).getBody();
             sendSettingMapper.select(query).forEach(sendSetting -> {
