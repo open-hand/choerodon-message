@@ -2,7 +2,7 @@
  * Created by chenbinjie on 2018/8/6.
  */
 import { action, computed, observable } from 'mobx';
-import { axios, store } from '@choerodon/boot';
+import { axios, store } from '@choerodon/master';
 import querystring from 'query-string';
 
 @store('InMailTemplateStore')

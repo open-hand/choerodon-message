@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import { asyncLocaleProvider, asyncRouter, nomatch } from '@choerodon/boot';
+import { asyncLocaleProvider, asyncRouter, nomatch } from '@choerodon/master';
 import { ModalContainer } from 'choerodon-ui/pro';
 
 const sendSetting = asyncRouter(() => import('./routes/global/send-setting'));
@@ -26,7 +26,6 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
         <Switch>
           <Route path={`${match.url}/msg-record`} component={msgRecord} />
           <Route path={`${match.url}/announcement`} component={announcement} />
-
           <Route path={`${match.url}/sms-template`} component={smsTemplate} />
           <Route path={`${match.url}/mail-template`} component={mailTemplate} />
           <Route path={`${match.url}/inmail-template`} component={inmailTemplate} />

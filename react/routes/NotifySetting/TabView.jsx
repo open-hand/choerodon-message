@@ -1,7 +1,7 @@
 import React, { Component, useContext, useState } from 'react';
 import { observer, useComputed } from 'mobx-react-lite';
 import { DataSet, Table, Modal, Button, Tabs, Tooltip } from 'choerodon-ui/pro';
-import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/boot';
+import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/master';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import MailSettingOutput from './mail-setting/MailSettingOutput';
 import SmsSettingOutput from './sms-setting/SmsSettingOutput';

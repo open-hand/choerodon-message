@@ -1,9 +1,9 @@
 {
   "name": "@choerodon/notify",
   "routeName": "notify",
-  "version": "0.18.0",
+  "version": "0.20.0",
   "description": "",
-  "main": "./react/index.js",
+  "main": "./lib/index.js",
   "dependencies": {
     "choerodon-ui": "^0.8.0",
     "react-quill": "^1.3.3"
@@ -12,12 +12,12 @@
     "lib"
   ],
   "peerDependencies": {
-    "@choerodon/boot": "0.19.x",
-    "@choerodon/master": "0.19.x"
+    "@choerodon/boot": "0.20.x",
+    "@choerodon/master": "0.20.x"
   },
   "devDependencies": {
-    "@choerodon/boot": "0.19.x",
-    "@choerodon/master": "0.19.x",
+    "@choerodon/boot": "^0.20.5",
+    "@choerodon/master": "^0.20.19",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",

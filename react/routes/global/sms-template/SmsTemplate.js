@@ -11,7 +11,7 @@ import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import {
   axios, Content, Header, Page, Permission, Action,
-} from '@choerodon/boot';
+} from '@choerodon/master';
 import MailTemplateStore from '../../../stores/global/sms-template';
 import './SmsTemplate.scss';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';

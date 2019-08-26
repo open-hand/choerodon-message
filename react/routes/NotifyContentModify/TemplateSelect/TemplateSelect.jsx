@@ -1,7 +1,7 @@
 import React, { useContext } from 'react/index';
 import { DataSet, Form, Output, Spin, Table, TextField, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Action } from '@choerodon/boot';
+import { Action } from '@choerodon/master';
 import store from '../Store';
 
 const { Column } = Table;
