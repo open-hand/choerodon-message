@@ -1,14 +1,15 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.io.IOException;
+import java.util.Map;
+
 import freemarker.template.TemplateException;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.domain.Template;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import java.io.IOException;
-import java.util.Map;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.domain.Template;
 
 @Component
 public class TemplateRender {
@@ -36,16 +37,17 @@ public class TemplateRender {
 
     String renderTemplate(final Template template, final Map<String, Object> variables, TemplateType type)
             throws IOException, TemplateException {
-        String templateKey = template.getCode() + ":" + type.getValue() + template.getObjectVersionNumber();
+        String messageType = template.getMessageType();
+        String templateKey = template.getCode() + "-" + messageType + ":" + type.getValue() + template.getObjectVersionNumber();
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
         String content = "";
         switch (type) {
             case TITLE:
-                content = template.getMessageType().equals(MessageType.EMAIL.getValue()) ?
+                content = messageType.equals(MessageType.EMAIL.getValue()) ?
                         template.getEmailTitle() : template.getPmTitle();
                 break;
             case CONTENT:
-                content = template.getMessageType().equals(MessageType.EMAIL.getValue()) ?
+                content = messageType.equals(MessageType.EMAIL.getValue()) ?
                         template.getEmailContent() : template.getPmContent();
                 break;
         }
