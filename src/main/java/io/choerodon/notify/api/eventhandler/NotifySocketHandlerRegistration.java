@@ -1,13 +1,14 @@
 package io.choerodon.notify.api.eventhandler;
 
 import io.choerodon.notify.infra.utils.OnlineCountStorageUtils;
-import io.choerodon.websocket.helper.SocketHandlerRegistration;
+import io.choerodon.websocket.connect.SocketHandlerRegistration;
 import io.choerodon.websocket.helper.WebSocketHelper;
-import io.choerodon.websocket.send.WebSocketSendPayload;
+import io.choerodon.websocket.send.SendMessagePayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,7 +31,7 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
     private RestTemplate restTemplate;
     private OnlineCountStorageUtils onlineCountStorageUtils;
 
-    public NotifySocketHandlerRegistration(WebSocketHelper webSocketHelper, RestTemplate restTemplate, OnlineCountStorageUtils onlineCountStorageUtils) {
+    public NotifySocketHandlerRegistration(@Lazy WebSocketHelper webSocketHelper, RestTemplate restTemplate, OnlineCountStorageUtils onlineCountStorageUtils) {
         this.webSocketHelper = webSocketHelper;
         this.restTemplate = restTemplate;
         this.onlineCountStorageUtils = onlineCountStorageUtils;
@@ -61,7 +62,7 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
                     return false;
                 }
             } else {
-                LOGGER.warn("reject webSocket connect, header must have 'Authorization' access-token");
+                LOGGER.warn("reject webSocket connect, must have 'token' query parameter");
                 return false;
             }
         } catch (RestClientException e) {
@@ -83,7 +84,7 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
         onlineCountStorageUtils.addOnlineCount(userId, session.getId());
         if (!originCount.equals(onlineCountStorageUtils.getOnlineCount())) {
             onlineCountStorageUtils.makeVisitorsInfo();
-            webSocketHelper.sendMessage(NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, new WebSocketSendPayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
+            webSocketHelper.sendMessageByKey(NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, new SendMessagePayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
         }
     }
 
@@ -94,7 +95,7 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
         onlineCountStorageUtils.subOnlineCount(userId, session.getId());
         if (!originCount.equals(onlineCountStorageUtils.getOnlineCount())) {
             onlineCountStorageUtils.makeVisitorsInfo();
-            webSocketHelper.sendMessage(NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, new WebSocketSendPayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
+            webSocketHelper.sendMessageByKey(NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, new SendMessagePayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
         }
     }
 }
