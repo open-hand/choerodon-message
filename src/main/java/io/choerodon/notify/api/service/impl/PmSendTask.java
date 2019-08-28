@@ -15,7 +15,7 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.websocket.helper.WebSocketHelper;
-import io.choerodon.websocket.send.WebSocketSendPayload;
+import io.choerodon.websocket.send.SendMessagePayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -118,7 +118,7 @@ public class PmSendTask {
         AtomicInteger count = new AtomicInteger();
         for (Long id : ids) {
             String key = CHOERODON_MSG_SIT_MSG + id;
-            webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
+            webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(id)));
             count.incrementAndGet();
         }
         logger.debug("PmSendTask send websocket completed.count:{}", count);

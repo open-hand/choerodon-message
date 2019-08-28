@@ -13,7 +13,7 @@ import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.websocket.helper.WebSocketHelper;
-import io.choerodon.websocket.send.WebSocketSendPayload;
+import io.choerodon.websocket.send.SendMessagePayload;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +128,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             }
         }
         String key = "choerodon:msg:site-msg:" + userId;
-        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
+        webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             }
         }
         String key = "choerodon:msg:site-msg:" + userId;
-        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
+        webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(userId)));
     }
 
     @Override

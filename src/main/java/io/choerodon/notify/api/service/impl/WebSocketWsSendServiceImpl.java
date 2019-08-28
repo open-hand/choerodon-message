@@ -12,7 +12,7 @@ import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.websocket.helper.WebSocketHelper;
-import io.choerodon.websocket.send.WebSocketSendPayload;
+import io.choerodon.websocket.send.SendMessagePayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -81,7 +81,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         if (sendSetting.getIsSendInstantly() != null && sendSetting.getIsSendInstantly()) {
             targetUsers.forEach(user -> {
                 String key = "choerodon:msg:site-msg:" + user.getId();
-                webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
+                webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
             });
         }
     }
@@ -98,6 +98,6 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     @Override
     public void sendWebSocket(String code, String id, String message) {
         String key = "choerodon:msg:" + code + ":" + id;
-        webSocketHelper.sendMessage(key, new WebSocketSendPayload<>(code, key, message));
+        webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(code, key, message));
     }
 }
