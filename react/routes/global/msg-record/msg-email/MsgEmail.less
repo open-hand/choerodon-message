@@ -1,0 +1,29 @@
+@base:#000000;
+
+.c7n-msgrecord {
+  .page-content {
+    padding-top: 0;
+  }
+  table {
+    font-family: PingFangSC-Medium;
+    tbody{
+      font-family: PingFangSC-Regular;
+      td:nth-child(n+4) {
+        color: fade(@base,65%);
+      }
+    }
+  }
+  &-status {
+    color: white;
+    padding: 2px 5px;
+    border-radius: 2px;
+    font-size: 10px;
+    &.failed {
+      background: #f44336;
+    }
+
+    &.completed {
+      background: #00bfa5;
+    }
+  }
+}
