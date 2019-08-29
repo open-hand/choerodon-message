@@ -2,7 +2,7 @@
 
 .c7n-iam-react-quill-editor {
   position: relative;
-
+  background: #fff;
   @include template;
 
   /* default header */
@@ -15,6 +15,32 @@
   .ql-snow .ql-picker.ql-font .ql-picker-label::before,
   .ql-snow .ql-picker.ql-font .ql-picker-item::before {
     content: '默认';
+  }
+  
+  .ql-header,.ql-font,.ql-size {
+    &.ql-picker {
+      width: .68rem;
+    }
+  }
+  
+  .ql-open {
+    width: .68rem !important;
+    &::before {
+      content: '展开更多';
+    }
+  }
+  .ql-close {
+    width: .68rem !important;
+    &::before {
+      content: '收起';
+    }
+  }
+
+  .ql-fullscreen {
+    width: .62rem !important;
+    &::before {
+      content: '全屏编辑';
+    }
   }
 
   .ql-changeToHtml {
@@ -157,7 +183,7 @@
   position: absolute;
   top: 0;
   width: 100%;
-  height: 320px;
+  height: 100%;
   border: 1px solid #ccc;
   line-height: 1.42;
   outline: none;
@@ -184,7 +210,7 @@
 
   .c7n-editor-changedHTML-container-content {
     width: 100%;
-    height: 276px;
+    height: 100%;
     padding: 12px 15px;
     outline: none;
     border: none;

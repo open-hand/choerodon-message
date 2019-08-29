@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react';
 import { observable, action, configure } from 'mobx';
 import moment from 'moment';
 import { Button, Table, Modal, Tooltip, Form, DatePicker, Input, Radio } from 'choerodon-ui';
+import { Modal as ProModal } from 'choerodon-ui/pro';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import { Content, Header, Page, Permission, Breadcrumb, Action } from '@choerodon/master';
@@ -16,6 +17,7 @@ configure({ enforceActions: false });
 
 // 匹配html界面为空白的正则。
 const patternHTMLEmpty = /^(((<[^>]+>)*\s*)|&nbsp;|\s)*$/g;
+const modalKey = ProModal.key();
 const iconType = {
   COMPLETED: 'COMPLETED',
   SENDING: 'RUNNING',
@@ -70,6 +72,7 @@ export default class Announcement extends Component {
     return {
       sendDate: null,
       endDate: null,
+      fullscreen: false,
     };
   }
 
@@ -505,18 +508,47 @@ export default class Announcement extends Component {
             )}
           </FormItem>
         </Form>
-        <p className="content-text">公告内容：</p>
+        <p style={{ display: 'inline-block' }} className="content-text">公告内容：</p>
+        <Button style={{ float: 'right' }} icon="zoom_out_map" onClick={this.handleFullScreen} type="primary">全屏编辑</Button>
         <Editor
           value={editorContent}
           onRef={(node) => {
             this.editor = node;
           }}
+          toolbarContainer="toolbar"
           onChange={(value) => {
             AnnouncementStore.setEditorContent(value);
           }}
         />
+        <Modal
+          title="编辑公告内容"
+          visible={this.state.fullscreen}
+          width="90%"
+          onOk={() => this.setState({ fullscreen: false })}
+          onCancel={() => this.setState({ fullscreen: false })}
+        >
+          <Editor
+            toolbarContainer="toolbar2"
+            value={editorContent}
+            height={500}
+            nomore
+            onRef={(node) => {
+              this.editor2 = node;
+            }}
+            onChange={(value) => {
+              AnnouncementStore.setEditorContent(value);
+            }}
+          /> 
+        </Modal>
       </div>
     );
+  }
+
+  handleFullScreen = () => {
+    if (this.editor2) {
+      this.editor2.initEditor();
+    }
+    this.setState({ fullscreen: true });
   }
 
   renderDetail({ content, status, sendDate, endDate, sticky }) {
