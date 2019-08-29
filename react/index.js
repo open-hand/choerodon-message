@@ -33,7 +33,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
           <Route path={`${match.url}/mail-setting`} component={mailSetting} />
           <Route path={`${match.url}/receive-setting`} component={receiveSetting} />
           <Route path={`${match.url}/user-msg`} component={userMsg} />
-          <Route path={`${match.url}/notify-setting`} component={notifySetting} />
+          <Route path={`${match.url}/msg-config`} component={notifySetting} />
           <Route path={`${match.url}/send-setting-content`} component={notifyList} />
           <Route path={`${match.url}/send-setting/:settingId/:settingBusinessType/:settingType`} component={notifyContentModify} />
           <Route path="*" component={nomatch} />

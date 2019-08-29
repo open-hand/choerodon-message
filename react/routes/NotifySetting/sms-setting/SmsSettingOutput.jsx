@@ -19,7 +19,7 @@ export default (props) => {
           )}
         />
         <Output name="singleSendApi" renderer={OutputEmptyValue} />
-        <Output name="secretKey" />
+        <Output renderer={() => '••••••'} name="secretKey" />
       </Form>
     </Spin>
   );

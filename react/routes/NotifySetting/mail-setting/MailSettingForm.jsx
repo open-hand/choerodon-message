@@ -1,13 +1,14 @@
 import React, { useContext } from 'react';
-import { Form, TextField, Select, SelectBox } from 'choerodon-ui/pro';
-import store from '../Store';
+import { Form, TextField, Select, SelectBox, Password } from 'choerodon-ui/pro';
+import '../index.less';
 
 const { Option } = Select;
 
-export default props => (
-  <Form dataSet={props.context.mailSettingDataSet} labelLayout="float" labelAlign="left">
+export default (props) => (
+  <Form className="hidden-password" dataSet={props.context.mailSettingDataSet} labelLayout="float" labelAlign="left">
+    <input type="password" style={{ position: 'absolute', top: '-999px' }} />
     <TextField name="account" />
-    <TextField name="password" />
+    <Password name="password" />
     <TextField name="sendName" />
     <Select name="protocol" disabled />
     <TextField name="host" />

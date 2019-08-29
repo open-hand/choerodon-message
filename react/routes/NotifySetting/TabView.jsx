@@ -17,7 +17,7 @@ export default (props) => {
   const context = useContext(Store);
   const [TabKey, setTabKey] = useState('mail');
 
-  const toggleTabKey = currentKey => setTabKey(currentKey);
+  const toggleTabKey = (currentKey) => setTabKey(currentKey);
 
   const refreshByTabKey = () => context.refresh(TabKey);
 
@@ -52,6 +52,7 @@ export default (props) => {
     Modal.open({
       title: `修改${TabKey === 'mail' ? '邮件' : '短信'}配置`,
       drawer: true,
+      className: 'msg-config-sider',
       style: {
         width: 380,
       },
@@ -90,11 +91,12 @@ export default (props) => {
           {`修改${TabKey === 'mail' ? '邮箱' : '短信'}配置`}
         </Button>
       </Header>
-      <Breadcrumb title="通知配置" />
+      <Breadcrumb title={TabKey === 'mail' ? '邮箱配置' : '短信配置'} />
       <Content
         values={{ name: context.AppState.getSiteInfo.systemName || 'Choerodon' }}
+        className="msg-config"
       >
-        <Tabs activeKey={TabKey} onChange={toggleTabKey}>
+        <Tabs animated={false} activeKey={TabKey} onChange={toggleTabKey}>
           <TabPane tab="邮箱配置" key="mail">
             <MailSettingOutput />
           </TabPane>

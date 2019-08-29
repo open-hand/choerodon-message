@@ -10,7 +10,7 @@ export default (props) => {
     <Spin dataSet={mailSettingDataSet}>
       <Form dataSet={mailSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
         <Output name="account" />
-        <Output name="password" />
+        <Output renderer={() => '••••••'} name="password" />
         <Output name="sendName" renderer={OutputEmptyValue} />
         <Output name="protocol" />
         <Output name="host" />
