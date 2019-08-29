@@ -1,0 +1,28 @@
+@base: #000000;
+
+.receiveSetting {
+    table {
+        font-size: 13px;
+        line-height: 20px;
+
+        .c7n-checkbox,
+        .c7n-checkbox-inner {
+            color: fade(@base, 65%);
+        }
+
+        thead {
+            font-family: PingFangSC-Medium;
+        }
+
+        tbody {
+            font-family: PingFangSC-Regular;
+
+            td {
+                &:nth-child(2) {
+                    color: fade(@base, 65%);
+                }
+            }
+        }
+
+    }
+}
