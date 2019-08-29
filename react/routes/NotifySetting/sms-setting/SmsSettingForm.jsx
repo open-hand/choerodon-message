@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
-import { Form, TextField, Select, SelectBox } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, Password } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
+import '../index.less';
 
 const { Option } = Select;
 
 export default observer(({ context }) => (
-  <Form dataSet={context.smsSettingDataSet} labelLayout="float" labelAlign="left">
+  <Form className="hidden-password" dataSet={context.smsSettingDataSet} labelLayout="float" labelAlign="left">
+    <input type="password" style={{ position: 'absolute', top: '-999px' }} />
     <TextField name="signature" />
     <TextField name="hostAddress" />
     <TextField name="hostPort" />
@@ -15,6 +17,6 @@ export default observer(({ context }) => (
       <Option value="async">{context.singleSendApiMap.get('async')}</Option>
     </SelectBox>
     <TextField name={`${context.smsSettingDataSet.current.get('sendType')}SendApi`} />
-    <TextField name="secretKey" />
+    <Password name="secretKey" />
   </Form>
 ));

@@ -20,6 +20,8 @@
   ],
   "extends": "airbnb",
   "rules": {
+    "arrow-parens": "off",
+    "react/jsx-props-no-spreading": "off",
     "class-methods-use-this": "off",
     "consistent-return": "off",
     "global-require": "off",
