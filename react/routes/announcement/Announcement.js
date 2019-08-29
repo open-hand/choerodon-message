@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { observable, action, configure } from 'mobx';
@@ -60,7 +61,10 @@ class AnnouncementType {
 @inject('AppState')
 @observer
 export default class Announcement extends Component {
-  state = this.getInitState();
+  constructor(props) {
+    super(props);
+    this.state = this.getInitState();
+  }
 
   getInitState() {
     return {
@@ -433,8 +437,7 @@ export default class Announcement extends Component {
                 onChange={this.onStartChange}
                 onOpenChange={this.clearStartTimes}
               />,
-            )
-              }
+            )}
           </FormItem>
           <FormItem {...formItemLayout}>
             {getFieldDecorator('sendNotices', {
@@ -485,8 +488,7 @@ export default class Announcement extends Component {
                     onChange={this.onEndChange}
                     onOpenChange={this.clearEndTimes}
                   />,
-                )
-              }
+                )}
               </FormItem>
             ) : null
           }
@@ -536,6 +538,7 @@ export default class Announcement extends Component {
         <div className="c7n-iam-announcement-detail-wrapper">
           <div
             className="c7n-iam-announcement-detail-content"
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: `${content}` }}
           />
         </div>
@@ -573,7 +576,7 @@ export default class Announcement extends Component {
             <FormattedMessage id="refresh" />
           </Button>
         </Header>
-        <Breadcrumb title={<FormattedMessage id={`${intlPrefix}.header.title`} />} />
+        <Breadcrumb />
         <Content
           title=" "
         >

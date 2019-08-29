@@ -6,7 +6,7 @@
       font-size: 14px;
       color: rgba(0, 0, 0, 0.65);
       line-height: 20px;
-      width: 270px;
+      width: 230px;
     }
     .inline {
       display: inline-block;
@@ -31,7 +31,6 @@
       > span {
         display: inline-block;
         width: 112px;
-        margin-right: 70px;
         font-size: 14px;
         color: #000;
         line-height: 20px;
@@ -45,7 +44,27 @@
     overflow: hidden;
   }
 
+  &-sidebar {
+    .c7n-modal {
+      &-content {
+        width: 3.9rem !important;
+        right: 0;
+        left: inherit;
+      }
+      &-body {
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+      }
+      &-footer {
+        position: absolute;
+        width: 100%;
+        bottom: 0.25rem;
+      }
+    }
+  }
+
   &-siderbar-content {
+    padding-bottom: .3rem;
     .radioGroup {
       > label:first-child {
         margin-right: 60px;
@@ -53,6 +72,7 @@
     }
 
     &-datepicker {
+      width: 100%;
       .ant-calendar-today-btn {
         display: none;
       }
@@ -62,19 +82,6 @@
       //font-size: 14px;
       color: rgba(0, 0, 0, 0.65);
       line-height: 20px;
-    }
-  }
-}
-.c7n-iam-announcement-sidebar {
-  .c7n-modal {
-    &-content {
-      width: 3.9rem !important;
-      right: 0;
-      left: inherit;
-    }
-    &-body {
-      padding-left: 0.2rem;
-      padding-right: 0.2rem;
     }
   }
 }
