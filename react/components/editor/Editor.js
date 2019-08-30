@@ -5,6 +5,7 @@ import 'react-quill/dist/quill.snow.css';
 import './Editor.scss';
 import { Modal, Input, Button, Form, Tabs, Upload, Icon } from 'choerodon-ui';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import CustomToolbar from './CustomToolbar';
 
 const { TabPane } = Tabs;
 const { Dragger } = Upload;
@@ -22,59 +23,6 @@ const Font = Quill.import('attributors/style/font');
 Font.whitelist = ['STSong', 'STKaiti', 'STHeiti', 'STFangsong', 'SimSun', 'KaiTi', 'SimHei', 'FangSong', 'Microsoft-YaHei'];
 Quill.register(Font, true);
 
-const CustomToolbar = () => (
-  <div id="toolbar">
-    <span className="ql-formats">
-      <button className="ql-bold" />
-      <button className="ql-italic" />
-      <button className="ql-underline" />
-      <button className="ql-list" value="ordered" />
-      <button className="ql-list" value="bullet" />
-      <select className="ql-align" />
-      <select className="ql-color" />
-      <select className="ql-header">
-        <option selected />
-        <option value="1">H1</option>
-        <option value="2">H2</option>
-        <option value="3">H3</option>
-        <option value="4">H4</option>
-        <option value="5">H5</option>
-        <option value="6">H6</option>
-      </select>
-      {
-        navigator.platform.indexOf('Mac') > -1 ? (
-          <select className="ql-font">
-            <option selected />
-            <option value="STSong">华文宋体</option>
-            <option value="STKaiti">华文楷体</option>
-            <option value="STHeiti">华文黑体</option>
-            <option value="STFangsong">华文仿宋</option>
-          </select>
-        ) : (
-          <select className="ql-font">
-            <option selected />
-            <option value="SimSun">宋体</option>
-            <option value="KaiTi">楷体</option>
-            <option value="SimHei">黑体</option>
-            <option value="FangSong">仿宋</option>
-            <option value="Microsoft-YaHei">微软雅黑</option>
-          </select>
-        )
-      }
-      <select className="ql-size">
-        <option value="10px" />
-        <option value="12px" />
-        <option value="14px" />
-        <option value="16px" />
-        <option value="18px" />
-        <option value="20px" />
-      </select>
-      <button className="ql-link" />
-      <button className="ql-image" />
-      <button className="ql-code-block" />
-    </span>
-  </div>
-);
 
 @Form.create()
 @injectIntl
@@ -301,20 +249,20 @@ export default class Editor extends Component {
             localSrc ? (
               <React.Fragment>
                 <div style={{ backgroundImage: `url(${localSrc})` }} className="c7n-iam-editor-dragger-preview-pic" />
-                            </React.Fragment>
+              </React.Fragment>
             ) : (
               <React.Fragment>
-    <Icon type="inbox" />
-    <h3 className="c7n-iam-editor-dragger-text">
+                <Icon type="inbox" />
+                <h3 className="c7n-iam-editor-dragger-text">
                   <FormattedMessage id="editor.dragger.text" />
                 </h3>
-    <h4 className="c7n-iam-editor-dragger-hint">
+                <h4 className="c7n-iam-editor-dragger-hint">
                   <FormattedMessage
                     id="editor.dragger.hint"
                     values={{ size: `${limitSize / 1024}M`, access: 'PNG、JPG、JPEG、GIF' }}
                   />
                 </h4>
-  </React.Fragment>
+              </React.Fragment>
             )
           }
         </Dragger>
@@ -374,7 +322,7 @@ export default class Editor extends Component {
 
   modules = {
     toolbar: {
-      container: '#toolbar',
+      container: `#${this.props.toolbarContainer}` || '#toolbar',
       handlers: {
         image: this.handleOpenModal,
         'code-block': this.changeToHtml,
@@ -392,6 +340,7 @@ export default class Editor extends Component {
     'link',
     'image',
     'color',
+    'open',
     'font',
     'size',
     'align',
@@ -399,8 +348,8 @@ export default class Editor extends Component {
   ];
 
   defaultStyle = {
-    width: '100%',
-    height: 320,
+    width: this.props.width || '100%',
+    height: this.props.height || 320,
   };
 
   render() {
@@ -418,7 +367,7 @@ export default class Editor extends Component {
     ];
     return (
       <div style={style} className="c7n-iam-react-quill-editor">
-        <CustomToolbar />
+        <CustomToolbar nomore={this.props.nomore} toolbarContainer={this.props.toolbarContainer || 'toolbar'} />
         <ReactQuill
           id="c7n-iam-editor"
           theme="snow"
