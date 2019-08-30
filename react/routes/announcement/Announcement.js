@@ -610,7 +610,7 @@ export default class Announcement extends Component {
         </Header>
         <Breadcrumb />
         <Content
-          title=" "
+          className="c7n-iam-announcement-pt0"
         >
           <Table
             loading={loading}
