@@ -1,6 +1,12 @@
 @import "../../common/style/mixin/template";
 
 .c7n-iam-announcement {
+  .c7n-select-selection__rendered {
+    min-height: 0;
+  }
+  &-pt0 {
+    padding-top: 0;
+  }
   &-detail {
     .send-time {
       font-size: 14px;
