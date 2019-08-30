@@ -8,7 +8,7 @@ export default (props) => {
   const { mailSettingDataSet } = useContext(store);
   return (
     <Spin dataSet={mailSettingDataSet}>
-      <Form dataSet={mailSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
+      <Form pristine dataSet={mailSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
         <Output name="account" />
         <Output renderer={() => '••••••'} name="password" />
         <Output name="sendName" renderer={OutputEmptyValue} />

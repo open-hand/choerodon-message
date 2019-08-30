@@ -279,12 +279,6 @@ export default class SmsSetting extends Component {
         <Header
           title="短信配置"
         >
-          {/* <Button
-            onClick={this.testContact}
-            icon="low_priority"
-          >
-            <FormattedMessage id={`${intlPrefix}.test.contact`} />
-          </Button> */}
           <Button
             onClick={this.handleRefresh}
             icon="refresh"
