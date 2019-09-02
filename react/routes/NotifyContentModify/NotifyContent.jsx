@@ -12,10 +12,34 @@ import ModifySetting from './ModifySetting';
 
 const { TabPane } = Tabs;
 
-
 export default (props) => {
-  const context = useContext(Store);
   // const [TabKey, setTabKey] = useState('mail');
+  const context = useContext(Store);
+  // console.log('NotifyContent', context);
+  async function handleSave() {
+    try {
+      if ((await context.createTemplateDataSet.submit())) {
+        setTimeout(() => { window.location.reload(true); }, 1000);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+  async function handleSaveConfig() {
+    try {
+      if ((await context.sendSettingDataSet.submit())) {
+        // setTimeout(() => { window.location.reload(true); }, 1000);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
   const modifyEdit = () => {
     Modal.open({
       title: '修改配置',
@@ -26,7 +50,7 @@ export default (props) => {
       children: (
         <ModifySetting context={context} />
       ),
-      // onOk: submitFunc,
+      onOk: handleSaveConfig,
       // onCancel: resetFunc,
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
@@ -42,11 +66,12 @@ export default (props) => {
       children: (
         <CreateTemplate context={context} />
       ),
-      // onOk: submitFunc,
+      onOk: handleSave,
       // onCancel: resetFunc,
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
   };
+
 
   return (
     <Page>
@@ -68,7 +93,7 @@ export default (props) => {
           {'创建模版'}
         </Button>
       </Header>
-      <Breadcrumb title="通知配置" />
+      <Breadcrumb title="设置邮件内容" />
       <Content>
         <SendSetting />
         <TemplateSelect />

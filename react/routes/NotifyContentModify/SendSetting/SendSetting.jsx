@@ -10,7 +10,8 @@ export default (props) => {
   return (
     <Spin dataSet={sendSettingDataSet}>
       <h1><FormattedMessage id={`${intlPrefix}.sendSetting.header.title`} /></h1>
-      <Form dataSet={sendSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
+      
+      <Form dataSet={sendSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={130}>
         <Output name="retryCount" />
         <Output name="sendInstantly" renderer={OutputEmptyValue} />
         <Output name="manualRetry" renderer={OutputEmptyValue} />

@@ -1,33 +1,27 @@
 const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 
-export default (id, businessType, type, datasetType, intl, intlPrefix) => {
+export default (id, intl, intlPrefix) => {
   const name = intl.formatMessage({ id: `${intlPrefix}.name` });
   const emailTitle = intl.formatMessage({ id: `${intlPrefix}.emailTitle` });
   const predefined = intl.formatMessage({ id: `${intlPrefix}.predefined` });
+  const emailContent = '模板内容';
   return {
-    autoQuery: datasetType === 'query',
-    autoCreate: datasetType !== 'query',
+    autoQuery: true,
     selection: false,
-    // dataKey: null,
-    paging: true,
+    paging: false,
+    dataKey: null,
     fields: [
+      // { name: 'id', type: 'string' },
       { name: 'name', type: 'string', label: name },
-      // { name: 'code', type: 'string', label: name, defaultValue: 'code322222' },
-
       { name: 'emailTitle', type: 'string', label: emailTitle },
-      { name: 'emailContent', type: 'string', defaultValue: '' },
+      { name: 'emailContent', type: 'string', label: emailContent },
       { name: 'predefined', type: 'boolean', label: predefined },
     ],
     transport: {
       read: {
-        url: `notify/v1/templates?businessType=${businessType}&messageType=${type}`,
+        url: `notify/v1/templates/${id}`,
         method: 'get',
       },
-      submit: ({ data }) => ({
-        url: `notify/v1/templates/${type}?set_to_the_current=${data[0].predefined}`,
-        method: 'put',
-        data: data[0],
-      }),
     },
   };
 };
