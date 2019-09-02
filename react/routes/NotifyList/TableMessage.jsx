@@ -1,7 +1,7 @@
 import React, { Component, useContext } from 'react/index';
 import classnames from 'classnames';
 import { Table, Button } from 'choerodon-ui/pro';
-import { Action, axios } from '@choerodon/master';
+import { Action, axios, Page, Breadcrumb, Content, Header } from '@choerodon/master';
 import Store from './Store';
 
 import './TableMessage.less';
@@ -17,7 +17,7 @@ const StatusCard = ({ enabled }) => (
       'c7n-notify-disable': !enabled,
     })}
   >
-    { enabled ? '启用' : '停用' }
+    {enabled ? '启用' : '停用'}
   </div>
 );
 
@@ -30,8 +30,8 @@ export default function Tab() {
       history.push(`/notify/send-setting/${id}/${businessType}/email`);
     } else if (mes === 'sms') {
       history.push(`/notify/send-setting/${id}/${businessType}/sms`);
-    } else if (mes === 'inmail') {
-      history.push(`/notify/send-setting/${id}/${businessType}/inmail`);
+    } else if (mes === 'pm') {
+      history.push(`/notify/send-setting/${id}/${businessType}/pm`);
     }
   }
   // 启用状态改变切换
@@ -54,6 +54,7 @@ export default function Tab() {
   function getNameMethod({ value, record }) {
     const messageType = record.get('messageType');
     const id = record.get('id');
+    // console.log(record);
     const actionDatas = [{
       service: [],
       text: '设置邮件内容',
@@ -62,7 +63,7 @@ export default function Tab() {
     {
       service: [],
       text: '设置站内信内容',
-      action: () => deleteLink('inmail'),
+      action: () => deleteLink('pm'),
     },
     {
       service: [],
@@ -88,6 +89,7 @@ export default function Tab() {
   }
   // 渲染启用状态
   const getEnabled = ({ record }) => <StatusCard enabled={record.get('enabled')} />;
+  
   // 接收配置渲染
   function getAllowConfig({ record }) {
     if (record.get('allowConfig')) {
@@ -121,15 +123,21 @@ export default function Tab() {
     }
   }
   return (
-    <page>
-      <header><div className="title">消息服务</div></header>
-      <Table className="messageService" dataSet={sendSettingDataSet}>
-        <Column className="column1" name="messageType" renderer={getNameMethod} />
-        <Column name="introduce" />
-        <Column name="level" renderer={getLevel} />
-        <Column width={130} name="enabled" align="center" renderer={getEnabled} />
-        <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
-      </Table>
-    </page>
+    <Page>
+      {/* <Header>
+        <div className="title">消息服务</div>
+      </Header> */}
+      <Breadcrumb title="" />
+
+      <Content className="">
+        <Table className="messageService" dataSet={sendSettingDataSet}>
+          <Column className="column1" name="messageType" renderer={getNameMethod} />
+          <Column name="introduce" />
+          <Column name="level" renderer={getLevel} />
+          <Column width={130} name="enabled" align="center" renderer={getEnabled} />
+          <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
+        </Table>
+      </Content>
+    </Page>
   );
 }

@@ -31,7 +31,7 @@ export default (id, intl, intlPrefix) => {
       },
 
       submit: ({ data }) => ({
-        url: 'notify/v1/notices/configs/email',
+        url: `notify/v1/notices/send_settings/${id}/email_send_setting`,
         method: 'put',
         data: data[0],
       }),
