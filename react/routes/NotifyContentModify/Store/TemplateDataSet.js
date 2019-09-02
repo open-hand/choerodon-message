@@ -1,3 +1,5 @@
+import { randomString } from '../../../common/util';
+
 const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 
 export default (id, businessType, type, datasetType, intl, intlPrefix) => {
@@ -17,6 +19,7 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       { name: 'emailTitle', type: 'string', label: emailTitle },
       { name: 'emailContent', type: 'string', defaultValue: '' },
       { name: 'predefined', type: 'boolean', label: predefined },
+
     ],
     transport: {
       read: {
@@ -25,8 +28,12 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       },
       submit: ({ data }) => ({
         url: `notify/v1/templates/${type}?set_to_the_current=${data[0].predefined}`,
-        method: 'put',
-        data: data[0],
+        method: 'post',
+        data: {
+          ...data[0],
+          businessType,
+          code: `${businessType}-${randomString(5)}`,
+        },
       }),
     },
   };

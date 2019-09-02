@@ -26,6 +26,7 @@ const detailTemplate = (detailId) => {
     // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
 };
+
 // 修改
 const updateLink = (type, detailId, context) => {
   Modal.open({
