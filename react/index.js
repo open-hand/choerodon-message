@@ -24,7 +24,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
     <IntlProviderAsync>
       <div>
         <Switch>
-          <Route path={`${match.url}/msg-record`} component={msgRecord} />
+          <Route path={`${match.url}/msg-log`} component={msgRecord} />
           <Route path={`${match.url}/announcement`} component={announcement} />
           <Route path={`${match.url}/sms-template`} component={smsTemplate} />
           <Route path={`${match.url}/mail-template`} component={mailTemplate} />
@@ -34,7 +34,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
           <Route path={`${match.url}/receive-setting`} component={receiveSetting} />
           <Route path={`${match.url}/user-msg`} component={userMsg} />
           <Route path={`${match.url}/msg-config`} component={notifySetting} />
-          <Route path={`${match.url}/send-setting-content`} component={notifyList} />
+          <Route path={`${match.url}/msg-service`} component={notifyList} />
           <Route path={`${match.url}/send-setting/:settingId/:settingBusinessType/:settingType`} component={notifyContentModify} />
           <Route path="*" component={nomatch} />
         </Switch>
