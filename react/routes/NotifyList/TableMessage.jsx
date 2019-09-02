@@ -23,15 +23,18 @@ const StatusCard = ({ enabled }) => (
 
 export default function Tab() {
   const { sendSettingDataSet, history, match } = useContext(Store);
+  // console.log(useContext(Store));
+
   function deleteLink(mes) {
     const id = sendSettingDataSet.current.get('id');
     const businessType = sendSettingDataSet.current.get('code');
+    const { search } = history.location;
     if (mes === 'email') {
-      history.push(`/notify/send-setting/${id}/${businessType}/email`);
+      history.push(`/notify/send-setting/${id}/${businessType}/email${search}`);
     } else if (mes === 'sms') {
-      history.push(`/notify/send-setting/${id}/${businessType}/sms`);
+      history.push(`/notify/send-setting/${id}/${businessType}/sms${search}`);
     } else if (mes === 'pm') {
-      history.push(`/notify/send-setting/${id}/${businessType}/pm`);
+      history.push(`/notify/send-setting/${id}/${businessType}/pm${search}`);
     }
   }
   // 启用状态改变切换
@@ -89,7 +92,7 @@ export default function Tab() {
   }
   // 渲染启用状态
   const getEnabled = ({ record }) => <StatusCard enabled={record.get('enabled')} />;
-  
+
   // 接收配置渲染
   function getAllowConfig({ record }) {
     if (record.get('allowConfig')) {

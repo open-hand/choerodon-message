@@ -16,3 +16,17 @@ export function handleFiltersParams(params, filters) {
   const targetfilters = Object.values(filters).find(item => !_.isEmpty(item) && pattern.test(item[0]));
   return targetParams || targetfilters;
 }
+/**
+ * 生成指定长度的随机字符串
+ * @param len 字符串长度
+ * @returns {string}
+ */
+export function randomString(len = 32) {
+  let code = '';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const maxPos = chars.length;
+  for (let i = 0; i < len; i += 1) {
+    code += chars.charAt(Math.floor(Math.random() * (maxPos + 1)));
+  }
+  return code;
+}

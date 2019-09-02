@@ -22,6 +22,13 @@ export default (id, intl, intlPrefix) => {
         url: `notify/v1/templates/${id}`,
         method: 'get',
       },
+      submit: ({ data }) => ({
+        url: `notify//v1/templates/email/${id}?set_to_the_current=${data[0].predefined}`,
+        method: 'put',
+        data: {
+          ...data[0],
+        },
+      }),
     },
   };
 };
