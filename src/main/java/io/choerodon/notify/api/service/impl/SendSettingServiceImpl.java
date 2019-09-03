@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class SendSettingServiceImpl implements SendSettingService {
 
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
+    public static final String SEND_SETTING_UPDATE_EXCEPTION ="error.send.setting.update";
     private SendSettingMapper sendSettingMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
@@ -92,7 +93,7 @@ public class SendSettingServiceImpl implements SendSettingService {
             db.setAllowConfig(updateDTO.getAllowConfig());
         }
         if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
-            throw new CommonException("error.send.setting.update");
+            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
         return sendSettingMapper.selectByPrimaryKey(db.getId());
     }
@@ -253,7 +254,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         updateDTO.setEmailTemplateId(updateVO.getEmailTemplateId());
         updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
-            throw new CommonException("error.send.setting.update");
+            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
         return getEmailSendSetting(updateDTO.getId());
     }
@@ -281,7 +282,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         updateDTO.setPmTemplateId(updateVO.getPmTemplateId());
         updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
-            throw new CommonException("error.send.setting.update");
+            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
         return getPmSendSetting(updateDTO.getId());
     }
