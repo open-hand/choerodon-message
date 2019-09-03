@@ -63,5 +63,5 @@ public interface TemplateService {
      * @param updateVO 更新VO
      * @return 更新结果
      */
-    TemplateCreateVO updateTemplate(TemplateCreateVO updateVO);
+    TemplateCreateVO updateTemplate(Boolean setToTheCurrent,TemplateCreateVO updateVO);
 }

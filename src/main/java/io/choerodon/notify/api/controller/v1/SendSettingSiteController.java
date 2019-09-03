@@ -146,4 +146,21 @@ public class SendSettingSiteController {
         updateVO.setId(id);
         return new ResponseEntity<>(sendSettingService.updateEmailSendSetting(updateVO), HttpStatus.OK);
     }
+
+
+    @GetMapping("/{id}/pm_send_setting")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "获取站内信内容的发送设置信息")
+    public ResponseEntity<PmSendSettingVO> getPmSendSetting(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.getPmSendSetting(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/pm_send_setting")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "修改站内信内容的发送设置信息")
+    public ResponseEntity<PmSendSettingVO> updatePmSendSetting(@PathVariable("id") Long id,
+                                                               @RequestBody PmSendSettingVO updateVO) {
+        updateVO.setId(id);
+        return new ResponseEntity<>(sendSettingService.updatePmSendSetting(updateVO), HttpStatus.OK);
+    }
 }

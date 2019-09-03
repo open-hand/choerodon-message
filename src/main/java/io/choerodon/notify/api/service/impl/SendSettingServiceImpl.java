@@ -258,6 +258,34 @@ public class SendSettingServiceImpl implements SendSettingService {
         return getEmailSendSetting(updateDTO.getId());
     }
 
+    @Override
+    public PmSendSettingVO getPmSendSetting(Long id) {
+        SendSetting sendSetting = sendSettingMapper.selectByPrimaryKey(id);
+        if (sendSetting == null) {
+            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
+        }
+        Template pmTemplate = null;
+        if (sendSetting.getPmTemplateId() != null) {
+            pmTemplate = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
+        }
+        return getPmSendSettingVO(sendSetting, pmTemplate);
+    }
+
+    @Override
+    public PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO) {
+        SendSetting updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
+        if (updateDTO == null) {
+            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
+        }
+        updateDTO.setPmType(updateVO.getPmType());
+        updateDTO.setPmTemplateId(updateVO.getPmTemplateId());
+        updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
+        if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
+            throw new CommonException("error.send.setting.update");
+        }
+        return getPmSendSetting(updateDTO.getId());
+    }
+
     /**
      * 根据 notify_send_setting{@link SendSetting} 和 notify_template{@link Template}
      * 获取 EmailSendSettingVO {@link EmailSendSettingVO}
@@ -269,11 +297,34 @@ public class SendSettingServiceImpl implements SendSettingService {
     private EmailSendSettingVO getEmailSendSettingVO(SendSetting sendSetting, Template template) {
         EmailSendSettingVO emailSendSettingVO = new EmailSendSettingVO();
         BeanUtils.copyProperties(sendSetting, emailSendSettingVO);
+        emailSendSettingVO.setSendInstantly(sendSetting.getIsSendInstantly());
+        emailSendSettingVO.setManualRetry(sendSetting.getIsManualRetry());
         if (template != null) {
             emailSendSettingVO
                     .setEmailTemplateId(template.getId())
                     .setEmailTemplateTitle(template.getEmailTitle());
         }
         return emailSendSettingVO;
+    }
+
+
+    /**
+     * 根据 notify_send_setting{@link SendSetting} 和 notify_template{@link Template}
+     * 获取 PmSendSettingVO {@link PmSendSettingVO}
+     *
+     * @param sendSetting
+     * @param template
+     * @return
+     */
+    private PmSendSettingVO getPmSendSettingVO(SendSetting sendSetting, Template template) {
+        PmSendSettingVO pmSendSettingVO = new PmSendSettingVO();
+        BeanUtils.copyProperties(sendSetting, pmSendSettingVO);
+        if (template != null) {
+            pmSendSettingVO
+                    .setPmTemplateId(template.getId())
+                    .setPmTemplateName(template.getName())
+                    .setPmTemplateTitle(template.getPmTitle());
+        }
+        return pmSendSettingVO;
     }
 }
