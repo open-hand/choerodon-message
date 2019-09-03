@@ -1,4 +1,4 @@
-export default (id, intl, intlPrefix) => {
+export default (id, businessType, type, intl, intlPrefix) => {
   const retryCount = intl.formatMessage({ id: `${intlPrefix}.retryCount` });
   const sendInstantly = intl.formatMessage({ id: `${intlPrefix}.sendInstantly` });
   const manualRetry = intl.formatMessage({ id: `${intlPrefix}.manualRetry` });
@@ -12,9 +12,11 @@ export default (id, intl, intlPrefix) => {
       { name: 'retryCount', type: 'string', label: retryCount, required: true },
       { name: 'sendInstantly', type: 'boolean', label: sendInstantly, required: true, defaultValue: false },
       { name: 'manualRetry', type: 'boolean', label: manualRetry, required: true },
-      { name: 'emailTemplate', type: 'object', label: emailTemplate, textField: 'name', valueField: 'id', required: true, ignore: 'always', lookupUrl: 'notify/v1/notices/emails/templates' },
-      { name: 'emailTemplateTitle', type: 'string', bind: 'emailTemplate.name' },
-      { name: 'emailTemplateId', type: 'string', bind: 'emailTemplate.id' },
+      { name: `${type}Template`, type: 'object', label: emailTemplate, textField: 'name', valueField: 'id', required: true, ignore: 'always', lookupUrl: `notify/v1/templates?businessType=${businessType}&messageType=${type}` },
+      { name: `${type}TemplateTitle`, type: 'string', bind: 'emailTemplate.name' },
+      { name: `${type}TemplateId`, type: 'string', bind: 'emailTemplate.id' },
+      { name: `${type}Type`, type: 'string', bind: 'emailTemplate.id' },
+
     ],
 
     transport: {

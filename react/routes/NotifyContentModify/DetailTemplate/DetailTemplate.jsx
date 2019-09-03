@@ -11,8 +11,9 @@ const WrappedEditor = observer(props => {
   const [editor2, setEditor2] = useState(undefined);
   const [fullscreen, setFullscreen] = useState(false);
   const [current, setCurrent] = useState(undefined);
+  const { settingType } = props;
   const setDoc = (value, current0) => {
-    current0.set('emailContent', value);
+    current0.set(`${settingType}Content`, value);
   };
   useEffect(() => {
     if (editor) {
@@ -28,7 +29,7 @@ const WrappedEditor = observer(props => {
   // return (<div>11</div>);
   return (
     <div style={{ display: 'inline-block' }}>
-      <p style={{ display: 'inline-block' }} className="content-text">邮件内容：</p>
+      <p style={{ display: 'inline-block' }} className="content-text">模板内容：</p>
       {/* <Editor
       onRef={noop}
       onChange={value => setDoc(value, props.current)}
@@ -37,7 +38,7 @@ const WrappedEditor = observer(props => {
       <Button style={{ float: 'right' }} icon="zoom_out_map" onClick={handleFullScreen} type="primary">全屏编辑</Button>
 
       <Editor
-        value={props.current.get('emailContent')}
+        value={props.current.get(`${settingType}Content`)}
         onRef={(node) => {
           setEditor(node);
         }}
@@ -56,7 +57,7 @@ const WrappedEditor = observer(props => {
       >
         <Editor
           toolbarContainer="toolbar2"
-          value={props.current.get('emailContent')}
+          value={props.current.get(`${settingType}Content`)}
           height={500}
           nomore
           onRef={(node) => {
@@ -77,7 +78,7 @@ export default observer(() => {
   async function handleSave() {
     try {
       if ((await context.detailTemplateDataSet.submit())) {
-        // setTimeout(() => { window.location.reload(true); }, 1000);
+        setTimeout(() => { window.location.reload(true); }, 1000);
         return true;
       } else {
         return false;
@@ -87,7 +88,9 @@ export default observer(() => {
     }
   }
   useEffect(() => {
-    modal.handleOk(handleSave);
+    if (editing) {
+      modal.handleOk(handleSave);
+    }
   }, []);
 
   return (
@@ -98,10 +101,11 @@ export default observer(() => {
       {editing && detailTemplateDataSet.current ? (
         <WrappedEditor
           current={detailTemplateDataSet.current}
+          settingType={context.settingType}
         />
       ) : <TextArea name="emailContent" resize="both" disabled />}
       {editing ? (
-        <SelectBox name="predefined">
+        <SelectBox name="current">
           <Option value>是</Option>
           <Option value={false}>否</Option>
         </SelectBox>

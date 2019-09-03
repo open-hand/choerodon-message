@@ -14,7 +14,8 @@ export const StoreProvider = injectIntl(inject('AppState')(
     const { AppState: { currentMenuType: { type, id } }, intl, children, detailId } = props;
     const { settingId, settingBusinessType, settingType } = props.match.params;
     const intlPrefix = 'global.notifyContent';
-    const sendSettingDataSet = useMemo(() => new DataSet(SendSettingDataSet(settingId, intl, `${intlPrefix}.sendSetting`)));
+    const prefixCls = 'notify-content';
+    const sendSettingDataSet = useMemo(() => new DataSet(SendSettingDataSet(settingId, settingBusinessType, settingType, intl, `${intlPrefix}.sendSetting`)));
     const templateDataSet = useMemo(() => new DataSet(TemplateDataSet(settingId, settingBusinessType, settingType, 'query', intl, `${intlPrefix}.template`)));
     const createTemplateDataSet = useMemo(() => new DataSet(TemplateDataSet(settingId, settingBusinessType, settingType, 'create', intl, `${intlPrefix}.template`)));
     const value = {
@@ -22,6 +23,7 @@ export const StoreProvider = injectIntl(inject('AppState')(
       settingId,
       settingType,
       intlPrefix,
+      prefixCls,
       createTemplateDataSet,
       sendSettingDataSet,
       templateDataSet,

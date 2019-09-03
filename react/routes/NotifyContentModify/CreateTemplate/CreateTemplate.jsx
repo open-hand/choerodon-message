@@ -7,15 +7,16 @@ import store from '../Store';
 
 const { Option } = Select;
 
-const setDoc = (value, current) => {
-  current.set('emailContent', value);
-};
 
 const WrappedEditor = observer(props => {
   const [editor, setEditor] = useState(undefined);
   const [editor2, setEditor2] = useState(undefined);
   const [fullscreen, setFullscreen] = useState(false);
-
+  const { settingType } = props;
+  const setDoc = (value, current) => {
+    current.set(`${settingType}Content`, value);
+  };
+  
   useEffect(() => {
     if (editor) {
       editor.initEditor();
@@ -30,7 +31,7 @@ const WrappedEditor = observer(props => {
   // console.log(props);
   return (
     <div style={{ display: 'inline-block' }}>
-      <p style={{ display: 'inline-block' }} className="content-text">邮件内容：</p>
+      <p style={{ display: 'inline-block' }} className="content-text">模板内容：</p>
       {/* <Editor
       onRef={noop}
       onChange={value => setDoc(value, props.current)}
@@ -39,7 +40,7 @@ const WrappedEditor = observer(props => {
       <Button style={{ float: 'right' }} icon="zoom_out_map" onClick={handleFullScreen} type="primary">全屏编辑</Button>
 
       <Editor
-        value={props.current.get('emailContent')}
+        value={props.current.get(`${settingType}Content`)}
         onRef={(node) => {
           setEditor(node);
         }}
@@ -57,7 +58,7 @@ const WrappedEditor = observer(props => {
       >
         <Editor
           toolbarContainer="toolbar2"
-          value={props.current.get('emailContent')}
+          value={props.current.get(`${settingType}Content`)}
           height={500}
           nomore
           onRef={(node) => {
@@ -75,11 +76,12 @@ const WrappedEditor = observer(props => {
 export default props => (
   <Form dataSet={props.context.createTemplateDataSet} labelLayout="float" labelAlign="left">
     <TextField name="name" />
-    <TextField name="emailTitle" />
+    <TextField name={`${props.context.settingType}Title`} />
     <WrappedEditor
       current={props.context.createTemplateDataSet.current}
+      settingType={props.context.settingType}
     />
-    <SelectBox name="predefined">
+    <SelectBox name="current">
       <Option value>是</Option>
       <Option value={false}>否</Option>
     </SelectBox>
