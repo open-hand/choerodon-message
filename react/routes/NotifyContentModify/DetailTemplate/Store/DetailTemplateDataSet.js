@@ -1,10 +1,10 @@
 const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 
-export default (id, intl, intlPrefix) => {
+export default (id, type, intl, intlPrefix) => {
   const name = intl.formatMessage({ id: `${intlPrefix}.name` });
-  const emailTitle = intl.formatMessage({ id: `${intlPrefix}.emailTitle` });
-  const predefined = intl.formatMessage({ id: `${intlPrefix}.predefined` });
-  const emailContent = '模板内容';
+  const Title = intl.formatMessage({ id: `${intlPrefix}.${type}Title` });
+  const current = intl.formatMessage({ id: `${intlPrefix}.current` });
+  const Content = '模板内容';
   return {
     autoQuery: true,
     selection: false,
@@ -13,9 +13,9 @@ export default (id, intl, intlPrefix) => {
     fields: [
       // { name: 'id', type: 'string' },
       { name: 'name', type: 'string', label: name },
-      { name: 'emailTitle', type: 'string', label: emailTitle },
-      { name: 'emailContent', type: 'string', label: emailContent },
-      { name: 'predefined', type: 'boolean', label: predefined },
+      { name: `${type}Title`, type: 'string', label: Title },
+      { name: `${type}Content`, type: 'string', label: Content },
+      { name: 'current', type: 'boolean', label: current, defaultValue: false },
     ],
     transport: {
       read: {

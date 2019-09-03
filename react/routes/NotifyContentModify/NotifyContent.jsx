@@ -1,4 +1,4 @@
-import React, { Component, useContext, useState } from 'react/index';
+import React, { Component, useContext, useState, useEffect } from 'react/index';
 import { observer, useComputed } from 'mobx-react-lite';
 import { DataSet, Table, Modal, Button, Tabs, Tooltip } from 'choerodon-ui/pro';
 import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/master';
@@ -9,12 +9,15 @@ import TemplateSelect from './TemplateSelect';
 import Store from './Store';
 import CreateTemplate from './CreateTemplate';
 import ModifySetting from './ModifySetting';
+import './NotifyContent.less';
 
 const { TabPane } = Tabs;
 
 export default (props) => {
   // const [TabKey, setTabKey] = useState('mail');
+  // const [title, settitle] = useState(undefined);
   const context = useContext(Store);
+  const { settingType, prefixCls } = context;
   // console.log('NotifyContent', context);
   async function handleSave() {
     try {
@@ -31,7 +34,7 @@ export default (props) => {
   async function handleSaveConfig() {
     try {
       if ((await context.sendSettingDataSet.submit())) {
-        // setTimeout(() => { window.location.reload(true); }, 1000);
+        setTimeout(() => { window.location.reload(true); }, 1000);
         return true;
       } else {
         return false;
@@ -71,13 +74,30 @@ export default (props) => {
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
   };
-
+  function chooseBreadcrumb() {
+    if (settingType === 'email') {
+      return '设置邮件内容';
+    } else if (settingType === 'sms') {
+      return '设置短信内容';
+    } else if (settingType === 'pm') {
+      return '设置站内信内容';
+    }
+  }
+  function isHasEditConfig() {
+    if (settingType === 'email') {
+      return true;
+    } else if (settingType === 'sms') {
+      return false;
+    } else if (settingType === 'pm') {
+      return false;
+    }
+  }
 
   return (
-    <Page>
+    <Page className={`${prefixCls}`}>
       <Header
         title="通知配置"
-      >
+      >{isHasEditConfig() ? (
         <Button
           color="blue"
           onClick={modifyEdit}
@@ -85,6 +105,7 @@ export default (props) => {
         >
           {'修改配置'}
         </Button>
+      ) : null}
         <Button
           color="blue"
           onClick={createTemplate}
@@ -93,7 +114,7 @@ export default (props) => {
           {'创建模版'}
         </Button>
       </Header>
-      <Breadcrumb title="设置邮件内容" />
+      <Breadcrumb title={chooseBreadcrumb()} />
       <Content>
         <SendSetting />
         <TemplateSelect />

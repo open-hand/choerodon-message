@@ -271,11 +271,15 @@ const pageDetail = {
   'global.notifyContent.template.header.title': '模板选择',
   'global.notifyContent.template.name': '模板名称',
   'global.notifyContent.template.emailTitle': '邮件主题',
+  'global.notifyContent.template.pmTitle': '站内信主题',
+  'global.notifyContent.template.smsTitle': '短信主题',
   'global.notifyContent.sendSetting.retryCount': '重发次数',
   'global.notifyContent.sendSetting.sendInstantly': '是否即时重发',
   'global.notifyContent.sendSetting.manualRetry': '是否允许手动重发',
   'global.notifyContent.sendSetting.emailTemplate': '模板',
-  'global.notifyContent.template.predefined': '是否默认为当前使用模版',
+  'global.notifyContent.template.current': '是否默认为当前使用模版',
+  'global.notifyContent.template.source': '来源',
+
 
   // 项目管理
   'organization.project.title': '组织"{name}"的项目管理',

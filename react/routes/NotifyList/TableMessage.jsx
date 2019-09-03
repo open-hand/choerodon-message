@@ -75,7 +75,7 @@ export default function Tab() {
     },
     {
       service: [],
-      text: record.get('enabled') ? '禁用' : '启用',
+      text: record.get('enabled') ? '停用' : '启用',
       action: () => changeMake(),
     },
     {
