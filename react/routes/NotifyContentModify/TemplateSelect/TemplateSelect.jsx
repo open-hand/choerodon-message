@@ -12,7 +12,7 @@ const { Column } = Table;
 const OutputEmptyValue = ({ value }) => (value ? <span>{value}</span> : <span>无</span>);
 
 // 打开详情页
-const detailTemplate = (detailId) => {
+const detailTemplate = (detailId, context) => {
   Modal.open({
     title: '详情页',
     drawer: true,
@@ -20,7 +20,7 @@ const detailTemplate = (detailId) => {
       width: 380,
     },
     children: (
-      <DetailTemplate detailId={detailId} editing={false} />
+      <DetailTemplate context={context} detailId={detailId} editing={false} />
     ),
     // onOk: close(),
     okCancel: false,
@@ -44,8 +44,14 @@ const updateLink = (type, detailId, context) => {
     // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
 };
-const deleteLink = (type, detailId) => {
+const deleteLink = (id) => {
   // console.log('DELETE删除模板/v1/templates/{id}');
+  axios.delete(`notify/v1/templates/${id}`).then(() => {
+    Choerodon.prompt('删除模板成功');
+    setTimeout(() => { window.location.reload(true); }, 1000);
+  }).catch((error) => {
+    Choerodon.prompt(error);
+  });
 };
 
 const dataSet = new DataSet({
@@ -93,22 +99,25 @@ export default (props) => {
     },
     {
       service: [],
-      text: moduleText,
-      action: () => changeCurrent(record.get('id')),
-    },
-    {
-      service: [],
       text: '删除',
       action: () => deleteLink(settingType, record.get('id')),
     }];
+    const currentArr = {
+      service: [],
+      text: '设为默认模板',
+      action: () => changeCurrent(record.get('id')),
+    };
     if (record.get('predefined')) {
       actionDatas.pop();
+    }
+    if (index) {
+      actionDatas.splice(1, 0, currentArr);
     }
 
     return (
       value ? (
         <React.Fragment>
-          <span className="name" onClick={detailTemplate.bind(this, record.get('id'))}>{value}</span>
+          <span className="name" onClick={detailTemplate.bind(this, record.get('id'), context)}>{value}</span>
           {index ? '' : <span className={`${prefixCls}-current`}>当前</span>}
           <Action className="action-icon" style={{ float: 'right', marginTop: 6 }} data={actionDatas} />
         </React.Fragment>
