@@ -110,24 +110,27 @@ public class TemplateSiteController {
     @Permission(type = ResourceType.SITE)
     @ApiModelProperty(value = "全局层更新邮件模版")
     public ResponseEntity<TemplateCreateVO> updateEmailTemplate(@PathVariable("id") long id,
+                                                                @RequestParam(value = "set_to_the_current") Boolean current,
                                                                 @RequestBody @Validated({Update.class}) TemplateCreateVO.EmailTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(updateVO), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
     }
 
     @PutMapping(value = "/pm/{id}")
     @Permission(type = ResourceType.SITE)
     @ApiModelProperty(value = "全局层更新站内信模版")
     public ResponseEntity<TemplateCreateVO> updatePmTemplate(@PathVariable("id") long id,
+                                                             @RequestParam(value = "set_to_the_current") Boolean current,
                                                              @RequestBody @Validated({Update.class}) TemplateCreateVO.PmTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(updateVO), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
     }
 
     @PutMapping(value = "/sms/{id}")
     @Permission(type = ResourceType.SITE)
     @ApiModelProperty(value = "全局层更新短信模版")
     public ResponseEntity<TemplateCreateVO> updateSmsTemplate(@PathVariable("id") long id,
+                                                              @RequestParam(value = "set_to_the_current") Boolean current,
                                                               @RequestBody @Validated({Update.class}) TemplateCreateVO.SmsTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(updateVO), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
     }
 
 }

@@ -16,6 +16,9 @@ public class EmailSendSettingVO {
     private Long emailTemplateId;
 
     @ApiModelProperty(value = "邮件模版名称")
+    private String emailTemplateName;
+
+    @ApiModelProperty(value = "邮件模版标题")
     private String emailTemplateTitle;
 
     @ApiModelProperty(value = "重试次数")
@@ -45,6 +48,15 @@ public class EmailSendSettingVO {
 
     public EmailSendSettingVO setEmailTemplateId(Long emailTemplateId) {
         this.emailTemplateId = emailTemplateId;
+        return this;
+    }
+
+    public String getEmailTemplateName() {
+        return emailTemplateName;
+    }
+
+    public EmailSendSettingVO setEmailTemplateName(String emailTemplateName) {
+        this.emailTemplateName = emailTemplateName;
         return this;
     }
 

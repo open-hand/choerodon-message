@@ -29,7 +29,7 @@ public class TemplateCreateVO {
     @ApiModelProperty(value = "模版编码")
     private String code;
 
-    @NotEmpty(message = "error.template.create.business.type.cannot.be.empty", groups = {Insert.class})
+    @NotEmpty(message = "error.template.create.business.type.cannot.be.empty", groups = {Insert.class, Update.class})
     @ApiModelProperty(value = "模版业务类型")
     private String businessType;
 

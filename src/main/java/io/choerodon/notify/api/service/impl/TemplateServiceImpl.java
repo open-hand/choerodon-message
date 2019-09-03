@@ -127,7 +127,8 @@ public class TemplateServiceImpl implements TemplateService {
 
 
     @Override
-    public TemplateCreateVO updateTemplate(TemplateCreateVO updateVO) {
+    public TemplateCreateVO updateTemplate(Boolean setToTheCurrent, TemplateCreateVO updateVO) {
+        // 更新模版
         Template template = templateMapper.selectByPrimaryKey(updateVO.getId());
         if (template == null) {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
@@ -144,6 +145,11 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
+        // 设为当前
+        if (setToTheCurrent) {
+            updateSendSettingTemplate(template.getId(), updateVO);
+        }
+        // 返回创建结果
         template = templateMapper.selectByPrimaryKey(updateVO.getId());
         TemplateCreateVO resultVO = new TemplateCreateVO();
         BeanUtils.copyProperties(template, resultVO);
