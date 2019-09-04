@@ -156,11 +156,13 @@
     <select id="doFTR" resultType="io.choerodon.notify.api.dto.TemplateVO">
         SELECT
         id,
-        NAME,
-        IS_PREDEFINED AS predefined,
-        EMAIL_TITLE,
-        PM_TITLE,
-        SMS_CONTENT
+        name,
+        is_predefined as predefined,
+        email_title,
+        pm_title,
+        sms_content,
+        case when (#{currentId} is not null and id=#{currentId} )
+        then true else false end as current_template
         FROM
         notify_template
         WHERE 1=1

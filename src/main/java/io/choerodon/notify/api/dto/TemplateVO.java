@@ -41,6 +41,9 @@ public class TemplateVO {
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
 
+    @ApiModelProperty(value = "是否为邮件/站内信/短信 当前模板")
+    private Boolean currentTemplate = false;
+
     public Long getId() {
         return id;
     }
@@ -120,5 +123,13 @@ public class TemplateVO {
     public TemplateVO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
         return this;
+    }
+
+    public Boolean getCurrentTemplate() {
+        return currentTemplate;
+    }
+
+    public void setCurrentTemplate(Boolean currentTemplate) {
+        this.currentTemplate = currentTemplate;
     }
 }
