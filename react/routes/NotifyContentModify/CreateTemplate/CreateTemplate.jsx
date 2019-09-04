@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from 'react/index';
-import { Form, TextField, Select, SelectBox } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, TextArea } from 'choerodon-ui/pro';
 import { Button, Modal } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import Editor from '../../../components/editor';
@@ -12,11 +12,11 @@ const WrappedEditor = observer(props => {
   const [editor, setEditor] = useState(undefined);
   const [editor2, setEditor2] = useState(undefined);
   const [fullscreen, setFullscreen] = useState(false);
-  const { settingType } = props;
+  const { settingType, label } = props;
   const setDoc = (value, current) => {
     current.set(`${settingType}Content`, value);
   };
-  
+
   useEffect(() => {
     if (editor) {
       editor.initEditor();
@@ -31,7 +31,7 @@ const WrappedEditor = observer(props => {
   // console.log(props);
   return (
     <div style={{ display: 'inline-block' }}>
-      <p style={{ display: 'inline-block' }} className="content-text">模板内容：</p>
+      <p style={{ display: 'inline-block' }} className="content-text">{label}：</p>
       {/* <Editor
       onRef={noop}
       onChange={value => setDoc(value, props.current)}
@@ -50,7 +50,7 @@ const WrappedEditor = observer(props => {
         }}
       />
       <Modal
-        title="编辑公告内容"
+        title={label}
         visible={fullscreen}
         width="90%"
         onOk={() => setFullscreen(false)}
@@ -73,17 +73,30 @@ const WrappedEditor = observer(props => {
   );
 });
 
-export default props => (
-  <Form dataSet={props.context.createTemplateDataSet} labelLayout="float" labelAlign="left">
-    <TextField name="name" />
-    <TextField name={`${props.context.settingType}Title`} />
-    <WrappedEditor
-      current={props.context.createTemplateDataSet.current}
-      settingType={props.context.settingType}
-    />
-    <SelectBox name="current">
-      <Option value>是</Option>
-      <Option value={false}>否</Option>
-    </SelectBox>
-  </Form>
-);
+export default props => {
+  function renderWrappedEditorAndTitle(settingType) {
+    const templateTitle = <TextField name={`${props.context.settingType}Title`} />;
+    const wrappedEditor = (
+      <WrappedEditor
+        current={props.context.createTemplateDataSet.current}
+        settingType={props.context.settingType}
+        label={props.context.createTemplateDataSet.getField(`${props.context.settingType}Content`).props.label}
+      />
+    );
+    const textArea = <TextArea name="smsContent" />;
+    if (settingType === 'email') {
+      return [templateTitle, wrappedEditor];
+    } else if (settingType === 'sms') {
+      return textArea;
+    } else if (settingType === 'pm') {
+      return [templateTitle, wrappedEditor];
+    }
+  }
+  return (
+    <Form dataSet={props.context.createTemplateDataSet} labelLayout="float" labelAlign="left" className="crete-temp-form">
+      <TextField name="name" />
+      {renderWrappedEditorAndTitle(props.context.settingType)}
+      <SelectBox name="defaultTemplate" />
+    </Form>
+  );
+};

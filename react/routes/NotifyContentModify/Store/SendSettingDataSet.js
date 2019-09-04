@@ -13,15 +13,15 @@ export default (id, businessType, type, intl, intlPrefix) => {
       { name: 'sendInstantly', type: 'boolean', label: sendInstantly, required: true, defaultValue: false },
       { name: 'manualRetry', type: 'boolean', label: manualRetry, required: true },
       { name: `${type}Template`, type: 'object', label: emailTemplate, textField: 'name', valueField: 'id', required: true, ignore: 'always', lookupUrl: `notify/v1/templates?businessType=${businessType}&messageType=${type}` },
-      { name: `${type}TemplateTitle`, type: 'string', bind: 'emailTemplate.name' },
-      { name: `${type}TemplateId`, type: 'string', bind: 'emailTemplate.id' },
-      { name: `${type}Type`, type: 'string', bind: 'emailTemplate.id' },
+      { name: `${type}TemplateTitle`, type: 'string', bind: `${type}Template.name` },
+      { name: `${type}TemplateId`, type: 'string', bind: `${type}Template.id` },
+      { name: `${type}Type`, type: 'string', label: '站内信类型', required: true },
 
     ],
 
     transport: {
       read: {
-        url: `notify/v1/notices/send_settings/${id}/email_send_setting`,
+        url: `notify/v1/notices/send_settings/${id}/${type}_send_setting`,
         method: 'get',
         transformResponse(data) {
           return ({

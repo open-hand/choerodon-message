@@ -22,7 +22,8 @@ export default (props) => {
   async function handleSave() {
     try {
       if ((await context.createTemplateDataSet.submit())) {
-        setTimeout(() => { window.location.reload(true); }, 1000);
+        // setTimeout(() => { window.location.reload(true); }, 1000);
+        context.templateDataSet.query();
         return true;
       } else {
         return false;
@@ -34,7 +35,8 @@ export default (props) => {
   async function handleSaveConfig() {
     try {
       if ((await context.sendSettingDataSet.submit())) {
-        setTimeout(() => { window.location.reload(true); }, 1000);
+        // setTimeout(() => { window.location.reload(true); }, 1000);
+        context.sendSettingDataSet.query();
         return true;
       } else {
         return false;
@@ -89,7 +91,7 @@ export default (props) => {
     } else if (settingType === 'sms') {
       return false;
     } else if (settingType === 'pm') {
-      return false;
+      return true;
     }
   }
 

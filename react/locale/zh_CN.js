@@ -278,6 +278,9 @@ const pageDetail = {
   'global.notifyContent.sendSetting.manualRetry': '是否允许手动重发',
   'global.notifyContent.sendSetting.emailTemplate': '模板',
   'global.notifyContent.template.current': '是否默认为当前使用模版',
+  'global.notifyContent.template.emailContent': '邮件内容',
+  'global.notifyContent.template.pmContent': '站内信内容',
+  'global.notifyContent.template.smsContent': '短信内容',
   'global.notifyContent.template.source': '来源',
 
 

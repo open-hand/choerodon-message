@@ -6,7 +6,7 @@ import FormHeader from '../common/FormHeader';
 
 const { Option } = SelectBox;
 const OutputEmptyValue = ({ value }) => (value ? <span>是</span> : <span>否</span>);
-
+const renderPmType = ({ value }) => (value === 'msg' ? <span>消息</span> : <span>通知</span>);
 export default (props) => {
   const { sendSettingDataSet, intlPrefix, prefixCls, settingType } = useContext(store);
   const renderForm = (type) => {
@@ -22,10 +22,7 @@ export default (props) => {
       case 'pm':
         return (
           <Form dataSet={sendSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={136} className={`${prefixCls}-send-setting`}>
-            <SelectBox name="pmType">
-              <Option value="msg">消息</Option>
-              <Option value="notity">通知</Option>
-            </SelectBox>
+            <Output name="pmType" renderer={renderPmType} />
           </Form>
         );
 

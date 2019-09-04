@@ -7,6 +7,7 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
   const name = intl.formatMessage({ id: `${intlPrefix}.name` });
   const Title = intl.formatMessage({ id: `${intlPrefix}.${type}Title` });
   const predefined = intl.formatMessage({ id: `${intlPrefix}.source` });
+  const content = intl.formatMessage({ id: `${intlPrefix}.${type}Content` });
   const queryPredefined = new DataSet({
     autoQuery: true,
     paging: false,
@@ -19,21 +20,12 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       { key: false, value: '自定义' },
     ],
   });
-  // const currentDataSet = new DataSet({
-  //   autoQuery: true,
-  //   paging: false,
-  //   fields: [
-  //     { name: 'emailTemplateTitle', type: 'string' },
-  //     { name: 'emailTemplateId', type: 'string' },
-
-  //   ],
-  //   transport: {
-  //     read: {
-  //       url: `notify/v1/notices/send_settings/${id}/email_send_setting`,
-  //       method: 'get',
-  //     },
-  //   },
-  // });
+  const optionDataSet = new DataSet({
+    selection: 'multiple',
+    data: [
+      { text: intl.formatMessage({ id: `${intlPrefix}.current` }), value: true },
+    ],
+  });
   return {
     autoQuery: datasetType === 'query',
     autoCreate: datasetType !== 'query',
@@ -41,11 +33,11 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
     // dataKey: null,
     paging: true,
     fields: [
-      { name: 'name', type: 'string', label: name },
+      { name: 'name', type: 'string', label: name, required: true },
       // { name: 'code', type: 'string', label: name, defaultValue: 'code322222' },
 
-      { name: `${type}Title`, type: 'string', label: Title },
-      { name: `${type}Content`, type: 'string', defaultValue: '' },
+      type !== 'sms' ? { name: `${type}Title`, type: 'string', label: Title, required: true } : {},
+      { name: `${type}Content`, type: 'string', label: content, required: true, defaultValue: '' },
       { name: 'predefined', type: 'boolean', label: predefined },
       {
         name: 'current',
@@ -57,6 +49,8 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
         // valueField: 'emailTemplateTitle',
         // options: currentDataSet,
       },
+      { name: 'defaultTemplate', type: 'boolean', textField: 'text', multiple: ',', valueField: 'value', options: optionDataSet },
+
       { name: 'eideid', type: 'object', label: '1111', bind: 'current0.emailTemplateId' },
     ],
     queryFields: [
@@ -73,9 +67,10 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       read: {
         url: `notify/v1/templates?businessType=${businessType}&messageType=${type}`,
         method: 'get',
+
       },
       submit: ({ data }) => ({
-        url: `notify/v1/templates/${type}?set_to_the_current=${data[0].current}`,
+        url: `notify/v1/templates/${type}?set_to_the_current=${data[0].defaultTemplate.split(',')[1] ? data[0].defaultTemplate.split(',')[1] : data[0].defaultTemplate}`,
         method: 'post',
         data: {
           ...data[0],

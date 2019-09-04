@@ -29,7 +29,14 @@ const detailTemplate = (detailId, context) => {
 };
 
 // 修改
-const updateLink = (type, detailId, context) => {
+/**
+ * 
+ * @param {string} type 邮件/站内信/短信 类型
+ * @param {*} detailId 当前模板对应的id
+ * @param {*} context 
+ * @param {*} index  用于判定是否是当前
+ */
+const updateLink = (type, detailId, context, index) => {
   Modal.open({
     title: '修改模版',
     drawer: true,
@@ -37,7 +44,7 @@ const updateLink = (type, detailId, context) => {
       width: 380,
     },
     children: (
-      <DetailTemplate context={context} detailId={detailId} />
+      <DetailTemplate context={context} detailId={detailId} isCurrent={!index} />
     ),
     // onOk: handleSave,
     // onCancel: resetFunc,
@@ -95,7 +102,7 @@ export default (props) => {
     const actionDatas = [{
       service: [],
       text: '修改',
-      action: () => updateLink(settingType, record.get('id'), context),
+      action: () => updateLink(settingType, record.get('id'), context, index),
     },
     {
       service: [],
