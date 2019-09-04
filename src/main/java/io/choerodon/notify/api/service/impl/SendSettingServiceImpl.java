@@ -1,7 +1,15 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.*;
@@ -14,19 +22,12 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
 
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
-    public static final String SEND_SETTING_UPDATE_EXCEPTION ="error.send.setting.update";
+    public static final String SEND_SETTING_UPDATE_EXCEPTION = "error.send.setting.update";
     private SendSettingMapper sendSettingMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
@@ -303,6 +304,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (template != null) {
             emailSendSettingVO
                     .setEmailTemplateId(template.getId())
+                    .setEmailTemplateName(template.getName())
                     .setEmailTemplateTitle(template.getEmailTitle());
         }
         return emailSendSettingVO;
