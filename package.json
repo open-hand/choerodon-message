@@ -13,7 +13,7 @@
   ],
   "peerDependencies": {
     "@choerodon/boot": "0.20.x",
-    "@choerodon/master": "0.20.x"
+    "@choerodon/master": "^0.20.21"
   },
   "devDependencies": {
     "@choerodon/boot": "^0.20.5",
