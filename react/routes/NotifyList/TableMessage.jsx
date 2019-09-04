@@ -85,7 +85,7 @@ export default function Tab() {
     }];
     return (
       <React.Fragment>
-        <span className="name">{value}</span>
+        <span className="c7n-tableMessage-name">{value}</span>
         <Action className="action-icon" data={actionDatas} />
       </React.Fragment>
     );
