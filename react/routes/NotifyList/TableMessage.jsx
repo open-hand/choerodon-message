@@ -30,11 +30,11 @@ export default function Tab() {
     const businessType = sendSettingDataSet.current.get('code');
     const { search } = history.location;
     if (mes === 'email') {
-      history.push(`/notify/send-setting/${id}/${businessType}/email${search}`);
+      history.push(`${match.path}/send-setting/${id}/${businessType}/email${search}`);
     } else if (mes === 'sms') {
-      history.push(`/notify/send-setting/${id}/${businessType}/sms${search}`);
+      history.push(`${match.path}/send-setting/${id}/${businessType}/sms${search}`);
     } else if (mes === 'pm') {
-      history.push(`/notify/send-setting/${id}/${businessType}/pm${search}`);
+      history.push(`${match.path}/send-setting/${id}/${businessType}/pm${search}`);
     }
   }
   // 启用状态改变切换
@@ -133,7 +133,7 @@ export default function Tab() {
       <Breadcrumb title="" />
 
       <Content className="">
-        <Table className="messageService" dataSet={sendSettingDataSet}>
+        <Table className="message-service" dataSet={sendSettingDataSet}>
           <Column className="column1" name="messageType" renderer={getNameMethod} />
           <Column name="introduce" />
           <Column name="level" renderer={getLevel} />

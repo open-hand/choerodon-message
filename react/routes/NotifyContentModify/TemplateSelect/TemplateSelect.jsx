@@ -29,7 +29,14 @@ const detailTemplate = (detailId, context) => {
 };
 
 // 修改
-const updateLink = (type, detailId, context) => {
+/**
+ * 
+ * @param {string} type 邮件/站内信/短信 类型
+ * @param {*} detailId 当前模板对应的id
+ * @param {*} context 
+ * @param {*} index  用于判定是否是当前
+ */
+const updateLink = (type, detailId, context, index) => {
   Modal.open({
     title: '修改模版',
     drawer: true,
@@ -37,7 +44,7 @@ const updateLink = (type, detailId, context) => {
       width: 380,
     },
     children: (
-      <DetailTemplate context={context} detailId={detailId} />
+      <DetailTemplate context={context} detailId={detailId} isCurrent={index} />
     ),
     // onOk: handleSave,
     // onCancel: resetFunc,
@@ -74,28 +81,29 @@ const dataSet = new DataSet({
 function renderPredefined({ value, record }) {
   return value ? '预定义' : '自定义';
 }
-function changeCurrent(id) {
-  // 【PUT】/v1/templates/{id}
-  axios.put(`notify/v1/templates/${id}`).then(() => {
-    Choerodon.prompt('更改默认成功');
-    setTimeout(() => { window.location.reload(true); }, 1000);
-  }).catch((error) => {
-    Choerodon.prompt(error);
-  });
-}
+
 export default (props) => {
   const context = useContext(store);
   const { templateDataSet, intlPrefix, prefixCls, settingType } = context;
+  function changeCurrent(id) {
+    // 【PUT】/v1/templates/{id}
+    axios.put(`notify/v1/templates/${id}`).then(() => {
+      Choerodon.prompt('更改默认成功');
+      templateDataSet.query();
+    }).catch((error) => {
+      Choerodon.prompt(error);
+    });
+  }
   // 渲染消息类型 
   function getNameMethod({ value, text, name, record }) {
     const messageType = record.get('messageType');
     const { index } = record;
     // const id = record.get('id');
-    const moduleText = index ? '设为默认模板' : '取消设为默认模板';
+    const moduleText = record.get('currentTemplate') ? '设为默认模板' : '取消设为默认模板';
     const actionDatas = [{
       service: [],
       text: '修改',
-      action: () => updateLink(settingType, record.get('id'), context),
+      action: () => updateLink(settingType, record.get('id'), context, record.get('currentTemplate')),
     },
     {
       service: [],
@@ -110,7 +118,7 @@ export default (props) => {
     if (record.get('predefined')) {
       actionDatas.pop();
     }
-    if (index) {
+    if (!record.get('currentTemplate')) {
       actionDatas.splice(1, 0, currentArr);
     }
 
@@ -118,7 +126,7 @@ export default (props) => {
       value ? (
         <React.Fragment>
           <span className="name" onClick={detailTemplate.bind(this, record.get('id'), context)}>{value}</span>
-          {index ? '' : <span className={`${prefixCls}-current`}>当前</span>}
+          {record.get('currentTemplate') ? <span className={`${prefixCls}-current`}>当前</span> : ''}
           <Action className="action-icon" style={{ float: 'right', marginTop: 6 }} data={actionDatas} />
         </React.Fragment>
       ) : null

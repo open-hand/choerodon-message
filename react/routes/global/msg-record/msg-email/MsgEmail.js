@@ -55,7 +55,7 @@ function APITest(props) {
     const newFilters = filtersIn || filters;
     const newParams = paramsIn || params;
     // 防止标签闪烁
-    setFilters(filters);
+    setFilters(newFilters);
     setLoading(true);
     // 若params或filters含特殊字符表格数据置空
     const isIncludeSpecialCode = handleFiltersParams(newParams, newFilters);
@@ -100,9 +100,9 @@ function APITest(props) {
         total: data.total,
       });
       setLoading(false);
-      setSort(sort);
-      setFilters(filters);
-      setParams(params);
+      setSort(newSort);
+      setFilters(newFilters);
+      setParams(newParams);
     }).catch((error) => {
       Choerodon.handleResponseError(error);
       setLoading(false);
@@ -245,11 +245,11 @@ function APITest(props) {
           </MouseOverWrapper>
         ),
       },
-      // {
-      //   title: <FormattedMessage id="msgrecord.send.count" />,
-      //   dataIndex: 'retryCount',
-      //   key: 'retryCount',
-      // },
+      {
+        title: <FormattedMessage id="msgrecord.send.count" />,
+        dataIndex: 'retryCount',
+        key: 'retryCount',
+      },
       {
         title: <FormattedMessage id="msgrecord.creationDate" />,
         dataIndex: 'creationDate',
@@ -262,7 +262,7 @@ function APITest(props) {
         className="c7n-msgrecord"
         service={permissions}
       >
-        <Breadcrumb title />
+        <Breadcrumb title="" />
         <Content
           values={{ name: AppState.getSiteInfo.systemName || 'Choerodon' }}
         >

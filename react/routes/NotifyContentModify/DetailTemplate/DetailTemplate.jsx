@@ -1,6 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Form, TextField, Select, SelectBox, TextArea } from 'choerodon-ui/pro';
 import { Button, Modal } from 'choerodon-ui';
+import { injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react-lite';
 import Store from './Store';
 import Editor from '../../../components/editor';
@@ -11,7 +12,7 @@ const WrappedEditor = observer(props => {
   const [editor2, setEditor2] = useState(undefined);
   const [fullscreen, setFullscreen] = useState(false);
   const [current, setCurrent] = useState(undefined);
-  const { settingType } = props;
+  const { settingType, label } = props;
   const setDoc = (value, current0) => {
     current0.set(`${settingType}Content`, value);
   };
@@ -29,7 +30,7 @@ const WrappedEditor = observer(props => {
   // return (<div>11</div>);
   return (
     <div style={{ display: 'inline-block' }}>
-      <p style={{ display: 'inline-block' }} className="content-text">模板内容：</p>
+      <p style={{ display: 'inline-block' }} className="content-text">{label}：</p>
       {/* <Editor
       onRef={noop}
       onChange={value => setDoc(value, props.current)}
@@ -49,7 +50,7 @@ const WrappedEditor = observer(props => {
         }}
       />
       <Modal
-        title="编辑公告内容"
+        title={label}
         visible={fullscreen}
         width="90%"
         onOk={() => setFullscreen(false)}
@@ -74,11 +75,20 @@ const WrappedEditor = observer(props => {
 });
 export default observer(() => {
   const context = useContext(Store);
-  const { detailTemplateDataSet, editing = true, handleOk, modal } = context;
+  // console.log('datail', context);
+  const { detailTemplateDataSet, settingType, editing = true, handleOk, modal, intlPrefix, isCurrent } = context;
   async function handleSave() {
     try {
+      // const currentArr = context.detailTemplateDataSet.current.get('current');
+      // if (currentArr.length === 0) {
+      //   context.detailTemplateDataSet.current.set('current', false);
+      // } 
+      // else if (currentArr.length === 2) {
+      //   currentArr.splice(0, 1);
+      // }
       if ((await context.detailTemplateDataSet.submit())) {
-        setTimeout(() => { window.location.reload(true); }, 1000);
+        context.context.templateDataSet.query();
+        // setTimeout(() => { window.location.reload(true); }, 1000);
         return true;
       } else {
         return false;
@@ -92,23 +102,26 @@ export default observer(() => {
       modal.handleOk(handleSave);
     }
   }, []);
+  // useEffect(() => {
+  //   if (detailTemplateDataSet.current && isCurrent) {
+  //     detailTemplateDataSet.current.set('current', isCurrent);
+  //   }
+  // }, [detailTemplateDataSet.current]);
 
   return (
-    <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left">
-      <TextField name="name" disabled={!editing} />
-      <TextField name="emailTitle" disabled={!editing} />
+    <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left" className="detail-template-form">
+      <TextField name="name" disabled />
+      <TextField name={`${settingType}Title`} disabled={!editing} />
 
       {editing && detailTemplateDataSet.current ? (
         <WrappedEditor
           current={detailTemplateDataSet.current}
           settingType={context.settingType}
+          label={detailTemplateDataSet.getField(`${settingType}Content`).props.label}
         />
-      ) : <TextArea name="emailContent" resize="both" disabled />}
+      ) : <TextArea name={`${settingType}Content`} resize="both" disabled={editing && settingType !== 'sms'} />}
       {editing ? (
-        <SelectBox name="current">
-          <Option value>是</Option>
-          <Option value={false}>否</Option>
-        </SelectBox>
+        <SelectBox name="current" />
       ) : null}
     </Form>
   );

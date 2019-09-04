@@ -1,5 +1,16 @@
-.messageService {
+.message-service {
   margin: 0;
+
+  table {
+    tbody {
+      font-family: PingFangSC-Regular;
+      font-size: 13px;
+      td:nth-child(n+2) {
+        color: fade(#000000,65%);
+      }
+    }
+  }
+
 }
 
 .title {
@@ -22,6 +33,7 @@
 
 .column1 {
   padding-left: 0.2rem;
+
   .c7n-pro-output {
     display: flex;
     justify-content: space-between;
@@ -75,10 +87,12 @@
   font-size: 0.10rem;
   line-height: 0.18rem;
 
-  position:absolute;
-  left:50%;    /* 定位父级的50% */
-  top:50%;
-  transform: translate(-50%,-50%); /*自己的50% */
+  position: absolute;
+  left: 50%;
+  /* 定位父级的50% */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /*自己的50% */
 }
 
 .c7n-notify-enable {
