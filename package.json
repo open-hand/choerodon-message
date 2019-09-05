@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@choerodon/boot": "^0.20.5",
-    "@choerodon/master": "^0.20.19",
+    "@choerodon/master": "^0.20.21",
     "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.1",
