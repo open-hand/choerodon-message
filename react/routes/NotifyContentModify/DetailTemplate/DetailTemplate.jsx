@@ -44,6 +44,7 @@ const WrappedEditor = observer(props => {
         onRef={(node) => {
           setEditor(node);
         }}
+        style={{ width: 340 }}
         toolbarContainer="toolbar"
         onChange={(value) => {
           // current.set('emailContent', value);
@@ -76,7 +77,6 @@ const WrappedEditor = observer(props => {
 });
 export default observer(() => {
   const context = useContext(Store);
-  // console.log('datail', context);
   const { detailTemplateDataSet, settingType, editing = true, prefixCls, handleOk, modal, intlPrefix, isCurrent } = context;
   async function handleSave() {
     try {
@@ -124,11 +124,13 @@ export default observer(() => {
     );
   };
   const renderDetailContent = ({ value }) => (
-    <div
-      // className="c7n-iam-announcement-detail-content"
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: `${value}` }}
-    />
+    <div className={`${prefixCls}-form-content-wrapper`}>
+      <div
+        className={`${prefixCls}-form-content-wrapper-html`}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: `${value}` }}
+      />
+    </div>
   );
   const renderDetail = () => (
     <Form dataSet={detailTemplateDataSet} labelLayout="horizontal" labelAlign="left" className={`${prefixCls}-form ${prefixCls}-form-content`}>

@@ -2,12 +2,12 @@ import { DataSet } from 'choerodon-ui/pro/lib';
 
 const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 function reqCurrentData(data) {
-  if (typeof (data) === 'undefined') { return false; }
+  if (typeof (data) === 'undefined' || data === '') { return false; }
   // .split(',')[1] ? data[0].current.split(',')[1] : Boolean(data[0].current)
   const dataArr = data.split(',');
   if (dataArr.length === 2) { return dataArr[1]; } else { return dataArr[0]; }
 }
-export default (id, type, isCurrent, intl, intlPrefix) => {
+export default (id, type, businessType, isCurrent, intl, intlPrefix) => {
   const name = intl.formatMessage({ id: `${intlPrefix}.name` });
   const Title = intl.formatMessage({ id: `${intlPrefix}.${type}Title` });
   const current = intl.formatMessage({ id: `${intlPrefix}.current` });
@@ -56,6 +56,8 @@ export default (id, type, isCurrent, intl, intlPrefix) => {
         method: 'put',
         data: {
           ...data[0],
+          businessType,
+          currentTemplate: reqCurrentData(data[0].current),
         },
       }),
     },

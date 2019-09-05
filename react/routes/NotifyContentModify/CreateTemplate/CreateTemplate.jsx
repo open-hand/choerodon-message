@@ -4,6 +4,7 @@ import { Button, Modal } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import Editor from '../../../components/editor';
 import store from '../Store';
+import DetailTemplateDataSet from '../DetailTemplate/Store/DetailTemplateDataSet';
 
 const { Option } = Select;
 
@@ -28,7 +29,6 @@ const WrappedEditor = observer(props => {
     }
     setFullscreen(true);
   };
-  // console.log(props);
   return (
     <div style={{ display: 'inline-block' }}>
       <p style={{ display: 'inline-block' }} className="content-text">{label}：</p>
@@ -74,7 +74,8 @@ const WrappedEditor = observer(props => {
 });
 
 export default props => {
-  function renderWrappedEditorAndTitle(settingType) {
+  const { settingType } = props.context;
+  function renderWrappedEditorAndTitle() {
     const templateTitle = <TextField name={`${props.context.settingType}Title`} />;
     const wrappedEditor = (
       <WrappedEditor
@@ -92,10 +93,39 @@ export default props => {
       return [templateTitle, wrappedEditor];
     }
   }
+  const handleReset = () => {
+    props.context.createTemplateDataSet.current.reset();
+  };
+  async function handleSave() {
+    try {
+      if ((await props.context.createTemplateDataSet.submit())) {
+        // setTimeout(() => { window.location.reload(true); }, 1000);
+        handleReset();
+        props.context.templateDataSet.query();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+    // return props.context.createTemplateDataSet.submit().then(()=>{
+
+    // }).catch((error)=>{
+
+    // })
+  }
+ 
+  useEffect(() => {
+    props.modal.handleOk(handleSave);
+  }, []);
+  // if (!props.context.createTemplateDataSet.current) {
+  //   props.context.createTemplateDataSet.create();
+  // }
   return (
     <Form dataSet={props.context.createTemplateDataSet} labelLayout="float" labelAlign="left" className="crete-temp-form">
       <TextField name="name" />
-      {renderWrappedEditorAndTitle(props.context.settingType)}
+      {props.context.createTemplateDataSet.current ? renderWrappedEditorAndTitle() : null}
       <SelectBox name="defaultTemplate" />
     </Form>
   );

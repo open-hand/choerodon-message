@@ -14,7 +14,7 @@ export const StoreProvider = injectIntl(inject('AppState')(
     const { settingId, settingBusinessType, settingType } = props.context.match.params;
     const intlPrefix = 'global.notifyContent';
     const prefixCls = 'notify-content-detail';
-    const detailTemplateDataSet = useMemo(() => new DataSet(DetailTemplateDataSet(detailId, settingType, isCurrent, intl, `${intlPrefix}.template`)));
+    const detailTemplateDataSet = useMemo(() => new DataSet(DetailTemplateDataSet(detailId, settingType, settingBusinessType, isCurrent, intl, `${intlPrefix}.template`)));
     const value = {
       ...props,
       settingId,
