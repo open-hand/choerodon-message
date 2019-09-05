@@ -18,25 +18,13 @@ export default (props) => {
   // const [title, settitle] = useState(undefined);
   const context = useContext(Store);
   const { settingType, prefixCls } = context;
-  // console.log('NotifyContent', context);
-  async function handleSave() {
-    try {
-      if ((await context.createTemplateDataSet.submit())) {
-        // setTimeout(() => { window.location.reload(true); }, 1000);
-        context.templateDataSet.query();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
+
   async function handleSaveConfig() {
     try {
       if ((await context.sendSettingDataSet.submit())) {
         // setTimeout(() => { window.location.reload(true); }, 1000);
-        context.sendSettingDataSet.query();
+        // context.sendSettingDataSet.query();
+        context.templateDataSet.query();
         return true;
       } else {
         return false;
@@ -59,7 +47,6 @@ export default (props) => {
       okText: <span className="modal-footer-btn">保存</span>,
       cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
       // onCancel: resetFunc,#3F51B5
-      // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
   };
 
@@ -73,7 +60,8 @@ export default (props) => {
       children: (
         <CreateTemplate context={context} />
       ),
-      onOk: handleSave,
+      // onOk: handleSave,
+  
       okText: <span className="modal-footer-btn">保存</span>,
       cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
       // onCancel: resetFunc,

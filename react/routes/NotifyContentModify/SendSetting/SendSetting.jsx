@@ -34,9 +34,11 @@ export default (props) => {
   };
   const form = renderForm(settingType);
   return form ? (
-    <Spin dataSet={sendSettingDataSet}>
+    // <Spin dataSet={sendSettingDataSet}>
+    <React.Fragment>
       <FormHeader title={<FormattedMessage id={`${intlPrefix}.sendSetting.header.title`} />} />
       {form}
-    </Spin>
+    </React.Fragment>
+    // </Spin>
   ) : null;
 };

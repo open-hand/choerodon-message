@@ -23,8 +23,6 @@ const StatusCard = ({ enabled }) => (
 
 export default function Tab() {
   const { sendSettingDataSet, history, match } = useContext(Store);
-  // console.log(useContext(Store));
-
   function deleteLink(mes) {
     const id = sendSettingDataSet.current.get('id');
     const businessType = sendSettingDataSet.current.get('code');
@@ -57,7 +55,6 @@ export default function Tab() {
   function getNameMethod({ value, record }) {
     const messageType = record.get('messageType');
     const id = record.get('id');
-    // console.log(record);
     const actionDatas = [{
       service: [],
       text: '设置邮件内容',

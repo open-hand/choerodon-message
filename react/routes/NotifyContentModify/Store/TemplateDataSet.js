@@ -75,7 +75,7 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
         data: {
           ...data[0],
           businessType,
-          code: `${businessType}-${randomString(5)}`,
+          code: `${businessType}-${randomString(7)}`,
         },
       }),
     },

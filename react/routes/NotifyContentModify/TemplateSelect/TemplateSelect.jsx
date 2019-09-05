@@ -50,35 +50,8 @@ const updateLink = (type, detailId, context, index) => {
     cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
     // onOk: handleSave,
     // onCancel: resetFunc,
-    // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
 };
-const deleteLink = (id) => {
-  // console.log('DELETE删除模板/v1/templates/{id}');
-  axios.delete(`notify/v1/templates/${id}`).then(() => {
-    Choerodon.prompt('删除模板成功');
-    setTimeout(() => { window.location.reload(true); }, 1000);
-  }).catch((error) => {
-    Choerodon.prompt(error);
-  });
-};
-
-const dataSet = new DataSet({
-  autoQuery: true,
-  paging: true,
-  fields: [
-    // { name: 'id', type: 'string' },
-    { name: 'name', type: 'string', label: '名字' },
-    { name: 'emailTitle', type: 'string', label: '111' },
-    { name: 'predefined', type: 'boolean', label: '2222' },
-  ],
-  transport: {
-    read: {
-      url: 'notify/v1/templates?businessType=feedback-created&messageType=email',
-      method: 'get',
-    },
-  },
-});
 
 function renderPredefined({ value, record }) {
   return value ? '预定义' : '自定义';
@@ -89,13 +62,29 @@ export default (props) => {
   const { templateDataSet, intlPrefix, prefixCls, settingType } = context;
   function changeCurrent(id) {
     // 【PUT】/v1/templates/{id}
-    axios.put(`notify/v1/templates/${id}`).then(() => {
+    axios.put(`notify/v1/templates/${id}`).then((data) => {
+      if (data.failed) {
+        throw data.message;
+      }
       Choerodon.prompt('更改默认成功');
       templateDataSet.query();
     }).catch((error) => {
       Choerodon.prompt(error);
     });
   }
+  const deleteLink = (id) => {
+    // 'DELETE删除模板/v1/templates/{id}');
+    axios.delete(`notify/v1/templates/${id}`).then((data) => {
+      if (data.failed) {
+        throw data.message;
+      }
+      Choerodon.prompt('删除模板成功');
+      templateDataSet.query();
+    }).catch((error) => {
+      Choerodon.prompt(error);
+    });
+  };
+
   // 渲染消息类型 
   function getNameMethod({ value, text, name, record }) {
     const messageType = record.get('messageType');
@@ -110,7 +99,7 @@ export default (props) => {
     {
       service: [],
       text: '删除',
-      action: () => deleteLink(settingType, record.get('id')),
+      action: () => deleteLink(record.get('id')),
     }];
     const currentArr = {
       service: [],
@@ -135,7 +124,8 @@ export default (props) => {
     );
   }
   return (
-    <Spin dataSet={templateDataSet}>
+    // <Spin dataSet={templateDataSet}>
+    <React.Fragment>
       <FormHeader isHasLine={false} title={<FormattedMessage id={`${intlPrefix}.template.header.title`} />} />
       <Table className="messageService" dataSet={templateDataSet} elementClassName={`${prefixCls}-template-select`}>
         <Column name="name" renderer={getNameMethod.bind(this)} />
@@ -143,6 +133,7 @@ export default (props) => {
         {settingType === 'sms' ? <Column name={`${settingType}Content`} /> : null}
         <Column name="predefined" renderer={renderPredefined.bind(this)} />
       </Table>
-    </Spin>
+    </React.Fragment>
+    // </Spin>
   );
 };
