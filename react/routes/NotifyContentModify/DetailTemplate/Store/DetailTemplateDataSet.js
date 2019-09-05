@@ -26,7 +26,7 @@ export default (id, type, isCurrent, intl, intlPrefix) => {
     fields: [
       // { name: 'id', type: 'string' },
       { name: 'name', type: 'string', label: name, required: true },
-      { name: `${type}Title`, type: 'string', label: Title, required: true },
+      type !== 'sms' ? { name: `${type}Title`, type: 'string', label: Title, required: true } : {},
       { name: `${type}Content`, type: 'string', label: content, required: true },
       {
         name: 'current',

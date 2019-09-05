@@ -1,0 +1,39 @@
+.notify-content-detail {
+    &-form {
+        table {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            line-height: 20px;
+            color: #000000;
+
+            tbody tr {
+                .c7n-pro-field-label {
+
+                    // color: rgba(0, 0, 0, 0.65);
+                }
+
+                .c7n-pro-field-required.c7n-pro-field-label:after {
+                    // color: rgba(0, 0, 0, 0.65);
+                    color: #000000;
+                    margin-bottom: .05rem;
+                    content: ':';
+                }
+
+                .c7n-pro-output {
+                    color: rgba(0, 0, 0, 0.65);
+                }
+
+            }
+        }
+
+        &-content {
+            tbody tr:last-of-type {
+                .c7n-pro-output {
+                    margin-top: .35rem;
+                    margin-left: -.65rem;
+                }
+
+            }
+        }
+    }
+}
