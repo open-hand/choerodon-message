@@ -1,10 +1,11 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
-import { Form, TextField, Select, SelectBox, TextArea } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, TextArea, Output } from 'choerodon-ui/pro';
 import { Button, Modal } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react-lite';
 import Store from './Store';
 import Editor from '../../../components/editor';
+import './DetailTemplate.less';
 
 const { Option } = Select;
 const WrappedEditor = observer(props => {
@@ -76,16 +77,9 @@ const WrappedEditor = observer(props => {
 export default observer(() => {
   const context = useContext(Store);
   // console.log('datail', context);
-  const { detailTemplateDataSet, settingType, editing = true, handleOk, modal, intlPrefix, isCurrent } = context;
+  const { detailTemplateDataSet, settingType, editing = true, prefixCls, handleOk, modal, intlPrefix, isCurrent } = context;
   async function handleSave() {
     try {
-      // const currentArr = context.detailTemplateDataSet.current.get('current');
-      // if (currentArr.length === 0) {
-      //   context.detailTemplateDataSet.current.set('current', false);
-      // } 
-      // else if (currentArr.length === 2) {
-      //   currentArr.splice(0, 1);
-      // }
       if ((await context.detailTemplateDataSet.submit())) {
         context.context.templateDataSet.query();
         // setTimeout(() => { window.location.reload(true); }, 1000);
@@ -102,27 +96,55 @@ export default observer(() => {
       modal.handleOk(handleSave);
     }
   }, []);
+  // eslint-disable-next-line arrow-body-style
+  const renderForm = () => {
+    // const formArr = [<TextField name="name" />, <TextField name={`${settingType}Title`} />];
+    // if (settingType === 'sms') {
+    //   formArr.pop();
+    //   formArr.push(<TextArea name={`${settingType}Content`} resize="both" />);
+    // } else {
+    //   formArr.push();
+    // }
+    // formArr.push();
+
+    return (
+      <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left" className="detail-template-form">
+        <TextField name="name" disabled />
+        {
+          settingType !== 'sms' && detailTemplateDataSet.current
+            ? [
+              <TextField name={`${settingType}Title`} />, <WrappedEditor
+                current={detailTemplateDataSet.current}
+                settingType={settingType}
+                label={detailTemplateDataSet.getField(`${settingType}Content`).props.label}
+              />] : <TextArea name={`${settingType}Content`} resize="both" />
+        }
+        <SelectBox name="current" />
+      </Form>
+    );
+  };
+  const renderDetailContent = ({ value }) => (
+    <div
+      // className="c7n-iam-announcement-detail-content"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: `${value}` }}
+    />
+  );
+  const renderDetail = () => (
+    <Form dataSet={detailTemplateDataSet} labelLayout="horizontal" labelAlign="left" className={`${prefixCls}-form ${prefixCls}-form-content`}>
+      <Output name="name" />
+      {settingType !== 'sms' ? <Output name={`${settingType}Title`} /> : null}
+      <Output
+        name={`${settingType}Content`}
+        renderer={renderDetailContent}
+      />
+    </Form>
+  );
   // useEffect(() => {
   //   if (detailTemplateDataSet.current && isCurrent) {
   //     detailTemplateDataSet.current.set('current', isCurrent);
   //   }
   // }, [detailTemplateDataSet.current]);
 
-  return (
-    <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left" className="detail-template-form">
-      <TextField name="name" disabled />
-      <TextField name={`${settingType}Title`} disabled={!editing} />
-
-      {editing && detailTemplateDataSet.current ? (
-        <WrappedEditor
-          current={detailTemplateDataSet.current}
-          settingType={context.settingType}
-          label={detailTemplateDataSet.getField(`${settingType}Content`).props.label}
-        />
-      ) : <TextArea name={`${settingType}Content`} resize="both" disabled={editing && settingType !== 'sms'} />}
-      {editing ? (
-        <SelectBox name="current" />
-      ) : null}
-    </Form>
-  );
+  return editing ? renderForm() : renderDetail();
 });

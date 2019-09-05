@@ -56,7 +56,9 @@ export default (props) => {
         <ModifySetting context={context} />
       ),
       onOk: handleSaveConfig,
-      // onCancel: resetFunc,
+      okText: <span className="modal-footer-btn">保存</span>,
+      cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
+      // onCancel: resetFunc,#3F51B5
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
   };
@@ -72,6 +74,8 @@ export default (props) => {
         <CreateTemplate context={context} />
       ),
       onOk: handleSave,
+      okText: <span className="modal-footer-btn">保存</span>,
+      cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
       // onCancel: resetFunc,
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });

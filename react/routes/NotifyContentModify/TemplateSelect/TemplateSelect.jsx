@@ -22,7 +22,7 @@ const detailTemplate = (detailId, context) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} editing={false} />
     ),
-    // onOk: close(),
+    okText: <span className="modal-footer-btn">关闭</span>,
     okCancel: false,
     // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
@@ -46,6 +46,8 @@ const updateLink = (type, detailId, context, index) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} isCurrent={index} />
     ),
+    okText: <span className="modal-footer-btn">保存</span>,
+    cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
     // onOk: handleSave,
     // onCancel: resetFunc,
     // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
@@ -138,6 +140,7 @@ export default (props) => {
       <Table className="messageService" dataSet={templateDataSet} elementClassName={`${prefixCls}-template-select`}>
         <Column name="name" renderer={getNameMethod.bind(this)} />
         <Column name={`${settingType}Title`} />
+        {settingType === 'sms' ? <Column name={`${settingType}Content`} /> : null}
         <Column name="predefined" renderer={renderPredefined.bind(this)} />
       </Table>
     </Spin>

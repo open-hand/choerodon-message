@@ -275,6 +275,7 @@ function APITest(props) {
             loading={loading}
             rowKey="id"
             filterBarPlaceholder={intl.formatMessage({ id: 'filtertable' })}
+            
           />
         </Content>
       </TabPage>

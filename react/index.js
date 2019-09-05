@@ -21,7 +21,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
   const IntlProviderAsync = asyncLocaleProvider(language, () => import(`./locale/${language}`));
   return (
     <IntlProviderAsync>
-      <div>
+      <React.Fragment>
         <Switch>
           <Route path={`${match.url}/msg-log`} component={msgRecord} />
           <Route path={`${match.url}/announcement`} component={announcement} />
@@ -37,7 +37,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
           <Route path="*" component={nomatch} />
         </Switch>
         <ModalContainer />
-      </div>
+      </React.Fragment>
     </IntlProviderAsync>
   );
 }

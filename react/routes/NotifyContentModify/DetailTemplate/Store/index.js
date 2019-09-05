@@ -13,11 +13,13 @@ export const StoreProvider = injectIntl(inject('AppState')(
     const { AppState: { currentMenuType: { type, id } }, intl, children, detailId, isCurrent } = props;
     const { settingId, settingBusinessType, settingType } = props.context.match.params;
     const intlPrefix = 'global.notifyContent';
+    const prefixCls = 'notify-content-detail';
     const detailTemplateDataSet = useMemo(() => new DataSet(DetailTemplateDataSet(detailId, settingType, isCurrent, intl, `${intlPrefix}.template`)));
     const value = {
       ...props,
       settingId,
       isCurrent,
+      prefixCls,
       settingBusinessType,
       settingType,
       intlPrefix,
