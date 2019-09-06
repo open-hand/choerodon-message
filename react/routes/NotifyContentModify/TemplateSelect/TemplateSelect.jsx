@@ -22,7 +22,7 @@ const detailTemplate = (detailId, context) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} editing={false} />
     ),
-    okText: <span className="modal-footer-btn">关闭</span>,
+    okText: <div>关闭</div>,
     okCancel: false,
     // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
@@ -46,8 +46,9 @@ const updateLink = (type, detailId, context, index) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} isCurrent={index} />
     ),
-    okText: <span className="modal-footer-btn">保存</span>,
-    cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
+    okText: <div>保存</div>,
+    // okText: <span className="modal-footer-btn">保存</span>,
+    cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
     // onOk: handleSave,
     // onCancel: resetFunc,
   });

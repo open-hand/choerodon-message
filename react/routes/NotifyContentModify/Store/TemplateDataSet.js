@@ -56,8 +56,8 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       { name: 'name', type: 'string', label: name },
       // { name: 'code', type: 'string', label: name, defaultValue: 'code322222' },
 
-      type !== 'sms' ? { name: `${type}Title`, type: 'string', label: Title }
-        : { name: `${type}Content`, type: 'string', label: content },
+      // type !== 'sms' ? { name: `${type}Title`, type: 'string', label: Title }
+      //   : { name: `${type}Content`, type: 'string', label: content },
       { name: 'predefined', type: 'string', label: predefined, textField: 'value', valueField: 'key', options: queryPredefined },
 
     ],
