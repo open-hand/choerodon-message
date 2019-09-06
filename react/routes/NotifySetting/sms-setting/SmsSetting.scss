@@ -3,6 +3,17 @@
   padding-top: 100px;
 }
 
+.c7n-smssetting-form {
+  font-size: .14rem;
+  .c7n-pro-field-label:after {
+    content: ':' !important;
+    color: #000 !important;
+  }
+  .c7n-pro-field-label {
+    color: rgba(0, 0, 0, .54);
+  }
+}
+
 .c7n-smssetting-container {
   .sslRadioGroup > label {
     margin-right: 52px;
