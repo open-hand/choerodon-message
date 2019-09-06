@@ -8,7 +8,7 @@ export default (id, businessType, type, intl, intlPrefix) => {
     { name: 'manualRetry', type: 'boolean', label: manualRetry, required: true }]
     : [{ name: `${type}Type`, type: 'string', label: '站内信类型', required: true }];
   return {
-    autoQuery: true,
+    autoQuery: type !== 'sms',
     selection: false,
     paging: false,
     dataKey: null,

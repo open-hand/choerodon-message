@@ -20,6 +20,9 @@ export default (props) => {
   const { settingType, prefixCls } = context;
 
   async function handleSaveConfig() {
+    if (!context.sendSettingDataSet.isModified()) {
+      return true;
+    }
     try {
       if ((await context.sendSettingDataSet.submit())) {
         // setTimeout(() => { window.location.reload(true); }, 1000);
@@ -61,7 +64,7 @@ export default (props) => {
         <CreateTemplate context={context} />
       ),
       // onOk: handleSave,
-  
+
       okText: <span className="modal-footer-btn">保存</span>,
       cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
       // onCancel: resetFunc,
@@ -110,7 +113,7 @@ export default (props) => {
       </Header>
       <Breadcrumb title={chooseBreadcrumb()} />
       <Content>
-        <SendSetting />
+        {settingType !== 'sms' ? <SendSetting /> : null}
         <TemplateSelect />
       </Content>
     </Page>
