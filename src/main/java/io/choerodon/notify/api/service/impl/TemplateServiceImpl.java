@@ -116,12 +116,9 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.insertSelective(createDTO) != 1) {
             throw new CommonException("error.template.insert");
         }
+        // 设为当前模板
         if (setToTheCurrent) {
-            // 设为当前模板
             updateSendSettingTemplate(createDTO.getId(), createVO);
-        } else {
-            // 取消当前模板
-            updateSendSettingTemplate(null, createVO);
         }
         // 返回创建结果
         Template template = templateMapper.selectByPrimaryKey(createDTO.getId());
@@ -149,9 +146,12 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
-        // 设为当前
+        // 设为当前模板
         if (setToTheCurrent) {
             updateSendSettingTemplate(template.getId(), updateVO);
+        } else {
+            // 取消当前模板
+            updateSendSettingTemplate(null, updateVO);
         }
         // 返回创建结果
         template = templateMapper.selectByPrimaryKey(updateVO.getId());
