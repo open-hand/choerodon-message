@@ -1,7 +1,13 @@
 package io.choerodon.notify.api.service.impl;
 
+import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.SEND_SETTING_DOES_NOT_EXIST;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.TemplateCreateVO;
@@ -12,21 +18,16 @@ import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.SEND_SETTING_DOES_NOT_EXIST;
 
 @Component
 public class TemplateServiceImpl implements TemplateService {
 
-    private static final String TEMPLATE_DOES_NOT_EXIST="error.template.not.exist";
-    private static final String TEMPLATE_UPDATE_EXCEPTION="error.template.update";
+    private static final String TEMPLATE_DOES_NOT_EXIST = "error.template.not.exist";
+    private static final String TEMPLATE_UPDATE_EXCEPTION = "error.template.update";
 
-    TemplateMapper templateMapper;
+    private TemplateMapper templateMapper;
 
-    SendSettingMapper sendSettingMapper;
+    private SendSettingMapper sendSettingMapper;
 
 
     public TemplateServiceImpl(TemplateMapper templateMapper, SendSettingMapper sendSettingMapper) {
@@ -69,7 +70,7 @@ public class TemplateServiceImpl implements TemplateService {
         sendSetting.setCode(template.getBusinessType());
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting != null &&
-                (id == sendSetting.getEmailTemplateId() || id == sendSetting.getPmTemplateId() || id == sendSetting.getSmsTemplateId())) {
+                (id.equals(sendSetting.getEmailTemplateId()) || id.equals(sendSetting.getPmTemplateId()) || id.equals(sendSetting.getSmsTemplateId()))) {
             throw new CommonException("error.template.delete.current");
         }
         // 4.删除
@@ -115,9 +116,12 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.insertSelective(createDTO) != 1) {
             throw new CommonException("error.template.insert");
         }
-        // 设为当前
         if (setToTheCurrent) {
+            // 设为当前模板
             updateSendSettingTemplate(createDTO.getId(), createVO);
+        } else {
+            // 取消当前模板
+            updateSendSettingTemplate(null, createVO);
         }
         // 返回创建结果
         Template template = templateMapper.selectByPrimaryKey(createDTO.getId());
@@ -163,7 +167,7 @@ public class TemplateServiceImpl implements TemplateService {
      *
      * @param messageType  消息类型
      * @param businessType 触发类型 即 发送设置code
-     * @return
+     * @return 该类型的当前模版id
      */
     private Long getCurrentId(String businessType, String messageType) {
         SendSetting sendSetting = new SendSetting();
@@ -223,7 +227,7 @@ public class TemplateServiceImpl implements TemplateService {
         } else if (createVO instanceof TemplateCreateVO.SmsTemplateCreateVO) {
             updateDTO.setSmsTemplateId(templateId);
         }
-        if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
+        if (sendSettingMapper.updateByPrimaryKey(updateDTO) != 1) {
             throw new CommonException("error.send.setting.update");
         }
     }
