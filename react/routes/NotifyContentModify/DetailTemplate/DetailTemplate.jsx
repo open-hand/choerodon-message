@@ -77,8 +77,13 @@ const WrappedEditor = observer(props => {
 });
 export default observer(() => {
   const context = useContext(Store);
+  
   const { detailTemplateDataSet, settingType, editing = true, prefixCls, handleOk, modal, intlPrefix, isCurrent } = context;
+
   async function handleSave() {
+    if (!context.detailTemplateDataSet.isModified()) {
+      return true;
+    }
     try {
       if ((await context.detailTemplateDataSet.submit())) {
         context.context.templateDataSet.query();

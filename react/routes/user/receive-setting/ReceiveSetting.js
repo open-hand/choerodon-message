@@ -54,12 +54,12 @@ function ReceiveSetting(props) {
         content: intl.formatMessage({ id: `${intlPrefix}.uncheck-all.content` }),
         onOk: () => {
           ReceiveSettingStore.unCheckAll(type);
-          saveSettings();
+          // saveSettings();
         },
       });
     } else {
       ReceiveSettingStore.checkAll(type);
-      saveSettings();
+      // saveSettings();
     }
   };
 
@@ -67,7 +67,7 @@ function ReceiveSetting(props) {
   const handleCheckChange = (e, id, type) => {
     ReceiveSettingStore.check(id, type);
     // forceUpdate();
-    saveSettings();
+    // saveSettings();
   };
 
 
@@ -178,18 +178,20 @@ function ReceiveSetting(props) {
             fixed
             className="c7n-permission-info-table"
           />
-          {/* <div style={{ marginTop: 25 }}>
+          <div style={{ marginTop: 25 }}>
             <Button
               funcType="raised"
               type="primary"
               onClick={saveSettings}
-            ><FormattedMessage id="save" /></Button>
+            ><FormattedMessage id="save" />
+            </Button>
             <Button
               funcType="raised"
               onClick={refresh}
               style={{ marginLeft: 16, color: '#3F51B5' }}
-            ><FormattedMessage id="cancel" /></Button>
-          </div> */}
+            ><FormattedMessage id="cancel" />
+            </Button>
+          </div>
         </Content>
       </Page>
     );
