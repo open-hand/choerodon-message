@@ -116,7 +116,7 @@ export default (props) => {
     return (
       value ? (
         <React.Fragment>
-          <span className="name" onClick={detailTemplate.bind(this, record.get('id'), context)}>{value}</span>
+          <span className={`${prefixCls}-detail`} onClick={detailTemplate.bind(this, record.get('id'), context)}>{value}</span>
           {record.get('currentTemplate') ? <span className={`${prefixCls}-current`}>当前</span> : ''}
           <Action className="action-icon" style={{ float: 'right', marginTop: 6 }} data={actionDatas} />
         </React.Fragment>
@@ -128,7 +128,7 @@ export default (props) => {
     <React.Fragment>
       <FormHeader isHasLine={false} title={<FormattedMessage id={`${intlPrefix}.template.header.title`} />} />
       <Table className="messageService" dataSet={templateDataSet} elementClassName={`${prefixCls}-template-select`}>
-        <Column name="name" renderer={getNameMethod.bind(this)} />
+        <Column align="left" name="name" renderer={getNameMethod.bind(this)} />
         <Column name={`${settingType}Title`} />
         {settingType === 'sms' ? <Column name={`${settingType}Content`} /> : null}
         <Column name="predefined" renderer={renderPredefined.bind(this)} />
