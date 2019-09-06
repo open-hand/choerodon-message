@@ -47,8 +47,9 @@ export default (props) => {
         <ModifySetting context={context} />
       ),
       onOk: handleSaveConfig,
-      okText: <span className="modal-footer-btn">保存</span>,
-      cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
+      okText: <div>保存</div>,
+      // okText: <span className="modal-footer-btn">保存</span>,
+      cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
       // onCancel: resetFunc,#3F51B5
     });
   };
@@ -65,8 +66,9 @@ export default (props) => {
       ),
       // onOk: handleSave,
 
-      okText: <span className="modal-footer-btn">保存</span>,
-      cancelText: <span className="modal-footer-btn" style={{ color: '#3F51B5' }}>取消</span>,
+      okText: <div>保存</div>,
+      // okText: <span className="modal-footer-btn">保存</span>,
+      cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
       // onCancel: resetFunc,
       // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
     });
@@ -94,6 +96,7 @@ export default (props) => {
     <Page className={`${prefixCls}`}>
       <Header
         title="通知配置"
+        className={`${prefixCls}-header`}
       >{isHasEditConfig() ? (
         <Button
           color="blue"
