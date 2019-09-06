@@ -131,11 +131,11 @@ export default function Tab() {
 
       <Content className="">
         <Table className="message-service" dataSet={sendSettingDataSet}>
-          <Column className="column1" name="messageType" renderer={getNameMethod} />
+          <Column align="left" className="column1" name="messageType" renderer={getNameMethod} />
           <Column name="introduce" />
-          <Column name="level" renderer={getLevel} />
-          <Column width={130} name="enabled" align="center" renderer={getEnabled} />
-          <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
+          <Column align="right" name="level" renderer={getLevel} />
+          <Column width={130} name="enabled" renderer={getEnabled} />
+          <Column align="right" width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
         </Table>
       </Content>
     </Page>
