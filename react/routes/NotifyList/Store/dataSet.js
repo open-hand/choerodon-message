@@ -1,4 +1,30 @@
+import { DataSet } from 'choerodon-ui/pro/lib';
+
 export default function (optionDs) {
+  const queryEnabled = new DataSet({
+    autoQuery: true,
+    paging: false,
+    fields: [
+      { name: 'key', type: 'string' },
+      { name: 'value', type: 'string' },
+    ],
+    data: [
+      { key: true, value: '启用' },
+      { key: false, value: '停用' },
+    ],
+  });
+  const queryAllowConfig = new DataSet({
+    autoQuery: true,
+    paging: false,
+    fields: [
+      { name: 'key', type: 'string' },
+      { name: 'value', type: 'string' },
+    ],
+    data: [
+      { key: true, value: '允许' },
+      { key: false, value: '禁止' },
+    ],
+  });
   return {
     autoQuery: true,
     selection: false,
@@ -47,10 +73,16 @@ export default function (optionDs) {
       name: 'enabled',
       type: 'string',
       label: '状态',
+      textField: 'value',
+      valueField: 'key',
+      options: queryEnabled,
     }, {
       name: 'allowConfig',
       type: 'string',
       label: '允许配置接收',
+      textField: 'value',
+      valueField: 'key',
+      options: queryAllowConfig,
     }],
     transport: {
       read: {

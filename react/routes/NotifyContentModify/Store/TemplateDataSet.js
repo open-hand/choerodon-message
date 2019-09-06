@@ -41,7 +41,7 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       { name: 'predefined', type: 'boolean', label: predefined },
       {
         name: 'current',
-        type: 'string',
+        type: 'string', 
         label: intl.formatMessage({ id: `${intlPrefix}.current` }),
         // textField: 'emailTemplateTitle',
         // valueField: 'emailTemplateId',
@@ -51,24 +51,22 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
       },
       { name: 'defaultTemplate', type: 'boolean', textField: 'text', multiple: ',', valueField: 'value', options: optionDataSet },
 
-      { name: 'eideid', type: 'object', label: '1111', bind: 'current0.emailTemplateId' },
     ],
     queryFields: [
       { name: 'name', type: 'string', label: name },
       // { name: 'code', type: 'string', label: name, defaultValue: 'code322222' },
 
-      { name: `${type}Title`, type: 'string', label: Title },
-      // { name: `${type}Content`, type: 'string', defaultValue: '' },
+      type !== 'sms' ? { name: `${type}Title`, type: 'string', label: Title }
+        : { name: `${type}Content`, type: 'string', label: content },
       { name: 'predefined', type: 'string', label: predefined, textField: 'value', valueField: 'key', options: queryPredefined },
 
     ],
 
     transport: {
-      read: {
+      read: ({ params }) => ({
         url: `notify/v1/templates?businessType=${businessType}&messageType=${type}`,
         method: 'get',
-
-      },
+      }),
       submit: ({ data }) => ({
         url: `notify/v1/templates/${type}?set_to_the_current=${data[0].defaultTemplate.split(',')[1] ? data[0].defaultTemplate.split(',')[1] : data[0].defaultTemplate}`,
         method: 'post',
