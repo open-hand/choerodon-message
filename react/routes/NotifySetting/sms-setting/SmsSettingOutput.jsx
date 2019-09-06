@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { observer } from 'mobx-react-lite';
 import { DataSet, Form, Output, Spin, TextField, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
 import store from '../Store';
+import './SmsSetting.scss';
 
 const OutputEmptyValue = ({ value }) => (value ? <span>{value}</span> : <span>无</span>);
 
@@ -10,7 +11,7 @@ export default observer((props) => {
   const sendType = smsSettingDataSet.current && smsSettingDataSet.current.getPristineValue('sendType');
   return (
     <Spin dataSet={smsSettingDataSet}>
-      <Form pristine dataSet={smsSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
+      <Form className="c7n-smssetting-form" pristine dataSet={smsSettingDataSet} labelLayout="horizontal" labelAlign="left" labelWidth={120}>
         <Output name="signature" />
         <Output name="hostAddress" />
         <Output name="hostPort" renderer={OutputEmptyValue} />

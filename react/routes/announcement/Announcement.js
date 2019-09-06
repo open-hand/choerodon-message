@@ -202,15 +202,15 @@ export default class Announcement extends Component {
         key: 'title',
         filters: [],
         filteredValue: filters.title || [],
-        width: '10%',
-        render: text => (
-          <MouseOverWrapper text={text} width={0.1}>
-            {text}
+        width: '20%',
+        render: (text, record) => (
+          <MouseOverWrapper text={text} width={0.2}>
+            <span className="link" onClick={() => this.handleOpen('detail', record)}>{text}</span>
           </MouseOverWrapper>
         ),
       }, {
         title: '',
-        width: '14%',
+        width: '50px',
         key: 'action',
         align: 'right',
         render: this.renderAction,
@@ -219,7 +219,7 @@ export default class Announcement extends Component {
         title: <FormattedMessage id={`${intlPrefix}.content`} />,
         dataIndex: 'textContent',
         key: 'textContent',
-        className: 'nowarp',
+        className: 'nowarp text-gray',
       }, {
         title: <FormattedMessage id="status" />,
         dataIndex: 'status',
@@ -241,6 +241,7 @@ export default class Announcement extends Component {
         dataIndex: 'sendDate',
         key: 'sendDate',
         width: '10%',
+        className: 'text-gray',
         render: text => (
           <MouseOverWrapper text={text} width={0.15}>
             {text}
@@ -432,6 +433,7 @@ export default class Announcement extends Component {
               <DatePicker
                 className="c7n-iam-announcement-siderbar-content-datepicker"
                 label={<FormattedMessage id="announcement.send.date" />}
+                placeholder="请选择发送时间"
                 format="YYYY-MM-DD HH:mm:ss"
                 disabledDate={this.disabledStartDate}
                 disabledTime={this.disabledDateStartTime}
