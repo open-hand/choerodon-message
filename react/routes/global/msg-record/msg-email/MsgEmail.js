@@ -11,20 +11,7 @@ import MouseOverWrapper from '../../../../components/mouseOverWrapper';
 import StatusTag from '../../../../components/statusTag';
 import { handleFiltersParams } from '../../../../common/util';
 import { useStore } from '../stores';
-// 公用方法类
-// class MsgRecordType {
-//   constructor(context) {
-//     context = context;
-//     const { AppState } = context.props;
-//     data = AppState.currentMenuType;
-//     const { type, id, name } = data;
-//     const codePrefix = type === 'organization' ? 'organization' : 'global';
-//     code = `${codePrefix}.msgrecord`;
-//     values = { name: name || 'Choerodon' };
-//     type = type;
-//     orgId = id;
-//   }
-// }
+
 
 const { Column } = Table;
 function MsgEmail(props) {
