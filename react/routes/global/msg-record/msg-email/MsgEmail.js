@@ -127,7 +127,7 @@ function APITest(props) {
   // 重发
   function retry(record) {
     const { type, id: orgId } = AppState.currentMenuType;
-    MsgRecordStore.retry(record.id, type, orgId).then((data) => {
+    MsgRecordStore.retry(record.get('id'), type, orgId).then((data) => {
       let msg = intl.formatMessage({ id: 'msgrecord.send.success' });
       if (data.failed) {
         msg = data.message;
@@ -174,6 +174,19 @@ function APITest(props) {
     // console.log(value);
     return StatusCard(value);
   }
+  const renderEmail = ({ value, record }) => {
+    const action = {
+      text: <FormattedMessage id="msgrecord.resend" />,
+      action: retry.bind(this, record),
+      disabled: record.get('status') === 'FAILED' && record.get('isManualRetry'),
+    };
+    return (
+      <React.Fragment>
+        <span>{value}</span>
+        <div>{renderDropDown(action)}</div>
+      </React.Fragment>
+    );
+  };
 
   function render() {
     const { msgRecordDataSet } = context;
@@ -296,8 +309,8 @@ function APITest(props) {
             
           /> */}
           <Table dataSet={msgRecordDataSet}>
-            <Column name="email" />
-            <Column width={130} name="status" renderer={StatusCard} />
+            <Column name="email" renderer={renderEmail} />
+            <Column align="center" width={130} name="status" renderer={StatusCard} />
             <Column name="templateType" />
             <Column name="failedReason" />
             <Column name="retryCount" />
