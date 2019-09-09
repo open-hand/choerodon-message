@@ -1,8 +1,4 @@
 import { DataSet } from 'choerodon-ui/pro/lib';
-<<<<<<< HEAD
-import { axios } from '@choerodon/master';
-=======
->>>>>>> d7e5674... [IMP]表格改为pro组件
 
 const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 const getTypePath = (type, orgId, method = 'get') => {
@@ -26,10 +22,14 @@ export default (orgId, type, intl, intlPrefix) => {
     ],
     data: [
 <<<<<<< HEAD
+<<<<<<< HEAD
       { key: 'COMPLETED', value: '完成' },
 =======
       { key: 'SUCCESS', value: '完成' },
 >>>>>>> d7e5674... [IMP]表格改为pro组件
+=======
+      { key: 'SUCCESS', value: '完成' },
+>>>>>>> [IMP]表格改为pro组件
       { key: 'FAILED', value: '失败' },
     ],
   });
@@ -39,10 +39,7 @@ export default (orgId, type, intl, intlPrefix) => {
       { text: intl.formatMessage({ id: `${intlPrefix}.current` }), value: true },
     ],
   });
-<<<<<<< HEAD
-=======
 
->>>>>>> d7e5674... [IMP]表格改为pro组件
   return {
     autoQuery: true,
     // autoCreate: datasetType !== 'query',
@@ -60,12 +57,9 @@ export default (orgId, type, intl, intlPrefix) => {
 
     ],
     queryFields: [
-<<<<<<< HEAD
+
       // receiveEmail 字段
       { name: 'receiveEmail', type: 'string', label: email },
-=======
-      { name: 'email', type: 'string', label: email },
->>>>>>> d7e5674... [IMP]表格改为pro组件
       { name: 'status', type: 'string', label: status, textField: 'value', valueField: 'key', options: queryPredefined },
       { name: 'templateType', type: 'string', label: templateType },
       { name: 'failedReason', type: 'string', label: failedReason },
@@ -76,10 +70,6 @@ export default (orgId, type, intl, intlPrefix) => {
       read: ({ params }) => ({
         url: `/notify/v1/records/emails${getTypePath(type, orgId)}`,
         method: 'get',
-<<<<<<< HEAD
-
-=======
->>>>>>> d7e5674... [IMP]表格改为pro组件
       }),
     },
   };
