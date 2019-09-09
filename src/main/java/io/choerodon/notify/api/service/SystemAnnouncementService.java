@@ -38,7 +38,7 @@ public interface SystemAnnouncementService {
      * @param param
      * @return 分页结果
      */
-    PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String param, String status, Boolean sendNotices);
+    PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String[] param, String status, Boolean sendNotices);
 
     /**
      * 根据id获取系统公告详情

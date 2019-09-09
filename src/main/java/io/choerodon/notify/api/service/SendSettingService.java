@@ -40,7 +40,7 @@ public interface SendSettingService {
      * @param pageRequest 分页信息
      * @return 分页结果
      */
-    PageInfo<MessageServiceVO> pagingAll(SendSetting filterDTO, String params, PageRequest pageRequest);
+    PageInfo<MessageServiceVO> pagingAll(SendSetting filterDTO, String[] params, PageRequest pageRequest);
 
     /**
      * 根据id启用消息服务（对应表；notify_send_setting）

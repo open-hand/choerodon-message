@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.constant.PageConstant;
 import io.choerodon.base.enums.ResourceType;
+import io.choerodon.notify.api.vo.SystemNoticeSearchVO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,15 +56,9 @@ public class SystemAnnouncementController {
 
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "分页查询系统公告")
-    @GetMapping("/all")
-    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                                       @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
-                                                                       @RequestParam(required = false) String title,
-                                                                       @RequestParam(required = false) String content,
-                                                                       @RequestParam(required = false) String status,
-                                                                       @RequestParam(required = false) Boolean sendNotices,
-                                                                       @RequestParam(required = false) String param) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(page, size, title, content, param, status, sendNotices), HttpStatus.OK);
+    @PostMapping("/all/list")
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryList(@RequestBody SystemNoticeSearchVO systemNoticeSearchVO) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(systemNoticeSearchVO.getPage(), systemNoticeSearchVO.getSize(), systemNoticeSearchVO.getTitle(), systemNoticeSearchVO.getContent(), systemNoticeSearchVO.getParams(), systemNoticeSearchVO.getStatus(), systemNoticeSearchVO.getSendNotices()), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)

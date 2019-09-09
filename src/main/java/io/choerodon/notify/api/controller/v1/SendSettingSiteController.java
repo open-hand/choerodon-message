@@ -9,6 +9,7 @@ import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.mybatis.annotation.SortDefault;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.api.vo.MessageServiceSearchVO;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
@@ -40,35 +41,30 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 
-    @GetMapping
+    @PostMapping("/list")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层分页查询消息服务列表")
     @CustomPageRequest
-    public ResponseEntity<PageInfo<MessageServiceVO>> pageSite(@ApiIgnore
+    public ResponseEntity<PageInfo<MessageServiceVO>> pageSiteList(@ApiIgnore
                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                               @RequestParam(required = false) String messageType,
-                                                               @RequestParam(required = false) String introduce,
-                                                               @RequestParam(required = false) String level,
-                                                               @RequestParam(required = false) Boolean enabled,
-                                                               @RequestParam(required = false) Boolean allowConfig,
-                                                               @RequestParam(required = false) String params) {
+                                                               @RequestBody(required = false) MessageServiceSearchVO messageQueryVO) {
         SendSetting filterDTO = new SendSetting();
-        if (messageType != null) {
-            filterDTO.setName(messageType);
+        if (messageQueryVO.getMessageType() != null) {
+            filterDTO.setName(messageQueryVO.getMessageType());
         }
-        if (introduce != null) {
-            filterDTO.setDescription(introduce);
+        if (messageQueryVO.getIntroduce() != null) {
+            filterDTO.setDescription(messageQueryVO.getIntroduce());
         }
-        if (level != null) {
-            filterDTO.setLevel(level);
+        if (messageQueryVO.getLevel() != null) {
+            filterDTO.setLevel(messageQueryVO.getLevel());
         }
-        if (enabled != null) {
-            filterDTO.setEnabled(enabled);
+        if (messageQueryVO.getEnabled() != null) {
+            filterDTO.setEnabled(messageQueryVO.getEnabled());
         }
-        if (allowConfig != null) {
-            filterDTO.setAllowConfig(allowConfig);
+        if (messageQueryVO.getAllowConfig() != null) {
+            filterDTO.setAllowConfig(messageQueryVO.getAllowConfig());
         }
-        return new ResponseEntity<>(sendSettingService.pagingAll(filterDTO, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.pagingAll(filterDTO, messageQueryVO.getParams(), pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

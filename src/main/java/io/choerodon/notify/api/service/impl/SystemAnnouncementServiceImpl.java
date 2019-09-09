@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.utils.ParamUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,9 +116,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
 
     @Override
-    public PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String param, String status, Boolean sendNotices) {
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String[] param, String status, Boolean sendNotices) {
         return PageHelper.startPage(page, size)
-                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, content, status, sendNotices, param));
+                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, content, status, sendNotices, ParamUtils.arrToStr(param)));
 
     }
 
