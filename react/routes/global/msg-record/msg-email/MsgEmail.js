@@ -4,7 +4,9 @@
 // eslint-disable-next-line max-classes-per-file
 import React, { Component, useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Table, Tooltip, IconSelect, Menu, Dropdown } from 'choerodon-ui';
+import { Button, Table as OldTable, Tooltip, IconSelect, Menu, Dropdown } from 'choerodon-ui';
+import { Table } from 'choerodon-ui/pro';
+import classnames from 'classnames';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import { axios, Content, Header, TabPage, Permission, Breadcrumb } from '@choerodon/master';
@@ -32,7 +34,7 @@ import { useStore } from '../stores';
 // @injectIntl
 // @inject('AppState')
 // @observer
-
+const { Column } = Table;
 function APITest(props) {
   const context = useStore();
   const { AppState, intl, permissions, MsgRecordStore } = context;
@@ -158,7 +160,23 @@ function APITest(props) {
       ) : null
     );
   };
+  const StatusCard = ({ value }) => (
+    <div
+      className={classnames('c7n-msgrecord-status',
+        value === 'FAILED' ? 'c7n-msgrecord-status-failed'
+          : 'c7n-msgrecord-status-completed')}
+    >
+      <FormattedMessage id={value.toLowerCase()} />
+      {/* 失败 */}
+    </div>
+  );
+  function renderStatus({ value }) {
+    // console.log(value);
+    return StatusCard(value);
+  }
+
   function render() {
+    const { msgRecordDataSet } = context;
     const retryService = getPermission();
     // const { sort: { columnKey, order }, filters, params, pagination, loading } = state;
     const columns = [
@@ -266,7 +284,7 @@ function APITest(props) {
         <Content
           values={{ name: AppState.getSiteInfo.systemName || 'Choerodon' }}
         >
-          <Table
+          {/* <Table
             columns={columns}
             dataSource={MsgRecordStore.getData}
             pagination={pagination}
@@ -276,7 +294,15 @@ function APITest(props) {
             rowKey="id"
             filterBarPlaceholder={intl.formatMessage({ id: 'filtertable' })}
             
-          />
+          /> */}
+          <Table dataSet={msgRecordDataSet}>
+            <Column name="email" />
+            <Column width={130} name="status" renderer={StatusCard} />
+            <Column name="templateType" />
+            <Column name="failedReason" />
+            <Column name="retryCount" />
+            <Column name="creationDate" />
+          </Table>
         </Content>
       </TabPage>
     );
