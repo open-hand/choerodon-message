@@ -38,7 +38,7 @@ class MsgRecordStore {
       queryObj.sort = sorter.join(',');
     }
     const path = appType === 'site' ? '' : `/organizations/${orgId}`;
-    return axios.get(`/notify/v1/records/emails${path}?${querystring.stringify(queryObj)}`);
+    return axios.post(`/notify/v1/records/emails${path}/list?${querystring.stringify(queryObj)}`);
   }
 
   retry = (id, appType, orgId) => {
