@@ -37,7 +37,6 @@
         <if test="query.params != null">
             AND(
             rc.status LIKE concat(concat('%',#{query.params}),'%') OR
-            rc.retry_count = #{query.params} OR
             rc.receive_account LIKE concat(concat('%',#{query.params}),'%') OR
             tl.name LIKE concat(concat('%',#{query.params}),'%') OR
             rc.failed_reason LIKE concat(concat('%',#{query.params}),'%')
