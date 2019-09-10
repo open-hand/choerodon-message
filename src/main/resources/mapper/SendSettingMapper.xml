@@ -90,6 +90,7 @@
         nts.is_send_instantly,
         nts.is_manual_retry,
         nts.is_allow_config,
+        nts.is_enabled,
         nts.object_version_number,
         ntemail.id AS email_template_id,
         ntemail.code AS email_template_code,
@@ -101,7 +102,7 @@
         LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
         LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
-        where 1 = 1
+        where nts.is_enabled = 1
         <if test="level != null">
             AND nts.fd_level = #{level}
         </if>
