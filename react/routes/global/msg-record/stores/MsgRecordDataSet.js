@@ -1,6 +1,5 @@
 import { DataSet } from 'choerodon-ui/pro/lib';
 
-const SendApiDynamicProps = ({ record, name }) => (`${record.get('sendType')}SendApi` === name ? { ignore: 'never' } : { ignore: 'always' });
 const getTypePath = (type, orgId, method = 'get') => {
   const path = type === 'site' ? '' : `/organizations/${orgId}`;
   return path;
@@ -21,15 +20,7 @@ export default (orgId, type, intl, intlPrefix) => {
       { name: 'value', type: 'string' },
     ],
     data: [
-<<<<<<< HEAD
-<<<<<<< HEAD
       { key: 'COMPLETED', value: '完成' },
-=======
-      { key: 'SUCCESS', value: '完成' },
->>>>>>> d7e5674... [IMP]表格改为pro组件
-=======
-      { key: 'SUCCESS', value: '完成' },
->>>>>>> [IMP]表格改为pro组件
       { key: 'FAILED', value: '失败' },
     ],
   });
@@ -68,8 +59,8 @@ export default (orgId, type, intl, intlPrefix) => {
 
     transport: {
       read: ({ params }) => ({
-        url: `/notify/v1/records/emails${getTypePath(type, orgId)}`,
-        method: 'get',
+        url: '/notify/v1/records/emails/list',
+        method: 'post',
       }),
     },
   };

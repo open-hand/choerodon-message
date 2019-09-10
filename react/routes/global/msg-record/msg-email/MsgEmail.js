@@ -31,10 +31,12 @@ function MsgEmail(props) {
   // 重发
   function retry(record) {
     const { type, id: orgId } = AppState.currentMenuType;
-    const getTypePath = () => (type === 'site' ? '' : `/organizations/${orgId}`);
+    // const getTypePath = () => (type === 'site' ? '' : `/organizations/${orgId}`);
     axios({
-      url: `/notify/v1/records/emails/${record.get('id')}/retry${getTypePath()}`,
-      method: type === 'site' ? 'post' : 'get',
+      // url: `/notify/v1/records/emails/${record.get('id')}/retry${getTypePath()}`,
+      // method: type === 'site' ? 'post' : 'get',
+      url: `/notify/v1/records/emails/${record.get('id')}/retry`,
+      method: 'post',
     }).then((data) => {
       let msg = intl.formatMessage({ id: 'msgrecord.send.success' });
       if (data.failed) {
@@ -108,17 +110,6 @@ function MsgEmail(props) {
         <Content
           values={{ name: AppState.getSiteInfo.systemName || 'Choerodon' }}
         >
-          {/* <Table
-            columns={columns}
-            dataSource={MsgRecordStore.getData}
-            pagination={pagination}
-            onChange={handlePageChange}
-            filters={params}
-            loading={loading}
-            rowKey="id"
-            filterBarPlaceholder={intl.formatMessage({ id: 'filtertable' })}
-            
-          /> */}
           <Table dataSet={msgRecordDataSet}>
             <Column align="left" name="email" renderer={renderEmail} />
             <Column name="action" width={30} renderer={renderAction} />
