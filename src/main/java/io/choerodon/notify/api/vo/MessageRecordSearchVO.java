@@ -1,35 +1,18 @@
 package io.choerodon.notify.api.vo;
 
-import io.choerodon.base.constant.PageConstant;
 /**
+ * 消息日志查询VO.
+ *
  * @author wkj
- * @since 2019/9/9 16:46:00
+ * @since 2019/9/9
  */
 public class MessageRecordSearchVO {
-    private int page = Integer.valueOf(PageConstant.PAGE);
-    private int size = Integer.valueOf(PageConstant.SIZE);
     private String status;
     private String receiveEmail;
     private String templateType;
-    private Integer retryStatus;
     private String failedReason;
+    private String level;
     private String[] params;
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
 
     public String getStatus() {
         return status;
@@ -55,20 +38,20 @@ public class MessageRecordSearchVO {
         this.templateType = templateType;
     }
 
-    public Integer getRetryStatus() {
-        return retryStatus;
-    }
-
-    public void setRetryStatus(Integer retryStatus) {
-        this.retryStatus = retryStatus;
-    }
-
     public String getFailedReason() {
         return failedReason;
     }
 
     public void setFailedReason(String failedReason) {
         this.failedReason = failedReason;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 
     public String[] getParams() {

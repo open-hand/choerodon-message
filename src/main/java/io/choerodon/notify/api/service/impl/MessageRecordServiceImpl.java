@@ -3,18 +3,21 @@ package io.choerodon.notify.api.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.stereotype.Service;
+
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.RecordListDTO;
-import io.choerodon.notify.api.pojo.RecordQueryParam;
 import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.MessageRecordService;
+import io.choerodon.notify.api.vo.MessageRecordSearchVO;
 import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
-import org.springframework.stereotype.Service;
+import io.choerodon.notify.infra.utils.ParamUtils;
 
 @Service
 public class MessageRecordServiceImpl implements MessageRecordService {
@@ -36,8 +39,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     }
 
     @Override
-    public PageInfo<RecordListDTO> pageEmail(final RecordQueryParam query, int page, int size) {
-        return PageHelper.startPage(page, size).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(query));
+    public PageInfo<RecordListDTO> pageEmail(PageRequest pageRequest, MessageRecordSearchVO searchVO) {
+        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(searchVO, ParamUtils.arrToStr(searchVO.getParams())));
     }
 
     @Override

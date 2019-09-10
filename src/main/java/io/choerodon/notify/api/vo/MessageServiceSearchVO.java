@@ -1,18 +1,17 @@
 package io.choerodon.notify.api.vo;
 
-import io.swagger.annotations.ApiModelProperty;
 /**
+ * 消息服务查询VO.
+ *
  * @author wkj
- * @since 2019/9/9 16:46:00
+ * @since 2019/9/9
  */
 public class MessageServiceSearchVO {
-    @ApiModelProperty(value = "查询消息种类")
     private String messageType;
     private String introduce;
     private String level;
     private Boolean enabled;
     private Boolean allowConfig;
-    @ApiModelProperty(value = "模糊查询字段")
     private String[] params;
 
     public String getMessageType() {

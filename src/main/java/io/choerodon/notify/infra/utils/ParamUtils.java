@@ -1,8 +1,8 @@
 package io.choerodon.notify.infra.utils;
 
 /**
- * @author flyleft
- * @since 2019/9/9 16:46:00
+ * @author wkj
+ * @since 2019/9/9
  */
 public class ParamUtils {
 

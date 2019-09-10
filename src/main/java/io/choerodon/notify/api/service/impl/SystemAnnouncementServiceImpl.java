@@ -5,7 +5,6 @@ import java.util.*;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.infra.utils.ParamUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,17 +12,20 @@ import org.springframework.stereotype.Component;
 
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.base.domain.PageRequest;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 import io.choerodon.notify.api.service.SystemAnnouncementService;
+import io.choerodon.notify.api.vo.SystemNoticeSearchVO;
 import io.choerodon.notify.domain.SystemAnnouncement;
 import io.choerodon.notify.infra.feign.AsgardFeignClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SystemAnnouncementMapper;
 import io.choerodon.notify.infra.utils.AsyncSendAnnouncementUtils;
+import io.choerodon.notify.infra.utils.ParamUtils;
 
 /**
  * @author dengyouquan
@@ -114,11 +116,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         return asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
     }
 
-
     @Override
-    public PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String[] param, String status, Boolean sendNotices) {
-        return PageHelper.startPage(page, size)
-                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, content, status, sendNotices, ParamUtils.arrToStr(param)));
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, SystemNoticeSearchVO searchVO) {
+        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize())
+                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(searchVO, ParamUtils.arrToStr(searchVO.getParams())));
 
     }
 
