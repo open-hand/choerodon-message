@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.utils.ParamUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -143,9 +144,9 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public PageInfo<MessageServiceVO> pagingAll(SendSetting filterDTO, String params, PageRequest pageRequest) {
+    public PageInfo<MessageServiceVO> pagingAll(SendSetting filterDTO, String[] params, PageRequest pageRequest) {
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(
-                () -> sendSettingMapper.doFTR(filterDTO, params));
+                () -> sendSettingMapper.doFTR(filterDTO, ParamUtils.arrToStr(params)));
     }
 
 

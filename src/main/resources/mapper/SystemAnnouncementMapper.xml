@@ -3,7 +3,7 @@
 <mapper namespace="io.choerodon.notify.infra.mapper.SystemAnnouncementMapper">
 
     <resultMap id="systemAnnouncementDTO" type="io.choerodon.notify.api.dto.SystemAnnouncementDTO">
-        <id column="id" property="id"></id>
+        <id column="id" property="id"/>
         <result column="is_sticky" property="sticky" jdbcType="BOOLEAN"/>
         <result column="is_send_notices" property="sendNotices" jdbcType="BOOLEAN"/>
     </resultMap>
@@ -12,55 +12,56 @@
     <select id="fulltextSearch" resultMap="systemAnnouncementDTO">
         SELECT *
         FROM notify_system_announcement
-        WHERE 1 = 1
-        <if test="title != null">
-            AND title LIKE concat(concat('%',#{title}), '%')
-        </if>
-        <if test="content != null">
-            AND content LIKE concat(concat('%',#{content}), '%')
-        </if>
-        <if test="status != null">
-            AND status LIKE concat(concat('%',#{status}), '%')
-        </if>
-        <if test="isSendNotices != null">
-            AND is_send_notices = #{isSendNotices}
-        </if>
-        <if test="param != null">
-            AND(
-            title LIKE concat(concat('%',#{param}), '%') OR
-            content LIKE concat(concat('%',#{param}), '%') OR
-            status LIKE concat(concat('%',#{param}), '%')
-            )
-        </if>
+        <where>
+            <if test="searchVO.title != null">
+                AND title LIKE concat(concat('%',#{searchVO.title}), '%')
+            </if>
+            <if test="searchVO.content != null">
+                AND content LIKE concat(concat('%',#{searchVO.content}), '%')
+            </if>
+            <if test="searchVO.status != null">
+                AND status = #{searchVO.status}
+            </if>
+            <if test="param != null">
+                AND(
+                title LIKE concat(concat('%',#{param}), '%') OR
+                content LIKE concat(concat('%',#{param}), '%')
+                )
+            </if>
+        </where>
         order by send_date desc
     </select>
 
     <select id="selectLastestSticky" resultMap="systemAnnouncementDTO">
         SELECT
-            *
+        *
         FROM
-            notify_system_announcement
+        notify_system_announcement
         WHERE
-            IS_STICKY = 1
+        IS_STICKY = 1
         AND
-            #{currentTime} BETWEEN SEND_DATE AND END_DATE
+        #{currentTime} BETWEEN SEND_DATE AND END_DATE
         ORDER BY ID DESC LIMIT 1
     </select>
 
 
     <select id="selectLastestSticky" databaseId="oracle" resultMap="systemAnnouncementDTO">
-    <![CDATA[
-      SELECT * FROM (
-            SELECT
-                *
-            FROM
-                notify_system_announcement
-            WHERE
-                IS_STICKY = 1
-            AND
-                #{currentTime} BETWEEN SEND_DATE AND END_DATE
-            ORDER BY ID DESC
-      ) WHERE ROWNUM <= 1
-    ]]>
+        <![CDATA[
+
+
+                      SELECT * FROM (
+                            SELECT
+                                *
+                            FROM
+                                notify_system_announcement
+                            WHERE
+                                IS_STICKY = 1
+                            AND
+                                #{currentTime} BETWEEN SEND_DATE AND END_DATE
+                            ORDER BY ID DESC
+                      ) WHERE ROWNUM <= 1
+
+
+        ]]>
     </select>
 </mapper>
