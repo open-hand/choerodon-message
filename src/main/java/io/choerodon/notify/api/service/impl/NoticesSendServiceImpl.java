@@ -1,5 +1,14 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
@@ -15,14 +24,6 @@ import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class NoticesSendServiceImpl implements NoticesSendService {
@@ -74,14 +75,19 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
         boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
         boolean haveSMSTemplate = sendSetting.getSmsTemplateId() != null;
-        //如果没有任何模板，则不发起feign调用
+        // 如果消息服务未启用，不发送通知
+        if (sendSetting.getEnabled() == null || !sendSetting.getEnabled()) {
+            LOGGER.warn("sendSetting '{}' disabled, can`t send notice.", dto.getCode());
+            return;
+        }
+        // 如果没有任何模板，则不发起feign调用
         if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate) {
             LOGGER.warn("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
         boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
 
-        //取得需要发送通知用户
+        // 取得需要发送通知用户
         if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
             return;
         }
@@ -100,10 +106,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
-        //捕获异常,防止邮件发送失败，影响站内信发送
+        // 捕获异常,防止邮件发送失败，影响站内信发送
         try {
             if (haveEmailTemplate) {
-                //得到需要发送邮件的用户
+                // 得到需要发送邮件的用户
                 Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.EMAIL);
                 emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
             } else {
@@ -165,18 +171,18 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      */
     private Set<UserDTO> getNeedSendUsers(final NoticeSendDTO dto) {
         Set<UserDTO> users = new HashSet<>();
-        //取得User中id不为空的id，将发起feign调用
+        // 取得User中id不为空的id，将发起feign调用
         Set<Long> needQueryUserIds = dto.getTargetUsers().stream().filter(user -> user.getId() != null).map(NoticeSendDTO.User::getId).collect(Collectors.toSet());
         if (!needQueryUserIds.isEmpty()) {
             Long[] userIds = needQueryUserIds.toArray(new Long[0]);
             //TODO 如果用户太多，需要多次查询
             users.addAll(userFeignClient.listUsersByIds(userIds).getBody());
         }
-        //取得User中id为空且email不为空的email，将发起feign调用
+        // 取得User中id为空且email不为空的email，将发起feign调用
         Set<String> needQueryEmails = dto.getTargetUsers().stream().filter(user -> user.getId() == null && user.getEmail() != null).map(NoticeSendDTO.User::getEmail).collect(Collectors.toSet());
         if (!needQueryEmails.isEmpty()) {
             String[] emails = needQueryEmails.toArray(new String[0]);
-            //注册组织时没有真正的用户，只有email,因此伪造一个UserDTO
+            // 注册组织时没有真正的用户，只有email,因此伪造一个UserDTO
             //TODO 如果用户太多，需要多次查询
             List<UserDTO> emailUsers = userFeignClient.listUsersByEmails(emails).getBody();
             Set<String> queryEmails = emailUsers.stream().map(UserDTO::getEmail).collect(Collectors.toSet());
