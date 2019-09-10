@@ -22,20 +22,31 @@ function htmlDecode(str) {
 @store('AnnouncementStore')
 class AnnouncementStore {
   @observable announcementData = [];
+
   @observable editorContent = null;
+
   @observable loading = false;
+
   @observable submitting = false;
+
   @observable sidebarVisible = false;
+
   @observable currentRecord = {};
+
   @observable pagination = {
     current: 1,
     pageSize: 10,
     total: 0,
   };
+
   @observable params = [];
+
   @observable filters = {};
+
   @observable sort = { columnKey: 'id', order: 'descend' };
+
   @observable announcementType = null;
+
   @observable selectType = 'create';
 
   @action
@@ -103,7 +114,7 @@ class AnnouncementStore {
       this.loading = false;
       return;
     }
-    return axios.get(`${this.announcementType.apiPrefix}/all?${queryString.stringify({
+    return axios.get(`${this.announcementType.apiPrefix}/all/list?${queryString.stringify({
       page: pagination.current,
       size: pagination.pageSize,
       content: filters.content && filters.content[0],
