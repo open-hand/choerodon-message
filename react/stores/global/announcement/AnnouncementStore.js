@@ -122,7 +122,9 @@ class AnnouncementStore {
       title: filters.title && filters.title[0],
       params: params.join(','),
       sort: sorter.join(','),
-    })}`)
+    })}`, {
+      data: {},
+    })
       .then(action(({ failed, list, total }) => {
         if (!failed) {
           this.announcementData = list;
