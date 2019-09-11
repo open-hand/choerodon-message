@@ -1,10 +1,11 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
+
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.notify.api.dto.TemplateCreateVO;
 import io.choerodon.notify.api.dto.TemplateVO;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.api.vo.TemplateSearchVO;
 
 /**
  * @author Eugen
@@ -13,12 +14,11 @@ public interface TemplateService {
     /**
      * 分页获取模版信息
      *
-     * @param filterDTO   过滤信息
-     * @param params      全局模糊查询参数
-     * @param pageRequest
-     * @return
+     * @param pageRequest 分页对象
+     * @param searchVO    消息模板查询VO
+     * @return 模板列表
      */
-    PageInfo<TemplateVO> pagingTemplateByMessageType(Template filterDTO, String[] params, PageRequest pageRequest);
+    PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, TemplateSearchVO searchVO);
 
 
     /**
@@ -63,5 +63,5 @@ public interface TemplateService {
      * @param updateVO 更新VO
      * @return 更新结果
      */
-    TemplateCreateVO updateTemplate(Boolean setToTheCurrent,TemplateCreateVO updateVO);
+    TemplateCreateVO updateTemplate(Boolean setToTheCurrent, TemplateCreateVO updateVO);
 }

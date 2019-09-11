@@ -14,10 +14,12 @@ import io.choerodon.notify.api.dto.TemplateCreateVO;
 import io.choerodon.notify.api.dto.TemplateVO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.TemplateService;
+import io.choerodon.notify.api.vo.TemplateSearchVO;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.domain.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
+import io.choerodon.notify.infra.utils.ParamUtils;
 
 @Component
 public class TemplateServiceImpl implements TemplateService {
@@ -36,10 +38,10 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public PageInfo<TemplateVO> pagingTemplateByMessageType(Template filterDTO, String[] params, PageRequest pageRequest) {
-        Long currentId = getCurrentId(filterDTO.getBusinessType(), filterDTO.getMessageType());
+    public PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, TemplateSearchVO searchVO) {
+        Long currentId = getCurrentId(searchVO.getBusinessType(), searchVO.getMessageType());
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(
-                () -> templateMapper.doFTR(filterDTO, currentId, params));
+                () -> templateMapper.doFTR(searchVO, currentId, ParamUtils.arrToStr(searchVO.getParams())));
     }
 
     @Override

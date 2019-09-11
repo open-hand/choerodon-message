@@ -1,6 +1,14 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
 import io.choerodon.base.annotation.Permission;
 import io.choerodon.base.domain.PageRequest;
 import io.choerodon.base.domain.Sort;
@@ -13,26 +21,19 @@ import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.TemplateService;
 import io.choerodon.notify.api.validator.Insert;
 import io.choerodon.notify.api.validator.Update;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.api.vo.TemplateSearchVO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
-import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping(value = "/v1/templates")
 public class TemplateSiteController {
-    TemplateService templateService;
+    private TemplateService templateService;
 
     public TemplateSiteController(TemplateService templateService) {
         this.templateService = templateService;
     }
 
-    @GetMapping
+    @PostMapping("/list")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "分页查询模版（全局层）")
     @CustomPageRequest
@@ -40,24 +41,14 @@ public class TemplateSiteController {
                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                 @RequestParam String businessType,
                                                                 @RequestParam String messageType,
-                                                                @RequestParam(required = false) String name,
-                                                                @RequestParam(required = false) Boolean predefined,
-                                                                @RequestParam(required = false) String[] params) {
+                                                                @RequestBody TemplateSearchVO searchVO) {
         // 1.校验消息类型
         if (!MessageType.isInclude(messageType)) {
             throw new CommonException("error.template.message.type.invalid");
         }
-        // 2.设置过滤信息
-        Template filterDTO = new Template();
-        filterDTO.setBusinessType(businessType);
-        filterDTO.setMessageType(messageType.toLowerCase());
-        if (name != null) {
-            filterDTO.setName(name);
-        }
-        if (predefined != null) {
-            filterDTO.setIsPredefined(predefined);
-        }
-        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(filterDTO, params, pageRequest), HttpStatus.OK);
+        searchVO.setBusinessType(businessType);
+        searchVO.setMessageType(messageType.toLowerCase());
+        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageRequest, searchVO), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
@@ -71,14 +62,14 @@ public class TemplateSiteController {
     @Permission(type = ResourceType.SITE)
     @ApiModelProperty(value = "全局层删除模版")
     public ResponseEntity<Boolean> deleteById(@PathVariable("id") long id) {
-        return new ResponseEntity(templateService.deleteById(id), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.deleteById(id), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")
     @Permission(type = ResourceType.SITE)
     @ApiModelProperty(value = "全局层设为当前模版")
     public ResponseEntity<Boolean> setToTheCurrent(@PathVariable("id") long id) {
-        return new ResponseEntity(templateService.setToTheCurrent(id), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.setToTheCurrent(id), HttpStatus.OK);
     }
 
 

@@ -154,7 +154,7 @@
     </select>
 
     <select id="doFTR" resultType="io.choerodon.notify.api.dto.TemplateVO">
-        SELECT
+        select
         id,
         name,
         is_predefined as predefined,
@@ -163,31 +163,29 @@
         sms_content,
         case when (#{currentId} is not null and id=#{currentId} )
         then true else false end as current_template
-        FROM
-        notify_template
-        WHERE 1=1
-        <if test="filterDTO.businessType != null">
-            AND BUSINESS_TYPE = #{filterDTO.businessType}
-        </if>
-        <if test="filterDTO.messageType != null">
-            AND MESSAGE_TYPE = #{filterDTO.messageType}
-        </if>
-        <if test="filterDTO.isPredefined != null">
-            AND IS_PREDEFINED = #{filterDTO.isPredefined}
-        </if>
-        <if test="filterDTO.name != null">
-            AND name LIKE concat(concat('%',#{filterDTO.name}),'%')
-        </if>
-        <if test="params != null">
-            <foreach collection="params" index="index" item="param">
+        from  notify_template
+        <where>
+            <if test="searchVO.businessType != null">
+                and business_type = #{searchVO.businessType}
+            </if>
+            <if test="searchVO.messageType != null">
+                and message_type = #{searchVO.messageType}
+            </if>
+            <if test="searchVO.predefined != null">
+                and is_predefined = #{searchVO.predefined}
+            </if>
+            <if test="searchVO.name != null">
+                and name like concat(concat('%',#{searchVO.name}),'%')
+            </if>
+            <if test="param != null">
                 AND (
-                EMAIL_TITLE LIKE concat(concat('%',#{param}),'%') OR
-                PM_TITLE LIKE concat(concat('%',#{param}),'%') OR
-                SMS_CONTENT LIKE concat(concat('%',#{param}),'%') OR
-                name LIKE concat(concat('%',#{param}),'%')
+                email_title like concat(concat('%',#{param}),'%') OR
+                pm_title like concat(concat('%',#{param}),'%') OR
+                sms_content like concat(concat('%',#{param}),'%') OR
+                name like concat(concat('%',#{param}),'%')
                 )
-            </foreach>
-        </if>
+            </if>
+        </where>
         <if test="currentId != null">
             ORDER BY FIELD(`id`,#{currentId}) desc,id desc
         </if>
