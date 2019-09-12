@@ -47,6 +47,8 @@ public class Template extends BaseDTO {
 
     private String smsContent;
 
+    private String whContent;
+
     public Template(String code, String messageType) {
         this.code = code;
         this.messageType = messageType;
@@ -69,7 +71,16 @@ public class Template extends BaseDTO {
                 ", pmTitle='" + pmTitle + '\'' +
                 ", pmContent='" + pmContent + '\'' +
                 ", smsContent='" + smsContent + '\'' +
+                ", whContent='" + whContent + '\'' +
                 '}';
+    }
+
+    public String getWhContent() {
+        return whContent;
+    }
+
+    public void setWhContent(String whContent) {
+        this.whContent = whContent;
     }
 
     public Long getId() {

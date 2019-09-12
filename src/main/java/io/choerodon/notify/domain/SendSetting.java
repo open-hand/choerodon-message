@@ -42,6 +42,8 @@ public class SendSetting extends BaseDTO {
 
     private Boolean isManualRetry;
 
+    private Long whTemplateId;
+
     public SendSetting(String code) {
         this.code = code;
     }
@@ -74,10 +76,20 @@ public class SendSetting extends BaseDTO {
                 ", level='" + level + '\'' +
                 ", pmType='" + pmType + '\'' +
                 ", isAllowConfig=" + isAllowConfig +
+                ", enabled=" + enabled +
                 ", retryCount=" + retryCount +
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
+                ", whTemplateId=" + whTemplateId +
                 '}';
+    }
+
+    public Long getWhTemplateId() {
+        return whTemplateId;
+    }
+
+    public void setWhTemplateId(Long whTemplateId) {
+        this.whTemplateId = whTemplateId;
     }
 
     public Long getId() {

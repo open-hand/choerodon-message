@@ -55,4 +55,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
             addNotNullConstraint(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE', columnDataType: 'VARCHAR(64)')
         }
     }
+
+    changeSet(author: 'bg_zyy@foxmail.com', id: '2019-11-15-add-column_enabled') {
+        addColumn(tableName: "NOTIFY_TEMPLATE") {
+            column(name: 'WH_CONTENT', type: 'TEXT', remarks: 'webhook 文本消息模版', afterColumn: 'PM_CONTENT')
+        }
+    }
 }
