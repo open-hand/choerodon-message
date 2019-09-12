@@ -35,6 +35,7 @@ public class TemplateQueryDTO {
                 skip().setSmsContent(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
+                skip().setWhContent(null);
                 skip().setObjectVersionNumber(null);
                 skip().setEmailTitle(null);
                 skip().setEmailContent(null);

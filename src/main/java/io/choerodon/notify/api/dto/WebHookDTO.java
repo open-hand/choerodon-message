@@ -7,7 +7,10 @@ import javax.persistence.*;
  * @since 2019/9/11
  */
 @Table(name = "NOTIFY_WEBHOOK")
-public class WebhookDTO {
+public class WebHookDTO {
+    public static final String WEB_HOOK_TYPE_DING_TALK = "DingTalk";
+    public static final String WEB_HOOK_TYPE_WE_CHAT = "WeChat";
+    public static final String WEB_HOOK_TYPE_JSON = "Json";
 
     @Id
     @GeneratedValue

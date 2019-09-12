@@ -44,6 +44,8 @@ public class SendSetting extends BaseDTO {
 
     private Long whTemplateId;
 
+    private Boolean whEnabledFlag;
+
     public SendSetting(String code) {
         this.code = code;
     }
@@ -82,6 +84,14 @@ public class SendSetting extends BaseDTO {
                 ", isManualRetry=" + isManualRetry +
                 ", whTemplateId=" + whTemplateId +
                 '}';
+    }
+
+    public Boolean getWhEnabledFlag() {
+        return whEnabledFlag;
+    }
+
+    public void setWhEnabledFlag(Boolean whEnabledFlag) {
+        this.whEnabledFlag = whEnabledFlag;
     }
 
     public Long getWhTemplateId() {

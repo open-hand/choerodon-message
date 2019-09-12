@@ -3,6 +3,7 @@ package io.choerodon.notify.api.service.impl;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import io.choerodon.notify.api.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,10 +15,6 @@ import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.api.service.EmailSendService;
-import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.notify.api.service.SmsService;
-import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.domain.ReceiveSetting;
 import io.choerodon.notify.domain.SendSetting;
 import io.choerodon.notify.infra.enums.SenderType;
@@ -32,6 +29,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private EmailSendService emailSendService;
 
     private WebSocketSendService webSocketSendService;
+    private WebHookService webHookService;
     private ReceiveSettingMapper receiveSettingMapper;
     private SendSettingMapper sendSettingMapper;
     private UserFeignClient userFeignClient;
@@ -40,12 +38,13 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService,
-                                  ReceiveSettingMapper receiveSettingMapper,
+                                  WebHookService webHookService, ReceiveSettingMapper receiveSettingMapper,
                                   SendSettingMapper sendSettingMapper,
                                   UserFeignClient userFeignClient,
                                   SmsService smsService) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
+        this.webHookService = webHookService;
         this.receiveSettingMapper = receiveSettingMapper;
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
@@ -75,13 +74,14 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
         boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
         boolean haveSMSTemplate = sendSetting.getSmsTemplateId() != null;
+        boolean enableWebHook = Boolean.TRUE.equals(sendSetting.getWhEnabledFlag());
         // 如果消息服务未启用，不发送通知
         if (sendSetting.getEnabled() == null || !sendSetting.getEnabled()) {
             LOGGER.warn("sendSetting '{}' disabled, can`t send notice.", dto.getCode());
             return;
         }
         // 如果没有任何模板，则不发起feign调用
-        if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate) {
+        if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate && !enableWebHook) {
             LOGGER.warn("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
             return;
         }
@@ -99,11 +99,19 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             if (dto.isSendingSiteMessage()) {
                 trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
             }
+            if (dto.isSendingWebHook() && Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())){
+                webHookService.trySendWebHook(dto, sendSetting);
+            }
         } else {
             trySendEmail(dto, sendSetting, users, haveEmailTemplate);
             trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
+            if (Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())){
+                webHookService.trySendWebHook(dto, sendSetting);
+            }
         }
     }
+
+
 
     private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
         // 捕获异常,防止邮件发送失败，影响站内信发送
