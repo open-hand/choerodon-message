@@ -1,14 +1,3 @@
-import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { asyncRouter, nomatch } from '@choerodon/master';
+import SmsSettingOutput from './SmsSettingOutput';
 
-const index = asyncRouter(() => (import('./SmsSettingOutput')));
-
-const Index = ({ match }) => (
-  <Switch>
-    <Route exact path={match.url} component={index} />
-    <Route path="*" component={nomatch} />
-  </Switch>
-);
-
-export default Index;
+export default SmsSettingOutput;

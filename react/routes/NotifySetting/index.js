@@ -1,9 +1,14 @@
 import React from 'react';
+import { PageWrap, PageTab } from '@choerodon/master';
 import { StoreProvider } from './Store';
-import TabView from './TabView';
+import MailSetting from './mail-setting';
+import SmsSetting from './sms-setting';
 
 export default (props) => (
   <StoreProvider {...props}>
-    <TabView />
+    <PageWrap noHeader={['choerodon.code.site.organization-approve', 'choerodon.code.site.organization-category']}>
+      <PageTab title="邮箱配置" tabKey="choerodon.code.site.message-config-email" component={MailSetting} />
+      <PageTab title="短信配置" tabKey="choerodon.code.site.message-config-sms" component={SmsSetting} />
+    </PageWrap>
   </StoreProvider>
 );
