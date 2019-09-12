@@ -118,9 +118,9 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.insertSelective(createDTO) != 1) {
             throw new CommonException("error.template.insert");
         }
-        // 设为当前模板
+        // 设置当前模板
         if (setToTheCurrent) {
-            updateSendSettingTemplate(createDTO.getId(), createVO);
+            updateSendSettingTemplate(createDTO.getId(), createVO, setToTheCurrent);
         }
         // 返回创建结果
         Template template = templateMapper.selectByPrimaryKey(createDTO.getId());
@@ -148,13 +148,8 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
-        // 设为当前模板
-        if (setToTheCurrent) {
-            updateSendSettingTemplate(template.getId(), updateVO);
-        } else {
-            // 取消当前模板
-            updateSendSettingTemplate(null, updateVO);
-        }
+        // 设置或取消当前模板
+        updateSendSettingTemplate(template.getId(), updateVO, setToTheCurrent);
         // 返回创建结果
         template = templateMapper.selectByPrimaryKey(updateVO.getId());
         TemplateCreateVO resultVO = new TemplateCreateVO();
@@ -214,7 +209,7 @@ public class TemplateServiceImpl implements TemplateService {
      * @param templateId 模版主键
      * @param createVO   更新的模版信息
      */
-    private void updateSendSettingTemplate(Long templateId, TemplateCreateVO createVO) {
+    private void updateSendSettingTemplate(Long templateId, TemplateCreateVO createVO, Boolean setToTheCurrent) {
         SendSetting updateDTO = new SendSetting();
         updateDTO.setCode(createVO.getBusinessType());
         updateDTO = sendSettingMapper.selectOne(updateDTO);
@@ -222,15 +217,41 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
         if (createVO instanceof TemplateCreateVO.EmailTemplateCreateVO) {
-            updateDTO.setEmailTemplateId(templateId);
+            // 设为当前模板
+            if (setToTheCurrent) {
+                updateDTO.setEmailTemplateId(templateId);
+            } else {
+                // 只有当前使用模板可取消
+                if (templateId.equals(updateDTO.getEmailTemplateId())) {
+                    updateDTO.setEmailTemplateId(null);
+                }
+            }
         } else if (createVO instanceof TemplateCreateVO.PmTemplateCreateVO) {
-            updateDTO.setPmTemplateId(templateId);
+            // 设为当前模板
+            if (setToTheCurrent) {
+                updateDTO.setPmTemplateId(templateId);
+            } else {
+                // 只有当前使用模板可取消
+                if (templateId.equals(updateDTO.getPmTemplateId())) {
+                    updateDTO.setPmTemplateId(null);
+                }
+            }
             updateDTO.setPmType(((TemplateCreateVO.PmTemplateCreateVO) createVO).getPmType());
         } else if (createVO instanceof TemplateCreateVO.SmsTemplateCreateVO) {
-            updateDTO.setSmsTemplateId(templateId);
+            // 设为当前模板
+            if (setToTheCurrent) {
+                updateDTO.setSmsTemplateId(templateId);
+            } else {
+                // 只有当前使用模板可取消
+                if (templateId.equals(updateDTO.getSmsTemplateId())) {
+                    updateDTO.setSmsTemplateId(null);
+                }
+            }
         }
         if (sendSettingMapper.updateByPrimaryKey(updateDTO) != 1) {
             throw new CommonException("error.send.setting.update");
         }
     }
+
+
 }
