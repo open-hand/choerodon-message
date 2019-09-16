@@ -63,4 +63,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: 'IS_ENABLED', type: 'TINYINT UNSIGNED', defaultValue: "1", remarks: '是否启用。1表示启用，0不启用', afterColumn: 'IS_ALLOW_CONFIG')
         }
     }
+
+    changeSet(author: 'bg_zyy@foxmail.com', id: '2019-11-15-add-column_enabled') {
+        addColumn(tableName: "NOTIFY_SEND_SETTING") {
+            column(name: 'WH_TEMPLATE_ID', type: 'BIGINT UNSIGNED', remarks: 'webhook 发送模版 id')
+            column(name: 'WH_ENABLED_FLAG', type: 'TINYINT UNSIGNED', remarks: '是否启用WebHook发送')
+        }
+    }
 }

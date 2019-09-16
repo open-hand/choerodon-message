@@ -35,20 +35,33 @@ public class TemplateRender {
     }
 
 
-    String renderTemplate(final Template template, final Map<String, Object> variables, TemplateType type)
-            throws IOException, TemplateException {
+    public String renderTemplate(final Template template, final Map<String, Object> variables, TemplateType type) throws IOException, TemplateException {
         String messageType = template.getMessageType();
         String templateKey = template.getCode() + "-" + messageType + ":" + type.getValue() + template.getObjectVersionNumber();
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
         String content = "";
         switch (type) {
             case TITLE:
-                content = messageType.equals(MessageType.EMAIL.getValue()) ?
-                        template.getEmailTitle() : template.getPmTitle();
+                if (MessageType.EMAIL.getValue().equals(messageType)){
+                    content = template.getEmailTitle();
+                } else if (MessageType.PM.getValue().equals(messageType)){
+                    content = template.getPmTitle();
+                } else {
+                    throw new CommonException("error.templateRender.renderError");
+                }
                 break;
             case CONTENT:
-                content = messageType.equals(MessageType.EMAIL.getValue()) ?
-                        template.getEmailContent() : template.getPmContent();
+                if (MessageType.EMAIL.getValue().equals(messageType)){
+                    content = template.getEmailContent();
+                } else if (MessageType.PM.getValue().equals(messageType)){
+                    content = template.getPmContent();
+                } else if (MessageType.WH.getValue().equals(messageType)){
+                    content = template.getWhContent();
+                } else if (MessageType.SMS.getValue().equals(messageType)){
+                    content = template.getSmsContent();
+                } else {
+                    throw new CommonException("error.templateRender.renderError");
+                }
                 break;
         }
         if (ft == null) {

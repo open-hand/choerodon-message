@@ -49,6 +49,7 @@ public class EmailTemplateDTO {
                 skip().setSmsContent(null);
                 skip().setPmTitle(null);
                 skip().setPmContent(null);
+                skip().setWhContent(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
                 skip().setLastUpdateDate(null);
