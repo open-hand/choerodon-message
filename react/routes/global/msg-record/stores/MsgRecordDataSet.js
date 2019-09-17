@@ -59,8 +59,8 @@ export default (orgId, type, intl, intlPrefix) => {
 
     transport: {
       read: ({ params }) => ({
-        url: '/notify/v1/records/emails/list',
-        method: 'post',
+        url: '/notify/v1/records/emails',
+        method: 'get',
       }),
     },
   };
