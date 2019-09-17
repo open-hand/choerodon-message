@@ -19,12 +19,19 @@ public interface SendSettingMapper extends Mapper<SendSetting> {
 
     /**
      * The full text retrieval
-     *
-     * @param filterDTO 过滤信息
-     * @param params    全局过滤信息（name，description）
+     * @param messageType
+     * @param introduce
+     * @param level
+     * @param enabled
+     * @param allowConfig
+     * @param params 全局过滤信息（name，description）
      * @return
      */
-    List<MessageServiceVO> doFTR(@Param("filterDTO") SendSetting filterDTO,
+    List<MessageServiceVO> doFTR(@Param("messageType") String messageType,
+                                 @Param("introduce") String introduce,
+                                 @Param("level") String level,
+                                 @Param("enabled") Boolean enabled,
+                                 @Param("allowConfig") Boolean allowConfig,
                                  @Param("params") String params);
 
     SendSettingDetailDTO selectById(@Param("id") Long id);

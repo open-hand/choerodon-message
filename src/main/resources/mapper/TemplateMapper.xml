@@ -21,7 +21,7 @@
         </if>
     </select>
 
-    <select id="fulltextSearchStationLetter" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
+    <select id="fulltextSearchStationLetter" resultType="io.choerodon.notify.api.dto.PmTemplateDTO">
         SELECT
         nt.id,
         nt.code,
@@ -58,7 +58,7 @@
         order by nt.id desc
     </select>
 
-    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.TemplateQueryDTO">
+    <select id="fulltextSearchEmail" resultType="io.choerodon.notify.api.dto.EmailTemplateDTO">
         SELECT
         nt.id,
         nt.code,

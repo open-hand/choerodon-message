@@ -1,18 +1,21 @@
 package io.choerodon.notify.infra.mapper;
 
-import java.util.Date;
-import java.util.List;
-
 import org.apache.ibatis.annotations.Param;
 
-import io.choerodon.mybatis.common.Mapper;
-import io.choerodon.notify.api.dto.RecordListDTO;
-import io.choerodon.notify.api.vo.MessageRecordSearchVO;
-import io.choerodon.notify.domain.Record;
+import java.util.*;
+
+import io.choerodon.mybatis.common.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.domain.*;
 
 public interface RecordMapper extends Mapper<Record> {
 
-    List<RecordListDTO> fulltextSearchEmail(@Param("searchVO") MessageRecordSearchVO searchVO, @Param("param") String param);
+    List<RecordListDTO> fulltextSearchEmail(@Param("status") String status,
+                                            @Param("receiveEmail") String receiveEmail,
+                                            @Param("templateType") String templateType,
+                                            @Param("failedReason") String failedReason,
+                                            @Param("params") String params,
+                                            @Param("level") String level);
 
     void updateRecordStatusAndIncreaseCount(@Param("id") long id,
                                             @Param("status") String status,

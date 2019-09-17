@@ -1,17 +1,14 @@
 package io.choerodon.notify.infra.mapper;
 
-import java.util.List;
-
 import org.apache.ibatis.annotations.Param;
 
-import io.choerodon.mybatis.common.Mapper;
-import io.choerodon.notify.api.dto.EmailTemplateDTO;
-import io.choerodon.notify.api.dto.PmTemplateDTO;
-import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.api.dto.TemplateVO;
-import io.choerodon.notify.api.query.TemplateQuery;
-import io.choerodon.notify.api.vo.TemplateSearchVO;
-import io.choerodon.notify.domain.Template;
+import java.util.*;
+
+import io.choerodon.mybatis.common.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.query.*;
+import io.choerodon.notify.api.vo.*;
+import io.choerodon.notify.domain.*;
 
 public interface TemplateMapper extends Mapper<Template> {
 

@@ -5,19 +5,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.RecordListDTO;
-import io.choerodon.notify.api.pojo.RecordSendData;
-import io.choerodon.notify.api.pojo.RecordStatus;
-import io.choerodon.notify.api.service.EmailSendService;
-import io.choerodon.notify.api.service.MessageRecordService;
-import io.choerodon.notify.api.vo.MessageRecordSearchVO;
-import io.choerodon.notify.domain.Record;
-import io.choerodon.notify.infra.mapper.RecordMapper;
-import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.infra.utils.ConvertUtils;
-import io.choerodon.notify.infra.utils.ParamUtils;
+import io.choerodon.base.domain.*;
+import io.choerodon.core.exception.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.pojo.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.domain.*;
+import io.choerodon.notify.infra.mapper.*;
+import io.choerodon.notify.infra.utils.*;
 
 @Service
 public class MessageRecordServiceImpl implements MessageRecordService {
@@ -39,8 +34,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     }
 
     @Override
-    public PageInfo<RecordListDTO> pageEmail(PageRequest pageRequest, MessageRecordSearchVO searchVO) {
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(searchVO, ParamUtils.arrToStr(searchVO.getParams())));
+    public PageInfo<RecordListDTO> pageEmail(String status, String receiveEmail, String templateType, String failedReason, String params, PageRequest pageRequest, String level) {
+        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(status, receiveEmail, templateType, failedReason, params, level));
     }
 
     @Override
