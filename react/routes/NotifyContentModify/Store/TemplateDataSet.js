@@ -64,8 +64,8 @@ export default (id, businessType, type, datasetType, intl, intlPrefix) => {
 
     transport: {
       read: ({ params }) => ({
-        url: `notify/v1/templates/list?businessType=${businessType}&messageType=${type}`,
-        method: 'post',
+        url: `notify/v1/templates?businessType=${businessType}&messageType=${type}`,
+        method: 'get',
       }),
       submit: ({ data }) => ({
         url: `notify/v1/templates/${type}?set_to_the_current=${data[0].defaultTemplate.split(',')[1] ? data[0].defaultTemplate.split(',')[1] : data[0].defaultTemplate}`,
