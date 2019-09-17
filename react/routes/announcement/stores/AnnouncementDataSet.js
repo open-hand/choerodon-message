@@ -20,8 +20,8 @@ export default (intl, intlPrefix) => {
     ],
     transport: {
       read: {
-        url: 'notify/v1/system_notice/all/list',
-        method: 'post',
+        url: 'notify/v1/system_notice/all',
+        method: 'get',
       },
       submit: ({ data }) => ({
         url: 'notify/v1/system_notice/create',

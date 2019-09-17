@@ -114,7 +114,7 @@ export default class AnnouncementStore {
       this.loading = false;
       return;
     }
-    return axios.post(`${this.announcementType.apiPrefix}/all/list?${queryString.stringify({
+    return axios.get(`${this.announcementType.apiPrefix}/all?${queryString.stringify({
       page: pagination.current,
       size: pagination.pageSize,
       content: filters.content && filters.content[0],
