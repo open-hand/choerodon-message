@@ -20,7 +20,7 @@
                 AND status = #{status}
             </if>
             <if test="params != null">
-                AND(
+                AND (
                 title LIKE concat(concat('%',#{params}), '%') OR
                 content LIKE concat(concat('%',#{params}), '%')
                 )

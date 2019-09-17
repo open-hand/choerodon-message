@@ -49,7 +49,7 @@
         </if>
 
         <if test="params != null">
-            AND(
+            AND (
             nt.code LIKE concat(concat('%',#{params}),'%') OR
             nt.name LIKE concat(concat('%',#{params}),'%') OR
             nss.name LIKE concat(concat('%',#{params}),'%')
@@ -86,7 +86,7 @@
         </if>
 
         <if test="params != null">
-            AND(
+            AND (
             nt.code LIKE concat(concat('%',#{params}),'%') OR
             nt.name LIKE concat(concat('%',#{params}),'%') OR
             nss.name LIKE concat(concat('%',#{params}),'%')
@@ -144,7 +144,7 @@
         </if>
 
         <if test="templateQuery.params != null">
-            AND(
+            AND (
             nt.code LIKE concat(concat('%',#{templateQuery.params}),'%') OR
             nt.name LIKE concat(concat('%',#{templateQuery.params}),'%') OR
             nss.name LIKE concat(concat('%',#{templateQuery.params}),'%')

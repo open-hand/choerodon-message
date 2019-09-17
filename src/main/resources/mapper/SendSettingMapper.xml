@@ -38,7 +38,7 @@
             AND nts.description LIKE concat(concat('%',#{description}),'%')
         </if>
         <if test="params != null">
-            AND(
+            AND (
             nts.code LIKE concat(concat('%',#{params}),'%') OR
             nts.name LIKE concat(concat('%',#{params}),'%') OR
             nts.description LIKE concat(concat('%',#{params}),'%')
@@ -141,7 +141,7 @@
             AND is_allow_config = #{allowConfig}
         </if>
         <if test="params != null">
-            AND(
+            AND (
             name LIKE concat(concat('%',#{params}),'%') OR
             description LIKE concat(concat('%',#{params}),'%')
             )

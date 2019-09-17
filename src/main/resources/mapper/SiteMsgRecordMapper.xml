@@ -64,7 +64,7 @@
             AND nsr.is_deleted = #{query.deleted}
         </if>
         <if test="query.params != null">
-            AND(
+            AND (
             nsr.title LIKE concat(concat('%',#{query.title}),'%') OR
             nsr.content LIKE concat(concat('%',#{query.content}),'%')
             )

@@ -32,7 +32,7 @@
             AND rc.failed_reason LIKE concat(concat('%',#{failedReason}),'%')
         </if>
         <if test="params != null">
-            AND(
+            AND (
             tl.name LIKE concat(concat('%',#{params}),'%') OR
             rc.receive_account LIKE concat(concat('%',#{params}),'%') OR
             rc.failed_reason LIKE concat(concat('%',#{params}),'%')
