@@ -1,8 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
 
-import java.util.*;
-
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.modelmapper.ModelMapper;
@@ -10,22 +8,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import io.choerodon.asgard.schedule.annotation.JobParam;
-import io.choerodon.asgard.schedule.annotation.JobTask;
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.notify.api.dto.ScheduleTaskDTO;
-import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
-import io.choerodon.notify.api.service.SystemAnnouncementService;
-import io.choerodon.notify.api.vo.SystemNoticeSearchVO;
-import io.choerodon.notify.domain.SystemAnnouncement;
-import io.choerodon.notify.infra.feign.AsgardFeignClient;
-import io.choerodon.notify.infra.feign.UserFeignClient;
-import io.choerodon.notify.infra.mapper.SystemAnnouncementMapper;
-import io.choerodon.notify.infra.utils.AsyncSendAnnouncementUtils;
-import io.choerodon.notify.infra.utils.ParamUtils;
+import java.util.*;
+
+import io.choerodon.asgard.schedule.annotation.*;
+import io.choerodon.base.domain.*;
+import io.choerodon.core.exception.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.core.oauth.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.domain.*;
+import io.choerodon.notify.infra.feign.*;
+import io.choerodon.notify.infra.mapper.*;
+import io.choerodon.notify.infra.utils.*;
 
 /**
  * @author dengyouquan
@@ -117,9 +112,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     }
 
     @Override
-    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, SystemNoticeSearchVO searchVO) {
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize())
-                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(searchVO, ParamUtils.arrToStr(searchVO.getParams())));
+                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, status, params));
 
     }
 

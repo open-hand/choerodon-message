@@ -1,28 +1,24 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.infra.utils.ParamUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.core.exception.CommonException;
+import java.util.*;
+import java.util.stream.*;
+
+import io.choerodon.base.domain.*;
+import io.choerodon.core.exception.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.pojo.PmType;
-import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.api.validator.CommonValidator;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.infra.utils.ConvertUtils;
-import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import io.choerodon.notify.api.pojo.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.api.validator.*;
+import io.choerodon.notify.domain.*;
+import io.choerodon.notify.infra.mapper.*;
+import io.choerodon.notify.infra.utils.*;
+import io.choerodon.swagger.notify.*;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
@@ -144,9 +140,9 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public PageInfo<MessageServiceVO> pagingAll(SendSetting filterDTO, String[] params, PageRequest pageRequest) {
+    public PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, PageRequest pageRequest) {
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(
-                () -> sendSettingMapper.doFTR(filterDTO, ParamUtils.arrToStr(params)));
+                () -> sendSettingMapper.doFTR(messageType, introduce, level, enabled, allowConfig, params));
     }
 
 

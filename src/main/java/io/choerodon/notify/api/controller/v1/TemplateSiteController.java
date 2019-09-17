@@ -33,7 +33,7 @@ public class TemplateSiteController {
         this.templateService = templateService;
     }
 
-    @PostMapping("/list")
+    @GetMapping
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "分页查询模版（全局层）")
     @CustomPageRequest
@@ -41,14 +41,14 @@ public class TemplateSiteController {
                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                 @RequestParam String businessType,
                                                                 @RequestParam String messageType,
-                                                                @RequestBody TemplateSearchVO searchVO) {
+                                                                @RequestParam(required = false) String name,
+                                                                @RequestParam(required = false) String predefined,
+                                                                @RequestParam(required = false) String params) {
         // 1.校验消息类型
         if (!MessageType.isInclude(messageType)) {
             throw new CommonException("error.template.message.type.invalid");
         }
-        searchVO.setBusinessType(businessType);
-        searchVO.setMessageType(messageType.toLowerCase());
-        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageRequest, searchVO), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageRequest, businessType, messageType, name, predefined, params), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

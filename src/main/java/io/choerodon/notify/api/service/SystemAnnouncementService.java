@@ -3,10 +3,9 @@ package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
 
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
-import io.choerodon.notify.api.vo.SystemNoticeSearchVO;
+import io.choerodon.base.domain.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.notify.api.dto.*;
 
 /**
  * @author dengyouquan , Eugen
@@ -33,12 +32,13 @@ public interface SystemAnnouncementService {
 
     /**
      * 分页查询系统公告.
-     *
-     * @param pageRequest 分页对象
-     * @param searchVO    系统公告查询VO
-     * @return 分页结果
+     * @param pageRequest
+     * @param title
+     * @param status
+     * @param param
+     * @return
      */
-    PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, SystemNoticeSearchVO searchVO);
+    PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String param);
 
     /**
      * 根据id获取系统公告详情.

@@ -15,10 +15,9 @@ public interface TemplateService {
      * 分页获取模版信息
      *
      * @param pageRequest 分页对象
-     * @param searchVO    消息模板查询VO
      * @return 模板列表
      */
-    PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, TemplateSearchVO searchVO);
+    PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, String businessType, String messageType, String name, String predefined, String params);
 
 
     /**

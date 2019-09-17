@@ -1,9 +1,5 @@
 package io.choerodon.notify.api.controller.v1;
 
-import java.util.List;
-import java.util.Set;
-import javax.validation.Valid;
-
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,17 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.base.domain.Sort;
-import io.choerodon.base.enums.ResourceType;
-import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.mybatis.annotation.SortDefault;
+import java.util.*;
+import javax.validation.*;
+
+import io.choerodon.base.annotation.*;
+import io.choerodon.base.domain.*;
+import io.choerodon.base.enums.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.mybatis.annotation.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.api.vo.MessageServiceSearchVO;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.swagger.annotation.CustomPageRequest;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.domain.*;
+import io.choerodon.swagger.annotation.*;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -42,30 +39,19 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 
-    @PostMapping("/list")
+    @GetMapping
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层分页查询消息服务列表")
     @CustomPageRequest
     public ResponseEntity<PageInfo<MessageServiceVO>> pageSite(@ApiIgnore
                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                               @RequestBody(required = false) MessageServiceSearchVO messageQueryVO) {
-        SendSetting filterDTO = new SendSetting();
-        if (messageQueryVO.getMessageType() != null) {
-            filterDTO.setName(messageQueryVO.getMessageType());
-        }
-        if (messageQueryVO.getIntroduce() != null) {
-            filterDTO.setDescription(messageQueryVO.getIntroduce());
-        }
-        if (messageQueryVO.getLevel() != null) {
-            filterDTO.setLevel(messageQueryVO.getLevel());
-        }
-        if (messageQueryVO.getEnabled() != null) {
-            filterDTO.setEnabled(messageQueryVO.getEnabled());
-        }
-        if (messageQueryVO.getAllowConfig() != null) {
-            filterDTO.setAllowConfig(messageQueryVO.getAllowConfig());
-        }
-        return new ResponseEntity<>(sendSettingService.pagingAll(filterDTO, messageQueryVO.getParams(), pageRequest), HttpStatus.OK);
+                                                               @RequestParam(required = false) String messageType,
+                                                               @RequestParam(required = false) String introduce,
+                                                               @RequestParam(required = false) String level,
+                                                               @RequestParam(required = false) Boolean enabled,
+                                                               @RequestParam(required = false) Boolean allowConfig,
+                                                               @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(sendSettingService.pagingAll(messageType, introduce, level, enabled, allowConfig, params, pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
