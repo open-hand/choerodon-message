@@ -60,8 +60,8 @@ public class SystemAnnouncementController {
     public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                        @RequestParam(required = false) String title,
                                                                        @RequestParam(required = false) String status,
-                                                                       @RequestParam(required = false) String param) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, status, param), HttpStatus.OK);
+                                                                       @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, status, params), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)

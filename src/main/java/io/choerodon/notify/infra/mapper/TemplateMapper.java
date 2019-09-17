@@ -38,12 +38,15 @@ public interface TemplateMapper extends Mapper<Template> {
     /**
      * 全局检索，指定当前id排序在前.
      *
-     * @param searchVO  模板查询VO
      * @param currentId 当前模板Id
-     * @param param     模糊查询参数
+     * @param params    模糊查询参数
      * @return 模板列表
      */
-    List<TemplateVO> doFTR(@Param("searchVO") TemplateSearchVO searchVO,
+    List<TemplateVO> doFTR(@Param("businessType") String businessType,
+                           @Param("messageType") String messageType,
+                           @Param("name") String name,
+                           @Param("predefined") String predefined,
                            @Param("currentId") Long currentId,
-                           @Param("param") String param);
+                           @Param("params") String params);
+
 }

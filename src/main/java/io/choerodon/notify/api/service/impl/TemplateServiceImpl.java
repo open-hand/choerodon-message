@@ -35,10 +35,10 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, TemplateSearchVO searchVO) {
-        Long currentId = getCurrentId(searchVO.getBusinessType(), searchVO.getMessageType());
+    public PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, String businessType, String messageType, String name, String predefined, String params) {
+        Long currentId = getCurrentId(businessType, messageType);
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(
-                () -> templateMapper.doFTR(searchVO, currentId, ParamUtils.arrToStr(searchVO.getParams())));
+                () -> templateMapper.doFTR(businessType, messageType, name, predefined, currentId, params));
     }
 
     @Override

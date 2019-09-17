@@ -12,7 +12,7 @@ import io.choerodon.notify.domain.*;
  * @author dengyouquan
  **/
 public interface SystemAnnouncementMapper extends Mapper<SystemAnnouncement> {
-    List<SystemAnnouncementDTO> fulltextSearch(@Param("title") String title, @Param("status") String status, @Param("param") String param);
+    List<SystemAnnouncementDTO> fulltextSearch(@Param("title") String title, @Param("status") String status, @Param("params") String params);
 
     SystemAnnouncementDTO selectLastestSticky(@Param("currentTime") Date currentTime);
 }

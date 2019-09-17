@@ -112,9 +112,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     }
 
     @Override
-    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String param) {
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
         return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize())
-                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, status, param));
+                .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, status, params));
 
     }
 

@@ -19,10 +19,10 @@
             <if test="status != null">
                 AND status = #{status}
             </if>
-            <if test="param != null">
+            <if test="params != null">
                 AND(
-                title LIKE concat(concat('%',#{param}), '%') OR
-                content LIKE concat(concat('%',#{param}), '%')
+                title LIKE concat(concat('%',#{params}), '%') OR
+                content LIKE concat(concat('%',#{params}), '%')
                 )
             </if>
         </where>

@@ -165,24 +165,24 @@
         then true else false end as current_template
         from  notify_template
         <where>
-            <if test="searchVO.businessType != null">
-                and business_type = #{searchVO.businessType}
+            <if test="businessType != null">
+                and business_type = #{businessType}
             </if>
-            <if test="searchVO.messageType != null">
-                and message_type = #{searchVO.messageType}
+            <if test="messageType != null">
+                and message_type = #{messageType}
             </if>
-            <if test="searchVO.predefined != null">
-                and is_predefined = #{searchVO.predefined}
+            <if test="predefined != null">
+                and is_predefined = #{predefined}
             </if>
-            <if test="searchVO.name != null">
-                and name like concat(concat('%',#{searchVO.name}),'%')
+            <if test="name != null">
+                and name like concat(concat('%',#{name}),'%')
             </if>
-            <if test="param != null">
+            <if test="params != null">
                 AND (
-                email_title like concat(concat('%',#{param}),'%') OR
-                pm_title like concat(concat('%',#{param}),'%') OR
-                sms_content like concat(concat('%',#{param}),'%') OR
-                name like concat(concat('%',#{param}),'%')
+                email_title like concat(concat('%',#{params}),'%') OR
+                pm_title like concat(concat('%',#{params}),'%') OR
+                sms_content like concat(concat('%',#{params}),'%') OR
+                name like concat(concat('%',#{params}),'%')
                 )
             </if>
         </where>
