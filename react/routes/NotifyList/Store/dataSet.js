@@ -86,8 +86,8 @@ export default function (optionDs) {
     }],
     transport: {
       read: {
-        url: '/notify/v1/notices/send_settings/list',
-        method: 'post',
+        url: '/notify/v1/notices/send_settings',
+        method: 'get',
       },
     },
   };
