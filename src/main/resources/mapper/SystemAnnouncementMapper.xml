@@ -14,7 +14,7 @@
         FROM notify_system_announcement
         <where>
             <if test="title != null">
-                AND title LIKE concat(concat('%', title}), '%')
+                AND title LIKE concat(concat('%', #{title}), '%')
             </if>
             <if test="status != null">
                 AND status = #{status}
