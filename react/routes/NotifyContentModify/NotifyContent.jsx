@@ -59,7 +59,7 @@ export default (props) => {
       title: '创建模版',
       drawer: true,
       style: {
-        width: 380,
+        width: 740,
       },
       children: (
         <CreateTemplate context={context} />
