@@ -44,7 +44,9 @@ const WrappedEditor = observer(props => {
         onRef={(node) => {
           setEditor(node);
         }}
+        width={694}
         toolbarContainer="toolbar"
+        nomore
         onChange={(value) => {
           setDoc(value, props.current);
         }}

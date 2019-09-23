@@ -17,7 +17,7 @@ const detailTemplate = (detailId, context) => {
     title: '详情页',
     drawer: true,
     style: {
-      width: 380,
+      width: 740,
     },
     children: (
       <DetailTemplate context={context} detailId={detailId} editing={false} />
@@ -41,7 +41,7 @@ const updateLink = (type, detailId, context, index) => {
     title: '修改模版',
     drawer: true,
     style: {
-      width: 380,
+      width: 740,
     },
     children: (
       <DetailTemplate context={context} detailId={detailId} isCurrent={index} />

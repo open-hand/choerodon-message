@@ -44,7 +44,8 @@ const WrappedEditor = observer(props => {
         onRef={(node) => {
           setEditor(node);
         }}
-        style={{ width: 340 }}
+        style={{ width: 694 }}
+        nomore
         toolbarContainer="toolbar"
         onChange={(value) => {
           // current.set('emailContent', value);
@@ -103,15 +104,6 @@ export default observer(() => {
   }, []);
   // eslint-disable-next-line arrow-body-style
   const renderForm = () => {
-    // const formArr = [<TextField name="name" />, <TextField name={`${settingType}Title`} />];
-    // if (settingType === 'sms') {
-    //   formArr.pop();
-    //   formArr.push(<TextArea name={`${settingType}Content`} resize="both" />);
-    // } else {
-    //   formArr.push();
-    // }
-    // formArr.push();
-
     return (
       <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left" className="detail-template-form">
         <TextField name="name" disabled />
@@ -147,11 +139,5 @@ export default observer(() => {
       />
     </Form>
   );
-  // useEffect(() => {
-  //   if (detailTemplateDataSet.current && isCurrent) {
-  //     detailTemplateDataSet.current.set('current', isCurrent);
-  //   }
-  // }, [detailTemplateDataSet.current]);
-
   return editing ? renderForm() : renderDetail();
 });
