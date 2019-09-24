@@ -1,8 +1,22 @@
 @import "../../common/style/mixin/template";
 
 .c7n-iam-announcement {
+  .c7n-table-thead {
+    th {
+      color: #000;
+    }
+  }
+  .c7n-table-filter-select-icon {
+    top: -0.05rem;
+    bottom: 0;
+    left: .17rem;
+  }
   .c7n-select-selection__rendered {
     min-height: 0;
+    .c7n-select-selection__placeholder {
+      left: .09rem;
+      top: .1rem;
+    }
   }
   .link:hover {
     color: #3f51b5;
@@ -60,8 +74,15 @@
 
   &-sidebar {
     .c7n-modal {
+      &-header {
+        height: .55rem;
+        min-height: .55rem;
+        .c7n-modal-title {
+          font-weight: 500;
+        }
+      }
       &-content {
-        width: 3.9rem !important;
+        width: 7.4rem !important;
         right: 0;
         left: inherit;
       }
