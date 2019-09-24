@@ -54,7 +54,7 @@ export default observer((props) => {
           onClick={() => openSideBar()}
           icon="mode_edit"
         >
-          {'修改邮箱配置'}
+          {'修改'}
         </Button>
       </Header>
       <Breadcrumb />

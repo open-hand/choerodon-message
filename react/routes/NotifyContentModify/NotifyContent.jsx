@@ -43,6 +43,7 @@ export default (props) => {
       style: {
         width: 380,
       },
+      className: prefixCls,
       children: (
         <ModifySetting context={context} />
       ),
@@ -61,6 +62,7 @@ export default (props) => {
       style: {
         width: 740,
       },
+      className: prefixCls,
       children: (
         <CreateTemplate context={context} />
       ),

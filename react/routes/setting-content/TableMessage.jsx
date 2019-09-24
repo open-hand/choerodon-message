@@ -121,7 +121,7 @@ export default function Tab() {
     }
   }
   return (
-    <page>
+    <page className="message-service">
       <header><div className="title">消息服务</div></header>
       <Content>
         <Table className="messageService" dataSet={sendSettingDataSet}>

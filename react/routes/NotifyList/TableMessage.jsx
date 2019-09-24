@@ -127,7 +127,7 @@ export default function Tab() {
       {/* <Header>
         <div className="title">消息服务</div>
       </Header> */}
-      <Breadcrumb title="" />
+      <Breadcrumb />
 
       <Content className="">
         <Table className="message-service" dataSet={sendSettingDataSet}>
