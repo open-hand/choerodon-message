@@ -1,6 +1,24 @@
 @base: #000000;
 
 .receiveSetting {
+    .c7n-table-thead {
+        th {
+            color: #000;
+        }
+    }
+    .c7n-table-filter-select-icon {
+        top: -0.05rem;
+        bottom: 0;
+        left: .17rem;
+    }
+    
+    .c7n-select-selection__rendered {
+        min-height: 0;
+        .c7n-select-selection__placeholder {
+          left: .09rem;
+          top: .1rem;
+        }
+    }
     table {
         font-size: 13px;
         line-height: 20px;
@@ -10,18 +28,9 @@
             color: fade(@base, 65%);
         }
 
-        thead {
-            font-family: PingFangSC-Medium;
-        }
-
         tbody {
-            font-family: PingFangSC-Regular;
-
             td {
                 color: fade(@base, 65%);
-                // &:nth-child(2) {
-                //     color: fade(@base, 65%);
-                // }
             }
         }
 

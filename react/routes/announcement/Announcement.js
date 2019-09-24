@@ -517,6 +517,7 @@ export default class Announcement extends Component {
           onRef={(node) => {
             this.editor = node;
           }}
+          nomore
           toolbarContainer="toolbar"
           onChange={(value) => {
             AnnouncementStore.setEditorContent(value);
