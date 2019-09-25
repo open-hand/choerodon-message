@@ -16,7 +16,7 @@ import MouseOverWrapper from '../../components/mouseOverWrapper';
 configure({ enforceActions: false });
 
 // 匹配html界面为空白的正则。
-const patternHTMLEmpty = /^(((<[^>]+>)*\s*)|&nbsp;|\s)*$/g;
+const patternHTMLEmpty = /^(((<[^i>]+>)*\s*)|&nbsp;|\s)*$/g;
 const modalKey = ProModal.key();
 const iconType = {
   COMPLETED: 'COMPLETED',
