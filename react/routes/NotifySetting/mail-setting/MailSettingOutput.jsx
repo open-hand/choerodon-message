@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { DataSet, Form, Output, Spin, Modal, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
+import { message, Form, Output, Spin, Modal, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
 import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/master';
 import store from '../Store';
 import MailSettingForm from './MailSettingForm';
@@ -19,7 +19,7 @@ export default (props) => {
         Choerodon.prompt(context.intl.formatMessage({ id: `${context.intlPrefix}.connect.success` }));
       }
     }).catch((error) => {
-      Choerodon.handleResponseError(error);
+      message.error('连接超时');
     });
   };
 
