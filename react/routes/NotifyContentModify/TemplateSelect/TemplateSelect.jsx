@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react/index';
-import { DataSet, Form, Output, Spin, Table, TextField, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea, Modal } from 'choerodon-ui/pro';
+import { DataSet, Form, Output, message, Table, Modal } from 'choerodon-ui/pro';
+import { Modal as OldModal } from 'choerodon-ui/';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { Action, axios } from '@choerodon/master';
 import { observer } from 'mobx-react-lite';
@@ -69,16 +70,23 @@ export default (props) => {
       Choerodon.prompt(error);
     });
   }
-  const deleteLink = (id) => {
-    // 'DELETE删除模板/v1/templates/{id}');
-    axios.delete(`notify/v1/templates/${id}`).then((data) => {
-      if (data.failed) {
-        throw data.message;
-      }
-      Choerodon.prompt('删除模板成功');
-      templateDataSet.query();
-    }).catch((error) => {
-      Choerodon.prompt(error);
+  const deleteLink = (record) => {
+    OldModal.confirm({
+      className: 'c7n-iam-confirm-modal',
+      title: '确认删除模板',
+      content: `确认删除模板"${record.get('name')}"吗？`,
+      onOk: async () => {
+        try {
+          const result = await axios.delete(`notify/v1/templates/${record.get('id')}`);
+          if (result.failed) {
+            throw result.message;
+          }
+        } catch (err) {
+          message.error(err);
+        } finally {
+          templateDataSet.query();
+        }
+      },
     });
   };
 
@@ -96,7 +104,7 @@ export default (props) => {
     {
       service: [],
       text: '删除',
-      action: () => deleteLink(record.get('id')),
+      action: () => deleteLink(record),
     }];
     const currentArr = {
       service: [],
