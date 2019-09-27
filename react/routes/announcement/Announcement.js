@@ -506,7 +506,7 @@ export default class Announcement extends Component {
               }],
               initialValue: isModify ? currentRecord.title : undefined,
             })(
-              <Input autoComplete="off" label={<FormattedMessage id="announcement.title" />} />,
+              <Input style={{ width: 512 }} autoComplete="off" label={<FormattedMessage id="announcement.title" />} />,
             )}
           </FormItem>
         </Form>
