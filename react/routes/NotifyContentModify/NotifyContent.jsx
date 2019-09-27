@@ -25,8 +25,7 @@ export default (props) => {
     }
     try {
       if ((await context.sendSettingDataSet.submit())) {
-        // setTimeout(() => { window.location.reload(true); }, 1000);
-        // context.sendSettingDataSet.query();
+        context.sendSettingDataSet.query();
         context.templateDataSet.query();
         return true;
       } else {
@@ -48,10 +47,8 @@ export default (props) => {
         <ModifySetting context={context} />
       ),
       onOk: handleSaveConfig,
-      okText: <div>保存</div>,
-      // okText: <span className="modal-footer-btn">保存</span>,
-      cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
-      // onCancel: resetFunc,#3F51B5
+      okText: '保存',
+      cancelText: '取消',
     });
   };
 
@@ -66,13 +63,8 @@ export default (props) => {
       children: (
         <CreateTemplate context={context} />
       ),
-      // onOk: handleSave,
-
-      okText: <div>保存</div>,
-      // okText: <span className="modal-footer-btn">保存</span>,
-      cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
-      // onCancel: resetFunc,
-      // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
+      okText: '保存',
+      cancelText: '取消',
     });
   };
   function chooseBreadcrumb() {
