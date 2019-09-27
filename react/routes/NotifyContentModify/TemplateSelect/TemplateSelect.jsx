@@ -22,9 +22,8 @@ const detailTemplate = (detailId, context) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} editing={false} />
     ),
-    okText: <div>关闭</div>,
+    okText: '关闭',
     okCancel: false,
-    // beforeClose: (a, b, c) => { debugger;window.console.log('after close'); },
   });
 };
 
@@ -46,11 +45,8 @@ const updateLink = (type, detailId, context, index) => {
     children: (
       <DetailTemplate context={context} detailId={detailId} isCurrent={index} />
     ),
-    okText: <div>保存</div>,
-    // okText: <span className="modal-footer-btn">保存</span>,
-    cancelText: <div style={{ color: '#3F51B5' }}>取消</div>,
-    // onOk: handleSave,
-    // onCancel: resetFunc,
+    okText: '保存',
+    cancelText: '取消',
   });
 };
 
@@ -125,7 +121,6 @@ export default (props) => {
     );
   }
   return (
-    // <Spin dataSet={templateDataSet}>
     <React.Fragment>
       <FormHeader isHasLine={false} title={<FormattedMessage id={`${intlPrefix}.template.header.title`} />} />
       <Table className="messageService" dataSet={templateDataSet} elementClassName={`${prefixCls}-template-select`}>
@@ -135,6 +130,5 @@ export default (props) => {
         <Column name="predefined" renderer={renderPredefined.bind(this)} />
       </Table>
     </React.Fragment>
-    // </Spin>
   );
 };
