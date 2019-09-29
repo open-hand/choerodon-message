@@ -29,21 +29,21 @@ preJob:
     registerHost: http://register-server:8000
     datasource:
       # manager_service数据库连接地址
-      url: jdbc:mysql://192.168.12.175:3306/manager_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
+      url: jdbc:mysql://localhost/manager_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
       # manager_service数据库用户名
-      username: root
+      username: choerodon
       # manager_service数据库密码
-      password: choerodon
+      password: password
   preInitDB:
     # 是否初始化notify_service数据库
     enabled: true
     datasource:
       # notify_service数据库连接地址
-      url: jdbc:mysql://192.168.12.175:3306/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
+      url: jdbc:mysql://localhost/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
       # notify_service数据库用户名
-      username: root
+      username: choerodon
       # notify_service数据库密码
-      password: choerodon
+      password: password
 
 deployment:
   # 服务管理端口
@@ -60,9 +60,9 @@ env:
     # 数据库连接地址
     SPRING_DATASOURCE_URL: jdbc:mysql://localhost/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
     # 数据库用户名
-    SPRING_DATASOURCE_USERNAME: root
+    SPRING_DATASOURCE_USERNAME: choerodon
     #  数据库密码
-    SPRING_DATASOURCE_PASSWORD: choerodon
+    SPRING_DATASOURCE_PASSWORD: password
     # redis主机地址
     SPRING_REDIS_HOST: localhost
     # redis端口
