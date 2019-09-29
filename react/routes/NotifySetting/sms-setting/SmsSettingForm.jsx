@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Form, TextField, Select, SelectBox, Password } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, Password, NumberField } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
 import '../index.less';
 
@@ -10,7 +10,7 @@ export default observer(({ context }) => (
     <input type="password" style={{ position: 'absolute', top: '-999px' }} />
     <TextField name="signature" />
     <TextField name="hostAddress" />
-    <TextField name="hostPort" />
+    <NumberField name="hostPort" />
     <SelectBox name="sendType">
       <Option value="batch">{context.singleSendApiMap.get('batch')}</Option>
       <Option value="single">{context.singleSendApiMap.get('single')}</Option>
