@@ -274,7 +274,7 @@ const pageDetail = {
   'global.notifyContent.template.pmTitle': '站内信主题',
   'global.notifyContent.template.smsTitle': '短信主题',
   'global.notifyContent.sendSetting.retryCount': '重发次数',
-  'global.notifyContent.sendSetting.sendInstantly': '是否即时重发',
+  'global.notifyContent.sendSetting.sendInstantly': '是否即时发送',
   'global.notifyContent.sendSetting.manualRetry': '是否允许手动重发',
   'global.notifyContent.sendSetting.emailTemplate': '模板',
   'global.notifyContent.template.current': '是否默认为当前使用模版',

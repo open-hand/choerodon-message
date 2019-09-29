@@ -185,6 +185,7 @@
   width: 100%;
   height: 100%;
   border: 1px solid #ccc;
+  border-bottom: 0;
   line-height: 1.42;
   outline: none;
   background: #fff;
@@ -210,7 +211,7 @@
 
   .c7n-editor-changedHTML-container-content {
     width: 100%;
-    height: 100%;
+    height: 88%;
     padding: 12px 15px;
     outline: none;
     border: none;
@@ -221,6 +222,7 @@
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
+    resize: none;
   }
 }
 
