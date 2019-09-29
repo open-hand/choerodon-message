@@ -17,8 +17,8 @@ export default (intl, intlPrefix) => {
     fields: [
       { name: 'id', type: 'string' },
       { name: 'signature', type: 'string', label: signature, required: true },
-      { name: 'hostAddress', type: 'string', label: hostAddress, required: true },
-      { name: 'hostPort', type: 'string', label: hostPort },
+      { name: 'hostAddress', type: 'url', label: hostAddress, required: true },
+      { name: 'hostPort', type: 'number', label: hostPort },
       { name: 'sendType', type: 'string', label: sendType },
       { name: 'singleSendApi', type: 'string', label: singleSendApi, dynamicProps: SendApiDynamicProps },
       { name: 'batchSendApi', type: 'string', label: batchSendApi, dynamicProps: SendApiDynamicProps },
