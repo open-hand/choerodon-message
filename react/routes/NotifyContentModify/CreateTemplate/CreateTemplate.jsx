@@ -13,7 +13,7 @@ const WrappedEditor = observer(props => {
   const [editor, setEditor] = useState(undefined);
   const [editor2, setEditor2] = useState(undefined);
   const [fullscreen, setFullscreen] = useState(false);
-  const { settingType, label } = props;
+  const { settingType, label, context } = props;
   const setDoc = (value, current) => {
     current.set(`${settingType}Content`, value);
   };
@@ -32,11 +32,6 @@ const WrappedEditor = observer(props => {
   return (
     <div style={{ display: 'inline-block' }}>
       <p style={{ display: 'inline-block' }} className="content-text">{label}：</p>
-      {/* <Editor
-      onRef={noop}
-      onChange={value => setDoc(value, props.current)}
-      value={props.current.get('content')}
-    /> */}
       <Button style={{ float: 'right' }} icon="zoom_out_map" onClick={handleFullScreen} type="primary">全屏编辑</Button>
 
       <Editor
@@ -76,9 +71,14 @@ const WrappedEditor = observer(props => {
 });
 
 export default props => {
-  const { settingType } = props.context;
+  const { settingType, createTemplateDataSet } = props.context;
+
+  props.modal.handleCancel(() => {
+    createTemplateDataSet.current.reset();
+  });
+
   function renderWrappedEditorAndTitle() {
-    const templateTitle = <TextField name={`${props.context.settingType}Title`} />;
+    const templateTitle = <TextField style={{ width: 512 }} name={`${props.context.settingType}Title`} />;
     const wrappedEditor = (
       <WrappedEditor
         current={props.context.createTemplateDataSet.current}
@@ -86,7 +86,7 @@ export default props => {
         label={props.context.createTemplateDataSet.getField(`${props.context.settingType}Content`).props.label}
       />
     );
-    const textArea = <TextArea name="smsContent" />;
+    const textArea = <TextArea style={{ width: 512 }} name="smsContent" />;
     if (settingType === 'email') {
       return [templateTitle, wrappedEditor];
     } else if (settingType === 'sms') {
@@ -101,7 +101,6 @@ export default props => {
   async function handleSave() {
     try {
       if ((await props.context.createTemplateDataSet.submit())) {
-        // setTimeout(() => { window.location.reload(true); }, 1000);
         handleReset();
         props.context.templateDataSet.query();
         return true;
@@ -111,24 +110,16 @@ export default props => {
     } catch (e) {
       return false;
     }
-    // return props.context.createTemplateDataSet.submit().then(()=>{
-
-    // }).catch((error)=>{
-
-    // })
   }
  
   useEffect(() => {
     props.modal.handleOk(handleSave);
   }, []);
-  // if (!props.context.createTemplateDataSet.current) {
-  //   props.context.createTemplateDataSet.create();
-  // }
   return (
     <Form dataSet={props.context.createTemplateDataSet} labelLayout="float" labelAlign="left" className="crete-temp-form">
-      <TextField name="name" />
+      <TextField style={{ width: 512 }} name="name" />
       {props.context.createTemplateDataSet.current ? renderWrappedEditorAndTitle() : null}
-      <SelectBox name="defaultTemplate" />
+      <SelectBox style={{ top: '-0.25rem', position: 'relative' }} name="defaultTemplate" />
     </Form>
   );
 };

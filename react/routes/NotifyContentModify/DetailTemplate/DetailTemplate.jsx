@@ -106,17 +106,17 @@ export default observer(() => {
   const renderForm = () => {
     return (
       <Form dataSet={detailTemplateDataSet} labelLayout="float" labelAlign="left" className="detail-template-form">
-        <TextField name="name" disabled />
+        <TextField style={{ width: 512 }} name="name" disabled />
         {
           settingType !== 'sms' && detailTemplateDataSet.current
             ? [
-              <TextField name={`${settingType}Title`} />, <WrappedEditor
+              <TextField style={{ width: 512 }} name={`${settingType}Title`} />, <WrappedEditor
                 current={detailTemplateDataSet.current}
                 settingType={settingType}
                 label={detailTemplateDataSet.getField(`${settingType}Content`).props.label}
-              />] : <TextArea name={`${settingType}Content`} resize="both" />
+              />] : <TextArea style={{ width: 512 }} name={`${settingType}Content`} resize="both" />
         }
-        <SelectBox name="current" />
+        <SelectBox style={{ top: '-0.25rem', position: 'relative' }} name="current" />
       </Form>
     );
   };
