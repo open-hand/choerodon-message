@@ -11,17 +11,15 @@ export default (props) => {
   const context = useContext(store);
   const { mailSettingDataSet } = context;
 
-  const testConnection = () => {
-    axios.post('notify/v1/notices/configs/email/test', mailSettingDataSet.current && mailSettingDataSet.current.toData()).then((data) => {
-      if (data.failed) {
-        Choerodon.prompt(data.message);
-      } else {
-        Choerodon.prompt(context.intl.formatMessage({ id: `${context.intlPrefix}.connect.success` }));
-      }
-    }).catch((error) => {
-      message.error('连接超时');
-    });
-  };
+  const testConnection = async () => axios.post('notify/v1/notices/configs/email/test', mailSettingDataSet.current && mailSettingDataSet.current.toData()).then((data) => {
+    if (data.failed) {
+      Choerodon.prompt(data.message);
+    } else {
+      Choerodon.prompt(context.intl.formatMessage({ id: `${context.intlPrefix}.connect.success` }));
+    }
+  }).catch((error) => {
+    message.error('连接超时');
+  });
 
   const submitFunc = () => new Promise((resolve, reject) => {
     mailSettingDataSet.validate().then((validateStatus) => {
