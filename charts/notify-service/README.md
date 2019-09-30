@@ -29,7 +29,6 @@ $ helm delete notify-service
 
 Parameter | Description	| Default
 --- |  ---  |  ---  
-
 `replicaCount` | pod运行数量 | `1`
 `image.repository` | 镜像库地址 | `registry.cn-hangzhou.aliyuncs.com/choerodon-framework/notify-service`
 `image.pullPolicy` | 镜像拉取策略 | `IfNotPresent`
