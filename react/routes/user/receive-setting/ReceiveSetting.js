@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { FormattedMessage } from 'react-intl';
-import { Content, Header, Page } from '@choerodon/master';
+import { Content, Header, Page, Breadcrumb } from '@choerodon/master';
 import { Table, Button, Checkbox, Modal, Tooltip } from 'choerodon-ui';
 import { Prompt } from 'react-router-dom';
 import { useStore } from './stores';
@@ -156,14 +156,9 @@ function ReceiveSetting(props) {
           'notify-service.receive-setting.queryByUserId',
         ]}
       >
-        {/* <Header>
-          <Button onClick={refresh} icon="refresh">
-            <FormattedMessage id="refresh" />
-          </Button> 
-        </Header> */}
+        <Breadcrumb />
         <Content
           className="receiveSetting"
-          title={<FormattedMessage id={`${intlPrefix}.header.title`} />}
         >
           <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={ReceiveSettingStore.getDirty} />
           <Table
