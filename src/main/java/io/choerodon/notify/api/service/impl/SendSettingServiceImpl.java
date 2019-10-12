@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.*;
 
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.*;
@@ -19,6 +19,7 @@ import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.mapper.*;
 import io.choerodon.notify.infra.utils.*;
 import io.choerodon.swagger.notify.*;
+import io.choerodon.web.util.*;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
@@ -140,8 +141,8 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, PageRequest pageRequest) {
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort().toSql()).doSelectPageInfo(
+    public PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable) {
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize(), PageableHelper.getSortSql(pageable.getSort())).doSelectPageInfo(
                 () -> sendSettingMapper.doFTR(messageType, introduce, level, enabled, allowConfig, params));
     }
 

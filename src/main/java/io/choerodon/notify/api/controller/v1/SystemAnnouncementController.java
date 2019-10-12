@@ -2,6 +2,9 @@ package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -11,11 +14,9 @@ import java.util.*;
 import javax.validation.*;
 
 import io.choerodon.base.annotation.*;
-import io.choerodon.base.domain.*;
 import io.choerodon.base.enums.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.core.iam.*;
-import io.choerodon.mybatis.annotation.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.swagger.annotation.*;
@@ -57,19 +58,19 @@ public class SystemAnnouncementController {
     @ApiOperation(value = "分页查询系统公告")
     @GetMapping("/all")
     @CustomPageRequest
-    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                        @RequestParam(required = false) String title,
                                                                        @RequestParam(required = false) String status,
                                                                        @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, title, status, params), HttpStatus.OK);
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageable, title, status, params), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "分页查询已发送的系统公告")
     @GetMapping("/completed")
     @CustomPageRequest
-    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null,
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageable, null,
                 SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value(), null), HttpStatus.OK);
     }
 

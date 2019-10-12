@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 import io.choerodon.asgard.schedule.annotation.*;
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.core.iam.*;
 import io.choerodon.core.oauth.*;
@@ -112,8 +112,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     }
 
     @Override
-    public PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize())
+    public PageInfo<SystemAnnouncementDTO> pagingQuery(Pageable pageable, String title, String status, String params) {
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize())
                 .doSelectPageInfo(() -> announcementMapper.fulltextSearch(title, status, params));
 
     }

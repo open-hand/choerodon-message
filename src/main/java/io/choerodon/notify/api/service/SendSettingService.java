@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 
 import java.util.*;
 
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.domain.*;
 import io.choerodon.swagger.notify.*;
@@ -41,10 +41,10 @@ public interface SendSettingService {
      * @param enabled
      * @param allowConfig
      * @param params
-     * @param pageRequest 分页信息
+     * @param pageable 分页信息
      * @return 分页结果
      */
-    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, PageRequest pageRequest);
+    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable);
 
     /**
      * 根据id启用消息服务（对应表；notify_send_setting）

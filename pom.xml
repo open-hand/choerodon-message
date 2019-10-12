@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.12.0.RELEASE</version>
+        <version>0.13.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,6 @@
 
     <!--choerodon-starters dependency-->
     <properties>
-        <choerodon.starters.version>0.12.0.RELEASE</choerodon.starters.version>
         <powermock.version>2.0.0</powermock.version>
         <choerodon.mainClass>io.choerodon.notify.NotifyApplication</choerodon.mainClass>
         <choerodon.serviceBuild>true</choerodon.serviceBuild>
@@ -48,44 +47,36 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-eureka-event</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
 
         <!--choerodon starters-->
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-oauth-resource</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-swagger</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-core</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-mybatis</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-asgard</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-actuator</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-websocket</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -95,6 +86,10 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-webmvc</artifactId>
         </dependency>
 
         <!--mail-->
@@ -127,7 +122,6 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-feign-replay</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign.form</groupId>
@@ -161,7 +155,6 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-metric</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
         <!-- test -->
         <dependency>
@@ -172,7 +165,6 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-liquibase</artifactId>
-            <version>${choerodon.starters.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -3,26 +3,23 @@ package io.choerodon.notify.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.domain.PageRequest;
-import io.choerodon.base.domain.Sort;
-import io.choerodon.base.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.mybatis.annotation.SortDefault;
-import io.choerodon.notify.api.dto.TemplateCreateVO;
-import io.choerodon.notify.api.dto.TemplateVO;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.api.service.TemplateService;
-import io.choerodon.notify.api.validator.Insert;
-import io.choerodon.notify.api.validator.Update;
-import io.choerodon.notify.api.vo.TemplateSearchVO;
-import io.choerodon.swagger.annotation.CustomPageRequest;
+import io.choerodon.base.annotation.*;
+import io.choerodon.base.enums.*;
+import io.choerodon.core.exception.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.pojo.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.api.validator.*;
+import io.choerodon.swagger.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/templates")
@@ -38,7 +35,7 @@ public class TemplateSiteController {
     @ApiOperation(value = "分页查询模版（全局层）")
     @CustomPageRequest
     public ResponseEntity<PageInfo<TemplateVO>> pagingByMessage(@ApiIgnore
-                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                 @RequestParam String businessType,
                                                                 @RequestParam String messageType,
                                                                 @RequestParam(required = false) String name,
@@ -48,7 +45,7 @@ public class TemplateSiteController {
         if (!MessageType.isInclude(messageType)) {
             throw new CommonException("error.template.message.type.invalid");
         }
-        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageRequest, businessType, messageType, name, predefined, params), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageable, businessType, messageType, name, predefined, params), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

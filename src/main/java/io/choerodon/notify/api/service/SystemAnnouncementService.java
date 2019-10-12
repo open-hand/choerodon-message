@@ -3,7 +3,7 @@ package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
 
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.core.iam.*;
 import io.choerodon.notify.api.dto.*;
 
@@ -32,13 +32,13 @@ public interface SystemAnnouncementService {
 
     /**
      * 分页查询系统公告.
-     * @param pageRequest
+     * @param pageable
      * @param title
      * @param status
      * @param param
      * @return
      */
-    PageInfo<SystemAnnouncementDTO> pagingQuery(PageRequest pageRequest, String title, String status, String param);
+    PageInfo<SystemAnnouncementDTO> pagingQuery(Pageable pageable, String title, String status, String param);
 
     /**
      * 根据id获取系统公告详情.

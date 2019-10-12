@@ -3,18 +3,16 @@ package io.choerodon.notify.api.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.choerodon.base.domain.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.api.vo.*;
 import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.mapper.*;
-import io.choerodon.notify.infra.utils.*;
 
 import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.*;
 
@@ -35,9 +33,9 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public PageInfo<TemplateVO> pagingTemplateByMessageType(PageRequest pageRequest, String businessType, String messageType, String name, String predefined, String params) {
+    public PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, String predefined, String params) {
         Long currentId = getCurrentId(businessType, messageType);
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize()).doSelectPageInfo(
                 () -> templateMapper.doFTR(businessType, messageType, name, predefined, currentId, params));
     }
 
