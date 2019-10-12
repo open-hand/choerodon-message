@@ -5,7 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.*;
@@ -34,8 +34,8 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     }
 
     @Override
-    public PageInfo<RecordListDTO> pageEmail(String status, String receiveEmail, String templateType, String failedReason, String params, PageRequest pageRequest, String level) {
-        return PageHelper.startPage(pageRequest.getPage(), pageRequest.getSize()).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(status, receiveEmail, templateType, failedReason, params, level));
+    public PageInfo<RecordListDTO> pageEmail(String status, String receiveEmail, String templateType, String failedReason, String params, Pageable pageable, String level) {
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize()).doSelectPageInfo(() -> recordMapper.fulltextSearchEmail(status, receiveEmail, templateType, failedReason, params, level));
     }
 
     @Override

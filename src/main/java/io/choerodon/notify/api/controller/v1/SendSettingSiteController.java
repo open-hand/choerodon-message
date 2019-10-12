@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +13,9 @@ import java.util.*;
 import javax.validation.*;
 
 import io.choerodon.base.annotation.*;
-import io.choerodon.base.domain.*;
+import org.springframework.data.domain.*;
 import io.choerodon.base.enums.*;
 import io.choerodon.core.iam.*;
-import io.choerodon.mybatis.annotation.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.domain.*;
@@ -44,14 +44,14 @@ public class SendSettingSiteController {
     @ApiOperation(value = "全局层分页查询消息服务列表")
     @CustomPageRequest
     public ResponseEntity<PageInfo<MessageServiceVO>> pageSite(@ApiIgnore
-                                                               @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                               @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                @RequestParam(required = false) String messageType,
                                                                @RequestParam(required = false) String introduce,
                                                                @RequestParam(required = false) String level,
                                                                @RequestParam(required = false) Boolean enabled,
                                                                @RequestParam(required = false) Boolean allowConfig,
                                                                @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(sendSettingService.pagingAll(messageType, introduce, level, enabled, allowConfig, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(sendSettingService.pagingAll(messageType, introduce, level, enabled, allowConfig, params, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
