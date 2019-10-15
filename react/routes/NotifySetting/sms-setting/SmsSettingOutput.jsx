@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Form, Output, Spin, Modal, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
-import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/master';
+import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/boot';
 import store from '../Store';
 import './SmsSetting.scss';
 import SmsSettingForm from './SmsSettingForm';

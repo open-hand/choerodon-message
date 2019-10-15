@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react/index';
 import { DataSet, Form, Output, message, Table, Modal } from 'choerodon-ui/pro';
 import { Modal as OldModal } from 'choerodon-ui/';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Action, axios } from '@choerodon/master';
+import { Action, axios, Choerodon } from '@choerodon/boot';
 import { observer } from 'mobx-react-lite';
 import store from '../Store';
 import DetailTemplate from '../DetailTemplate';

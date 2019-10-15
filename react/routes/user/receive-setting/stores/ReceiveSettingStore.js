@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx';
-import { axios, store } from '@choerodon/master';
+import { axios, store, Choerodon } from '@choerodon/boot';
 
 class ReceiveSettingStore {
   /**

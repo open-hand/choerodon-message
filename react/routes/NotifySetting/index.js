@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageWrap, PageTab } from '@choerodon/master';
+import { PageWrap, PageTab } from '@choerodon/boot';
 import { StoreProvider } from './Store';
 import MailSetting from './mail-setting';
 import SmsSetting from './sms-setting';

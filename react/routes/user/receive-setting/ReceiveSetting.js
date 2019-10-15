@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { FormattedMessage } from 'react-intl';
-import { Content, Header, Page, Breadcrumb } from '@choerodon/master';
+import { Content, Header, Page, Breadcrumb, Choerodon } from '@choerodon/boot';
 import { Table, Button, Checkbox, Modal, Tooltip } from 'choerodon-ui';
 import { Prompt } from 'react-router-dom';
 import { useStore } from './stores';

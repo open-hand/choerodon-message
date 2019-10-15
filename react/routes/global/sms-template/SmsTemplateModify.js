@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Button, Select, Tooltip, Modal, Form, Input, Popover, Icon } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, Page } from '@choerodon/master';
+import { axios, Content, Header, Page, Choerodon } from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/sms-template';
 import './SmsTemplate.scss';
 import Editor from '../../../components/editor';
@@ -205,8 +205,7 @@ export default class SmsTemplateModify extends Component {
             initialValue: MailTemplateStore.getCurrentDetail.code,
           })(
             <Input disabled autoComplete="off" style={{ width: inputWidth }} label={<FormattedMessage id="mailtemplate.code" />} />,
-          )
-          }
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}

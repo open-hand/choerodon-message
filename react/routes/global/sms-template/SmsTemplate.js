@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /**
  * Created by chenbinjie on 2018/8/6.
  */
@@ -10,8 +11,8 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import {
-  axios, Content, Header, Page, Permission, Action,
-} from '@choerodon/master';
+  axios, Content, Header, Page, Permission, Action, Choerodon,
+} from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/sms-template';
 import './SmsTemplate.scss';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';
@@ -19,8 +20,6 @@ import StatusTag from '../../../components/statusTag';
 import '../../../common/ConfirmModal.scss';
 import { handleFiltersParams } from '../../../common/util';
 // eslint-disable-next-line import/order
-import { HEADER_TITLE_NAME } from '@choerodon/boot/lib/containers/common/constants';
-
 
 // 公用方法类
 class MailTemplateType {
@@ -226,30 +225,9 @@ export default class SmsTemplate extends Component {
     this.props.history.push(createUrl);
   }
 
-  // getPermission() {
-  //   const { AppState } = this.props;
-  //   const { type } = AppState.currentMenuType;
-  //   let createService = ['notify-service.email-template-site.create'];
-  //   let modifyService = ['notify-service.email-template-site.update'];
-  //   let deleteService = ['notify-service.email-template-site.delete'];
-  //   if (type === 'organization') {
-  //     createService = ['notify-service.email-template-org.create'];
-  //     modifyService = ['notify-service.email-template-org.update'];
-  //     deleteService = ['notify-service.email-template-org.delete'];
-  //   }
-  //   return {
-  //     createService,
-  //     modifyService,
-  //     deleteService,
-  //   };
-  // }
-
   render() {
     const { intl } = this.props;
     const { AppState } = this.props;
-    const { name = HEADER_TITLE_NAME } = AppState.currentMenuType;
-    const { type } = AppState.currentMenuType;
-    // const { createService, modifyService, deleteService } = this.getPermission();
     const { filters, pagination, params } = this.state;
     const mailTemplateData = MailTemplateStore.getMailTemplate();
     const columns = [{

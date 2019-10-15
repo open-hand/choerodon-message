@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Button, List, Tabs, Collapse, Modal, Icon, Checkbox, Avatar, Tooltip } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { axios, Content, Header, Page, Permission } from '@choerodon/master';
+import { axios, Content, Header, Page, Permission, Choerodon } from '@choerodon/boot';
 import { withRouter } from 'react-router-dom';
 import classnames from 'classnames';
 import './UserMsg.scss';
@@ -10,8 +10,8 @@ import UserMsgStore from '../../../stores/user/user-msg/UserMsgStore';
 import '../../../common/ConfirmModal.scss';
 
 const intlPrefix = 'user.usermsg';
-const Panel = Collapse.Panel;
-const TabPane = Tabs.TabPane;
+const { Panel } = Collapse;
+const { TabPane } = Tabs;
 
 function timestampFormat(timestamp) {
   function zeroize(num) {
@@ -241,9 +241,9 @@ export default class UserMsg extends Component {
             style={UserMsgStore.getExpandMsg.has(id) ? null : { backgroundColor: '#fff' }}
           >
             <Panel header={this.renderMsgTitle(title, id, read, sendTime, UserMsgStore.getSelectMsg.has(id), avatar)} key={id.toString()} className="c7n-iam-user-msg-collapse-panel">
-              {<div>
+              <div>
                 <div style={{ width: 'calc(100% - 72px)', margin: '0 36px', display: 'inline-block' }} dangerouslySetInnerHTML={{ __html: `${content}` }} />
-              </div> }
+              </div>
             </Panel>
           </Collapse>
 
@@ -260,9 +260,9 @@ export default class UserMsg extends Component {
             style={UserMsgStore.getExpandMsg.has(id) ? null : { backgroundColor: '#fff' }}
           >
             <Panel header={this.renderAnnoucenmentTitle(title, id, sendDate, systemAvatar)} key={id.toString()} className="c7n-iam-user-msg-collapse-panel">
-              {<div>
+              <div>
                 <div style={{ width: 'calc(100% - 72px)', margin: '0 36px', display: 'inline-block' }} dangerouslySetInnerHTML={{ __html: `${content}` }} />
-              </div> }
+              </div>
             </Panel>
           </Collapse>
 
@@ -336,7 +336,7 @@ export default class UserMsg extends Component {
               disabled={UserMsgStore.getSelectMsg.size === 0 || isAnnounceMent}
               onClick={this.handleDelete}
             >
-              <FormattedMessage id={'remove'} />
+              <FormattedMessage id="remove" />
             </Button>
           </Permission>
           <Button
@@ -355,12 +355,14 @@ export default class UserMsg extends Component {
                     className={this.getUserMsgClass('unRead')}
                     onClick={() => { this.showUserMsg(false); }}
                     type="primary"
-                  ><FormattedMessage id="user.usermsg.unread" /></Button>
+                  ><FormattedMessage id="user.usermsg.unread" />
+                  </Button>
                   <Button
                     className={this.getUserMsgClass('all')}
                     onClick={() => { this.showUserMsg(true); }}
                     type="primary"
-                  ><FormattedMessage id="user.usermsg.all" /></Button>
+                  ><FormattedMessage id="user.usermsg.all" />
+                  </Button>
                 </div>
                 <List
                   style={{ width: isAnnounceMent ? '100%' : 'calc(100% - 113px)' }}

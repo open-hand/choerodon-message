@@ -3,13 +3,13 @@ import { inject, observer } from 'mobx-react';
 import { Button, Select, Tooltip, Modal, Form, Input, Popover, Icon } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, Page } from '@choerodon/master';
+import { axios, Content, Header, Page, Choerodon } from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/mail-template';
 import './MailTemplate.scss';
 import Editor from '../../../components/editor';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 
 class MailTemplateType {
   constructor(context) {
@@ -196,8 +196,7 @@ export default class MailTemplateModify extends Component {
             initialValue: MailTemplateStore.getCurrentDetail.code,
           })(
             <Input disabled autoComplete="off" style={{ width: inputWidth }} label={<FormattedMessage id="mailtemplate.code" />} />,
-          )
-          }
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}

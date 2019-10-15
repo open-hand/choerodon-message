@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { withRouter } from 'react-router-dom';
 import { Input, Button, Select, Table, Tooltip, Form, Spin, Radio } from 'choerodon-ui';
-import { axios, Content, Header, Page, Permission } from '@choerodon/master';
+import { axios, Content, Header, Page, Permission, Choerodon } from '@choerodon/boot';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import './MailSetting.scss';
@@ -14,7 +14,7 @@ import MailSettingStore from '../../../stores/global/mail-setting/index';
 
 const intlPrefix = 'global.mailsetting';
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 const RadioGroup = Radio.Group;
 const formItemLayout = {
   labelCol: {
@@ -216,8 +216,8 @@ export default class MailSetting extends Component {
                         className="sslRadioGroup"
                         label={intl.formatMessage({ id: `${intlPrefix}.ssl` })}
                       >
-                        <Radio value={'Y'}><FormattedMessage id="yes" /></Radio>
-                        <Radio value={'N'}><FormattedMessage id="no" /></Radio>
+                        <Radio value="Y"><FormattedMessage id="yes" /></Radio>
+                        <Radio value="N"><FormattedMessage id="no" /></Radio>
                       </RadioGroup>,
                     )}
                   </FormItem>

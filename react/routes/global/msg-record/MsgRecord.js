@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { asyncRouter, PageWrap, PageTab } from '@choerodon/master';
+import { asyncRouter, PageWrap, PageTab } from '@choerodon/boot';
 
 const MsgEmail = asyncRouter(() => import('./msg-email'));
 

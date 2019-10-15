@@ -1,7 +1,7 @@
 import React, { Component, useContext } from 'react';
 import { Table, Button } from 'choerodon-ui/pro';
 import { Tag } from 'choerodon-ui';
-import { Action, axios, Content, Header, Page } from '@choerodon/master';
+import { Action, axios, Content, Header, Page } from '@choerodon/boot';
 import Store from './Store/index';
 
 import './TableMessage.less';

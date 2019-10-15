@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { message, Form, Output, Spin, Modal, NumberField, Password, EmailField, UrlField, DatePicker, Select, SelectBox, Switch, Lov, Button, TextArea } from 'choerodon-ui/pro';
-import { axios, Content, Header, Page, Permission, Breadcrumb } from '@choerodon/master';
+import { axios, Content, Header, Page, Permission, Breadcrumb, Choerodon } from '@choerodon/boot';
 import store from '../Store';
 import MailSettingForm from './MailSettingForm';
 import './MailSetting.scss';
@@ -69,7 +69,7 @@ export default (props) => {
           onClick={() => openSideBar()}
           icon="mode_edit"
         >
-          {'修改'}
+          修改
         </Button>
       </Header>
       <Breadcrumb />

@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx';
-import { axios, store } from '@choerodon/master';
+import { axios, store, Choerodon } from '@choerodon/boot';
 import querystring from 'query-string';
 
 @store('SendSettingStore')
@@ -68,7 +68,8 @@ class SendSettingStore {
     { current, pageSize },
     { name, code, description, level },
     { columnKey = 'id', order = 'descend' },
-    params, appType, orgId) {
+    params, appType, orgId,
+  ) {
     const queryObj = {
       page: current,
       size: pageSize,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { asyncRouter } from '@choerodon/master';
+import { asyncRouter } from '@choerodon/boot';
 import { StoreProvider } from '../stores';
 
 const MsgEmail = asyncRouter(() => (import('./MsgEmail')));

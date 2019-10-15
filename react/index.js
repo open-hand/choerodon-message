@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { inject, observer } from 'mobx-react';
-import { asyncLocaleProvider, asyncRouter, nomatch } from '@choerodon/master';
+import { asyncLocaleProvider, asyncRouter, nomatch } from '@choerodon/boot';
 import { ModalContainer } from 'choerodon-ui/pro';
 
 const sendSetting = asyncRouter(() => import('./routes/global/send-setting'));

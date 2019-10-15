@@ -10,8 +10,8 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import {
-  axios, Content, Header, Page, Permission, Action,
-} from '@choerodon/master';
+  axios, Content, Header, Page, Permission, Action, Choerodon,
+} from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/mail-template';
 import './MailTemplate.scss';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';
@@ -297,7 +297,8 @@ export default class MailTemplate extends Component {
           mode="icon"
           name={intl.formatMessage({ id: isPredefined ? 'predefined' : 'custom' })}
           colorCode={isPredefined ? 'PREDEFINE' : 'CUSTOM'}
-        />),
+        />
+      ),
       filteredValue: filters.isPredefined || [],
       filters: [{
         text: intl.formatMessage({ id: 'mailtemplate.predefined' }),

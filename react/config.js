@@ -5,6 +5,9 @@ const config = {
   projectType: 'choerodon',
   buildType: 'single',
   dashboard: {},
+  modules: [
+    '.',
+  ],
   resourcesLevel: ['site', 'organization', 'project', 'user'],
 };
 

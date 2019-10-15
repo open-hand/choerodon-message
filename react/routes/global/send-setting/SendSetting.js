@@ -7,7 +7,7 @@ import { inject, observer } from 'mobx-react';
 import { Button, Select, Table, Tooltip, Form, Modal, Radio, InputNumber } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, Page, Permission } from '@choerodon/master';
+import { axios, Content, Header, Page, Permission, Choerodon } from '@choerodon/boot';
 import SendSettingStore from '../../../stores/global/send-setting';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';
 import './SendSetting.scss';
@@ -279,9 +279,9 @@ export default class SendSetting extends Component {
       >
         <Form className="c7n-sendsetting-form">
           <FormItem
-              {...formItemLayout}
-            >
-              {
+            {...formItemLayout}
+          >
+            {
                 getFieldDecorator('allowConfig', {
                   rules: [],
                   initialValue: getCurrentRecord.allowConfig ? 'allow' : 'notallow',
@@ -487,7 +487,8 @@ export default class SendSetting extends Component {
       render: text => (
         <MouseOverWrapper text={text} width={0.1}>
           {text}
-        </MouseOverWrapper>),
+        </MouseOverWrapper>
+      ),
     }, {
       title: <FormattedMessage id="sendsetting.code" />,
       dataIndex: 'code',
@@ -498,7 +499,8 @@ export default class SendSetting extends Component {
       render: text => (
         <MouseOverWrapper text={text} width={0.1}>
           {text}
-        </MouseOverWrapper>),
+        </MouseOverWrapper>
+      ),
     }, {
       title: <FormattedMessage id="sendsetting.description" />,
       dataIndex: 'description',

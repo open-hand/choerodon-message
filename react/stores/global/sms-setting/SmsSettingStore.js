@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx';
-import { axios, store } from '@choerodon/master';
+import { axios, store } from '@choerodon/boot';
 
 @store('MailSettingStore')
 class MailSettingStore {

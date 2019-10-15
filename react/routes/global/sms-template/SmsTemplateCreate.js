@@ -3,8 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Button, Select, Form, Input, Popover, Icon } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, Page } from '@choerodon/master';
-import { HEADER_TITLE_NAME } from '@choerodon/boot/lib/containers/common/constants';
+import { axios, Content, Header, Page, Choerodon } from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/sms-template';
 import './SmsTemplate.scss';
 import Editor from '../../../components/editor';
@@ -205,8 +204,7 @@ export default class SmsTemplateCreate extends Component {
             validateFirst: true,
           })(
             <Input autoComplete="off" style={{ width: inputWidth }} label={<FormattedMessage id="mailtemplate.code" />} />,
-          )
-          }
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}
@@ -337,7 +335,7 @@ export default class SmsTemplateCreate extends Component {
 
   render() {
     const { AppState } = this.props;
-    const { name = HEADER_TITLE_NAME } = AppState.currentMenuType;
+    const { name } = AppState.currentMenuType;
     return (
       <Page>
         <Header

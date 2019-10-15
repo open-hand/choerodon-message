@@ -3,13 +3,13 @@ import { inject, observer } from 'mobx-react';
 import { Button, Select, Form, Input, Popover, Icon } from 'choerodon-ui';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, Page } from '@choerodon/master';
+import { axios, Content, Header, Page, Choerodon } from '@choerodon/boot';
 import InmailTemplateStore from '../../../stores/global/inmail-template';
 import './InMailTemplate.scss';
 import Editor from '../../../components/editor';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option } = Select;
 
 class MailTemplateType {
   constructor(context) {
@@ -143,7 +143,7 @@ export default class InMailTemplateCreate extends Component {
 
   renderContent = () => {
     const { intl } = this.props;
-    const selectType = InmailTemplateStore.selectType;
+    const { selectType } = InmailTemplateStore;
     const { getFieldDecorator } = this.props.form;
     const { isSubmitting } = this.state;
     const inputWidth = 512;
@@ -184,8 +184,7 @@ export default class InMailTemplateCreate extends Component {
             validateFirst: true,
           })(
             <Input autoComplete="off" style={{ width: inputWidth }} label={<FormattedMessage id="inmailtemplate.code" />} />,
-          )
-          }
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}
@@ -294,7 +293,7 @@ export default class InMailTemplateCreate extends Component {
       <Page>
         <Header
           title={<FormattedMessage id="inmailtemplate.create" />}
-          backPath={'/notify/inmail-template'}
+          backPath="/notify/inmail-template"
         />
         <Content
           code={`${this.mail.code}.create`}
