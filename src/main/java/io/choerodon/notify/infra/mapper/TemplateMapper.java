@@ -45,7 +45,7 @@ public interface TemplateMapper extends Mapper<Template> {
     List<TemplateVO> doFTR(@Param("businessType") String businessType,
                            @Param("messageType") String messageType,
                            @Param("name") String name,
-                           @Param("predefined") String predefined,
+                           @Param("predefined") Boolean predefined,
                            @Param("currentId") Long currentId,
                            @Param("params") String params);
 

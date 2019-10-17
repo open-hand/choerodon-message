@@ -39,7 +39,7 @@ public class TemplateSiteController {
                                                                 @RequestParam String businessType,
                                                                 @RequestParam String messageType,
                                                                 @RequestParam(required = false) String name,
-                                                                @RequestParam(required = false) String predefined,
+                                                                @RequestParam(required = false) Boolean predefined,
                                                                 @RequestParam(required = false) String params) {
         // 1.校验消息类型
         if (!MessageType.isInclude(messageType)) {
