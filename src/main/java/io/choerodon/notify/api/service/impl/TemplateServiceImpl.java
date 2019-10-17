@@ -33,7 +33,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, String predefined, String params) {
+    public PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, Boolean predefined, String params) {
         Long currentId = getCurrentId(businessType, messageType);
         return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize()).doSelectPageInfo(
                 () -> templateMapper.doFTR(businessType, messageType, name, predefined, currentId, params));

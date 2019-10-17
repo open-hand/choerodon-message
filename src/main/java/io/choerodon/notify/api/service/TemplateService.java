@@ -15,7 +15,7 @@ public interface TemplateService {
      * @param pageable 分页对象
      * @return 模板列表
      */
-    PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, String predefined, String params);
+    PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, Boolean predefined, String params);
 
 
     /**
