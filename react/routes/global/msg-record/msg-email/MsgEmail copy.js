@@ -9,10 +9,9 @@ import { Table } from 'choerodon-ui/pro';
 import classnames from 'classnames';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { axios, Content, Header, TabPage, Permission, Breadcrumb, Choerodon } from '@choerodon/boot';
+import { axios, Content, Header, TabPage, Permission, Breadcrumb, Choerodon, StatusTag } from '@choerodon/boot';
 import './MsgEmail.less';
 import MouseOverWrapper from '../../../../components/mouseOverWrapper';
-import StatusTag from '../../../../components/statusTag';
 import { handleFiltersParams } from '../../../../common/util';
 import { useStore } from '../stores';
 // 公用方法类

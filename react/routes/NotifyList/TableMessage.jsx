@@ -5,7 +5,6 @@ import { Action, axios, Page, Breadcrumb, Content, Header } from '@choerodon/boo
 import Store from './Store';
 
 import './TableMessage.less';
-import StatusTag from '../../components/statusTag';
 
 const { Column } = Table;
 // 设置邮件，设置短信，设置站内信

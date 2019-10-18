@@ -87,6 +87,8 @@ export default (props) => {
           templateDataSet.query();
         }
       },
+      okText: '确定',
+      cancelText: '取消',
     });
   };
 

@@ -11,12 +11,11 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import {
-  axios, Content, Header, Page, Permission, Action, Choerodon,
+  StatusTag, Content, Header, Page, Permission, Action, Choerodon,
 } from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/sms-template';
 import './SmsTemplate.scss';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';
-import StatusTag from '../../../components/statusTag';
 import '../../../common/ConfirmModal.scss';
 import { handleFiltersParams } from '../../../common/util';
 // eslint-disable-next-line import/order

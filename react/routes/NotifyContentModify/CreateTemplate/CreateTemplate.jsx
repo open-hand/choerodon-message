@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from 'react/index';
-import { Form, TextField, Select, SelectBox, TextArea } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, TextArea, message } from 'choerodon-ui/pro';
 import { Button, Modal } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import Editor from '../../../components/editor';
@@ -7,7 +7,8 @@ import store from '../Store';
 import DetailTemplateDataSet from '../DetailTemplate/Store/DetailTemplateDataSet';
 
 const { Option } = Select;
-
+// 匹配html界面为空白的正则。
+const patternHTMLEmpty = /^(((<[^i>]+>)*\s*)|&nbsp;|\s)*$/;
 
 const WrappedEditor = observer(props => {
   const [editor, setEditor] = useState(undefined);
@@ -100,6 +101,10 @@ export default props => {
   };
   async function handleSave() {
     try {
+      if (patternHTMLEmpty.test(props.context.createTemplateDataSet.current.get(`${settingType}Content`))) {
+        message.info('内容不可为空');
+        return false;
+      }
       if ((await props.context.createTemplateDataSet.submit())) {
         handleReset();
         props.context.templateDataSet.query();

@@ -10,12 +10,11 @@ import {
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import {
-  axios, Content, Header, Page, Permission, Action, Choerodon,
+  axios, Content, Header, Page, Permission, Action, Choerodon, StatusTag,
 } from '@choerodon/boot';
 import MailTemplateStore from '../../../stores/global/mail-template';
 import './MailTemplate.scss';
 import MouseOverWrapper from '../../../components/mouseOverWrapper';
-import StatusTag from '../../../components/statusTag';
 import '../../../common/ConfirmModal.scss';
 import { handleFiltersParams } from '../../../common/util';
 

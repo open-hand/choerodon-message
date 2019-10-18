@@ -7,9 +7,8 @@ import { Button, Table, Modal, Tooltip, Form, DatePicker, Input, Radio } from 'c
 import { Modal as ProModal } from 'choerodon-ui/pro';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { Content, Header, Page, Permission, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
+import { Content, Header, Page, Permission, Breadcrumb, Action, Choerodon, StatusTag } from '@choerodon/boot';
 import './Announcement.scss';
-import StatusTag from '../../components/statusTag';
 import Editor from '../../components/editor';
 import MouseOverWrapper from '../../components/mouseOverWrapper';
 
