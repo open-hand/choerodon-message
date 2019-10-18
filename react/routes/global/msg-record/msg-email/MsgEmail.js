@@ -113,7 +113,7 @@ function MsgEmail(props) {
           <Table dataSet={msgRecordDataSet}>
             <Column align="left" name="email" renderer={renderEmail} />
             <Column name="action" width={30} renderer={renderAction} />
-            <Column align="center" width={100} name="status" renderer={StatusCard} />
+            <Column align="left" width={100} name="status" renderer={StatusCard} />
             <Column name="templateType" renderer={renderMouseOver} />
             <Column name="failedReason" renderer={renderMouseOver} />
             <Column width={100} align="left" name="retryCount" />

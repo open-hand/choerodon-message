@@ -134,7 +134,7 @@ export default function Tab() {
           <Column align="left" className="column1" name="messageType" renderer={getNameMethod} />
           <Column name="introduce" />
           <Column name="level" width={80} renderer={getLevel} />
-          <Column width={80} name="enabled" renderer={getEnabled} />
+          <Column width={80} name="enabled" renderer={getEnabled} align="left" />
           <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
         </Table>
       </Content>

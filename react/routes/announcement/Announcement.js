@@ -558,7 +558,7 @@ export default class Announcement extends Component {
     const { intl } = this.props;
     return (
       <div className="c7n-iam-announcement-detail">
-        <div><span>{intl.formatMessage({ id: 'status' })}：</span>
+        <div><span>{intl.formatMessage({ id: 'status' })}</span>
           <div className="inline">
             <StatusTag
               name={intl.formatMessage({ id: status ? `announcement.${status.toLowerCase()}` : 'announcement.completed' })}
@@ -566,10 +566,10 @@ export default class Announcement extends Component {
             />
           </div>
         </div>
-        <div><span>{intl.formatMessage({ id: 'announcement.send.date' })}：</span><span className="send-time">{sendDate}</span></div>
-        <div><span>{intl.formatMessage({ id: 'announcement.send.is-sticky' })}：</span><span className="send-time">{intl.formatMessage({ id: sticky ? 'yes' : 'no' })}</span></div>
-        {sticky ? <div><span>{intl.formatMessage({ id: 'announcement.end-date' })}：</span><span className="send-time">{endDate}</span></div> : null}
-        <div><span>{intl.formatMessage({ id: 'global.announcement.content' })}：</span></div>
+        <div><span>{intl.formatMessage({ id: 'announcement.send.date' })}</span><span className="send-time">{sendDate}</span></div>
+        <div><span>{intl.formatMessage({ id: 'announcement.send.is-sticky' })}</span><span className="send-time">{intl.formatMessage({ id: sticky ? 'yes' : 'no' })}</span></div>
+        {sticky ? <div><span>{intl.formatMessage({ id: 'announcement.end-date' })}</span><span className="send-time">{endDate}</span></div> : null}
+        <div><span>{intl.formatMessage({ id: 'global.announcement.content' })}</span></div>
         <div className="c7n-iam-announcement-detail-wrapper">
           <div
             className="c7n-iam-announcement-detail-content"
