@@ -486,6 +486,7 @@ export default class Announcement extends Component {
                     className="c7n-iam-announcement-siderbar-content-datepicker"
                     label={<FormattedMessage id="announcement.end-date" />}
                     format="YYYY-MM-DD HH:mm:ss"
+                    placeholder="请选择结束显示时间"
                     disabledDate={this.disabledEndDate}
                     disabledTime={this.disabledDateEndTime}
                     showTime={{ defaultValue: moment() }}
