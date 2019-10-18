@@ -1,4 +1,4 @@
-export default (id, businessType, type, intl, intlPrefix) => {
+export default (id, businessType, type, intl, intlPrefix, templateDataSet) => {
   const retryCount = intl.formatMessage({ id: `${intlPrefix}.retryCount` });
   const sendInstantly = intl.formatMessage({ id: `${intlPrefix}.sendInstantly` });
   const manualRetry = intl.formatMessage({ id: `${intlPrefix}.manualRetry` });
@@ -14,7 +14,7 @@ export default (id, businessType, type, intl, intlPrefix) => {
     dataKey: null,
     fields: [
       ...cofingFields,
-      { name: `${type}Template`, type: 'object', label: emailTemplate, textField: 'name', valueField: 'id', required: true, ignore: 'always', lookupUrl: `notify/v1/templates?businessType=${businessType}&messageType=${type}` },
+      { name: `${type}Template`, type: 'object', label: emailTemplate, textField: 'name', valueField: 'id', required: true, ignore: 'always', options: templateDataSet },
       { name: `${type}TemplateName`, type: 'string', bind: `${type}Template.name` },
       { name: `${type}TemplateId`, type: 'string', bind: `${type}Template.id` },
 

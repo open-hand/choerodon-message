@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect, Fragment } from 'react/index';
 import { Form, TextField, Select, SelectBox, NumberField } from 'choerodon-ui/pro';
+import { observer } from 'mobx-react-lite';
 import store from '../Store';
 
 const { Option } = Select;
 
-export default props => {
+export default observer(props => {
   const handleCancel = () => {
     props.context.sendSettingDataSet.current.reset();
   };
@@ -36,4 +37,4 @@ export default props => {
       <Select name={`${settingType}Template`} />
     </Form>
   );
-};
+});

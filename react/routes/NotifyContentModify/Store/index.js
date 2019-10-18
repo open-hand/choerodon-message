@@ -15,8 +15,8 @@ export const StoreProvider = injectIntl(inject('AppState')(
     const { settingId, settingBusinessType, settingType } = props.match.params;
     const intlPrefix = 'global.notifyContent';
     const prefixCls = 'notify-content';
-    const sendSettingDataSet = useMemo(() => new DataSet(SendSettingDataSet(settingId, settingBusinessType, settingType, intl, `${intlPrefix}.sendSetting`)));
     const templateDataSet = useMemo(() => new DataSet(TemplateDataSet(settingId, settingBusinessType, settingType, 'query', intl, `${intlPrefix}.template`)));
+    const sendSettingDataSet = useMemo(() => new DataSet(SendSettingDataSet(settingId, settingBusinessType, settingType, intl, `${intlPrefix}.sendSetting`, templateDataSet)));
     const createTemplateDataSet = useMemo(() => new DataSet(TemplateDataSet(settingId, settingBusinessType, settingType, 'create', intl, `${intlPrefix}.template`)));
     const value = {
       ...props,
