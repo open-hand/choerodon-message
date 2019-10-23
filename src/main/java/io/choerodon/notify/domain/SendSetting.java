@@ -33,11 +33,18 @@ public class SendSetting extends BaseDTO {
 
     private Boolean isAllowConfig;
 
+    @Column(name = "is_enabled")
+    private Boolean enabled;
+
     private Integer retryCount;
 
     private Boolean isSendInstantly;
 
     private Boolean isManualRetry;
+
+    private Long whTemplateId;
+
+    private Boolean whEnabledFlag;
 
     public SendSetting(String code) {
         this.code = code;
@@ -71,10 +78,28 @@ public class SendSetting extends BaseDTO {
                 ", level='" + level + '\'' +
                 ", pmType='" + pmType + '\'' +
                 ", isAllowConfig=" + isAllowConfig +
+                ", enabled=" + enabled +
                 ", retryCount=" + retryCount +
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
+                ", whTemplateId=" + whTemplateId +
                 '}';
+    }
+
+    public Boolean getWhEnabledFlag() {
+        return whEnabledFlag;
+    }
+
+    public void setWhEnabledFlag(Boolean whEnabledFlag) {
+        this.whEnabledFlag = whEnabledFlag;
+    }
+
+    public Long getWhTemplateId() {
+        return whTemplateId;
+    }
+
+    public void setWhTemplateId(Long whTemplateId) {
+        this.whTemplateId = whTemplateId;
     }
 
     public Long getId() {
@@ -179,5 +204,13 @@ public class SendSetting extends BaseDTO {
 
     public void setAllowConfig(Boolean allowConfig) {
         isAllowConfig = allowConfig;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

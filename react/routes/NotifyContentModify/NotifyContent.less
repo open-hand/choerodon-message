@@ -1,0 +1,148 @@
+@import '~choerodon-ui/lib/style/themes/default';
+
+.notify-content {
+    .page-content {
+        padding-top: 0;
+
+        .messageService {
+            margin-top: .12rem;
+
+        }
+    }
+
+    &-send-setting {
+        table {
+            font-family: PingFangSC-Regular;
+            font-size: 14px;
+            line-height: 20px;
+            color: #000000;
+
+            margin-top: .08rem;
+            margin-bottom: .16rem;
+
+            tbody tr {
+                // td:nth-child(2){
+                //     padding-bottom: 2px;
+
+                // }
+                td {
+                    line-height: 20px;
+                }
+
+                .c7n-pro-field-wrapper {
+                    padding-top: .08rem;
+                    padding-bottom: .08rem;
+                }
+
+                .c7n-pro-output {
+                    line-height: 20px;
+
+                }
+
+                .c7n-pro-field-label {
+
+                    padding-top: .08rem;
+                    padding-bottom: .08rem;
+                    color: rgba(0, 0, 0, 0.65);
+                }
+
+
+                .c7n-pro-field-required.c7n-pro-field-label:after {
+                    color: rgba(0, 0, 0, 0.65);
+                    content: '';
+                }
+
+            }
+        }
+    }
+
+    &-template-select {
+        table {
+            tbody {
+                font-family: PingFangSC-Regular;
+                font-size: 13px;
+                color: #000000;
+
+                td:nth-child(n+2) {
+                    color: rgba(0, 0, 0, 0.65);
+                }
+            }
+        }
+    }
+
+    &-current {
+        background: #4D90FE;
+        border-radius: 2px;
+        border-radius: 2px;
+        width: .4rem;
+        height: .16rem;
+        font-family: PingFangSC-Medium;
+        font-size: 10px;
+        color: #FFFFFF;
+        text-align: center;
+        line-height: .14rem;
+        padding: .01rem .1rem;
+        margin-left: .08rem;
+    }
+
+    &-detail {
+        cursor: pointer;
+        &-form-content-wrapper-html {
+            overflow: auto;
+        }
+    }
+
+    &-detail:hover {
+        color: @primary-color;
+        text-decoration: underline;
+    }
+    .crete-temp-form,
+    .detail-template-form {
+        .c7n-pro-modal-body {
+            padding-right: .1rem;
+
+            .content-text {
+                color: rgba(0, 0, 0, 0.65);
+                line-height: 20px;
+                padding-top: .06rem;
+            }
+
+            table {
+                td:last-child {
+                    .c7n-pro-field-wrapper {
+                        margin-top: 0;
+                    }
+                }
+            }
+        }
+
+    }
+
+    .c7n-pro-modal-body {
+        padding: .24rem .2rem;
+
+        .c7n-iam-react-quill-editor {
+            width: 3.4rem;
+        }
+
+        .ql-toolbar.ql-snow .ql-formats {
+            margin-right: .12rem;
+        }
+    }
+
+    .c7n-pro-modal-footer {
+        padding-left: .2rem;
+
+        div .c7n-ripple-wrapper {
+            width: .5rem;
+            height: .32rem;
+        }
+    }
+
+    // .modal-footer-btn {
+    //     font-family: PingFangSC-Medium;
+    //     font-size: 13px;
+    //     text-align: left;
+    //     line-height: 15px;
+    // }
+}

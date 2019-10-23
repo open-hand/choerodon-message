@@ -1,13 +1,14 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.RecordListDTO;
-import io.choerodon.notify.api.pojo.RecordQueryParam;
-import io.choerodon.notify.domain.Record;
+
+import org.springframework.data.domain.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.domain.*;
 
 public interface MessageRecordService {
 
-    PageInfo<RecordListDTO> pageEmail(RecordQueryParam param, int page, int size);
+    PageInfo<RecordListDTO> pageEmail(String status, String receiveEmail, String templateType, String failedReason, String params, Pageable pageable, String level);
 
     Record manualRetrySendEmail(long recordId);
 

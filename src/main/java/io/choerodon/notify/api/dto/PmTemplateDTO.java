@@ -50,6 +50,7 @@ public class PmTemplateDTO {
                 skip().setSmsContent(null);
                 skip().setEmailTitle(null);
                 skip().setEmailContent(null);
+                skip().setWhContent(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
                 skip().setLastUpdateDate(null);

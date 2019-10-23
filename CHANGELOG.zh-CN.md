@@ -2,6 +2,32 @@
 
 这个项目的所有显著变化都将被记录在这个文件中。
 
+# [0.19.0] - 2019-09-30
+
+## 后端
+
+### 新增
+
+-  短信服务功能迁移到通知服务
+- `bootstrap.yml` 添加健康检查详情显示
+- `values.yaml` 添加初始化配置策略参数
+
+### 修改
+
+- 模糊查询列表接口统一改为 GET 请求
+- 更新 Websocket 的使用，Websocket 接口忽略 JWT 检查
+- 更新feign调用 `iam-service` 为 `base-service`
+- 升级`choerodon-starter`依赖版本为`0.12.0.RELEASE`
+- 更新跨服务初始化目录名 `/script/front` 为 `/script/meta`
+
+### 修复
+
+- 修复消息模板编码一致时，freemarker 模板替换问题
+
+### 移除
+
+- 迁移 Websocket 核心代码到`choerodon-starter`
+
 # [0.18.0] -2019-06-21
 
 ## 后端

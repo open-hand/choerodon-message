@@ -1,18 +1,21 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
-import io.choerodon.base.enums.ResourceType;
-import io.choerodon.notify.api.dto.RecordListDTO;
-import io.choerodon.notify.api.pojo.RecordQueryParam;
-import io.choerodon.notify.api.service.MessageRecordService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-import static io.choerodon.notify.infra.config.NotifyProperties.LEVEL_ORG;
+import io.choerodon.base.annotation.*;
+import io.choerodon.base.enums.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.swagger.annotation.*;
 
 
 @RestController
@@ -28,17 +31,16 @@ public class MessageRecordOrgController {
     @Permission(type = ResourceType.ORGANIZATION)
     @GetMapping("/emails/organizations/{organization_id}")
     @ApiOperation(value = "组织层分页查询邮件消息记录")
+    @CustomPageRequest
     public ResponseEntity<PageInfo<RecordListDTO>> pageEmail(@PathVariable("organization_id") long id,
-                                                             @RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                             @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+                                                             @ApiIgnore
+                                                             @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                              @RequestParam(required = false) String status,
                                                              @RequestParam(required = false) String receiveEmail,
                                                              @RequestParam(required = false) String templateType,
                                                              @RequestParam(required = false) String failedReason,
-                                                             @RequestParam(required = false) Integer retryCount,
                                                              @RequestParam(required = false) String params) {
-        final RecordQueryParam param = new RecordQueryParam(status, receiveEmail, templateType, retryCount, failedReason, params, LEVEL_ORG);
-        return new ResponseEntity<>(messageRecordService.pageEmail(param,page,size), HttpStatus.OK);
+        return new ResponseEntity<>(messageRecordService.pageEmail(status, receiveEmail, templateType, failedReason, params, pageable, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE)

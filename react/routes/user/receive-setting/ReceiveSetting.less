@@ -1,0 +1,39 @@
+@base: #000000;
+
+.receiveSetting {
+    padding-top: 0;
+    .c7n-table-thead {
+        th {
+            color: #000;
+        }
+    }
+    .c7n-table-filter-select-icon {
+        top: -0.05rem;
+        bottom: 0;
+        left: .17rem;
+    }
+    
+    .c7n-select-selection__rendered {
+        min-height: 0;
+        .c7n-select-selection__placeholder {
+          left: .09rem;
+          top: .1rem;
+        }
+    }
+    table {
+        font-size: 13px;
+        line-height: 20px;
+
+        .c7n-checkbox,
+        .c7n-checkbox-inner {
+            color: fade(@base, 65%);
+        }
+
+        tbody {
+            td {
+                color: fade(@base, 65%);
+            }
+        }
+
+    }
+}

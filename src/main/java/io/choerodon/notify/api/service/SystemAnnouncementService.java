@@ -2,8 +2,10 @@ package io.choerodon.notify.api.service;
 
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
+
+import org.springframework.data.domain.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.notify.api.dto.*;
 
 /**
  * @author dengyouquan , Eugen
@@ -11,51 +13,47 @@ import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
 public interface SystemAnnouncementService {
 
     /**
-     * 创建系统公告
+     * 创建系统公告.
      *
-     * @param dto
-     * @return
+     * @param dto 系统公告DTO
+     * @return 系统公告DTO
      */
     SystemAnnouncementDTO create(SystemAnnouncementDTO dto);
 
     /**
-     * 更新系统公告
+     * 更新系统公告.
      *
-     * @param dto
-     * @param level
-     * @param sourceId
-     * @return
+     * @param dto      系统公告DTO
+     * @param level    层级
+     * @param sourceId 组织/项目Id 平台层为:0
+     * @return 系统公告DTO
      */
     SystemAnnouncementDTO update(SystemAnnouncementDTO dto, ResourceLevel level, Long sourceId);
 
     /**
-     * 分页查询系统公告
-     *
-     * @param page
-     * @param size
+     * 分页查询系统公告.
+     * @param pageable
      * @param title
-     * @param content
+     * @param status
      * @param param
-     * @return 分页结果
+     * @return
      */
-    PageInfo<SystemAnnouncementDTO> pagingQuery(int page, int size, String title, String content, String param, String status, Boolean sendNotices);
+    PageInfo<SystemAnnouncementDTO> pagingQuery(Pageable pageable, String title, String status, String param);
 
     /**
-     * 根据id获取系统公告详情
+     * 根据id获取系统公告详情.
      *
-     * @param id
+     * @param id 系统公告ID
      * @return 系统公告详情
      */
     SystemAnnouncementDTO getDetailById(Long id);
 
-
     /**
      * 根据id删除系统公告
      *
-     * @param id
+     * @param id 系统公告ID
      */
     void delete(Long id);
-
 
     /**
      * 系统公告的可执行程序具体方法：
@@ -64,9 +62,9 @@ public interface SystemAnnouncementService {
      *
      * @param sourceType           层级
      * @param sourceId             组织/项目Id 平台层为:0
-     * @param systemNocificationId 系统公告Id
+     * @param systemNotificationId 系统公告Id
      */
-    void sendSystemNotification(ResourceLevel sourceType, Long sourceId, Long systemNocificationId);
+    void sendSystemNotification(ResourceLevel sourceType, Long sourceId, Long systemNotificationId);
 
     /**
      * 获取当前需悬浮显示的最新的系统公告

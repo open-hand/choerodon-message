@@ -1,13 +1,14 @@
 package io.choerodon.notify.infra.mapper;
 
-import io.choerodon.mybatis.common.Mapper;
-import io.choerodon.notify.api.dto.EmailTemplateDTO;
-import io.choerodon.notify.api.dto.PmTemplateDTO;
-import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.domain.Template;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import java.util.*;
+
+import io.choerodon.mybatis.common.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.query.*;
+import io.choerodon.notify.api.vo.*;
+import io.choerodon.notify.domain.*;
 
 public interface TemplateMapper extends Mapper<Template> {
 
@@ -28,5 +29,24 @@ public interface TemplateMapper extends Mapper<Template> {
 
     String selectLevelByCode(@Param("code") String code, @Param("messageType") String messageType);
 
+    /**
+     * 模糊查询短信模版
+     */
+    List<Template> pagedSearch(@Param("templateQuery") TemplateQuery templateQuery);
+
+
+    /**
+     * 全局检索，指定当前id排序在前.
+     *
+     * @param currentId 当前模板Id
+     * @param params    模糊查询参数
+     * @return 模板列表
+     */
+    List<TemplateVO> doFTR(@Param("businessType") String businessType,
+                           @Param("messageType") String messageType,
+                           @Param("name") String name,
+                           @Param("predefined") Boolean predefined,
+                           @Param("currentId") Long currentId,
+                           @Param("params") String params);
 
 }

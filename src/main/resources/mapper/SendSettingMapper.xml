@@ -38,7 +38,7 @@
             AND nts.description LIKE concat(concat('%',#{description}),'%')
         </if>
         <if test="params != null">
-            AND(
+            AND (
             nts.code LIKE concat(concat('%',#{params}),'%') OR
             nts.name LIKE concat(concat('%',#{params}),'%') OR
             nts.description LIKE concat(concat('%',#{params}),'%')
@@ -54,27 +54,27 @@
 
     <select id="selectById" resultMap="SendSettingDetailDTO">
         SELECT
-        nts.id,
-        nts.code,
-        nts.name,
-        nts.description,
-        nts.fd_level,
-        nts.pm_type,
-        nts.retry_count,
-        nts.is_send_instantly,
-        nts.is_manual_retry,
-        nts.is_allow_config,
-        nts.object_version_number,
-        ntemail.id AS email_template_id,
-        ntemail.code AS email_template_code,
-        ntsms.id AS sms_template_id,
-        ntsms.code AS sms_template_code,
-        ntpm.id AS pm_template_id,
-        ntpm.code AS pm_template_code
+            nts.id,
+            nts.code,
+            nts.name,
+            nts.description,
+            nts.fd_level,
+            nts.pm_type,
+            nts.retry_count,
+            nts.is_send_instantly,
+            nts.is_manual_retry,
+            nts.is_allow_config,
+            nts.object_version_number,
+            ntemail.id   AS email_template_id,
+            ntemail.code AS email_template_code,
+            ntsms.id     AS sms_template_id,
+            ntsms.code   AS sms_template_code,
+            ntpm.id      AS pm_template_id,
+            ntpm.code    AS pm_template_code
         FROM notify_send_setting nts
-        LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
-        LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
-        LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
+                 LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
+                 LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
+                 LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
         where nts.id = #{id}
     </select>
 
@@ -90,6 +90,7 @@
         nts.is_send_instantly,
         nts.is_manual_retry,
         nts.is_allow_config,
+        nts.is_enabled,
         nts.object_version_number,
         ntemail.id AS email_template_id,
         ntemail.code AS email_template_code,
@@ -101,12 +102,49 @@
         LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
         LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
         LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
-        where 1 = 1
+        where nts.is_enabled = 1
         <if test="level != null">
             AND nts.fd_level = #{level}
         </if>
         <if test="allowConfig != null">
             AND nts.is_allow_config = #{allowConfig}
+        </if>
+    </select>
+
+
+    <select id="doFTR" resultType="io.choerodon.notify.api.dto.MessageServiceVO">
+        SELECT
+        id,
+        code,
+        NAME AS message_type,
+        description AS introduce,
+        fd_level AS LEVEL,
+        is_enabled as enabled,
+        is_allow_config AS allowConfig,
+        object_version_number
+        FROM
+        notify_send_setting
+        WHERE 1 = 1
+        <if test="level != null">
+            AND fd_level = #{level}
+        </if>
+        <if test="messageType != null">
+            AND name LIKE concat(concat('%',#{messageType}),'%')
+        </if>
+        <if test="introduce != null">
+            AND description LIKE concat(concat('%',#{introduce}),'%')
+        </if>
+        <if test="enabled != null">
+            AND is_enabled = #{enabled}
+        </if>
+        <if test="allowConfig != null">
+            AND is_allow_config = #{allowConfig}
+        </if>
+        <if test="params != null">
+            AND (
+            name LIKE concat(concat('%',#{params}),'%') OR
+            description LIKE concat(concat('%',#{params}),'%')
+            )
         </if>
     </select>
 </mapper>

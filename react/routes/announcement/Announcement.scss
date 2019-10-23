@@ -1,0 +1,122 @@
+@import "../../common/style/mixin/template";
+
+.c7n-iam-announcement {
+  .c7n-table-thead {
+    th {
+      color: #000;
+    }
+  }
+  .c7n-table-filter-select-icon {
+    top: -0.05rem;
+    bottom: 0;
+    left: .17rem;
+  }
+  .c7n-select-selection__rendered {
+    min-height: 0;
+    .c7n-select-selection__placeholder {
+      left: .09rem;
+      top: .1rem;
+    }
+  }
+  .link:hover {
+    color: #3f51b5;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .text-gray {
+    color: rgba(0, 0, 0, 0.65);
+  }
+  &-pt0 {
+    padding-top: 0;
+  }
+  &-detail {
+    .send-time {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: 20px;
+      width: 230px;
+    }
+    .inline {
+      display: inline-block;
+    }
+    width: 100%;
+    &-wrapper {
+      background: #f8f8f8;
+      border-radius: 4px;
+      padding: 20px;
+      width: 100%;
+      img {
+        max-width: 100%;
+      }
+    }
+    &-content {
+      width: 100%;
+
+      @include template;
+    }
+    > div {
+      margin-bottom: 14px;
+      > span {
+        display: inline-block;
+        width: 112px;
+        font-size: 14px;
+        color: #000;
+        line-height: 20px;
+      }
+    }
+  }
+  .nowarp {
+    max-width: 200px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  &-sidebar {
+    .c7n-modal {
+      &-header {
+        height: .55rem;
+        min-height: .55rem;
+        .c7n-modal-title {
+          font-weight: 500;
+        }
+      }
+      &-content {
+        width: 7.4rem !important;
+        right: 0;
+        left: inherit;
+      }
+      &-body {
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+      }
+      &-footer {
+        position: absolute;
+        width: 100%;
+        bottom: 0.25rem;
+      }
+    }
+  }
+
+  &-siderbar-content {
+    padding-bottom: .3rem;
+    .radioGroup {
+      > label:first-child {
+        margin-right: 60px;
+      }
+    }
+
+    &-datepicker {
+      width: 5.12rem;
+      .ant-calendar-today-btn {
+        display: none;
+      }
+    }
+
+    .content-text {
+      //font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: 20px;
+    }
+  }
+}

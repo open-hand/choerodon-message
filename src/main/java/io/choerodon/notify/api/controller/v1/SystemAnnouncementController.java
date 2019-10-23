@@ -1,24 +1,25 @@
 package io.choerodon.notify.api.controller.v1;
 
-import java.util.Date;
-import javax.validation.Valid;
-
 import com.github.pagehelper.PageInfo;
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
-import io.choerodon.base.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
-import io.choerodon.notify.api.service.SystemAnnouncementService;
-import io.choerodon.swagger.annotation.CustomPageRequest;
+import java.util.*;
+import javax.validation.*;
+
+import io.choerodon.base.annotation.*;
+import io.choerodon.base.enums.*;
+import io.choerodon.core.exception.*;
+import io.choerodon.core.iam.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.*;
+import io.choerodon.swagger.annotation.*;
 
 /**
  * @author dengyouquan, Eugen
@@ -56,26 +57,22 @@ public class SystemAnnouncementController {
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "分页查询系统公告")
     @GetMapping("/all")
-    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                                       @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                        @RequestParam(required = false) String title,
-                                                                       @RequestParam(required = false) String content,
                                                                        @RequestParam(required = false) String status,
-                                                                       @RequestParam(required = false) Boolean sendNotices,
-                                                                       @RequestParam(required = false) String param) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(page, size, title, content, param, status, sendNotices), HttpStatus.OK);
+                                                                       @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageable, title, status, params), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "分页查询已发送的系统公告")
-    @CustomPageRequest
     @GetMapping("/completed")
-    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                                                @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size) {
-        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(page, size, null, null, null,
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageable, null,
                 SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value(), null), HttpStatus.OK);
     }
-
 
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "查看系统公告详情")

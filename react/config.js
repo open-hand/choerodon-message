@@ -1,9 +1,13 @@
 const config = {
   server: 'http://api.staging.saas.hand-china.com',
-  master: '@choerodon/master',
+  master: './node_modules/@choerodon/master/lib/master.js',
+  masterName: 'master',
   projectType: 'choerodon',
   buildType: 'single',
   dashboard: {},
+  modules: [
+    '.',
+  ],
   resourcesLevel: ['site', 'organization', 'project', 'user'],
 };
 

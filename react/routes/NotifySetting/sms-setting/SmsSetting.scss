@@ -1,0 +1,54 @@
+.c7n-smssetting-loading-container {
+  text-align: center;
+  padding-top: 100px;
+}
+
+.c7n-smssetting-form {
+  font-size: .14rem;
+  padding: .08rem;
+  .c7n-pro-field-label:after {
+    content: '' !important;
+    color: #000 !important;
+  }
+  .c7n-pro-field-label {
+    color: rgba(0, 0, 0, .54);
+  }
+}
+
+.c7n-smssetting-container {
+  .sslRadioGroup > label {
+    margin-right: 52px;
+  }
+
+  .divider {
+    width: 512px;
+    height: 1px;
+    margin: 0 0 12px;
+    border: none;
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  .btnGroup {
+    > button:last-child {
+      margin-left: 12px;
+    }
+  }
+
+  .c7n-smssetting-container-title {
+    font-size: 16px;
+    line-height: 24px;
+    margin: 0;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .c7n-smssetting-container-wrap {
+    width: 512px;
+    padding: 20px 12px;
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.20), 0 0 0 1px rgba(0, 0, 0, 0.12), 0 2px 2px -1px rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 0;
+    display: inline-block;
+  }
+}

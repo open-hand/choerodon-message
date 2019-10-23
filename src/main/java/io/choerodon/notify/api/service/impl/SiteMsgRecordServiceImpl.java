@@ -139,8 +139,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             if (id == null) continue;
             SiteMsgRecord siteMsgRecord = siteMsgRecordMapper.selectByPrimaryKey(id);
             if (siteMsgRecord != null && siteMsgRecord.getUserId().equals(userId) && !siteMsgRecord.getDeleted()) {
-                siteMsgRecord.setDeleted(true);
-                siteMsgRecordMapper.updateByPrimaryKeySelective(siteMsgRecord);
+                siteMsgRecordMapper.deleteByPrimaryKey(siteMsgRecord);
             }
         }
         String key = "choerodon:msg:site-msg:" + userId;

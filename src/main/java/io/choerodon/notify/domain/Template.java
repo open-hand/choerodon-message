@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 消息模板实体
@@ -20,14 +22,19 @@ public class Template extends BaseDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "error.template.code.empty")
     private String code;
 
+    @NotEmpty(message = "error.template.name.empty")
     private String name;
 
+    @NotEmpty(message = "error.template.messageType.empty")
     private String messageType;
 
+    @NotNull(message = "error.template.isPredefined.null")
     private Boolean isPredefined;
 
+    @NotEmpty(message = "error.template.businessType.empty")
     private String businessType;
 
     private String emailTitle;
@@ -39,6 +46,8 @@ public class Template extends BaseDTO {
     private String pmContent;
 
     private String smsContent;
+
+    private String whContent;
 
     public Template(String code, String messageType) {
         this.code = code;
@@ -62,7 +71,16 @@ public class Template extends BaseDTO {
                 ", pmTitle='" + pmTitle + '\'' +
                 ", pmContent='" + pmContent + '\'' +
                 ", smsContent='" + smsContent + '\'' +
+                ", whContent='" + whContent + '\'' +
                 '}';
+    }
+
+    public String getWhContent() {
+        return whContent;
+    }
+
+    public void setWhContent(String whContent) {
+        this.whContent = whContent;
     }
 
     public Long getId() {

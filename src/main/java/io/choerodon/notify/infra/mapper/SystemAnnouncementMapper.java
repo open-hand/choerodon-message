@@ -1,23 +1,18 @@
 package io.choerodon.notify.infra.mapper;
 
-import java.util.Date;
-import java.util.List;
-
-import io.choerodon.mybatis.common.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import io.choerodon.notify.api.dto.SystemAnnouncementDTO;
-import io.choerodon.notify.domain.SystemAnnouncement;
+import java.util.*;
+
+import io.choerodon.mybatis.common.*;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.domain.*;
 
 /**
  * @author dengyouquan
  **/
 public interface SystemAnnouncementMapper extends Mapper<SystemAnnouncement> {
-    List<SystemAnnouncementDTO> fulltextSearch(@Param("title") String title,
-                                               @Param("content") String content,
-                                               @Param("status") String status,
-                                               @Param("isSendNotices") Boolean sendNotices,
-                                               @Param("param") String param);
+    List<SystemAnnouncementDTO> fulltextSearch(@Param("title") String title, @Param("status") String status, @Param("params") String params);
 
     SystemAnnouncementDTO selectLastestSticky(@Param("currentTime") Date currentTime);
 }
