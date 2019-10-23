@@ -38,7 +38,7 @@ const detailTemplate = (detailId, context) => {
  */
 const updateLink = (type, detailId, context, index) => {
   Modal.open({
-    title: '修改模版',
+    title: '修改模板',
     drawer: true,
     style: {
       width: 740,

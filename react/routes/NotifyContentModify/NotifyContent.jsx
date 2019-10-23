@@ -35,7 +35,8 @@ export default (props) => {
       return false;
     }
   }
-  const modifyEdit = () => {
+  const modifyEdit = async () => {
+    await context.sendSettingDataSet.query();
     Modal.open({
       title: '修改配置',
       drawer: true,
@@ -54,7 +55,7 @@ export default (props) => {
 
   const createTemplate = () => {
     Modal.open({
-      title: '创建模版',
+      title: '创建模板',
       drawer: true,
       style: {
         width: 740,
@@ -97,7 +98,7 @@ export default (props) => {
           onClick={modifyEdit}
           icon="mode_edit"
         >
-          {'修改配置'}
+          修改配置
         </Button>
       ) : null}
         <Button
@@ -105,7 +106,7 @@ export default (props) => {
           onClick={createTemplate}
           icon="playlist_add"
         >
-          {'创建模版'}
+          创建模板
         </Button>
       </Header>
       <Breadcrumb title={chooseBreadcrumb()} />

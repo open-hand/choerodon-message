@@ -110,7 +110,7 @@ const pageDetail = {
   'global.configuration.link': `${docServer}/user-guide/microservice-development/microservice-management/config/`,
 
   'global.configuration.create.title': '在平台"{name}"中创建配置',
-  'global.configuration.create.description': '一个配置属于一个微服务。请先选择一个配置对应的微服务，再选择该微服务下的已有配置为配置模版。您可自定义您的配置版本。系统将自动生成您的配置ID。',
+  'global.configuration.create.description': '一个配置属于一个微服务。请先选择一个配置对应的微服务，再选择该微服务下的已有配置为配置模板。您可自定义您的配置版本。系统将自动生成您的配置ID。',
   'global.configuration.create.link': `${docServer}/user-guide/microservice-development/microservice-management/config/`,
   'global.configuration.create.base.title': '在平台"{name}"中创建配置',
   'global.configuration.create.base.description': '您可自定义您的配置版本。系统将自动生成您的配置ID。',
@@ -183,7 +183,7 @@ const pageDetail = {
   'global.mailtemplate.link': `${docServer}/user-guide/system-configuration/message/email-template/`,
 
   'global.mailtemplate.create.title': '在平台"{name}"中创建邮件模板',
-  'global.mailtemplate.create.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模版统一了用户接收的邮件内容。',
+  'global.mailtemplate.create.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模板统一了用户接收的邮件内容。',
   'global.mailtemplate.create.link': `${docServer}/user-guide/system-configuration/message/email-template/`,
 
   'global.mailtemplate.baseon.title': '在平台"{name}"中创建邮件模板',
@@ -277,7 +277,7 @@ const pageDetail = {
   'global.notifyContent.sendSetting.sendInstantly': '是否即时发送',
   'global.notifyContent.sendSetting.manualRetry': '是否允许手动重发',
   'global.notifyContent.sendSetting.emailTemplate': '模板',
-  'global.notifyContent.template.current': '是否默认为当前使用模版',
+  'global.notifyContent.template.current': '是否默认为当前使用模板',
   'global.notifyContent.template.emailContent': '邮件内容',
   'global.notifyContent.template.pmContent': '站内信内容',
   'global.notifyContent.template.smsContent': '短信内容',
@@ -434,7 +434,7 @@ const pageDetail = {
   'organization.mailtemplate.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.mailtemplate.create.title': '在组织"{name}"中创建邮件模板',
-  'organization.mailtemplate.create.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模版统一了用户接收的邮件内容。',
+  'organization.mailtemplate.create.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模板统一了用户接收的邮件内容。',
   'organization.mailtemplate.create.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.mailtemplate.baseon.title': '在组织"{name}"中创建邮件模板',
@@ -442,11 +442,11 @@ const pageDetail = {
   'organization.mailtemplate.baseon.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.mailtemplate.modify.title': '修改邮件模板"{name}"',
-  'organization.mailtemplate.modify.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模版统一了用户接收的邮件内容。',
+  'organization.mailtemplate.modify.description': '由特定事件触发后，系统自动发送邮件给用户，邮件模板统一了用户接收的邮件内容。',
   'organization.mailtemplate.modify.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
 
-  // 短信模版
+  // 短信模板
   'smstemplate.delete.owncontent': '确定要删除短信模板"{name}"吗？',
 
   'global.smstemplate.title': '平台"{name}"的短信模板',
@@ -467,7 +467,7 @@ const pageDetail = {
   'organization.inmailtemplate.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.inmailtemplate.create.title': '在组织"{name}"中创建站内信模板',
-  'organization.inmailtemplate.create.description': '由特定事件触发后，系统自动发送站内信给用户，站内信模版统一了用户接收的站内信内容。',
+  'organization.inmailtemplate.create.description': '由特定事件触发后，系统自动发送站内信给用户，站内信模板统一了用户接收的站内信内容。',
   'organization.inmailtemplate.create.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.inmailtemplate.baseon.title': '在组织"{name}"中创建站内信模板',
@@ -475,7 +475,7 @@ const pageDetail = {
   'organization.inmailtemplate.baseon.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   'organization.inmailtemplate.modify.title': '修改站内信模板"{name}"',
-  'organization.inmailtemplate.modify.description': '由特定事件触发后，系统自动发送站内信给用户，站内信模版统一了用户接收的站内信内容。',
+  'organization.inmailtemplate.modify.description': '由特定事件触发后，系统自动发送站内信给用户，站内信模板统一了用户接收的站内信内容。',
   'organization.inmailtemplate.modify.link': `${docServer}/user-guide/system-configuration/tenant/email-template/`,
 
   // 任务明细
@@ -1070,7 +1070,7 @@ const zh_CN = {
   'global.configuration.create': '创建配置',
   'global.configuration.modify': '修改配置',
   'global.configuration.step1.title': '选择微服务及填写配置基本信息',
-  'global.configuration.step1.description': '一个配置属于一个微服务。请先选择一个配置对应的微服务，再选择该微服务下的已有配置为配置模版。您可自定义您的配置版本。系统将自动生成您的配置ID。',
+  'global.configuration.step1.description': '一个配置属于一个微服务。请先选择一个配置对应的微服务，再选择该微服务下的已有配置为配置模板。您可自定义您的配置版本。系统将自动生成您的配置ID。',
   'global.configuration.step2.description': ' 您可以通过yaml文件编辑配置的详细信息。',
   'global.configuration.step2.title': '修改配置信息',
   'global.configuration.step3.create.title': '确认信息并创建',
@@ -1714,7 +1714,7 @@ const zh_CN = {
   // 消息通知
   'user.usermsg.header.title': '消息通知',
   'user.usermsg.title': '用户"{name}"的消息通知',
-  'user.usermsg.description': '展示你能使用的消息模版发送的特定触发事件，您可以规定对应触发事件所要应用的模版，发送频率等。',
+  'user.usermsg.description': '展示你能使用的消息模板发送的特定触发事件，您可以规定对应触发事件所要应用的模板，发送频率等。',
   'user.usermsg.view': '查看消息：',
   'user.usermsg.unread': '未读消息',
   'user.usermsg.all': '全部消息',
