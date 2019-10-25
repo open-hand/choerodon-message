@@ -29,4 +29,18 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-receive-setting.groovy') {
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+
+    changeSet(author: 'longhe1996@icloud.com', id: '2019-10-22-notify_receive_setting-mpdify-column') {
+        setTableRemarks(tableName: "NOTIFY_RECEIVE_SETTING", remarks: "此表用于存储用户的接收设置(记录用户拒绝接受的消息)")
+        addColumn(tableName: 'NOTIFY_RECEIVE_SETTING') {
+            column(name: 'SENDING_TYPE', type: 'VARCHAR(16)',defaultValue: "EMPTY STRING", remarks: '模版类型:email,sms,pm,webhook') {
+                constraints(nullable: false)
+            }
+        }
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE NOTIFY_RECEIVE_SETTING SET SENDING_TYPE=MESSAGE_TYPE"
+        }
+        dropColumn(tableName: 'NOTIFY_RECEIVE_SETTING', columnName: 'MESSAGE_TYPE')
+        dropColumn(tableName: 'NOTIFY_RECEIVE_SETTING', columnName: 'IS_DISABLED')
+    }
 }

@@ -38,7 +38,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
     }
     changeSet(author: 'youquan.deng@hand-china.com', id: '2018-10-25-add-column') {
         addColumn(tableName: "NOTIFY_SITEMSG_RECORD") {
-            column(name: 'TYPE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'CONTENT')
+            column(name: 'TY            column(name: \'TYPE\', type: \'VARCHAR(16)\', defaultValue: "msg", remarks: \'站内信消息类型（消息：msg，通知：notice）\', afterColumn: \'CONTENT\')PE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'CONTENT')
             column(name: 'SEND_BY', type: 'BIGINT UNSIGNED', remarks: '触发此站内信的用户id', afterColumn: 'IS_DELETED')
         }
     }
@@ -48,5 +48,18 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
             column(name: 'SENDER_TYPE', type: 'VARCHAR(32)', defaultValue: "user", remarks: '发送者的类型，包含site/organization/project/user四种类型，默认值是user', afterColumn: 'SEND_BY')
         }
         renameColumn(tableName: 'NOTIFY_SITEMSG_RECORD', oldColumnName: 'SEND_BY', newColumnName: 'SEND_BY', columnDataType: 'BIGINT UNSIGNED', remarks: '触发此站内信的发送者的id')
+    }
+
+    changeSet(id: '2019-10-22-notify_sitemsg_record-modify-column', author: 'longhe1996@icloud.com') {
+        addColumn(tableName: 'NOTIFY_SITEMSG_RECORD') {
+            column(name: 'BACKLOG_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否是待办消息。0：不是（默认）；1：是') {
+                constraints(nullable: false)
+            }
+        }
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE notify_sitemsg_record " +
+                    "SET BACKLOG_FLAG=CASE WHEN TYPE='msg' THEN 0 WHEN TYPE='notice' THEN 1 END"
+        }
+        dropColumn(tableName: 'NOTIFY_SITEMSG_RECORD', columnName: 'TYPE')
     }
 }
