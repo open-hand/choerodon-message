@@ -1,18 +1,27 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
-import io.choerodon.base.enums.ResourceType;
+import io.choerodon.core.annotation.Permission;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.api.validator.SiteMsgRecordValidator;
+import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -30,15 +39,16 @@ public class SiteMsgRecordController {
     @GetMapping
     @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "全局层查询用户站内信消息接口")
-    public ResponseEntity<PageInfo<SiteMsgRecordDTO>> pagingQuery(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                                  @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<SiteMsgRecordDTO>> pagingQuery(@ApiIgnore
+                                                                  @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                   @RequestParam("user_id") Long userId,
                                                                   @RequestParam(value = "read", required = false) Boolean isRead,
                                                                   @ApiParam(name = "type", value = "站内信类型(msg/notice)", example = "msg")
-                                                              @RequestParam(required = false) String type
+                                                                  @RequestParam(required = false) String type
     ) {
         SiteMsgRecordValidator.validateCurrentUser(userId);
-        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, isRead, type, page, size), HttpStatus.OK);
+        return new ResponseEntity<>(siteMsgRecordService.pagingQueryByUserId(userId, isRead, type, pageable.getPageNumber(), pageable.getPageSize()), HttpStatus.OK);
     }
 
     @PutMapping("/batch_read")

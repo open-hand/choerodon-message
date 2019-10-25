@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import javax.validation.*;
 
-import io.choerodon.base.annotation.*;
-import io.choerodon.base.enums.*;
+import io.choerodon.core.annotation.*;
+import io.choerodon.core.enums.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.core.iam.*;
 import io.choerodon.notify.api.dto.*;

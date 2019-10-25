@@ -12,9 +12,9 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.*;
 import javax.validation.*;
 
-import io.choerodon.base.annotation.*;
+import io.choerodon.core.annotation.*;
 import org.springframework.data.domain.*;
-import io.choerodon.base.enums.*;
+import io.choerodon.core.enums.*;
 import io.choerodon.core.iam.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;

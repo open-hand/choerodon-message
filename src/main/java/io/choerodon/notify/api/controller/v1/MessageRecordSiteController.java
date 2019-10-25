@@ -1,6 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.annotation.Permission;;
+import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,12 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.choerodon.base.annotation.*;
-import io.choerodon.base.enums.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.domain.*;
 import io.choerodon.swagger.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 @RestController
@@ -31,7 +32,8 @@ public class MessageRecordSiteController {
     @GetMapping("/emails")
     @ApiOperation(value = "全局层分页查询邮件消息记录")
     @CustomPageRequest
-    public ResponseEntity<PageInfo<RecordListDTO>> pageEmail(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<PageInfo<RecordListDTO>> pageEmail(@ApiIgnore
+                                                             @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                              @RequestParam(required = false) String status,
                                                              @RequestParam(required = false) String receiveEmail,
                                                              @RequestParam(required = false) String templateType,

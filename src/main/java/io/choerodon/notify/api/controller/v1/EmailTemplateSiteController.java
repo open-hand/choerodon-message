@@ -1,22 +1,34 @@
 package io.choerodon.notify.api.controller.v1;
 
-import java.util.List;
-import javax.validation.Valid;
-
 import com.github.pagehelper.PageInfo;
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
-import io.choerodon.base.enums.ResourceType;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import io.choerodon.core.annotation.Permission;;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.service.EmailTemplateService;
+import io.choerodon.swagger.annotation.CustomPageRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("v1/notices/emails/templates")
@@ -32,15 +44,16 @@ public class EmailTemplateSiteController {
     @GetMapping
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层分页查询邮件模版")
-    public ResponseEntity<PageInfo<TemplateQueryDTO>> pageSite(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                               @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<TemplateQueryDTO>> pageSite(@ApiIgnore
+                                                               @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                @RequestParam(required = false) String name,
                                                                @RequestParam(required = false) String code,
                                                                @RequestParam(required = false) String type,
                                                                @RequestParam(required = false) Boolean isPredefined,
                                                                @RequestParam(required = false) String params) {
         TemplateQueryDTO query = new TemplateQueryDTO(name, code, type, isPredefined, params);
-        return new ResponseEntity<>(templateService.pageByLevel(query, null, page, size), HttpStatus.OK);
+        return new ResponseEntity<>(templateService.pageByLevel(query, null, pageable.getPageNumber(), pageable.getPageSize()), HttpStatus.OK);
     }
 
 
