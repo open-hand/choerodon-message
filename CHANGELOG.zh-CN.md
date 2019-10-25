@@ -19,7 +19,7 @@
 - 更新feign调用 `iam-service` 为 `base-service`
 - 升级`choerodon-starter`依赖版本为`0.12.0.RELEASE`
 - 更新跨服务初始化目录名 `/script/front` 为 `/script/meta`
-
+- 升级`choerodon-framework-parent`依赖版本为`0.13.0.RELEASE`
 ### 修复
 
 - 修复消息模板编码一致时，freemarker 模板替换问题

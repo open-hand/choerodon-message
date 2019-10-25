@@ -1,6 +1,8 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.annotation.Permission;;
+import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import io.choerodon.base.annotation.*;
-import io.choerodon.base.enums.*;
 import io.choerodon.core.iam.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;

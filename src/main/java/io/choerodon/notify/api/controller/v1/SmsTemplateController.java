@@ -1,19 +1,31 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.base.annotation.Permission;
-import io.choerodon.base.constant.PageConstant;
-import io.choerodon.base.enums.ResourceType;
+import io.choerodon.core.annotation.Permission;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.query.TemplateQuery;
 import io.choerodon.notify.api.service.SmsTemplateService;
 import io.choerodon.notify.domain.Template;
+import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -42,10 +54,11 @@ public class SmsTemplateController {
     @GetMapping
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层分页查询短信模版列表")
-    public ResponseEntity<PageInfo<Template>> pagedSearch(@RequestParam(defaultValue = PageConstant.PAGE, required = false) final int page,
-                                                          @RequestParam(defaultValue = PageConstant.SIZE, required = false) final int size,
+    @CustomPageRequest
+    public ResponseEntity<PageInfo<Template>> pagedSearch(@ApiIgnore
+                                                          @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                           TemplateQuery templateQuery) {
-        return new ResponseEntity<>(smsTemplateService.pagedSearch(page, size, templateQuery), HttpStatus.OK);
+        return new ResponseEntity<>(smsTemplateService.pagedSearch(pageable.getPageNumber(), pageable.getPageSize(), templateQuery), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
