@@ -2,7 +2,7 @@ package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 
 /**
  * @author dengyouquan

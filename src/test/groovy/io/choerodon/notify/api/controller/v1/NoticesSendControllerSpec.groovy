@@ -5,9 +5,9 @@ import io.choerodon.notify.api.dto.NoticeSendDTO
 import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.api.service.impl.NoticesSendServiceImpl
-import io.choerodon.notify.domain.Config
+import io.choerodon.notify.infra.dto.Config
 import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.ConfigMapper
 import io.choerodon.notify.infra.mapper.SendSettingMapper

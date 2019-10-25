@@ -4,7 +4,7 @@ import io.choerodon.core.exception.CommonException
 
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import io.choerodon.websocket.helper.WebSocketHelper

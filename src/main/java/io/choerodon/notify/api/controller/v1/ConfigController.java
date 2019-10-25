@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import java.util.regex.Pattern;
 
 import static io.choerodon.notify.api.dto.EmailConfigDTO.EMAIL_REGULAR_EXPRESSION;
-import static io.choerodon.notify.domain.Config.EMAIL_PROTOCOL_SMTP;
+import static io.choerodon.notify.infra.dto.Config.EMAIL_PROTOCOL_SMTP;
 
 @RestController
 @RequestMapping("v1/notices/configs")

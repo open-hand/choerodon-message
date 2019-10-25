@@ -1,4 +1,9 @@
-package io.choerodon.notify.domain;
+package io.choerodon.notify.infra.dto;
+
+/**
+ * @author jiameng.cao
+ * @date 2019/10/25
+ */
 
 import io.choerodon.mybatis.entity.BaseDTO;
 
@@ -11,9 +16,11 @@ import javax.persistence.Table;
 /**
  * 消息业务类型
  */
+@Table(name = "notify_send_setting")
+public class SendSettingDTO extends BaseDTO {
 
-public class SendSetting {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String code;
@@ -48,49 +55,6 @@ public class SendSetting {
 
     private Boolean backlogGFlag;
 
-
-    public SendSetting(String code) {
-        this.code = code;
-    }
-
-    public SendSetting(String code, String name, String description,
-                       String level, Integer retryCount,
-                       Boolean isSendInstantly, Boolean isManualRetry) {
-        this.code = code;
-        this.name = name;
-        this.description = description;
-        this.level = level;
-        this.retryCount = retryCount;
-        this.isSendInstantly = isSendInstantly;
-        this.isManualRetry = isManualRetry;
-    }
-
-    public SendSetting() {
-    }
-
-    @Override
-    public String toString() {
-        return "SendSetting{" +
-                "id=" + id +
-                ", code='" + code + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", categoryCode=" + categoryCode +
-                ", emailEnabledFlag=" + emailEnabledFlag +
-                ", pmEnabledFlag=" + pmEnabledFlag +
-                ", level='" + level + '\'' +
-                ", smsEnabledFlag='" + smsEnabledFlag + '\'' +
-                ", isAllowConfig=" + isAllowConfig +
-                ", enabled=" + enabled +
-                ", retryCount=" + retryCount +
-                ", isSendInstantly=" + isSendInstantly +
-                ", isManualRetry=" + isManualRetry +
-                ", backlogGFlag=" + backlogGFlag +
-                ", webhookEnabledFlag=" + webhookEnabledFlag +
-                '}';
-    }
-
-
     public Long getId() {
         return id;
     }
@@ -123,7 +87,6 @@ public class SendSetting {
         this.description = description;
     }
 
-
     public String getLevel() {
         return level;
     }
@@ -132,28 +95,12 @@ public class SendSetting {
         this.level = level;
     }
 
-    public Integer getRetryCount() {
-        return retryCount;
+    public String getCategoryCode() {
+        return categoryCode;
     }
 
-    public void setRetryCount(Integer retryCount) {
-        this.retryCount = retryCount;
-    }
-
-    public Boolean getIsSendInstantly() {
-        return isSendInstantly;
-    }
-
-    public void setIsSendInstantly(Boolean sendInstantly) {
-        isSendInstantly = sendInstantly;
-    }
-
-    public Boolean getIsManualRetry() {
-        return isManualRetry;
-    }
-
-    public void setIsManualRetry(Boolean manualRetry) {
-        isManualRetry = manualRetry;
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
     }
 
     public Boolean getAllowConfig() {
@@ -164,20 +111,28 @@ public class SendSetting {
         isAllowConfig = allowConfig;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public Integer getRetryCount() {
+        return retryCount;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 
-    public void setCategoryCode(String categoryCode) {
-        this.categoryCode = categoryCode;
+    public Boolean getSendInstantly() {
+        return isSendInstantly;
     }
 
-    public String getCategoryCode() {
-        return categoryCode;
+    public void setSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+    }
+
+    public Boolean getManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
     }
 
     public Boolean getEmailEnabledFlag() {

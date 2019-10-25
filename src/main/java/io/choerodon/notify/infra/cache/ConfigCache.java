@@ -1,7 +1,7 @@
 package io.choerodon.notify.infra.cache;
 
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

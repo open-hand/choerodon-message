@@ -6,10 +6,10 @@ import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.pojo.MessageType
 import io.choerodon.notify.api.pojo.RecordSendData
 import io.choerodon.notify.api.service.EmailSendService
-import io.choerodon.notify.domain.Config
+import io.choerodon.notify.infra.dto.Config
 import io.choerodon.notify.domain.Record
 import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.cache.ConfigCache
 import io.choerodon.notify.infra.mapper.RecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper

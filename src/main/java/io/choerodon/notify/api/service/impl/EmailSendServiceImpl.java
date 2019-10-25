@@ -9,10 +9,10 @@ import io.choerodon.notify.api.exception.EmailSendException;
 import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
-import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -81,7 +81,7 @@ public class EmailSendServiceImpl implements EmailSendService {
     @Override
     public void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSetting sendSetting) {
         LOGGER.trace("SendEmail code:{} to users: {}", code, targetUsers);
-        io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
+        Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
         validatorEmailTemplate(template);
         targetUsers.forEach(user -> {
             Record record = new Record();

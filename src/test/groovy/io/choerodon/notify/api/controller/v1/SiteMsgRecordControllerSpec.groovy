@@ -4,7 +4,7 @@ import io.choerodon.core.domain.Page
 import io.choerodon.core.exception.ExceptionResponse
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam
-import io.choerodon.notify.domain.SiteMsgRecord
+import io.choerodon.notify.infra.dto.SiteMsgRecord
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

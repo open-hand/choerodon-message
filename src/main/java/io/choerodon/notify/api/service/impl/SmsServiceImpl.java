@@ -12,6 +12,8 @@ import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.asserts.SendSettingAssertHelper;
 import io.choerodon.notify.infra.asserts.SmsConfigAssertHelper;
 import io.choerodon.notify.infra.asserts.TemplateAssertHelper;
+import io.choerodon.notify.infra.dto.SmsConfigDTO;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.enums.SmsSendType;
 import io.choerodon.notify.infra.mapper.RecordMapper;
 import io.choerodon.notify.infra.mapper.SmsConfigMapper;

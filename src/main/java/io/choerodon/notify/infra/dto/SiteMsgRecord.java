@@ -1,4 +1,4 @@
-package io.choerodon.notify.domain;
+package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
 import io.choerodon.notify.api.pojo.PmType;
@@ -21,8 +21,6 @@ public class SiteMsgRecord extends BaseDTO {
     private String title;
 
     private String content;
-
-    private String type;
 
     @Column(name = "is_read")
     private Boolean read;
@@ -68,14 +66,6 @@ public class SiteMsgRecord extends BaseDTO {
         this.content = content;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Boolean getRead() {
         return read;
     }
@@ -117,7 +107,6 @@ public class SiteMsgRecord extends BaseDTO {
         this.sendTime = new Date();
         this.setCreationDate(new Date());
         this.setLastUpdateDate(new Date());
-        this.setType(PmType.MSG.getValue());
     }
 
     public SiteMsgRecord() {
@@ -131,7 +120,6 @@ public class SiteMsgRecord extends BaseDTO {
                 ", userId=" + userId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", type='" + type + '\'' +
                 ", read=" + read +
                 ", deleted=" + deleted +
                 ", sendBy=" + sendBy +

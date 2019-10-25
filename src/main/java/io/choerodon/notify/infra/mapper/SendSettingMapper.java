@@ -4,12 +4,12 @@ import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface SendSettingMapper extends Mapper<SendSetting> {
+public interface SendSettingMapper extends Mapper<SendSettingDTO> {
 
     List<SendSettingListDTO> fulltextSearch(@Param("level") String level,
                                             @Param("code") String code,

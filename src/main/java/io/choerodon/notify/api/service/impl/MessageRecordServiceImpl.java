@@ -3,6 +3,7 @@ package io.choerodon.notify.api.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.dto.Template;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.*;
@@ -48,7 +49,7 @@ public class MessageRecordServiceImpl implements MessageRecordService {
             throw new CommonException("error.record.retryNotFailed");
         }
 
-        io.choerodon.notify.domain.Template template = templateMapper.selectByPrimaryKey(record.getTemplateId());
+        Template template = templateMapper.selectByPrimaryKey(record.getTemplateId());
         if (template == null) {
             throw new CommonException("error.emailTemplate.notExist");
         }

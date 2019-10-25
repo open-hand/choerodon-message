@@ -1,4 +1,4 @@
-package io.choerodon.notify.api.dto;
+package io.choerodon.notify.infra.dto;
 
 import javax.persistence.*;
 
@@ -15,9 +15,11 @@ public class WebHookDTO {
     @Id
     @GeneratedValue
     private Long id;
-    private String webhookType;
+    private String name;
+    private String type;
     private String webhookPath;
     private Long projectId;
+    private Boolean enableFlag;
 
     public Long getId() {
         return id;
@@ -25,14 +27,6 @@ public class WebHookDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getWebhookType() {
-        return webhookType;
-    }
-
-    public void setWebhookType(String webhookType) {
-        this.webhookType = webhookType;
     }
 
     public String getWebhookPath() {
@@ -49,5 +43,29 @@ public class WebHookDTO {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean getEnableFlag() {
+        return enableFlag;
+    }
+
+    public void setEnableFlag(Boolean enableFlag) {
+        this.enableFlag = enableFlag;
     }
 }

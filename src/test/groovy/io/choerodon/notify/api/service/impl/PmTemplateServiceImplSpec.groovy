@@ -3,7 +3,7 @@ package io.choerodon.notify.api.service.impl
 import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.api.pojo.MessageType
 import io.choerodon.notify.api.service.PmTemplateService
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import spock.lang.Specification

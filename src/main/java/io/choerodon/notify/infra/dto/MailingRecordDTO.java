@@ -1,10 +1,20 @@
-package io.choerodon.notify.domain;
+package io.choerodon.notify.infra.dto;
 
-import io.choerodon.notify.api.pojo.RecordSendData;
+import io.choerodon.mybatis.entity.BaseDTO;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-public class Record {
-
+/**
+ * @author jiameng.cao
+ * @date 2019/10/25
+ */
+@Table(name = "notify_mailing_record")
+public class MailingRecordDTO extends BaseDTO {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String status;
     private String receiveAccount;
@@ -13,9 +23,6 @@ public class Record {
     private String variables;
     private Long templateId;
     private String sendSettingCode;
-
-    private RecordSendData sendData;
-
 
     public Long getId() {
         return id;
@@ -57,7 +64,6 @@ public class Record {
         this.retryCount = retryCount;
     }
 
-
     public String getVariables() {
         return variables;
     }
@@ -66,35 +72,12 @@ public class Record {
         this.variables = variables;
     }
 
-    public RecordSendData getSendData() {
-        return sendData;
-    }
-
-    public void setSendData(RecordSendData sendData) {
-        this.sendData = sendData;
-    }
-
     public Long getTemplateId() {
         return templateId;
     }
 
     public void setTemplateId(Long templateId) {
         this.templateId = templateId;
-    }
-
-    @Override
-    public String toString() {
-        return "Record{" +
-                "id=" + id +
-                ", status='" + status + '\'' +
-                ", receiveAccount='" + receiveAccount + '\'' +
-                ", failedReason='" + failedReason + '\'' +
-                ", sendSettingCode='" + sendSettingCode + '\'' +
-                ", retryCount=" + retryCount +
-                ", variables='" + variables + '\'' +
-                ", templateId=" + templateId +
-                ", sendData=" + sendData +
-                '}';
     }
 
     public String getSendSettingCode() {

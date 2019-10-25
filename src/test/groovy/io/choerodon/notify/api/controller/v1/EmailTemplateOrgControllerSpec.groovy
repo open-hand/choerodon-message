@@ -4,7 +4,7 @@ import io.choerodon.core.domain.Page
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.EmailTemplateDTO
 import io.choerodon.notify.api.pojo.MessageType
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

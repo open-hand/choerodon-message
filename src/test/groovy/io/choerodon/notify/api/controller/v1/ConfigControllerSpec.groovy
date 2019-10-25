@@ -3,7 +3,7 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.core.exception.ExceptionResponse
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.EmailConfigDTO
-import io.choerodon.notify.domain.Config
+import io.choerodon.notify.infra.dto.Config
 import io.choerodon.notify.infra.mapper.ConfigMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

@@ -9,7 +9,7 @@ import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.PmTemplateService;
 import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.modelmapper.ModelMapper;

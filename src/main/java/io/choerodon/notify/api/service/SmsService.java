@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.domain.SmsConfigDTO;
+import io.choerodon.notify.infra.dto.SmsConfigDTO;
 
 /**
  * @author superlee

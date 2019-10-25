@@ -9,7 +9,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 
 @Component
 public class TemplateRender {

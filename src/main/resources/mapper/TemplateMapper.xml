@@ -119,7 +119,7 @@
         WHERE nt.code = #{code} AND nt.message_type = #{messageType}
     </select>
 
-    <select id="pagedSearch" resultType="io.choerodon.notify.domain.Template">
+    <select id="pagedSearch" resultType="io.choerodon.notify.infra.dto.Template">
         SELECT
         nt.id,
         nt.code,

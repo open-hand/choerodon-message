@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.dto;
 
-import io.choerodon.notify.domain.SiteMsgRecord;
+import io.choerodon.notify.infra.dto.SiteMsgRecord;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;

@@ -1,7 +1,7 @@
 package io.choerodon.notify.infra.asserts;
 
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import org.modelmapper.PropertyMap;
 
 public class TemplateQueryDTO {

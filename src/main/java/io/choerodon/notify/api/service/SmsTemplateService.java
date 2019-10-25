@@ -3,7 +3,7 @@ package io.choerodon.notify.api.service;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.query.TemplateQuery;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 
 import java.util.List;
 

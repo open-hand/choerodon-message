@@ -9,7 +9,7 @@ import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
 import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;

@@ -3,6 +3,7 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.dto.SystemAnnouncement;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import io.choerodon.core.iam.*;
 import io.choerodon.core.oauth.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.feign.*;
 import io.choerodon.notify.infra.mapper.*;
 import io.choerodon.notify.infra.utils.*;

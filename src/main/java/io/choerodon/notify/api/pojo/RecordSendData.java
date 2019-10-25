@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.pojo;
 
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Map;

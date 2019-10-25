@@ -1,7 +1,7 @@
 package io.choerodon.notify.infra.asserts;
 
 import io.choerodon.core.exception.FeignException;
-import io.choerodon.notify.domain.SmsConfigDTO;
+import io.choerodon.notify.infra.dto.SmsConfigDTO;
 import io.choerodon.notify.infra.mapper.SmsConfigMapper;
 import org.springframework.stereotype.Component;
 

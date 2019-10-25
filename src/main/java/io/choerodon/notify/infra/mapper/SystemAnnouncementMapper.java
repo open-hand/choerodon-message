@@ -1,12 +1,12 @@
 package io.choerodon.notify.infra.mapper;
 
+import io.choerodon.notify.infra.dto.SystemAnnouncement;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.*;
 
 import io.choerodon.mybatis.common.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.domain.*;
 
 /**
  * @author dengyouquan
