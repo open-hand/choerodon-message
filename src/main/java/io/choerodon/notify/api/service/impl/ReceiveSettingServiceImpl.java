@@ -32,8 +32,9 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         this.receiveSettingMapper = receiveSettingMapper;
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
-        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.entity2Dto());
-        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.dto2Entity());
+        //todo
+//        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.entity2Dto());
+//        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.dto2Entity());
         modelMapper.validate();
     }
 

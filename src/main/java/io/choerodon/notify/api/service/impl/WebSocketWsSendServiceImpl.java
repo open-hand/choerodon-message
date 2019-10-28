@@ -4,11 +4,11 @@ import freemarker.template.TemplateException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.DefaultAutowiredField;
-import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.WebSocketSendService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.SiteMsgRecord;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.websocket.helper.WebSocketHelper;
@@ -48,7 +48,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     @Override
     public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSettingDTO sendSetting) {
-        Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
+        Template template = templateMapper.selectOne(new Template().setSendSettingCode(sendSetting.getCode()).setSendingType(SendingTypeEnum.PM.getValue()));
         validatorPmTemplate(template);
         List<SiteMsgRecord> records = new LinkedList<>();
         targetUsers.forEach(user -> {
@@ -67,8 +67,8 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                     SiteMsgRecord record = new SiteMsgRecord(user.getId(), pmTitle, pmContent);
                     record.setSendBy(sendBy);
                     record.setSenderType(senderType);
-                    if (PmType.NOTICE.getValue().equals(sendSetting.getPmType())) {
-                        record.setType(PmType.NOTICE.getValue());
+                    if (sendSetting.getBacklogFlag()) {
+//                        record.setType(PmType.NOTICE.getValue()); todo
                     }
                     records.add(record);
                 }
@@ -93,7 +93,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         if (template == null) {
             throw new CommonException("error.pmTemplate.notExist");
         }
-        if (template.getPmContent() == null) {
+        if (template.getContent() == null) {
             throw new CommonException("error.pmTemplate.contentNull");
         }
     }

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.NotifyType;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.swagger.notify.NotifyTemplateScanData;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.util.StringUtils;
@@ -46,23 +46,21 @@ public class ConvertUtils {
 
     public static Template convertNotifyTemplate(final NotifyTemplateScanData scanData) {
         Template template = new Template();
-        template.setCode(scanData.getCode());
-        template.setName(scanData.getName());
         template.setIsPredefined(true);
-        template.setBusinessType(scanData.getBusinessType());
+        template.setSendSettingCode(scanData.getBusinessType());
         if (scanData.getType().equals(NotifyType.EMAIL.getValue())) {
-            template.setEmailTitle(scanData.getTitle());
-            template.setMessageType(MessageType.EMAIL.getValue());
-            template.setEmailContent(scanData.getContent());
+            template.setTitle(scanData.getTitle());
+            template.setSendingType(SendingTypeEnum.EMAIL.getValue());
+            template.setContent(scanData.getContent());
         }
         if (scanData.getType().equals(NotifyType.PM.getValue())) {
-            template.setPmTitle(scanData.getTitle());
-            template.setMessageType(MessageType.PM.getValue());
-            template.setPmContent(scanData.getContent());
+            template.setTitle(scanData.getTitle());
+            template.setSendingType(SendingTypeEnum.PM.getValue());
+            template.setContent(scanData.getContent());
         }
         if (scanData.getType().equals(NotifyType.SMS.getValue())) {
-            template.setMessageType(NotifyType.SMS.getValue());
-            template.setSmsContent(scanData.getContent());
+            template.setSendingType(NotifyType.SMS.getValue());
+            template.setContent(scanData.getContent());
         }
         return template;
     }

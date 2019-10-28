@@ -3,7 +3,7 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.core.domain.Page
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.EmailTemplateDTO
-import io.choerodon.notify.api.pojo.MessageType
+import io.choerodon.notify.infra.enums.SendingTypeEnum
 import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +12,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
-import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -127,7 +126,7 @@ class EmailTemplateOrgControllerSpec extends Specification {
         template.setEmailContent("{content}")
         template.setIsPredefined(false)
         template.setEmailTitle("测试邮件")
-        template.setMessageType(MessageType.EMAIL.getValue())
+        template.setMessageType(SendingTypeEnum.EMAIL.getValue())
         templateMapper.insert(template)
 
         and: "构造请求参数"
@@ -167,7 +166,7 @@ class EmailTemplateOrgControllerSpec extends Specification {
         template.setEmailContent("\${content}")
         template.setIsPredefined(false)
         template.setEmailTitle("测试邮件")
-        template.setMessageType(MessageType.EMAIL.value)
+        template.setMessageType(SendingTypeEnum.EMAIL.value)
         templateMapper.insert(template)
         def params = new HashMap<String, Object>()
         params.put("organization_id", 1L)

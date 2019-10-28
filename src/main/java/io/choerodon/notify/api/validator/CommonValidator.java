@@ -2,7 +2,7 @@ package io.choerodon.notify.api.validator;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 
 /**
  * @author dengyouquan
@@ -31,7 +31,7 @@ public class CommonValidator {
      * @param messageType
      */
     public static void validatorMessageType(final String messageType) {
-        for (MessageType type : MessageType.values()) {
+        for (SendingTypeEnum type : SendingTypeEnum.values()) {
             if (type.getValue().equalsIgnoreCase(messageType)) {
                 return;
             }

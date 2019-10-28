@@ -3,14 +3,13 @@ package io.choerodon.notify.api.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.notify.NotifyType;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.EmailTemplateService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
@@ -41,10 +40,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                                     SendSettingMapper sendSettingMapper) {
         this.templateMapper = templateMapper;
         this.sendSettingMapper = sendSettingMapper;
-        modelMapper.addMappings(EmailTemplateDTO.entity2Dto());
-        modelMapper.addMappings(EmailTemplateDTO.dto2Entity());
-        modelMapper.addMappings(TemplateQueryDTO.dto2Entity());
-        modelMapper.addMappings(TemplateQueryDTO.entity2Dto());
+        //todo
+//        modelMapper.addMappings(EmailTemplateDTO.entity2Dto());
+//        modelMapper.addMappings(EmailTemplateDTO.dto2Entity());
+//        modelMapper.addMappings(TemplateQueryDTO.dto2Entity());
+//        modelMapper.addMappings(TemplateQueryDTO.entity2Dto());
         modelMapper.validate();
     }
 
@@ -62,17 +62,17 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public List<TemplateNamesDTO> listNames(final String level, final String businessType) {
-        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, MessageType.EMAIL.getValue());
+        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, SendingTypeEnum.EMAIL.getValue());
     }
 
     @Override
     public EmailTemplateDTO query(Long id) {
         Template template = templateMapper.selectByPrimaryKey(id);
-        if (template == null || !template.getMessageType().equals(MessageType.EMAIL.getValue())) {
+        if (template == null || !template.getSendingType().equals(SendingTypeEnum.EMAIL.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         EmailTemplateDTO dto = modelMapper.map(template, EmailTemplateDTO.class);
-        dto.setType(template.getBusinessType());
+        dto.setType(template.getSendSettingCode());
         return dto;
     }
 
@@ -80,20 +80,20 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     public EmailTemplateDTO create(EmailTemplateDTO dto) {
         valid(dto.getType());
         Template template = modelMapper.map(dto, Template.class);
-        template.setMessageType(MessageType.EMAIL.getValue());
-        template.setBusinessType(dto.getType());
+        template.setSendingType(SendingTypeEnum.EMAIL.getValue());
+        template.setSendSettingCode(dto.getType());
         if (templateMapper.insertSelective(template) != 1) {
             throw new CommonException("error.emailTemplate.save");
         }
         EmailTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), EmailTemplateDTO.class);
-        returnDto.setType(template.getBusinessType());
+        returnDto.setType(template.getSendSettingCode());
         return returnDto;
     }
 
     @Override
     public EmailTemplateDTO update(EmailTemplateDTO dto) {
         Template dbTemplate = templateMapper.selectByPrimaryKey(dto.getId());
-        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.EMAIL.getValue())) {
+        if (dbTemplate == null || !dbTemplate.getSendingType().equals(SendingTypeEnum.EMAIL.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         if (dto.getType() != null) {
@@ -104,14 +104,14 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             throw new CommonException("error.emailTemplate.update");
         }
         EmailTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), EmailTemplateDTO.class);
-        returnDto.setType(template.getBusinessType());
+        returnDto.setType(template.getSendSettingCode());
         return returnDto;
     }
 
     @Override
     public void createByScan(Set<NotifyTemplateScanData> set) {
         set.stream().map(ConvertUtils::convertNotifyTemplate).forEach(t -> {
-            Template query = templateMapper.selectOne(new Template(t.getCode(), t.getMessageType()));
+            Template query = templateMapper.selectOne(new Template().setSendingType(t.getSendingType()).setSendSettingCode(t.getSendSettingCode()));
             Long templateId;
             if (query == null) {
                 templateMapper.insertSelective(t);
@@ -122,17 +122,18 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 t.setObjectVersionNumber(query.getObjectVersionNumber());
                 templateMapper.updateByPrimaryKeySelective(t);
             }
-            SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(t.getBusinessType()));
-            if (sendSetting != null) {
-                if (NotifyType.EMAIL.getValue().equals(t.getMessageType()) && sendSetting.getEmailTemplateId() == null) {
-                    sendSetting.setEmailTemplateId(templateId);
-                } else if (NotifyType.PM.getValue().equals(t.getMessageType()) && sendSetting.getPmTemplateId() == null) {
-                    sendSetting.setPmTemplateId(templateId);
-                } else if (NotifyType.SMS.getValue().equals(t.getMessageType()) && sendSetting.getSmsTemplateId() == null) {
-                    sendSetting.setSmsTemplateId(templateId);
-                }
-                sendSettingMapper.updateByPrimaryKey(sendSetting);
-            }
+            SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(t.getSendSettingCode()));
+            //todo
+//            if (sendSetting != null) {
+//                if (NotifyType.EMAIL.getValue().equals(t.getSendingType()) && sendSetting.getEmailTemplateId() == null) {
+//                    sendSetting.setEmailTemplateId(templateId);
+//                } else if (NotifyType.PM.getValue().equals(t.getSendingType()) && sendSetting.getPmTemplateId() == null) {
+//                    sendSetting.setPmTemplateId(templateId);
+//                } else if (NotifyType.SMS.getValue().equals(t.getSendingType()) && sendSetting.getSmsTemplateId() == null) {
+//                    sendSetting.setSmsTemplateId(templateId);
+//                }
+//                sendSettingMapper.updateByPrimaryKey(sendSetting);
+//            }
         });
 
     }
@@ -146,7 +147,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     @Override
     public void delete(Long id) {
         Template dbTemplate = templateMapper.selectByPrimaryKey(id);
-        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.EMAIL.getValue())) {
+        if (dbTemplate == null || !dbTemplate.getSendingType().equals(SendingTypeEnum.EMAIL.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         if (dbTemplate.getIsPredefined() == null || dbTemplate.getIsPredefined()) {
@@ -160,7 +161,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     @Override
     public void check(String code) {
-        String level = templateMapper.selectLevelByCode(code, MessageType.EMAIL.getValue());
+        String level = templateMapper.selectLevelByCode(code, SendingTypeEnum.EMAIL.getValue());
         if (StringUtils.isEmpty(level)) {
             return;
         }

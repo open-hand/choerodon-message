@@ -152,7 +152,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         AtomicInteger count = new AtomicInteger();
         List<SiteMsgRecord> records = new LinkedList<>();
         for (Long id : ids) {
-            SiteMsgRecord record = new SiteMsgRecord(id, template.getPmTitle(), pmContent);
+            SiteMsgRecord record = new SiteMsgRecord(id, template.getTitle(), pmContent);
             records.add(record);
             if (records.size() >= 999) {
                 siteMsgRecordMapper.batchInsert(records);

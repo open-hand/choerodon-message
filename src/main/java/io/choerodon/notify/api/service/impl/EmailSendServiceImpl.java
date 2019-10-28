@@ -6,7 +6,10 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.exception.EmailSendException;
-import io.choerodon.notify.api.pojo.*;
+import io.choerodon.notify.api.pojo.DefaultAutowiredField;
+import io.choerodon.notify.api.pojo.EmailSendError;
+import io.choerodon.notify.api.pojo.RecordSendData;
+import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.domain.Record;
@@ -14,6 +17,7 @@ import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.MailingRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
@@ -81,15 +85,14 @@ public class EmailSendServiceImpl implements EmailSendService {
     @Override
     public void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSetting) {
         LOGGER.trace("SendEmail code:{} to users: {}", code, targetUsers);
-        Template template = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
+        Template template = templateMapper.selectOne(new Template().setSendingType(SendingTypeEnum.EMAIL.getValue()).setSendSettingCode(sendSetting.getCode()));
         validatorEmailTemplate(template);
         targetUsers.forEach(user -> {
             Record record = new Record();
             record.setStatus(null);
             record.setRetryCount(0);
-            record.setMessageType(MessageType.EMAIL.getValue());
             record.setReceiveAccount(user.getEmail());
-            record.setBusinessType(sendSetting.getCode());
+            record.setSendSettingCode(sendSetting.getCode());
             record.setTemplateId(template.getId());
             Map<String, Object> newParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
             record.setVariables(ConvertUtils.convertMapToJson(objectMapper, newParams));
@@ -109,7 +112,7 @@ public class EmailSendServiceImpl implements EmailSendService {
         if (template == null) {
             throw new CommonException("error.emailTemplate.notExist");
         }
-        if (StringUtils.isEmpty(template.getEmailContent()) || StringUtils.isEmpty(template.getEmailTitle())) {
+        if (StringUtils.isEmpty(template.getContent()) || StringUtils.isEmpty(template.getTitle())) {
             throw new CommonException("error.emailTemplate.notValid");
         }
     }

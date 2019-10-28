@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -86,27 +85,28 @@ public class SmsServiceImpl implements SmsService {
         }
         SendSettingDTO sendSetting = sendSettingAssertHelper.sendSettingNotExisted(code);
 
-        Long templateId = sendSetting.getSmsTemplateId();
-        Template template = templateAssertHelper.templateNotExisted(templateId);
-        String content = template.getSmsContent();
-        if (!"sms".equals(template.getMessageType()) || StringUtils.isEmpty(content)) {
-            LOGGER.warn("illegal sms template, id: {}", templateId);
-            throw new FeignException("error.illegal.sms.template");
-        }
-
-        SmsConfigDTO smsConfig =
-                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
-        Map<String, Object> variable = noticeSendDTO.getParams();
-        variable.put("secretKey", smsConfig.getSecretKey());
-        variable.put("source", smsConfig.getSignature());
-        JsonNode node = null;
-        try {
-            node = objectMapper.readTree(content);
-            substitutionVariable(variable, node);
-        } catch (IOException e) {
-            throw new FeignException("error.parse.sms.template.json");
-        }
-        sendSms(smsConfig, node, template, variable);
+        //todo
+//        Long templateId = sendSetting.getSmsTemplateId();
+//        Template template = templateAssertHelper.templateNotExisted(templateId);
+//        String content = template.getContent();
+//        if (!"sms".equals(template.getSendingType()) || StringUtils.isEmpty(content)) {
+//            LOGGER.warn("illegal sms template, id: {}", templateId);
+//            throw new FeignException("error.illegal.sms.template");
+//        }
+//
+//        SmsConfigDTO smsConfig =
+//                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
+//        Map<String, Object> variable = noticeSendDTO.getParams();
+//        variable.put("secretKey", smsConfig.getSecretKey());
+//        variable.put("source", smsConfig.getSignature());
+//        JsonNode node = null;
+//        try {
+//            node = objectMapper.readTree(content);
+//            substitutionVariable(variable, node);
+//        } catch (IOException e) {
+//            throw new FeignException("error.parse.sms.template.json");
+//        }
+//        sendSms(smsConfig, node, template, variable);
     }
 
     @Override
@@ -206,9 +206,9 @@ public class SmsServiceImpl implements SmsService {
     }
 
     private Record initRecord(Template template, Map<String, Object> variable) {
-        String businessType = template.getBusinessType();
+        String businessType = template.getSendSettingCode();
         Record record = new Record();
-        record.setBusinessType(businessType);
+        record.setSendSettingCode(businessType);
         record.setRetryCount(0);
         try {
             record.setVariables(objectMapper.writeValueAsString(variable));
@@ -216,7 +216,8 @@ public class SmsServiceImpl implements SmsService {
             throw new FeignException("error.parse.object.to.string");
         }
         record.setTemplateId(template.getId());
-        record.setMessageType("sms");
+        //todo
+//        record.setMessageType("sms");
         return record;
     }
 

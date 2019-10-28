@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.WebHookMapper">
+    <select id="selectBySendSetting" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
+        SELECT
+        wh.*
+        FROM
+        notify_webhook wh
+        LEFT JOIN NOTIFY_WEBHOOK_MESSAGE_SETTING wms ON wh.ID = wms.WEBHOOK_ID
+        WHERE
+        wms.SEND_SETTING_ID = #{send_setting_id}
+        AND wh.PROJECT_ID =#{project_id}
+    </select>
+</mapper>

@@ -67,7 +67,6 @@ public class PmSendTask {
         sendSetting.setCode("addFunction");
         int delete = sendSettingMapper.delete(sendSetting);
         Template template = new Template();
-        template.setCode("addFunction-preset");
         int delete1 = templateMapper.delete(template);
         logger.debug("delete 'addFunction' send setting,{} row,delete 'addFunction-preset' template.{} row", delete, delete1);
     }
@@ -77,22 +76,23 @@ public class PmSendTask {
         String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("");
         Map<String, Object> params = convertJsonToMap(mapJson);
         SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(code));
-        if (sendSetting == null || sendSetting.getPmTemplateId() == null) {
-            logger.warn("PmSendTask no sendsetting or sendsetting no opposite station letter template,cann`t send station letter.");
-            return;
-        }
-        Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
-        if (template == null) {
-            logger.warn("PmSendTask no template,cann`t send station letter.");
-            return;
-        }
-        String pmContent = renderPmTemplate(template, params);
-        Long[] ids = userFeignClient.getUserIds().getBody();
-        if (ids == null || ids.length == 0) {
-            logger.warn("PmSendTask current system no user,no send station letter.");
-            return;
-        }
-        sendSocketAndInsertRecord(template, pmContent, ids);
+        //todo
+//        if (sendSetting == null || sendSetting.getPmTemplateId() == null) {
+//            logger.warn("PmSendTask no sendsetting or sendsetting no opposite station letter template,cann`t send station letter.");
+//            return;
+//        }
+//        Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
+//        if (template == null) {
+//            logger.warn("PmSendTask no template,cann`t send station letter.");
+//            return;
+//        }
+//        String pmContent = renderPmTemplate(template, params);
+//        Long[] ids = userFeignClient.getUserIds().getBody();
+//        if (ids == null || ids.length == 0) {
+//            logger.warn("PmSendTask current system no user,no send station letter.");
+//            return;
+//        }
+//       sendSocketAndInsertRecord(template, pmContent, ids);
     }
 
     private Map<String, Object> convertJsonToMap(String mapJson) {
@@ -127,7 +127,7 @@ public class PmSendTask {
     }
 
     private String renderPmTemplate(Template template, Map<String, Object> params) {
-        String pm = template.getPmContent();
+        String pm = template.getContent();
         try {
             pm = templateRender.renderTemplate(template, params, TemplateRender.TemplateType.CONTENT);
         } catch (IOException | TemplateException e) {

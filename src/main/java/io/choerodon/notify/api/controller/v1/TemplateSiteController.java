@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,6 @@ import io.choerodon.core.annotation.*;
 import io.choerodon.core.enums.*;
 import io.choerodon.core.exception.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.api.validator.*;
 import io.choerodon.swagger.annotation.*;
@@ -41,7 +41,7 @@ public class TemplateSiteController {
                                                                 @RequestParam(required = false) Boolean predefined,
                                                                 @RequestParam(required = false) String params) {
         // 1.校验消息类型
-        if (!MessageType.isInclude(messageType)) {
+        if (!SendingTypeEnum.isInclude(messageType)) {
             throw new CommonException("error.template.message.type.invalid");
         }
         return new ResponseEntity<>(templateService.pagingTemplateByMessageType(pageable, businessType, messageType, name, predefined, params), HttpStatus.OK);

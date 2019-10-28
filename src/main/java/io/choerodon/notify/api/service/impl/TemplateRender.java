@@ -1,15 +1,14 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.io.IOException;
-import java.util.Map;
-
 import freemarker.template.TemplateException;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.infra.dto.Template;
+import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class TemplateRender {
@@ -36,29 +35,32 @@ public class TemplateRender {
 
 
     public String renderTemplate(final Template template, final Map<String, Object> variables, TemplateType type) throws IOException, TemplateException {
-        String messageType = template.getMessageType();
-        String templateKey = template.getCode() + "-" + messageType + ":" + type.getValue() + template.getObjectVersionNumber();
+        String messageType = template.getSendingType();
+        String templateKey =
+                //todo
+//                template.getCode() + "-" +
+                messageType + ":" + type.getValue() + template.getObjectVersionNumber();
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
         String content = "";
         switch (type) {
             case TITLE:
-                if (MessageType.EMAIL.getValue().equals(messageType)){
-                    content = template.getEmailTitle();
-                } else if (MessageType.PM.getValue().equals(messageType)){
-                    content = template.getPmTitle();
+                if (SendingTypeEnum.EMAIL.getValue().equals(messageType)) {
+                    content = template.getTitle();
+                } else if (SendingTypeEnum.PM.getValue().equals(messageType)) {
+                    content = template.getTitle();
                 } else {
                     throw new CommonException("error.templateRender.renderError");
                 }
                 break;
             case CONTENT:
-                if (MessageType.EMAIL.getValue().equals(messageType)){
-                    content = template.getEmailContent();
-                } else if (MessageType.PM.getValue().equals(messageType)){
-                    content = template.getPmContent();
-                } else if (MessageType.WH.getValue().equals(messageType)){
-                    content = template.getWhContent();
-                } else if (MessageType.SMS.getValue().equals(messageType)){
-                    content = template.getSmsContent();
+                if (SendingTypeEnum.EMAIL.getValue().equals(messageType)) {
+                    content = template.getContent();
+                } else if (SendingTypeEnum.PM.getValue().equals(messageType)) {
+                    content = template.getContent();
+                } else if (SendingTypeEnum.WH.getValue().equals(messageType)) {
+                    content = template.getContent();
+                } else if (SendingTypeEnum.SMS.getValue().equals(messageType)) {
+                    content = template.getContent();
                 } else {
                     throw new CommonException("error.templateRender.renderError");
                 }

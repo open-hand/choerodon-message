@@ -4,7 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.UserDTO;
-import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -62,82 +63,69 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void sendNotice(NoticeSendDTO dto) {
-        if (dto.isSendingSMS()) {
+        // 0 发送短信
+        if (!ObjectUtils.isEmpty(dto) && !ObjectUtils.isEmpty(dto.isSendingSMS()) && dto.isSendingSMS()) {
             smsService.send(dto);
         }
-        SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(dto.getCode()));
-        if (dto.getCode() == null || sendSetting == null) {
-            LOGGER.warn("no sendSetting : {}, can`t send notice.", dto.getCode());
-            return;
-        }
-        boolean haveEmailTemplate = sendSetting.getEmailTemplateId() != null;
-        boolean havePmTemplate = sendSetting.getPmTemplateId() != null;
-        boolean haveSMSTemplate = sendSetting.getSmsTemplateId() != null;
-        boolean enableWebHook = Boolean.TRUE.equals(sendSetting.getWhEnabledFlag());
-        // 如果消息服务未启用，不发送通知
-        if (sendSetting.getEnabled() == null || !sendSetting.getEnabled()) {
-            LOGGER.warn("sendSetting '{}' disabled, can`t send notice.", dto.getCode());
-            return;
-        }
-        // 如果没有任何模板，则不发起feign调用
-        if (!haveEmailTemplate && !havePmTemplate && !haveSMSTemplate && !enableWebHook) {
-            LOGGER.warn("sendSetting '{}' no opposite email template and pm template and sms template, can`t send notice.", dto.getCode());
-            return;
-        }
-        boolean doCustomizedSending = (dto.getCustomizedSendingTypes() != null && !dto.getCustomizedSendingTypes().isEmpty());
 
-        // 取得需要发送通知用户
-        if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
+        // 0.1 校验SendSetting是否存在 : 不存在 则 取消发送
+        SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(new SendSettingDTO().setCode(dto.getCode()));
+        if (ObjectUtils.isEmpty(sendSettingDTO)) {
+            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting code does not exist.[INFO:send_setting_code:'{}']", dto.getCode());
             return;
         }
-        Set<UserDTO> users = getNeedSendUsers(dto);
-        if (doCustomizedSending) {
-            if (dto.isSendingEmail()) {
-                trySendEmail(dto, sendSetting, users, haveEmailTemplate);
-            }
-            if (dto.isSendingSiteMessage()) {
-                trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
-            }
-            if (dto.isSendingWebHook() && Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())) {
-                webHookService.trySendWebHook(dto, sendSetting);
-            }
-        } else {
-            trySendEmail(dto, sendSetting, users, haveEmailTemplate);
-            trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
-            if (Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())) {
-                webHookService.trySendWebHook(dto, sendSetting);
-            }
+        // 0.2 校验SendSetting启用状态 / 发送方式启用状态 : 如停用 或 发送方式皆不启用 则 取消发送
+        if (!sendSettingDTO.getEnabled() ||
+                !(sendSettingDTO.getEmailEnabledFlag() || sendSettingDTO.getPmEnabledFlag() ||
+                        sendSettingDTO.getSmsEnabledFlag() || sendSettingDTO.getWebhookEnabledFlag())) {
+            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting has been disabled OR all sending types for this send setting have been disabled.[INFO:send_setting_code:'{}']", dto.getCode());
+            return;
         }
+        // 0.3 校验发送对象不为空 : 如发送对象为空，则取消此次发送
+        if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
+            LOGGER.warn(">>>CANCEL_SENDING>>> No sending receiver is specified");
+            return;
+        }
+        // 1.获取发送对象
+        Set<UserDTO> users = getNeedSendUsers(dto);
+        // 2.获取是否启用自定义发送类型
+        boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(dto.getCustomizedSendingTypes());
+        // 3.1.发送邮件
+        if (((customizedSendingTypesFlag && dto.isSendingEmail()) || !customizedSendingTypesFlag) && sendSettingDTO.getEmailEnabledFlag()) {
+            trySendEmail(dto, sendSettingDTO, users);
+        }
+        // 3.2.发送站内信
+        if (((customizedSendingTypesFlag && dto.isSendingSiteMessage()) || !customizedSendingTypesFlag) && sendSettingDTO.getPmEnabledFlag()) {
+            trySendSiteMessage(dto, sendSettingDTO, users);
+        }
+        // 3.3.发送WebHook
+        if (((customizedSendingTypesFlag && dto.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
+            webHookService.trySendWebHook(dto, sendSettingDTO);
+        }
+
     }
 
 
-    private void trySendEmail(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
+    private void trySendEmail(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users) {
         // 捕获异常,防止邮件发送失败，影响站内信发送
         try {
-            if (haveEmailTemplate) {
-                // 得到需要发送邮件的用户
-                Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.EMAIL);
-                emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
-            } else {
-                LOGGER.warn("sendSetting '{}' no opposite email template, can`t send email.", dto.getCode());
-            }
+            // 得到需要发送邮件的用户
+            Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, SendingTypeEnum.EMAIL);
+            emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
         } catch (CommonException e) {
             LOGGER.error("send email failed!", e);
         }
     }
 
-    private void trySendSiteMessage(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users, final boolean havePmTemplate) {
+    private void trySendSiteMessage(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users) {
         try {
-            if (havePmTemplate) {
-                //得到需要发送站内信的用户
-                Set<UserDTO> needSendPmUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, MessageType.PM);
-                Map<String, Long> sender = new HashMap<>(5);
-                String senderType = getSenderDetail(dto, sender, sendSetting);
-                webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
-                        sender.get(senderType), senderType, sendSetting);
-            } else {
-                LOGGER.warn("sendSetting '{}' no opposite pm template, can`t send pm.", dto.getCode());
-            }
+            //得到需要发送站内信的用户
+            Set<UserDTO> needSendPmUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, SendingTypeEnum.PM);
+            Map<String, Long> sender = new HashMap<>(5);
+            String senderType = getSenderDetail(dto, sender, sendSetting);
+            webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
+                    sender.get(senderType), senderType, sendSetting);
+
         } catch (CommonException e) {
             LOGGER.error("send station letter failed!", e);
         }
@@ -209,7 +197,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 则得到没有禁用接收通知的用户
      * 否则得到全部用户
      */
-    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSettingDTO sendSetting, final Set<UserDTO> users, final MessageType type) {
+    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSettingDTO sendSetting, final Set<UserDTO> users, final SendingTypeEnum type) {
         if (!sendSetting.getAllowConfig()) {
             return users;
         }

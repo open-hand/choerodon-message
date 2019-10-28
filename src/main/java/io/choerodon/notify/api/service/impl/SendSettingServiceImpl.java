@@ -2,25 +2,26 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.pojo.PmType;
+import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.api.validator.CommonValidator;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import io.choerodon.notify.infra.mapper.TemplateMapper;
+import io.choerodon.notify.infra.utils.ConvertUtils;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import io.choerodon.web.util.PageableHelper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.*;
-
-import org.springframework.data.domain.*;
-import io.choerodon.core.exception.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.pojo.*;
-import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.api.validator.*;
-import io.choerodon.notify.infra.mapper.*;
-import io.choerodon.notify.infra.utils.*;
-import io.choerodon.swagger.notify.*;
-import io.choerodon.web.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
@@ -71,9 +72,10 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
         db.setObjectVersionNumber(updateDTO.getObjectVersionNumber());
-        db.setEmailTemplateId(updateDTO.getEmailTemplateId());
-        db.setSmsTemplateId(updateDTO.getSmsTemplateId());
-        db.setPmTemplateId(updateDTO.getPmTemplateId());
+        //todo
+//        db.setEmailTemplateId(updateDTO.getEmailTemplateId());
+//        db.setSmsTemplateId(updateDTO.getSmsTemplateId());
+//        db.setPmTemplateId(updateDTO.getPmTemplateId());
         if (updateDTO.getRetryCount() != null) {
             db.setRetryCount(updateDTO.getRetryCount());
         }
@@ -84,10 +86,10 @@ public class SendSettingServiceImpl implements SendSettingService {
             db.setIsSendInstantly(updateDTO.getIsSendInstantly());
         }
         if (PmType.NOTICE.getValue().equals(updateDTO.getPmType())) {
-            db.setPmType(PmType.NOTICE.getValue());
+            db.setBacklogFlag(true);
         }
         if (PmType.MSG.getValue().equals(updateDTO.getPmType())) {
-            db.setPmType(PmType.MSG.getValue());
+            db.setBacklogFlag(false);
         }
         if (updateDTO.getAllowConfig() != null) {
             db.setAllowConfig(updateDTO.getAllowConfig());
@@ -235,9 +237,10 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
         Template emailTemplate = null;
-        if (sendSetting.getEmailTemplateId() != null) {
-            emailTemplate = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
-        }
+        //todo
+//        if (sendSetting.getEmailTemplateId() != null) {
+//            emailTemplate = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
+//        }
         return getEmailSendSettingVO(sendSetting, emailTemplate);
     }
 
@@ -251,7 +254,8 @@ public class SendSettingServiceImpl implements SendSettingService {
         updateDTO.setRetryCount(updateVO.getRetryCount());
         updateDTO.setIsSendInstantly(updateVO.getSendInstantly());
         updateDTO.setIsManualRetry(updateVO.getManualRetry());
-        updateDTO.setEmailTemplateId(updateVO.getEmailTemplateId());
+        //todo
+//        updateDTO.setEmailTemplateId(updateVO.getEmailTemplateId());
         updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
             throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
@@ -266,9 +270,10 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
         Template pmTemplate = null;
-        if (sendSetting.getPmTemplateId() != null) {
-            pmTemplate = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
-        }
+        //todo
+//        if (sendSetting.getPmTemplateId() != null) {
+//            pmTemplate = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
+//        }
         return getPmSendSettingVO(sendSetting, pmTemplate);
     }
 
@@ -278,8 +283,9 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (updateDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
-        updateDTO.setPmType(updateVO.getPmType());
-        updateDTO.setPmTemplateId(updateVO.getPmTemplateId());
+        //todo
+//        updateDTO.setPmType(updateVO.getPmType());
+//        updateDTO.setPmTemplateId(updateVO.getPmTemplateId());
         updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
             throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
@@ -303,8 +309,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (template != null) {
             emailSendSettingVO
                     .setEmailTemplateId(template.getId())
-                    .setEmailTemplateName(template.getName())
-                    .setEmailTemplateTitle(template.getEmailTitle());
+                    .setEmailTemplateTitle(template.getTitle());
         }
         return emailSendSettingVO;
     }
@@ -324,8 +329,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (template != null) {
             pmSendSettingVO
                     .setPmTemplateId(template.getId())
-                    .setPmTemplateName(template.getName())
-                    .setPmTemplateTitle(template.getPmTitle());
+                    .setPmTemplateTitle(template.getTitle());
         }
         return pmSendSettingVO;
     }

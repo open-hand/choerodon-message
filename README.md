@@ -65,7 +65,7 @@ Choerodon Notify Service 是一个通知服务，用于发送电子邮件、站�
         ReadTimeout: 15000
         ConnectTimeout: 15000
     mybatis:
-      mapperLocations: classpath*:/mapper/*.xml
+      mapperLocations: classpath*:/webHookMapper/*.xml
       configuration: # 数据库下划线转驼峰配置
         mapUnderscoreToCamelCase: true
     db:

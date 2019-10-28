@@ -45,11 +45,7 @@ public class EmailTemplateDTO {
     public static PropertyMap<EmailTemplateDTO, Template> dto2Entity() {
         return new PropertyMap<EmailTemplateDTO, Template>() {
             protected void configure() {
-                skip().setMessageType(null);
-                skip().setSmsContent(null);
-                skip().setPmTitle(null);
-                skip().setPmContent(null);
-                skip().setWhContent(null);
+                skip().setSendingType(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
                 skip().setLastUpdateDate(null);
@@ -80,9 +76,9 @@ public class EmailTemplateDTO {
                 skip().setAttribute14(null);
                 skip().setAttribute15(null);
 
-                map().setBusinessType(source.getType());
-                map().setEmailContent(source.getContent());
-                map().setEmailTitle(source.getTitle());
+                map().setSendSettingCode(source.getType());
+                map().setContent(source.getContent());
+                map().setTitle(source.getTitle());
             }
         };
     }
@@ -91,9 +87,9 @@ public class EmailTemplateDTO {
         return new PropertyMap<Template, EmailTemplateDTO>() {
             @Override
             protected void configure() {
-                map().setType(source.getBusinessType());
-                map().setContent(source.getEmailContent());
-                map().setTitle(source.getEmailTitle());
+                map().setType(source.getSendSettingCode());
+                map().setContent(source.getContent());
+                map().setTitle(source.getTitle());
             }
         };
     }

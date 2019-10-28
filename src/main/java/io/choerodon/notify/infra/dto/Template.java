@@ -58,16 +58,18 @@ public class Template extends BaseDTO {
         return sendingType;
     }
 
-    public void setSendingType(String sendingType) {
+    public Template setSendingType(String sendingType) {
         this.sendingType = sendingType;
+        return this;
     }
 
     public String getSendSettingCode() {
         return sendSettingCode;
     }
 
-    public void setSendSettingCode(String sendSettingCode) {
+    public Template setSendSettingCode(String sendSettingCode) {
         this.sendSettingCode = sendSettingCode;
+        return this;
     }
 
     public String getTitle() {

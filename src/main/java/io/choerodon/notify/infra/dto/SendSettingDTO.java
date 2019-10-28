@@ -48,7 +48,7 @@ public class SendSettingDTO extends BaseDTO {
 
     private Boolean webhookEnabledFlag;
 
-    private Boolean backlogGFlag;
+    private Boolean backlogFlag;
 
 
     public SendSettingDTO(String code) {
@@ -87,7 +87,7 @@ public class SendSettingDTO extends BaseDTO {
                 ", retryCount=" + retryCount +
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
-                ", backlogGFlag=" + backlogGFlag +
+                ", backlogFlag=" + backlogFlag +
                 ", webhookEnabledFlag=" + webhookEnabledFlag +
                 '}';
     }
@@ -105,8 +105,9 @@ public class SendSettingDTO extends BaseDTO {
         return code;
     }
 
-    public void setCode(String code) {
+    public SendSettingDTO setCode(String code) {
         this.code = code;
+        return this;
     }
 
     public String getName() {
@@ -214,11 +215,11 @@ public class SendSettingDTO extends BaseDTO {
         this.webhookEnabledFlag = webhookEnabledFlag;
     }
 
-    public Boolean getBacklogGFlag() {
-        return backlogGFlag;
+    public Boolean getBacklogFlag() {
+        return backlogFlag;
     }
 
-    public void setBacklogGFlag(Boolean backlogGFlag) {
-        this.backlogGFlag = backlogGFlag;
+    public void setBacklogFlag(Boolean backlogFlag) {
+        this.backlogFlag = backlogFlag;
     }
 }

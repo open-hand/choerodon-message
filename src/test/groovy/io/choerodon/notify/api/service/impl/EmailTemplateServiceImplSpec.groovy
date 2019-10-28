@@ -2,7 +2,7 @@ package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.IntegrationTestConfiguration
-import io.choerodon.notify.api.pojo.MessageType
+import io.choerodon.notify.infra.enums.SendingTypeEnum
 import io.choerodon.notify.api.service.EmailTemplateService
 import io.choerodon.notify.infra.dto.SendSettingDTO
 import io.choerodon.notify.infra.dto.Template
@@ -55,7 +55,7 @@ class EmailTemplateServiceImplSpec extends Specification {
     def "Delete"() {
         given: "构造请求参数"
         Template dbTemplate = new Template()
-        dbTemplate.setMessageType(MessageType.EMAIL.getValue())
+        dbTemplate.setMessageType(SendingTypeEnum.EMAIL.getValue())
 
         when: "调用方法[异常-邮件模板不存在]"
         emailTemplateService.delete(1L)
