@@ -5,7 +5,7 @@ import io.choerodon.core.exception.ExceptionResponse
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.RecordListDTO
 import io.choerodon.notify.domain.Record
-import io.choerodon.notify.infra.mapper.RecordMapper
+import io.choerodon.notify.infra.mapper.MailingRecordMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -16,7 +16,7 @@ import spock.lang.Specification
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan*  */
+ * @author dengyouquan*   */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 class MessageRecordOrgControllerSpec extends Specification {
@@ -24,7 +24,7 @@ class MessageRecordOrgControllerSpec extends Specification {
     @Autowired
     private TestRestTemplate restTemplate
     @Autowired
-    private RecordMapper recordMapper
+    private MailingRecordMapper recordMapper
     @Shared
     List<Record> records = new ArrayList<>()
     @Shared

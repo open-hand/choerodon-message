@@ -8,7 +8,7 @@ import io.choerodon.notify.api.dto.SendSettingDetailDTO;
 import io.choerodon.notify.api.dto.SendSettingListDTO;
 import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,13 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -74,9 +68,9 @@ public class SendSettingOrgController {
     @PutMapping("/{id}/organizations/{organization_id}")
     @Permission(type = ResourceType.ORGANIZATION)
     @ApiOperation(value = "组织层更新发送设置")
-    public ResponseEntity<SendSetting> update(@PathVariable("organization_id") long orgId,
-                                              @PathVariable Long id,
-                                              @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
+    public ResponseEntity<SendSettingDTO> update(@PathVariable("organization_id") long orgId,
+                                                 @PathVariable Long id,
+                                                 @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
         updateDTO.setId(id);
         return new ResponseEntity<>(sendSettingService.update(updateDTO), HttpStatus.OK);
     }

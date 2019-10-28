@@ -2,20 +2,21 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.dto.TemplateCreateVO;
+import io.choerodon.notify.api.dto.TemplateVO;
+import io.choerodon.notify.api.pojo.MessageType;
+import io.choerodon.notify.api.service.TemplateService;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.choerodon.core.exception.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.pojo.*;
-import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.domain.*;
-import io.choerodon.notify.infra.mapper.*;
-
-import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.*;
+import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.SEND_SETTING_DOES_NOT_EXIST;
 
 @Component
 public class TemplateServiceImpl implements TemplateService {
@@ -64,7 +65,7 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException("error.template.delete.predefined");
         }
         // 3. 不可删除发送设置的当前模版
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(template.getBusinessType());
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting != null &&
@@ -86,7 +87,7 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
         }
         // 2.获取发送设置
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(template.getBusinessType());
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting == null) {
@@ -163,7 +164,7 @@ public class TemplateServiceImpl implements TemplateService {
      * @return 该类型的当前模版id
      */
     private Long getCurrentId(String businessType, String messageType) {
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(businessType);
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting == null) {
@@ -206,7 +207,7 @@ public class TemplateServiceImpl implements TemplateService {
      * @param createVO   更新的模版信息
      */
     private void updateSendSettingTemplate(Long templateId, TemplateCreateVO createVO, Boolean setToTheCurrent) {
-        SendSetting updateDTO = new SendSetting();
+        SendSettingDTO updateDTO = new SendSettingDTO();
         updateDTO.setCode(createVO.getBusinessType());
         updateDTO = sendSettingMapper.selectOne(updateDTO);
         if (updateDTO == null) {

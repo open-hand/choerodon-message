@@ -4,9 +4,9 @@ import com.github.pagehelper.PageInfo;
 
 import java.util.*;
 
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import org.springframework.data.domain.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.domain.*;
 import io.choerodon.swagger.notify.*;
 
 public interface SendSettingService {
@@ -21,7 +21,7 @@ public interface SendSettingService {
     PageInfo<SendSettingListDTO> page(String name, String code,
                                       String description, String params, int page, int size);
 
-    SendSetting update(SendSettingUpdateDTO updateDTO);
+    SendSettingDTO update(SendSettingUpdateDTO updateDTO);
 
     SendSettingDetailDTO query(Long id);
 

@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * @author jiameng.cao
@@ -21,6 +22,17 @@ public class ReceiveSettingDTO extends BaseDTO {
     private String sourceType;
     private Long userId;
     private String sendingType;
+
+    public ReceiveSettingDTO() {
+    }
+
+    public ReceiveSettingDTO(Long sendSettingId, String sendingType, Long sourceId, String sourceType, Long userId) {
+        this.sendSettingId = sendSettingId;
+        this.sourceId = sourceId;
+        this.sourceType = sourceType;
+        this.userId = userId;
+        this.sendingType = sendingType;
+    }
 
     public Long getId() {
         return id;
@@ -62,6 +74,22 @@ public class ReceiveSettingDTO extends BaseDTO {
         this.userId = userId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReceiveSettingDTO that = (ReceiveSettingDTO) o;
+        return Objects.equals(getSendSettingId(), that.getSendSettingId()) &&
+                Objects.equals(getSendingType(), that.getSendingType()) &&
+                Objects.equals(getSourceId(), that.getSourceId()) &&
+                Objects.equals(getSourceType(), that.getSourceType()) &&
+                Objects.equals(getUserId(), that.getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSendSettingId(), getSendingType(), getSourceId(), getSourceType(), getUserId());
+    }
 
     public String getSendingType() {
         return sendingType;

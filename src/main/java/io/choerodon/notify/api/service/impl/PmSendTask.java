@@ -8,7 +8,7 @@ import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.service.SiteMsgRecordService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -63,7 +63,7 @@ public class PmSendTask {
             repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.SECONDS, repeatInterval = 100, params = {})
     @JobTask(code = "deleteAddFunctionSendSetting", description = "删除“添加新功能”的发送设置")
     public void deleteSendSetting(Map<String, Object> map) {
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode("addFunction");
         int delete = sendSettingMapper.delete(sendSetting);
         Template template = new Template();
@@ -76,7 +76,7 @@ public class PmSendTask {
         String code = Optional.ofNullable((String) map.get("code")).orElseThrow(() -> new CommonException("error.PmSendTask.codeEmpty"));
         String mapJson = Optional.ofNullable((String) map.get("variables")).orElse("");
         Map<String, Object> params = convertJsonToMap(mapJson);
-        SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(code));
+        SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(code));
         if (sendSetting == null || sendSetting.getPmTemplateId() == null) {
             logger.warn("PmSendTask no sendsetting or sendsetting no opposite station letter template,cann`t send station letter.");
             return;

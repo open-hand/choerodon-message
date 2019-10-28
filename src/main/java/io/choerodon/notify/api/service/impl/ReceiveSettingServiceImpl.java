@@ -3,11 +3,10 @@ package io.choerodon.notify.api.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.OrganizationProjectDTO;
-import io.choerodon.notify.api.dto.ReceiveSettingDTO;
 import io.choerodon.notify.api.service.ReceiveSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
-import io.choerodon.notify.domain.ReceiveSetting;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -33,38 +32,38 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         this.receiveSettingMapper = receiveSettingMapper;
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
-        modelMapper.addMappings(ReceiveSettingDTO.entity2Dto());
-        modelMapper.addMappings(ReceiveSettingDTO.dto2Entity());
+        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.entity2Dto());
+        modelMapper.addMappings(io.choerodon.notify.api.dto.ReceiveSettingDTO.dto2Entity());
         modelMapper.validate();
     }
 
     @Override
-    public List<ReceiveSettingDTO> queryByUserId(final Long userId) {
-        ReceiveSetting receiveSetting = new ReceiveSetting();
-        receiveSetting.setUserId(userId);
-        return modelMapper.map(receiveSettingMapper.select(receiveSetting), List.class);
+    public List<io.choerodon.notify.api.dto.ReceiveSettingDTO> queryByUserId(final Long userId) {
+        ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
+        receiveSettingDTO.setUserId(userId);
+        return modelMapper.map(receiveSettingMapper.select(receiveSettingDTO), List.class);
     }
 
     @Override
     @Transactional
-    public void update(final Long userId, final List<ReceiveSettingDTO> settingDTOList) {
+    public void update(final Long userId, final List<io.choerodon.notify.api.dto.ReceiveSettingDTO> settingDTOList) {
         if (userId == null) return;
         //没有校验接收通知设置中，层级是否一致，
         // 即sendSettingId中对应的level和接收通知设置中level不一定一致
-        List<ReceiveSetting> updateSettings = settingDTOList.stream().
-                map(settingDTO -> modelMapper.map(settingDTO, ReceiveSetting.class))
-                .peek(receiveSetting -> receiveSetting.setUserId(userId)).collect(Collectors.toList());
-        ReceiveSetting receiveSetting = new ReceiveSetting();
-        receiveSetting.setUserId(userId);
-        List<ReceiveSetting> dbSettings = receiveSettingMapper.select(receiveSetting);
+        List<ReceiveSettingDTO> updateSettings = settingDTOList.stream().
+                map(settingDTO -> modelMapper.map(settingDTO, ReceiveSettingDTO.class))
+                .peek(receiveSettingDTO -> receiveSettingDTO.setUserId(userId)).collect(Collectors.toList());
+        ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
+        receiveSettingDTO.setUserId(userId);
+        List<ReceiveSettingDTO> dbSettings = receiveSettingMapper.select(receiveSettingDTO);
         //备份updateSettings，移除updateSettings和数据库dbSettings中不同的元素
-        List<ReceiveSetting> insertSetting = new ArrayList<>(updateSettings);
+        List<ReceiveSettingDTO> insertSetting = new ArrayList<>(updateSettings);
         insertSetting.removeAll(dbSettings);
         //insertSetting是应该插入的元素
         insertSetting.forEach(t -> {
             t.setUserId(userId);
             if (receiveSettingMapper.insert(t) != 1) {
-                throw new CommonException("error.receiveSetting.update");
+                throw new CommonException("error.receiveSettingDTO.update");
             }
         });
         //移除数据库dbSettings和updateSettings中不同的元素，这些是应该删除的对象
@@ -72,7 +71,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         dbSettings.forEach(t -> {
             t.setUserId(userId);
             if (receiveSettingMapper.delete(t) != 1) {
-                throw new CommonException("error.receiveSetting.update");
+                throw new CommonException("error.receiveSettingDTO.update");
             }
         });
     }
@@ -92,13 +91,13 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
             receiveSettingMapper.deleteByUserIdAndSourceTypeAndSourceId(userId, sourceType, sourceId);
         } else {
             //如果是禁用，则不需要接收通知，向数据库插入记录
-            SendSetting query = new SendSetting();
+            SendSettingDTO query = new SendSettingDTO();
             query.setLevel(sourceType);
             query.setAllowConfig(true);
             sendSettingMapper.select(query).forEach(sendSetting -> {
-                ReceiveSetting receiveSetting = new ReceiveSetting(sendSetting.getId(), messageType, sourceId, sourceType, userId);
-                if (receiveSettingMapper.selectCount(receiveSetting) == 0) {
-                    receiveSettingMapper.insert(receiveSetting);
+                ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO(sendSetting.getId(), messageType, sourceId, sourceType, userId);
+                if (receiveSettingMapper.selectCount(receiveSettingDTO) == 0) {
+                    receiveSettingMapper.insert(receiveSettingDTO);
                 }
             });
         }
@@ -112,7 +111,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
             receiveSettingMapper.deleteByUserIdAndSourceTypeAndSourceId(userId, null, null);
         } else {
             //如果是禁用，则不需要接收通知，向数据库插入记录
-            SendSetting query = new SendSetting();
+            SendSettingDTO query = new SendSettingDTO();
             query.setAllowConfig(true);
             //feign调用，从base-service查询用户所在所有项目和组织
             final OrganizationProjectDTO organizationProjectDTO =
@@ -131,31 +130,31 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
         }
     }
 
-    private void insertReceiveSettingSite(Long userId, String messageType, SendSetting sendSetting) {
-        ReceiveSetting receiveSetting =
-                new ReceiveSetting(sendSetting.getId(), messageType, 0L, ResourceLevel.SITE.value(), userId);
+    private void insertReceiveSettingSite(Long userId, String messageType, SendSettingDTO sendSetting) {
+        ReceiveSettingDTO receiveSettingDTO =
+                new ReceiveSettingDTO(sendSetting.getId(), messageType, 0L, ResourceLevel.SITE.value(), userId);
         //判断数据库是否有记录,没有则插入记录
-        if (receiveSettingMapper.selectCount(receiveSetting) == 0) {
-            receiveSettingMapper.insert(receiveSetting);
+        if (receiveSettingMapper.selectCount(receiveSettingDTO) == 0) {
+            receiveSettingMapper.insert(receiveSettingDTO);
         }
     }
 
-    private void insertReceiveSettingOrganization(Long userId, String messageType, OrganizationProjectDTO organizationProjectDTO, SendSetting sendSetting) {
+    private void insertReceiveSettingOrganization(Long userId, String messageType, OrganizationProjectDTO organizationProjectDTO, SendSettingDTO sendSetting) {
         organizationProjectDTO.getOrganizationList().forEach(organization -> {
-            ReceiveSetting receiveSetting =
-                    new ReceiveSetting(sendSetting.getId(), messageType, organization.getId(), ResourceLevel.ORGANIZATION.value(), userId);
-            if (receiveSettingMapper.selectCount(receiveSetting) == 0) {
-                receiveSettingMapper.insert(receiveSetting);
+            ReceiveSettingDTO receiveSettingDTO =
+                    new ReceiveSettingDTO(sendSetting.getId(), messageType, organization.getId(), ResourceLevel.ORGANIZATION.value(), userId);
+            if (receiveSettingMapper.selectCount(receiveSettingDTO) == 0) {
+                receiveSettingMapper.insert(receiveSettingDTO);
             }
         });
     }
 
-    private void insertReceiveSettingProject(Long userId, String messageType, OrganizationProjectDTO organizationProjectDTO, SendSetting sendSetting) {
+    private void insertReceiveSettingProject(Long userId, String messageType, OrganizationProjectDTO organizationProjectDTO, SendSettingDTO sendSetting) {
         organizationProjectDTO.getProjectList().forEach(project -> {
-            ReceiveSetting receiveSetting =
-                    new ReceiveSetting(sendSetting.getId(), messageType, project.getId(), ResourceLevel.PROJECT.value(), userId);
-            if (receiveSettingMapper.selectCount(receiveSetting) == 0) {
-                receiveSettingMapper.insert(receiveSetting);
+            ReceiveSettingDTO receiveSettingDTO =
+                    new ReceiveSettingDTO(sendSetting.getId(), messageType, project.getId(), ResourceLevel.PROJECT.value(), userId);
+            if (receiveSettingMapper.selectCount(receiveSettingDTO) == 0) {
+                receiveSettingMapper.insert(receiveSettingDTO);
             }
         });
     }

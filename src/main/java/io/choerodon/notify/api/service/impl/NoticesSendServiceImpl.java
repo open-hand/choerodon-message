@@ -1,26 +1,25 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.notify.api.dto.EmailConfigDTO;
+import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.dto.UserDTO;
+import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.enums.SenderType;
+import io.choerodon.notify.infra.feign.UserFeignClient;
+import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.EmailConfigDTO;
-import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.dto.UserDTO;
-import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.domain.ReceiveSetting;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.infra.enums.SenderType;
-import io.choerodon.notify.infra.feign.UserFeignClient;
-import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NoticesSendServiceImpl implements NoticesSendService {
@@ -66,7 +65,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         if (dto.isSendingSMS()) {
             smsService.send(dto);
         }
-        SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(dto.getCode()));
+        SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(dto.getCode()));
         if (dto.getCode() == null || sendSetting == null) {
             LOGGER.warn("no sendSetting : {}, can`t send notice.", dto.getCode());
             return;
@@ -99,21 +98,20 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             if (dto.isSendingSiteMessage()) {
                 trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
             }
-            if (dto.isSendingWebHook() && Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())){
+            if (dto.isSendingWebHook() && Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())) {
                 webHookService.trySendWebHook(dto, sendSetting);
             }
         } else {
             trySendEmail(dto, sendSetting, users, haveEmailTemplate);
             trySendSiteMessage(dto, sendSetting, users, havePmTemplate);
-            if (Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())){
+            if (Boolean.TRUE.equals(sendSetting.getWhEnabledFlag())) {
                 webHookService.trySendWebHook(dto, sendSetting);
             }
         }
     }
 
 
-
-    private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
+    private void trySendEmail(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
         // 捕获异常,防止邮件发送失败，影响站内信发送
         try {
             if (haveEmailTemplate) {
@@ -128,7 +126,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
     }
 
-    private void trySendSiteMessage(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean havePmTemplate) {
+    private void trySendSiteMessage(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users, final boolean havePmTemplate) {
         try {
             if (havePmTemplate) {
                 //得到需要发送站内信的用户
@@ -151,7 +149,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * @param dto NoticeSendDTO
      * @return sender type
      */
-    private String getSenderDetail(NoticeSendDTO dto, Map<String, Long> map, SendSetting sendSetting) {
+    private String getSenderDetail(NoticeSendDTO dto, Map<String, Long> map, SendSettingDTO sendSetting) {
         NoticeSendDTO.User user = dto.getFromUser();
         //设置默认发送者为平台
         String senderType = SenderType.SITE.value();
@@ -211,12 +209,12 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 则得到没有禁用接收通知的用户
      * 否则得到全部用户
      */
-    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSetting sendSetting, final Set<UserDTO> users, final MessageType type) {
+    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSettingDTO sendSetting, final Set<UserDTO> users, final MessageType type) {
         if (!sendSetting.getAllowConfig()) {
             return users;
         }
         return users.stream().filter(user -> {
-            ReceiveSetting setting = new ReceiveSetting(sendSetting.getId(), type.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
+            ReceiveSettingDTO setting = new ReceiveSettingDTO(sendSetting.getId(), type.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
             return receiveSettingMapper.selectCount(setting) == 0;
         }).collect(Collectors.toSet());
     }

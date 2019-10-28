@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.NotifyType;
 import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.api.pojo.MessageType;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.Config;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.swagger.notify.NotifyTemplateScanData;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
@@ -67,7 +67,7 @@ public class ConvertUtils {
         return template;
     }
 
-    public static BusinessTypeDTO convertBusinessTypeDTO(final SendSetting sendSetting) {
+    public static BusinessTypeDTO convertBusinessTypeDTO(final SendSettingDTO sendSetting) {
         return new BusinessTypeDTO(sendSetting.getId(), sendSetting.getCode(), sendSetting.getName());
     }
 

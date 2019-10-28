@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
-public interface RecordMapper extends Mapper<MailingRecordDTO> {
+public interface MailingRecordMapper extends Mapper<MailingRecordDTO> {
 
     List<RecordListDTO> fulltextSearchEmail(@Param("status") String status,
                                             @Param("receiveEmail") String receiveEmail,

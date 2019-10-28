@@ -6,7 +6,7 @@ import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.pojo.DefaultAutowiredField;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.WebSocketSendService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.SiteMsgRecord;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
@@ -19,7 +19,10 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service("pmWsSendService")
 public class WebSocketWsSendServiceImpl implements WebSocketSendService {
@@ -44,7 +47,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
     }
 
     @Override
-    public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSetting sendSetting) {
+    public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSettingDTO sendSetting) {
         Template template = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
         validatorPmTemplate(template);
         List<SiteMsgRecord> records = new LinkedList<>();

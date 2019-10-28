@@ -4,7 +4,7 @@ import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.pojo.MessageType
 import io.choerodon.notify.api.service.EmailTemplateService
-import io.choerodon.notify.domain.SendSetting
+import io.choerodon.notify.infra.dto.SendSettingDTO
 import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
@@ -16,8 +16,7 @@ import spock.lang.Specification
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan* */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 class EmailTemplateServiceImplSpec extends Specification {
@@ -41,7 +40,7 @@ class EmailTemplateServiceImplSpec extends Specification {
             set.add(scanData)
         }
         Template template = new Template()
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
 
         when: "调用方法"
         emailTemplateService.createByScan(set)

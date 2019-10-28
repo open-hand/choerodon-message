@@ -8,7 +8,7 @@ import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.PmTemplateService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -105,7 +105,7 @@ public class PmTemplateServiceImpl implements PmTemplateService {
     }
 
     private void valid(final String type) {
-        if (sendSettingMapper.selectOne(new SendSetting(type)) == null) {
+        if (sendSettingMapper.selectOne(new SendSettingDTO(type)) == null) {
             throw new CommonException("error.pmTemplate.businessTypeNotExist");
         }
     }

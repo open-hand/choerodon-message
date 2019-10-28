@@ -2,6 +2,7 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +17,6 @@ import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.*;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.api.validator.*;
-import io.choerodon.notify.domain.*;
 import io.choerodon.notify.infra.mapper.*;
 import io.choerodon.notify.infra.utils.*;
 import io.choerodon.swagger.notify.*;
@@ -38,7 +38,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public Set<BusinessTypeDTO> listNames(final String level) {
-        SendSetting query = new SendSetting();
+        SendSettingDTO query = new SendSettingDTO();
         query.setLevel(level);
         return sendSettingMapper.select(query).stream()
                 .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
@@ -65,8 +65,8 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public SendSetting update(SendSettingUpdateDTO updateDTO) {
-        SendSetting db = sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
+    public SendSettingDTO update(SendSettingUpdateDTO updateDTO) {
+        SendSettingDTO db = sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
         if (db == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -109,8 +109,8 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public void createByScan(Set<NotifyBusinessTypeScanData> businessTypes) {
-        businessTypes.stream().map(t -> modelMapper.map(t, SendSetting.class)).forEach(i -> {
-            SendSetting query = sendSettingMapper.selectOne(new SendSetting(i.getCode()));
+        businessTypes.stream().map(t -> modelMapper.map(t, SendSettingDTO.class)).forEach(i -> {
+            SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(i.getCode()));
             if (query == null) {
                 sendSettingMapper.insertSelective(i);
             } else {
@@ -150,7 +150,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public MessageServiceVO enabled(Long id) {
-        SendSetting enabledDTO = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO enabledDTO = sendSettingMapper.selectByPrimaryKey(id);
         if (enabledDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -165,7 +165,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public MessageServiceVO disabled(Long id) {
-        SendSetting disabledDTO = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO disabledDTO = sendSettingMapper.selectByPrimaryKey(id);
         if (disabledDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -181,7 +181,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public MessageServiceVO allowConfiguration(Long id) {
-        SendSetting allowDTO = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO allowDTO = sendSettingMapper.selectByPrimaryKey(id);
         if (allowDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -196,7 +196,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public MessageServiceVO forbiddenConfiguration(Long id) {
-        SendSetting forbiddenDTO = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO forbiddenDTO = sendSettingMapper.selectByPrimaryKey(id);
         if (forbiddenDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -210,13 +210,13 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     /**
-     * 根据 notify_send_setting{@link SendSetting}
+     * 根据 notify_send_setting{@link SendSettingDTO}
      * 获取 MessageServiceVO {@link MessageServiceVO}
      *
-     * @param sendSetting {@link SendSetting}
+     * @param sendSetting {@link SendSettingDTO}
      * @return {@link MessageServiceVO}
      */
-    private MessageServiceVO getMessageServiceVO(SendSetting sendSetting) {
+    private MessageServiceVO getMessageServiceVO(SendSettingDTO sendSetting) {
         return new MessageServiceVO()
                 .setId(sendSetting.getId())
                 .setMessageType(sendSetting.getName())
@@ -230,7 +230,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public EmailSendSettingVO getEmailSendSetting(Long id) {
-        SendSetting sendSetting = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO sendSetting = sendSettingMapper.selectByPrimaryKey(id);
         if (sendSetting == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -244,7 +244,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public EmailSendSettingVO updateEmailSendSetting(EmailSendSettingVO updateVO) {
-        SendSetting updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
+        SendSettingDTO updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
         if (updateDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -261,7 +261,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public PmSendSettingVO getPmSendSetting(Long id) {
-        SendSetting sendSetting = sendSettingMapper.selectByPrimaryKey(id);
+        SendSettingDTO sendSetting = sendSettingMapper.selectByPrimaryKey(id);
         if (sendSetting == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -274,7 +274,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO) {
-        SendSetting updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
+        SendSettingDTO updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
         if (updateDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -288,14 +288,14 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     /**
-     * 根据 notify_send_setting{@link SendSetting} 和 notify_template{@link Template}
+     * 根据 notify_send_setting{@link SendSettingDTO} 和 notify_template{@link Template}
      * 获取 EmailSendSettingVO {@link EmailSendSettingVO}
      *
      * @param sendSetting
      * @param template
      * @return
      */
-    private EmailSendSettingVO getEmailSendSettingVO(SendSetting sendSetting, Template template) {
+    private EmailSendSettingVO getEmailSendSettingVO(SendSettingDTO sendSetting, Template template) {
         EmailSendSettingVO emailSendSettingVO = new EmailSendSettingVO();
         BeanUtils.copyProperties(sendSetting, emailSendSettingVO);
         emailSendSettingVO.setSendInstantly(sendSetting.getIsSendInstantly());
@@ -311,14 +311,14 @@ public class SendSettingServiceImpl implements SendSettingService {
 
 
     /**
-     * 根据 notify_send_setting{@link SendSetting} 和 notify_template{@link Template}
+     * 根据 notify_send_setting{@link SendSettingDTO} 和 notify_template{@link Template}
      * 获取 PmSendSettingVO {@link PmSendSettingVO}
      *
      * @param sendSetting
      * @param template
      * @return
      */
-    private PmSendSettingVO getPmSendSettingVO(SendSetting sendSetting, Template template) {
+    private PmSendSettingVO getPmSendSettingVO(SendSettingDTO sendSetting, Template template) {
         PmSendSettingVO pmSendSettingVO = new PmSendSettingVO();
         BeanUtils.copyProperties(sendSetting, pmSendSettingVO);
         if (template != null) {

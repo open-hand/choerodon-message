@@ -8,7 +8,7 @@ import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.query.TemplateQuery;
 import io.choerodon.notify.api.service.SmsTemplateService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -94,7 +94,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
     public void validateBusinessType(Template templateDTO) {
         String businessType = templateDTO.getBusinessType();
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(businessType);
         if (sendSettingMapper.selectOne(sendSetting) == null) {
             throw new CommonException("error.template.illegal.businessType");

@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.notify.api.service.SendSettingService
-import io.choerodon.notify.domain.SendSetting
+import io.choerodon.notify.infra.dto.SendSettingDTO
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData
 import spock.lang.Specification
@@ -31,7 +31,7 @@ class SendSettingServiceImplSpec extends Specification {
         settingService.createByScan(set)
 
         then: "校验结果"
-        sendSettingMapper.selectOne(_) >>> [null,new SendSetting()]
+        sendSettingMapper.selectOne(_) >>> [null,new SendSettingDTO()]
         1 * sendSettingMapper.updateByPrimaryKeySelective(_)
     }
 }

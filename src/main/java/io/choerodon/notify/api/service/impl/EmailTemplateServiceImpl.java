@@ -9,7 +9,7 @@ import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
 import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.EmailTemplateService;
-import io.choerodon.notify.domain.SendSetting;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
@@ -122,7 +122,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 t.setObjectVersionNumber(query.getObjectVersionNumber());
                 templateMapper.updateByPrimaryKeySelective(t);
             }
-            SendSetting sendSetting = sendSettingMapper.selectOne(new SendSetting(t.getBusinessType()));
+            SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(t.getBusinessType()));
             if (sendSetting != null) {
                 if (NotifyType.EMAIL.getValue().equals(t.getMessageType()) && sendSetting.getEmailTemplateId() == null) {
                     sendSetting.setEmailTemplateId(templateId);
@@ -138,7 +138,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     private void valid(final String type) {
-        if (sendSettingMapper.selectOne(new SendSetting(type)) == null) {
+        if (sendSettingMapper.selectOne(new SendSettingDTO(type)) == null) {
             throw new CommonException("error.emailTemplate.businessTypeNotExist");
         }
     }

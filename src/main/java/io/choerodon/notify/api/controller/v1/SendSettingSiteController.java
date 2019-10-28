@@ -1,25 +1,26 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.annotation.Permission;
+import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.*;
-import javax.validation.*;
-
-import io.choerodon.core.annotation.*;
-import org.springframework.data.domain.*;
-import io.choerodon.core.enums.*;
-import io.choerodon.core.iam.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.domain.*;
-import io.choerodon.swagger.annotation.*;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -64,8 +65,8 @@ public class SendSettingSiteController {
     @PutMapping("/{id}")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层更新发送设置")
-    public ResponseEntity<SendSetting> update(@PathVariable Long id,
-                                              @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
+    public ResponseEntity<SendSettingDTO> update(@PathVariable Long id,
+                                                 @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
         updateDTO.setId(id);
         return new ResponseEntity<>(sendSettingService.update(updateDTO), HttpStatus.OK);
     }

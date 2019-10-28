@@ -1,9 +1,8 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.exception.CommonException
-
 import io.choerodon.notify.api.service.WebSocketSendService
-import io.choerodon.notify.domain.SendSetting
+import io.choerodon.notify.infra.dto.SendSettingDTO
 import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
@@ -12,8 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import spock.lang.Specification
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan* */
 class WebSocketWsSendServiceImplTest extends Specification {
     private TemplateRender templateRender = Mock(TemplateRender)
     private TemplateMapper templateMapper = Mock(TemplateMapper)
@@ -27,7 +25,7 @@ class WebSocketWsSendServiceImplTest extends Specification {
         String code = "code"
         Map<String, Object> params = new HashMap<>()
         Set<Long> ids = new HashSet<>()
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
         sendSetting.setPmTemplateId(1L)
         Long sendBy = 1L
         Template template = new Template()

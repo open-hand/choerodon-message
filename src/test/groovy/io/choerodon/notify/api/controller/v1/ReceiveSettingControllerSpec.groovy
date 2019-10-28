@@ -1,10 +1,8 @@
 package io.choerodon.notify.api.controller.v1
 
 import io.choerodon.core.exception.ExceptionResponse
-import io.choerodon.core.oauth.DetailsHelper
 import io.choerodon.notify.IntegrationTestConfiguration
-import io.choerodon.notify.api.dto.ReceiveSettingDTO
-import io.choerodon.notify.domain.ReceiveSetting
+import io.choerodon.notify.infra.dto.ReceiveSettingDTO
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -19,8 +17,7 @@ import spock.lang.Stepwise
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan*  */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 @Stepwise
@@ -37,7 +34,7 @@ class ReceiveSettingControllerSpec extends Specification {
     @Shared
     def count = 3
     @Shared
-    List<ReceiveSetting> settingList = new ArrayList<>()
+    List<io.choerodon.notify.infra.dto.ReceiveSettingDTO> settingList = new ArrayList<>()
     @Shared
     List<ReceiveSettingDTO> settingDTOList = new ArrayList<>()
 
@@ -46,7 +43,7 @@ class ReceiveSettingControllerSpec extends Specification {
             given: "构造请求参数"
             needInit = false
             for (int i = 0; i < count; i++) {
-                ReceiveSetting setting = new ReceiveSetting()
+                io.choerodon.notify.infra.dto.ReceiveSettingDTO setting = new io.choerodon.notify.infra.dto.ReceiveSettingDTO()
                 setting.setUserId(1L)
                 setting.setSourceId(0L)
                 setting.setSourceType("site")
@@ -66,7 +63,7 @@ class ReceiveSettingControllerSpec extends Specification {
 
             when: "插入数据"
             int num = 0
-            for (ReceiveSetting receiveSetting: settingList) {
+            for (io.choerodon.notify.infra.dto.ReceiveSettingDTO receiveSetting : settingList) {
                 mapper.insert(receiveSetting)
                 num++
             }
@@ -83,7 +80,7 @@ class ReceiveSettingControllerSpec extends Specification {
 
             when: "删除数据"
             int result = 0
-            for (ReceiveSetting setting : settingList) {
+            for (ReceiveSettingDTO setting : settingList) {
                 result += mapper.deleteByPrimaryKey(setting)
             }
 
