@@ -10,9 +10,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 
 @RestController
@@ -56,6 +58,32 @@ public class NoticesSendController {
             dto.setParams(new HashMap<>(0));
         }
         noticesSendService.sendNotice(dto);
+    }
+
+    /**
+     * NoticeSendDTO中目前未传输loginName 和 realName，
+     * 所以发送通知前需要发起feign调用，可以在NoticeSendDTO加入这些字段
+     * 则可以发送部分站内信时不需要feign调用，定时发送信息
+     *
+     * @param dto
+     */
+    @PostMapping("/schedule")
+    @ApiOperation(value = "发送定时邮件，定时站内信，定时短信")
+    @Permission(type = ResourceType.SITE)
+    public void postScheduleNotice(@RequestBody NoticeSendDTO dto,@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
+        if (StringUtils.isEmpty(dto.getCode())) {
+            throw new FeignException("error.postNotify.codeEmpty");
+        }
+        if (dto.getSourceId() == null && dto.isSendingSMS()) {
+            throw new FeignException("error.postNotify.sourceId.null");
+        }
+        if (dto.getSourceId() == null) {
+            dto.setSourceId(0L);
+        }
+        if (dto.getParams() == null) {
+            dto.setParams(new HashMap<>(0));
+        }
+        noticesSendService.sendScheduleNotice(dto,date);
     }
 
     @PostMapping("/ws/{code}/{id}")
