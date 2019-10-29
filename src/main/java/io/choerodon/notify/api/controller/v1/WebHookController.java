@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -20,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @since 2019/10/28
  */
 @RestController
-@RequestMapping(value = "/v1/webhook/{project_id}")
+@RequestMapping(value = "/v1/{project_id}/webhooks")
 public class WebHookController {
 
     private WebHookService webHookService;
@@ -43,7 +44,7 @@ public class WebHookController {
         return new ResponseEntity<>(webHookService.pagingWebHook(pageable, projectId, name, type, enableFlag, params), HttpStatus.OK);
     }
 
-    @PostMapping("/check")
+    @GetMapping("/check")
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "校验webhook名称是否已经存在（项目层）")
     public void check(@RequestParam("name") String name) {
@@ -52,21 +53,21 @@ public class WebHookController {
 
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "添加webhook")
-    @PostMapping("/save")
-    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId, @RequestBody WebHookDTO webHookDTO) {
+    @PostMapping
+    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId, @RequestBody @Validated WebHookDTO webHookDTO) {
         return new ResponseEntity<>(webHookService.createWebHook(projectId, webHookDTO), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "更新webhook")
-    @PutMapping("/update")
-    public ResponseEntity<WebHookDTO> update(@PathVariable("project_id") Long projectId, @RequestBody WebHookDTO webHookDTO) {
+    @PutMapping
+    public ResponseEntity<WebHookDTO> update(@PathVariable("project_id") Long projectId, @RequestBody @Validated WebHookDTO webHookDTO) {
         return new ResponseEntity<>(webHookService.updateWebHook(projectId, webHookDTO), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "删除webhook")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<WebHookDTO> delete(@PathVariable("id") Long id) {
         return new ResponseEntity<>(webHookService.deleteWebHook(id), HttpStatus.OK);
     }

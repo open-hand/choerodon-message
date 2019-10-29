@@ -36,8 +36,7 @@
         <if test="params !=null">
             AND (
             name LIKE concat(concat('%',#{params}),'%') OR
-            type LIKE concat(concat('%',#{params}),'%') OR
-            enable_flag LIKE concat(concat('%',#{params}),'%')
+            type LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>

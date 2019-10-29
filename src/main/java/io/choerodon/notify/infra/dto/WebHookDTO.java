@@ -3,6 +3,7 @@ package io.choerodon.notify.infra.dto;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author bgzyy
@@ -10,9 +11,6 @@ import javax.persistence.*;
  */
 @Table(name = "NOTIFY_WEBHOOK")
 public class WebHookDTO {
-    public static final String WEB_HOOK_TYPE_DING_TALK = "DingTalk";
-    public static final String WEB_HOOK_TYPE_WE_CHAT = "WeChat";
-    public static final String WEB_HOOK_TYPE_JSON = "Json";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,15 +18,19 @@ public class WebHookDTO {
     private Long id;
 
     @ApiModelProperty("webhook名称")
+    @NotNull(message = "error.the.name.is.not.be.null")
     private String name;
 
     @ApiModelProperty("webhook类型/必填字段")
+    @NotNull(message = "error.the.type.is.not.be.null")
     private String type;
 
     @ApiModelProperty("webhook地址/必填字段")
+    @NotNull(message = "error.the.webhookPath.is.not.be.null")
     private String webhookPath;
 
     @ApiModelProperty("项目ID/必填字段")
+    @NotNull(message = "error.the.projectId.is.not.be.null")
     private Long projectId;
 
     @ApiModelProperty("webhook是否启用")

@@ -143,7 +143,7 @@ public class WebHookServiceImpl implements WebHookService {
         }
         WebHookDTO webHookDTO = new WebHookDTO();
         webHookDTO.setName(name);
-        if (!org.apache.commons.collections.CollectionUtils.isEmpty(webHookMapper.select(webHookDTO))) {
+        if (!CollectionUtils.isEmpty(webHookMapper.select(webHookDTO))) {
             throw new WebHookException("The name is already exited");
         }
     }
@@ -153,30 +153,19 @@ public class WebHookServiceImpl implements WebHookService {
         if (projectId == null) {
             throw new CommonException("error the projectId is not be null");
         }
-        validateSaveOrUpdate(webHookDTO);
         webHookDTO.setProjectId(projectId);
         webHookMapper.insertSelective(webHookDTO);
         return webHookDTO;
     }
 
-    //@Transactional(rollbackFor = CommonException.class)
+    @Transactional(rollbackFor = CommonException.class)
     @Override
     public WebHookDTO updateWebHook(Long projectId, WebHookDTO webHookDTO) {
-        validateProjectId(projectId);
-        validateSaveOrUpdate(webHookDTO);
         WebHookDTO webHookDTO1 = webHookNotExisted(webHookDTO.getId());
         webHookMapper.updateByPrimaryKeySelective(webHookDTO);
         return webHookDTO1;
     }
 
-    private void validateProjectId(Long projectId) {
-        WebHookDTO webHookDTO = new WebHookDTO();
-        webHookDTO.setProjectId(projectId);
-        List<WebHookDTO> hookDTOS = webHookMapper.select(webHookDTO);
-        if (CollectionUtils.isEmpty(hookDTOS)) {
-            throw new CommonException("error the projectId is null!");
-        }
-    }
 
     @Override
     public WebHookDTO deleteWebHook(Long id) {
@@ -190,7 +179,7 @@ public class WebHookServiceImpl implements WebHookService {
         webHookDTO.setId(id);
         WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
         if (ObjectUtils.isEmpty(webHookDTO1)) {
-            throw new WebHookException("error the webhook entity is null!");
+            throw new CommonException("error the webhook entity is null!");
         }
         return webHookDTO1;
     }
@@ -209,20 +198,10 @@ public class WebHookServiceImpl implements WebHookService {
         WebHookDTO webHookDTO = webHookNotExisted(id);
         webHookDTO.setEnableFlag(able);
         if (webHookMapper.updateByPrimaryKeySelective(webHookDTO) != 1) {
-            throw new WebHookException("error.webhook.update.status");
+            throw new CommonException("error.the.webhook.is.not.existsted");
+
         }
         return webHookDTO;
     }
 
-    private void validateSaveOrUpdate(WebHookDTO webHookDTO) {
-        if (ObjectUtils.isEmpty(webHookDTO.getName())) {
-            throw new WebHookException("error the name is not be null!");
-        }
-        if (ObjectUtils.isEmpty(webHookDTO.getType())) {
-            throw new WebHookException("error the type is not be null!");
-        }
-        if (ObjectUtils.isEmpty(webHookDTO.getWebhookPath())) {
-            throw new WebHookException("error the webhookPath is not be null!");
-        }
-    }
 }
