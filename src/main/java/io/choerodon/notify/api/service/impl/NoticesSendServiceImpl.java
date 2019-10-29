@@ -4,11 +4,11 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.UserDTO;
-import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.enums.SenderType;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -62,56 +62,63 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public void sendNotice(NoticeSendDTO dto) {
+    public void sendNotice(NoticeSendDTO noticeSendDTO) {
         // 0 发送短信
-        if (!ObjectUtils.isEmpty(dto) && !ObjectUtils.isEmpty(dto.isSendingSMS()) && dto.isSendingSMS()) {
-            smsService.send(dto);
+        if (!ObjectUtils.isEmpty(noticeSendDTO) && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS()) {
+            smsService.send(noticeSendDTO);
         }
 
         // 0.1 校验SendSetting是否存在 : 不存在 则 取消发送
-        SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(new SendSettingDTO().setCode(dto.getCode()));
+        SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(new SendSettingDTO().setCode(noticeSendDTO.getCode()));
         if (ObjectUtils.isEmpty(sendSettingDTO)) {
-            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting code does not exist.[INFO:send_setting_code:'{}']", dto.getCode());
+            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting code does not exist.[INFO:send_setting_code:'{}']", noticeSendDTO.getCode());
             return;
         }
         // 0.2 校验SendSetting启用状态 / 发送方式启用状态 : 如停用 或 发送方式皆不启用 则 取消发送
         if (!sendSettingDTO.getEnabled() ||
                 !(sendSettingDTO.getEmailEnabledFlag() || sendSettingDTO.getPmEnabledFlag() ||
                         sendSettingDTO.getSmsEnabledFlag() || sendSettingDTO.getWebhookEnabledFlag())) {
-            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting has been disabled OR all sending types for this send setting have been disabled.[INFO:send_setting_code:'{}']", dto.getCode());
+            LOGGER.warn(">>>CANCEL_SENDING>>> The send setting has been disabled OR all sending types for this send setting have been disabled.[INFO:send_setting_code:'{}']", noticeSendDTO.getCode());
             return;
         }
         // 0.3 校验发送对象不为空 : 如发送对象为空，则取消此次发送
-        if (ObjectUtils.isEmpty(dto.getTargetUsers())) {
+        if (ObjectUtils.isEmpty(noticeSendDTO.getTargetUsers())) {
             LOGGER.warn(">>>CANCEL_SENDING>>> No sending receiver is specified");
             return;
         }
         // 1.获取发送对象
-        Set<UserDTO> users = getNeedSendUsers(dto);
+        Set<UserDTO> users = getNeedSendUsers(noticeSendDTO);
         // 2.获取是否启用自定义发送类型
-        boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(dto.getCustomizedSendingTypes());
+        boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         // 3.1.发送邮件
-        if (((customizedSendingTypesFlag && dto.isSendingEmail()) || !customizedSendingTypesFlag) && sendSettingDTO.getEmailEnabledFlag()) {
-            trySendEmail(dto, sendSettingDTO, users);
+        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag) && sendSettingDTO.getEmailEnabledFlag()) {
+            trySendEmail(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.2.发送站内信
-        if (((customizedSendingTypesFlag && dto.isSendingSiteMessage()) || !customizedSendingTypesFlag) && sendSettingDTO.getPmEnabledFlag()) {
-            trySendSiteMessage(dto, sendSettingDTO, users);
+        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage()) || !customizedSendingTypesFlag) && sendSettingDTO.getPmEnabledFlag()) {
+            trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.3.发送WebHook
-        if (((customizedSendingTypesFlag && dto.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
-            webHookService.trySendWebHook(dto, sendSettingDTO);
+        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
+            webHookService.trySendWebHook(noticeSendDTO, sendSettingDTO);
         }
 
     }
 
 
-    private void trySendEmail(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users) {
-        // 捕获异常,防止邮件发送失败，影响站内信发送
+    /**
+     * 发送邮件
+     * 需要捕获异常并LOG
+     *
+     * @param noticeSendDTO  发送信息
+     * @param sendSettingDTO 发送设置信息
+     * @param users          用户
+     */
+    private void trySendEmail(NoticeSendDTO noticeSendDTO, SendSettingDTO sendSettingDTO, final Set<UserDTO> users) {
         try {
-            // 得到需要发送邮件的用户
-            Set<UserDTO> needSendEmailUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, SendingTypeEnum.EMAIL);
-            emailSendService.sendEmail(dto.getCode(), dto.getParams(), needSendEmailUsers, sendSetting);
+            //1.获取邮件接收用户
+            Set<UserDTO> mailRecipient = getNeedReceiveNoticeTargetUsers(noticeSendDTO, sendSettingDTO, users, SendingTypeEnum.EMAIL);
+            emailSendService.sendEmail(noticeSendDTO.getCode(), noticeSendDTO.getParams(), mailRecipient, sendSettingDTO);
         } catch (CommonException e) {
             LOGGER.error("send email failed!", e);
         }
@@ -197,12 +204,14 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 则得到没有禁用接收通知的用户
      * 否则得到全部用户
      */
-    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO dto, final SendSettingDTO sendSetting, final Set<UserDTO> users, final SendingTypeEnum type) {
-        if (!sendSetting.getAllowConfig()) {
+    private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO noticeSendDTO, final SendSettingDTO sendSettingDTO, final Set<UserDTO> users, final SendingTypeEnum type) {
+        //1.获取
+        if (!sendSettingDTO.getAllowConfig()) {
             return users;
         }
         return users.stream().filter(user -> {
-            ReceiveSettingDTO setting = new ReceiveSettingDTO(sendSetting.getId(), type.getValue(), dto.getSourceId(), sendSetting.getLevel(), user.getId());
+            new ReceiveSettingDTO().setUserId(user.getId());
+            ReceiveSettingDTO setting = new ReceiveSettingDTO(sendSettingDTO.getId(), type.getValue(), noticeSendDTO.getSourceId(), sendSettingDTO.getLevel(), user.getId());
             return receiveSettingMapper.selectCount(setting) == 0;
         }).collect(Collectors.toSet());
     }

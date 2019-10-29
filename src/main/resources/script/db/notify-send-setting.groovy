@@ -101,20 +101,13 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
                     "SMS_ENABLED_FLAG =CASE WHEN SMS_TEMPLATE_ID IS NULL THEN 0 ELSE 1 END,\n" +
                     "WEBHOOK_ENABLED_FLAG =CASE WHEN WH_TEMPLATE_ID IS NULL OR  WH_ENABLED_FLAG =0 THEN 0 ELSE 1 END"
         }
-
-        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
-            "DELETE FROM notify_template WHERE ID NOT IN (\n" +
-                    "SELECT EMAIL_TEMPLATE_ID AS id FROM notify_send_setting WHERE EMAIL_TEMPLATE_ID IS NOT NULL UNION \n" +
-                    "SELECT PM_TEMPLATE_ID AS id FROM notify_send_setting WHERE PM_TEMPLATE_ID IS NOT NULL UNION \n" +
-                    "SELECT SMS_TEMPLATE_ID AS id FROM notify_send_setting WHERE SMS_TEMPLATE_ID IS NOT NULL UNION \n" +
-                    "SELECT WH_TEMPLATE_ID AS id FROM notify_send_setting WHERE WH_TEMPLATE_ID IS NOT NULL AND WH_ENABLED_FLAG=1)"
-        }
+        /*以下列需要提供template做数据迁移，所以在template.groovy中做删除
 
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TYPE')
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'EMAIL_TEMPLATE_ID')
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'SMS_TEMPLATE_ID')
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TEMPLATE_ID')
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_TEMPLATE_ID')
-        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')*/
     }
 }

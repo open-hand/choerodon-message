@@ -83,6 +83,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
                     "CONTENT=CASE WHEN MESSAGE_TYPE='pm' THEN PM_CONTENT WHEN MESSAGE_TYPE='email' THEN EMAIL_CONTENT WHEN MESSAGE_TYPE='sms' THEN SMS_CONTENT WHEN MESSAGE_TYPE='webhook' THEN WH_CONTENT END;"
         }
         dropUniqueConstraint(constraintName: 'UK_NOTIFY_TEMPLATE_U1', tableName: 'NOTIFY_TEMPLATE')
+
         dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE')
         dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'NAME')
         dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'MESSAGE_TYPE')
@@ -94,6 +95,24 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'SMS_CONTENT')
         dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'WH_CONTENT')
 
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "DELETE FROM notify_template WHERE ID NOT IN (\n" +
+                    "SELECT EMAIL_TEMPLATE_ID AS id FROM notify_send_setting WHERE EMAIL_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT PM_TEMPLATE_ID AS id FROM notify_send_setting WHERE PM_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT SMS_TEMPLATE_ID AS id FROM notify_send_setting WHERE SMS_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT WH_TEMPLATE_ID AS id FROM notify_send_setting WHERE WH_TEMPLATE_ID IS NOT NULL AND WH_ENABLED_FLAG=1)"
+        }
+
         addUniqueConstraint(tableName: 'NOTIFY_TEMPLATE', columnNames: 'SENDING_TYPE,SEND_SETTING_CODE', constraintName: "UK_NOTIFY_TEMPLATE_U1")
+    }
+
+    changeSet(id: '2019-10-22-notify_send_setting-drop-column', author: 'longhe1996@icloud.com') {
+        //以下列属send_setting,但需要供template做数据修复，故保存在此
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TYPE')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'EMAIL_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'SMS_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')
     }
 }

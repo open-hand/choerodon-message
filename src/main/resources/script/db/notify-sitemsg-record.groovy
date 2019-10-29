@@ -38,7 +38,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
     }
     changeSet(author: 'youquan.deng@hand-china.com', id: '2018-10-25-add-column') {
         addColumn(tableName: "NOTIFY_SITEMSG_RECORD") {
-            column(name: 'TY            column(name: \'TYPE\', type: \'VARCHAR(16)\', defaultValue: "msg", remarks: \'站内信消息类型（消息：msg，通知：notice）\', afterColumn: \'CONTENT\')PE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'CONTENT')
+            column(name: 'TYPE', type: 'VARCHAR(16)', defaultValue: "msg", remarks: '站内信消息类型（消息：msg，通知：notice）', afterColumn: 'CONTENT')
             column(name: 'SEND_BY', type: 'BIGINT UNSIGNED', remarks: '触发此站内信的用户id', afterColumn: 'IS_DELETED')
         }
     }
