@@ -1,9 +1,21 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.choerodon.asgard.schedule.annotation.JobParam;
+import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.oauth.DetailsHelper;
+import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.infra.feign.AsgardFeignClient;
+import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,7 +37,7 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 @Service
 public class NoticesSendServiceImpl implements NoticesSendService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendServiceImpl.class);
-
+    private static final String SITE_SCHEDULE_NOTYFICATION_CODE = "scheduleNotice";
     private EmailSendService emailSendService;
 
     private WebSocketSendService webSocketSendService;
@@ -33,7 +45,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private ReceiveSettingMapper receiveSettingMapper;
     private SendSettingMapper sendSettingMapper;
     private UserFeignClient userFeignClient;
-
+    private AsgardFeignClient asgardFeignClient;
     private SmsService smsService;
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
@@ -41,6 +53,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                                   WebHookService webHookService, ReceiveSettingMapper receiveSettingMapper,
                                   SendSettingMapper sendSettingMapper,
                                   UserFeignClient userFeignClient,
+                                  AsgardFeignClient asgardFeignClient,
                                   SmsService smsService) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
@@ -49,6 +62,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         this.sendSettingMapper = sendSettingMapper;
         this.userFeignClient = userFeignClient;
         this.smsService = smsService;
+        this.asgardFeignClient = asgardFeignClient;
     }
 
     //单元测试
@@ -111,7 +125,44 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
     }
 
+    @Override
+    public Long sendScheduleNotice(NoticeSendDTO dto, Date date) {
+        Long methodId = asgardFeignClient.getMethodIdByCode(SITE_SCHEDULE_NOTYFICATION_CODE).getBody();
+        Long[] assignUserIds = new Long[1];
+        assignUserIds[0] = DetailsHelper.getUserDetails().getUserId();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonStr = new String();
+        try {
+            jsonStr = objectMapper.writeValueAsString(dto);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("json translation failed!", e);
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("noticeSendDTO", jsonStr);
+        ScheduleTaskDTO createTskDTO = new ScheduleTaskDTO(
+                methodId, params, "通知消息","消息信息", date, assignUserIds);
+        return asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
+    }
 
+    /**
+     * 通知消息 JobTask
+     *
+     * @param map 参数map
+     */
+    @JobTask(maxRetryCount = 0, code = "scheduleNotice", params = {
+            @JobParam(name = "noticeSendDTO", description = "参数")
+    }, description = "发送通知消息")
+    public void scheduleNotice(Map<String, Object> map) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        NoticeSendDTO dto = null;
+        try {
+            dto = objectMapper.readValue((Optional.ofNullable((String) map.get("noticeSendDTO"))).orElseThrow(() -> new CommonException("error.systemNotification.id.empty")), NoticeSendDTO.class);
+        } catch (IOException e) {
+            LOGGER.error("send email failed!", e);
+        }
+        sendNotice(dto);
+    }
 
     private void trySendEmail(NoticeSendDTO dto, SendSetting sendSetting, final Set<UserDTO> users, final boolean haveEmailTemplate) {
         // 捕获异常,防止邮件发送失败，影响站内信发送
