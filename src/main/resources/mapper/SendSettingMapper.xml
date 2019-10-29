@@ -147,4 +147,8 @@
             )
         </if>
     </select>
+
+    <select id="selectCategoryCodes" resultType="io.choerodon.notify.infra.dto.SendSettingDTO">
+        SELECT category_code FROM notify_send_setting;
+    </select>
 </mapper>

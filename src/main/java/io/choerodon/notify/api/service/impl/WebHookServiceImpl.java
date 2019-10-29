@@ -1,8 +1,11 @@
 package io.choerodon.notify.api.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.exception.WebHookException;
 import io.choerodon.notify.api.service.TemplateService;
 import io.choerodon.notify.api.service.WebHookService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -13,10 +16,13 @@ import io.choerodon.notify.infra.enums.WebHookTypeEnum;
 import io.choerodon.notify.infra.mapper.WebHookMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -123,5 +129,100 @@ public class WebHookServiceImpl implements WebHookService {
         WebHookDTO example = new WebHookDTO();
         example.setProjectId(projectId);
         return webHookMapper.select(example);
+    }
+
+    @Override
+    public PageInfo<WebHookDTO> pagingWebHook(Pageable pageable, Long projectId, String name, String type, Boolean enableFlag, String params) {
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize()).doSelectPageInfo(() -> webHookMapper.selectWebHookAll(projectId, name, type, enableFlag, params));
+    }
+
+    @Override
+    public void check(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new WebHookException("error the name is not be null");
+        }
+        WebHookDTO webHookDTO = new WebHookDTO();
+        webHookDTO.setName(name);
+        if (!org.apache.commons.collections.CollectionUtils.isEmpty(webHookMapper.select(webHookDTO))) {
+            throw new WebHookException("The name is already exited");
+        }
+    }
+
+    @Override
+    public WebHookDTO createWebHook(Long projectId, WebHookDTO webHookDTO) {
+        if (projectId == null) {
+            throw new CommonException("error the projectId is not be null");
+        }
+        validateSaveOrUpdate(webHookDTO);
+        webHookDTO.setProjectId(projectId);
+        webHookMapper.insertSelective(webHookDTO);
+        return webHookDTO;
+    }
+
+    //@Transactional(rollbackFor = CommonException.class)
+    @Override
+    public WebHookDTO updateWebHook(Long projectId, WebHookDTO webHookDTO) {
+        validateProjectId(projectId);
+        validateSaveOrUpdate(webHookDTO);
+        WebHookDTO webHookDTO1 = webHookNotExisted(webHookDTO.getId());
+        webHookMapper.updateByPrimaryKeySelective(webHookDTO);
+        return webHookDTO1;
+    }
+
+    private void validateProjectId(Long projectId) {
+        WebHookDTO webHookDTO = new WebHookDTO();
+        webHookDTO.setProjectId(projectId);
+        List<WebHookDTO> hookDTOS = webHookMapper.select(webHookDTO);
+        if (CollectionUtils.isEmpty(hookDTOS)) {
+            throw new CommonException("error the projectId is null!");
+        }
+    }
+
+    @Override
+    public WebHookDTO deleteWebHook(Long id) {
+        WebHookDTO webHookDTO = webHookNotExisted(id);
+        webHookMapper.delete(webHookDTO);
+        return webHookDTO;
+    }
+
+    private WebHookDTO webHookNotExisted(Long id) {
+        WebHookDTO webHookDTO = new WebHookDTO();
+        webHookDTO.setId(id);
+        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
+        if (ObjectUtils.isEmpty(webHookDTO1)) {
+            throw new WebHookException("error the webhook entity is null!");
+        }
+        return webHookDTO1;
+    }
+
+    @Override
+    public WebHookDTO disableWebHook(Long id) {
+        return updateStatus(id, false);
+    }
+
+    @Override
+    public WebHookDTO enableWebHook(Long id) {
+        return updateStatus(id, true);
+    }
+
+    private WebHookDTO updateStatus(Long id, boolean able) {
+        WebHookDTO webHookDTO = webHookNotExisted(id);
+        webHookDTO.setEnableFlag(able);
+        if (webHookMapper.updateByPrimaryKeySelective(webHookDTO) != 1) {
+            throw new WebHookException("error.webhook.update.status");
+        }
+        return webHookDTO;
+    }
+
+    private void validateSaveOrUpdate(WebHookDTO webHookDTO) {
+        if (ObjectUtils.isEmpty(webHookDTO.getName())) {
+            throw new WebHookException("error the name is not be null!");
+        }
+        if (ObjectUtils.isEmpty(webHookDTO.getType())) {
+            throw new WebHookException("error the type is not be null!");
+        }
+        if (ObjectUtils.isEmpty(webHookDTO.getWebhookPath())) {
+            throw new WebHookException("error the webhookPath is not be null!");
+        }
     }
 }

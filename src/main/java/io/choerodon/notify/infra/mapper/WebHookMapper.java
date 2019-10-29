@@ -4,6 +4,7 @@ import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Set;
 
 public interface WebHookMapper extends Mapper<WebHookDTO> {
@@ -16,4 +17,10 @@ public interface WebHookMapper extends Mapper<WebHookDTO> {
      */
     Set<WebHookDTO> selectBySendSetting(@Param("project_id") Long projectId,
                                         @Param("send_setting_id") Long sendSettingId);
+
+    List<WebHookDTO> selectWebHookAll(@Param("projectId") Long projectId,
+                                      @Param("name") String name,
+                                      @Param("type") String type,
+                                      @Param("enableFlag") Boolean enableFlag,
+                                      @Param("params") String params);
 }

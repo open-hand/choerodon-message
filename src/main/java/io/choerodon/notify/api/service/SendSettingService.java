@@ -41,7 +41,7 @@ public interface SendSettingService {
      * @param enabled
      * @param allowConfig
      * @param params
-     * @param pageable 分页信息
+     * @param pageable    分页信息
      * @return 分页结果
      */
     PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable);
@@ -118,5 +118,10 @@ public interface SendSettingService {
      * @return 更新结果
      */
     PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
+
+    /**
+     * 查询项目层下的所有的CategoryCode
+     */
+    List<SendSettingDTO> getCategoryCodes();
 
 }

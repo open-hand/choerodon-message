@@ -1,5 +1,7 @@
 package io.choerodon.notify.infra.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 
 /**
@@ -13,12 +15,23 @@ public class WebHookDTO {
     public static final String WEB_HOOK_TYPE_JSON = "Json";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty("主键ID")
     private Long id;
+
+    @ApiModelProperty("webhook名称")
     private String name;
+
+    @ApiModelProperty("webhook类型/必填字段")
     private String type;
+
+    @ApiModelProperty("webhook地址/必填字段")
     private String webhookPath;
+
+    @ApiModelProperty("项目ID/必填字段")
     private Long projectId;
+
+    @ApiModelProperty("webhook是否启用")
     private Boolean enableFlag;
 
     public Long getId() {

@@ -11,4 +11,34 @@
         wms.SEND_SETTING_ID = #{send_setting_id}
         AND wh.PROJECT_ID =#{project_id}
     </select>
+
+    <select id="selectWebHookAll" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
+        SELECT
+        id,
+        name,
+        type,
+        webhook_path,
+        project_id,
+        enable_flag,
+        object_version_number
+        FROM
+        notify_webhook
+        where project_id=#{projectId}
+        <if test="name !=null">
+            AND name=#{name}
+        </if>
+        <if test="type !=null">
+            AND type=#{type}
+        </if>
+        <if test="enableFlag !=null">
+            AND enable_flag=#{enableFlag}
+        </if>
+        <if test="params !=null">
+            AND (
+            name LIKE concat(concat('%',#{params}),'%') OR
+            type LIKE concat(concat('%',#{params}),'%') OR
+            enable_flag LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+    </select>
 </mapper>

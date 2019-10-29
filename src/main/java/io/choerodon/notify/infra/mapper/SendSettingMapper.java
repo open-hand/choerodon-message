@@ -39,4 +39,5 @@ public interface SendSettingMapper extends Mapper<SendSettingDTO> {
     List<SendSettingDetailDTO> queryByLevelAndAllowConfig(@Param("level") String level,
                                                           @Param("allowConfig") boolean allowConfig);
 
+    List<SendSettingDTO> selectCategoryCodes();
 }
