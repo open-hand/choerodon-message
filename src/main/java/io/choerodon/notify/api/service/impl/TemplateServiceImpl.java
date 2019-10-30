@@ -160,11 +160,20 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public Template getOne(Template template) {
+        //1.获取模版
         Template result = Optional.ofNullable(templateMapper.selectOne(template))
                 .orElseThrow(() -> new NotExistedException("error.template.does.not.exist"));
+        //2.校验模版内容不能为空
         if (ObjectUtils.isEmpty(result.getContent())) {
             throw new CommonException("error.template.content.empty");
         }
+        //3.校验 邮件/站内信 模版标题不能为空
+        if ((SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(result.getSendingType())
+                || SendingTypeEnum.PM.getValue().equalsIgnoreCase(result.getSendingType()))
+                && ObjectUtils.isEmpty(result.getTitle())) {
+            throw new CommonException("error.template.title.empty");
+        }
+        //4.返回结果
         return result;
     }
 

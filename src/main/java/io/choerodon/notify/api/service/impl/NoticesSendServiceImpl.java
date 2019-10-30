@@ -118,23 +118,35 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         try {
             //1.获取邮件接收用户
             Set<UserDTO> mailRecipient = getNeedReceiveNoticeTargetUsers(noticeSendDTO, sendSettingDTO, users, SendingTypeEnum.EMAIL);
-            emailSendService.sendEmail(noticeSendDTO.getCode(), noticeSendDTO.getParams(), mailRecipient, sendSettingDTO);
+            //2.发送邮件
+            emailSendService.sendEmail(noticeSendDTO.getParams(), mailRecipient, sendSettingDTO);
         } catch (CommonException e) {
-            LOGGER.error("send email failed!", e);
+            LOGGER.warn(">>>SENDING_EMAIL_ERROR>>> An error occurred while sending the message.", e);
         }
     }
 
-    private void trySendSiteMessage(NoticeSendDTO dto, SendSettingDTO sendSetting, final Set<UserDTO> users) {
+    /**
+     * 发送站内信
+     * 需要捕获异常并LOG
+     *
+     * @param noticeSendDTO  发送信息
+     * @param sendSettingDTO 发送设置信息
+     * @param users          用户
+     */
+    private void trySendSiteMessage(NoticeSendDTO noticeSendDTO, SendSettingDTO sendSettingDTO, final Set<UserDTO> users) {
         try {
-            //得到需要发送站内信的用户
-            Set<UserDTO> needSendPmUsers = getNeedReceiveNoticeTargetUsers(dto, sendSetting, users, SendingTypeEnum.PM);
-            Map<String, Long> sender = new HashMap<>(5);
-            String senderType = getSenderDetail(dto, sender, sendSetting);
-            webSocketSendService.sendSiteMessage(dto.getCode(), dto.getParams(), needSendPmUsers,
-                    sender.get(senderType), senderType, sendSetting);
+            //1.获取站内信接收用户
+            Set<UserDTO> needSendPmUsers = getNeedReceiveNoticeTargetUsers(noticeSendDTO, sendSettingDTO, users, SendingTypeEnum.PM);
 
+            //2.获取发送方信息
+            Map<String, Long> sender = new HashMap<>(5);
+            String senderType = getSenderDetail(noticeSendDTO, sender, sendSettingDTO);
+
+            //3.发送站内信
+            webSocketSendService.sendSiteMessage(noticeSendDTO.getCode(), noticeSendDTO.getParams(), needSendPmUsers,
+                    sender.get(senderType), senderType, sendSettingDTO);
         } catch (CommonException e) {
-            LOGGER.error("send station letter failed!", e);
+            LOGGER.warn(">>>SENDING_SITE_MESSAGE_ERROR>>> An error occurred while sending the message.", e);
         }
     }
 
@@ -205,10 +217,11 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * 否则得到全部用户
      */
     private Set<UserDTO> getNeedReceiveNoticeTargetUsers(final NoticeSendDTO noticeSendDTO, final SendSettingDTO sendSettingDTO, final Set<UserDTO> users, final SendingTypeEnum type) {
-        //1.获取
+        //1.是否允许用户配置拒绝接收
         if (!sendSettingDTO.getAllowConfig()) {
             return users;
         }
+        //2.过滤去除拒绝接收的用户
         return users.stream().filter(user -> {
             new ReceiveSettingDTO().setUserId(user.getId());
             ReceiveSettingDTO setting = new ReceiveSettingDTO(sendSettingDTO.getId(), type.getValue(), noticeSendDTO.getSourceId(), sendSettingDTO.getLevel(), user.getId());

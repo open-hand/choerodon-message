@@ -44,8 +44,9 @@ public class MailingRecordDTO extends BaseDTO {
         return receiveAccount;
     }
 
-    public void setReceiveAccount(String receiveAccount) {
+    public MailingRecordDTO setReceiveAccount(String receiveAccount) {
         this.receiveAccount = receiveAccount;
+        return this;
     }
 
     public String getFailedReason() {
@@ -60,8 +61,9 @@ public class MailingRecordDTO extends BaseDTO {
         return retryCount;
     }
 
-    public void setRetryCount(Integer retryCount) {
+    public MailingRecordDTO setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+        return this;
     }
 
     public String getVariables() {
@@ -76,15 +78,17 @@ public class MailingRecordDTO extends BaseDTO {
         return templateId;
     }
 
-    public void setTemplateId(Long templateId) {
+    public MailingRecordDTO setTemplateId(Long templateId) {
         this.templateId = templateId;
+        return this;
     }
 
     public String getSendSettingCode() {
         return sendSettingCode;
     }
 
-    public void setSendSettingCode(String sendSettingCode) {
+    public MailingRecordDTO setSendSettingCode(String sendSettingCode) {
         this.sendSettingCode = sendSettingCode;
+        return this;
     }
 }

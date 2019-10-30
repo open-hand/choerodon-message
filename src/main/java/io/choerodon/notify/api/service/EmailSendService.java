@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface EmailSendService {
 
-    void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSetting);
+    void sendEmail(Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSetting);
 
     void sendRecord(Record record, boolean isManualRetry);
 

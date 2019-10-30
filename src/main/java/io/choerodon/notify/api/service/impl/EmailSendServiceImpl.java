@@ -12,14 +12,15 @@ import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.NoticesSendService;
+import io.choerodon.notify.api.service.TemplateService;
 import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.dto.Config;
+import io.choerodon.notify.infra.dto.MailingRecordDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.MailingRecordMapper;
-import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,6 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -50,7 +50,7 @@ public class EmailSendServiceImpl implements EmailSendService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoticesSendService.class);
 
-    private final TemplateMapper templateMapper;
+    private final TemplateService templateService;
 
     private final ConfigCache configCache;
 
@@ -67,13 +67,13 @@ public class EmailSendServiceImpl implements EmailSendService {
     private final Executor executor;
 
 
-    public EmailSendServiceImpl(TemplateMapper templateMapper,
+    public EmailSendServiceImpl(TemplateService templateService,
                                 ConfigCache configCache,
                                 MailingRecordMapper mailingRecordMapper,
                                 EmailQueueObservable emailQueueObservable,
                                 TemplateRender templateRender,
                                 @Qualifier("asyncSendNoticeExecutor") Executor executor) {
-        this.templateMapper = templateMapper;
+        this.templateService = templateService;
         this.configCache = configCache;
         this.mailingRecordMapper = mailingRecordMapper;
         this.emailQueueObservable = emailQueueObservable;
@@ -83,38 +83,42 @@ public class EmailSendServiceImpl implements EmailSendService {
 
 
     @Override
-    public void sendEmail(String code, Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSetting) {
-        LOGGER.trace("SendEmail code:{} to users: {}", code, targetUsers);
-        Template template = templateMapper.selectOne(new Template().setSendingType(SendingTypeEnum.EMAIL.getValue()).setSendSettingCode(sendSetting.getCode()));
-        validatorEmailTemplate(template);
+    public void sendEmail(Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSettingDTO) {
+        LOGGER.warn(">>>START_SENDING_EMAIL>>> Send a message to the user.[INFO:send_setting_code:'{}' - users:{} ]", sendSettingDTO.getCode(), targetUsers);
+
+        //1. 获取该发送设置的邮件模版
+        Template tmp = null;
+        try {
+            tmp = templateService.getOne(new Template()
+                    .setSendingType(SendingTypeEnum.EMAIL.getValue())
+                    .setSendSettingCode(sendSettingDTO.getCode()));
+        } catch (Exception e) {
+            LOGGER.warn(">>>CANCEL_SENDING_EMAIL>>> No valid templates available.");
+            return;
+        }
+        Template template = tmp;
+        //2.逐个发送邮件
         targetUsers.forEach(user -> {
-            Record record = new Record();
-            record.setStatus(null);
-            record.setRetryCount(0);
-            record.setReceiveAccount(user.getEmail());
-            record.setSendSettingCode(sendSetting.getCode());
-            record.setTemplateId(template.getId());
+            Record mailingRecordDTO = (Record) new MailingRecordDTO()
+                    .setRetryCount(0)
+                    .setReceiveAccount(user.getEmail())
+                    .setSendSettingCode(sendSettingDTO.getCode())
+                    .setTemplateId(template.getId());
+            //2.1.整理参数
             Map<String, Object> newParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
-            record.setVariables(ConvertUtils.convertMapToJson(objectMapper, newParams));
-            record.setSendData(new RecordSendData(template, newParams, createEmailSender(), sendSetting.getRetryCount()));
-            if (mailingRecordMapper.insert(record) != 1) {
+            mailingRecordDTO.setVariables(ConvertUtils.convertMapToJson(objectMapper, newParams));
+            //2.2.记录邮件发送信息
+            if (mailingRecordMapper.insert(mailingRecordDTO) != 1) {
                 throw new CommonException("error.noticeSend.recordInsert");
             }
-            if (sendSetting.getIsSendInstantly()) {
-                sendRecord(record, false);
+            //2.3.发送邮件
+            mailingRecordDTO.setSendData(new RecordSendData(template, newParams, createEmailSender(), sendSettingDTO.getRetryCount()));
+            if (sendSettingDTO.getIsSendInstantly()) {
+                sendRecord(mailingRecordDTO, false);
             } else {
-                emailQueueObservable.emit(record);
+                emailQueueObservable.emit(mailingRecordDTO);
             }
         });
-    }
-
-    private void validatorEmailTemplate(Template template) {
-        if (template == null) {
-            throw new CommonException("error.emailTemplate.notExist");
-        }
-        if (StringUtils.isEmpty(template.getContent()) || StringUtils.isEmpty(template.getTitle())) {
-            throw new CommonException("error.emailTemplate.notValid");
-        }
     }
 
     @Override

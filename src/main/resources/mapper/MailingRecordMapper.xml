@@ -42,7 +42,7 @@
     </select>
 
     <update id="updateRecordStatusAndIncreaseCount">
-        UPDATE notify_record
+        UPDATE notify_mailing_record
         SET object_version_number = object_version_number + 1,
         status = #{status}, failed_reason = #{reason}
         <if test="increase">

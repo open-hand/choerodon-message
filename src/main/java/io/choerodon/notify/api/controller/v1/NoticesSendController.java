@@ -35,11 +35,9 @@ public class NoticesSendController {
     /**
      * NoticeSendDTO中目前未传输loginName 和 realName，所以发送通知前需要发起feign调用
      * 可以在NoticeSendDTO加入这些字段，则可以发送部分站内信时不需要feign调用
-     *
-     * @param dto
      */
     @PostMapping
-    @ApiOperation(value = "发送邮件，站内信，短信")
+    @ApiOperation(value = "发送消息")
     @Permission(type = ResourceType.SITE)
     public void postNotice(@RequestBody NoticeSendDTO dto) {
         if (StringUtils.isEmpty(dto.getCode())) {
