@@ -7,8 +7,6 @@ import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Set;
-
 
 public interface WebHookService {
     /**
@@ -21,57 +19,72 @@ public interface WebHookService {
 
 
     /**
-     * 分页查询webhook信息
-     * @param pageable 分页信息
+     * 分页查询WebHook信息
+     *
+     * @param pageable  分页信息
      * @param projectId 项目ID
-     * @param name webhook名称
-     * @param type 类别
-     * @param enableFlag 是否启用
-     * @param params 模糊匹配字段
+     * @param filterDTO 过滤字段
+     * @param params    模糊匹配字段
      * @return
      */
-    PageInfo<WebHookDTO> pagingWebHook(Pageable pageable, Long projectId, String name, String type, Boolean enableFlag, String params);
+    PageInfo<WebHookDTO> pagingWebHook(Pageable pageable, Long projectId, WebHookDTO filterDTO, String params);
 
     /**
-     * 根据webhook名称检测该webhook是由已经存在
-     * @param name webhook名称
+     * WebHook名称校验重复
+     *
+     * @param id
+     * @param path
      */
-    void check(String name);
+    Boolean checkPath(Long id,
+                      String path);
 
     /**
-     * 添加webhook
+     * 查询WebHook详情
+     *
      * @param projectId 项目ID
-     * @param webHookVO
      * @return
      */
-    WebHookDTO createWebHook(Long projectId, WebHookVO webHookVO);
+    WebHookVO getById(Long projectId, Long webHookId);
 
     /**
-     * 跟新webhook
+     * 添加WebHook
+     *
      * @param projectId 项目ID
-     * @param webHookDTO
+     * @param createVO  webHook创建信息
      * @return
      */
-    WebHookDTO updateWebHook(Long projectId, WebHookDTO webHookDTO);
+    WebHookVO create(Long projectId, WebHookVO createVO);
 
     /**
-     * 删除webhook
-     * @param id webhook唯一标识ID
+     * 更新WebHook
+     *
+     * @param projectId 项目ID
+     * @param updateVO  webHook更新信息
      * @return
      */
-    WebHookDTO deleteWebHook(Long id);
+    WebHookVO update(Long projectId, WebHookVO updateVO);
 
     /**
-     * 停用webhook
-     * @param id webhook唯一标识ID
+     * 删除WebHook
+     *
+     * @param id WebHook主键
      * @return
      */
-    WebHookDTO disableWebHook(Long id);
+    void delete(Long id);
 
     /**
-     * 启用webhook
-     * @param id webhook唯一标识ID
+     * 停用WebHook
+     *
+     * @param id WebHook主键
      * @return
      */
-    WebHookDTO enableWebHook(Long id);
+    WebHookDTO disabled(Long id);
+
+    /**
+     * 启用WebHook
+     *
+     * @param id WebHook主键
+     * @return
+     */
+    WebHookDTO enabled(Long id);
 }

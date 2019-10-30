@@ -45,4 +45,9 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_webhook.groovy') {
         dropColumn(tableName: 'NOTIFY_WEBHOOK', columnName: 'WEBHOOK_TYPE')
         addUniqueConstraint(tableName: 'NOTIFY_WEBHOOK', columnNames: 'PROJECT_ID,WEBHOOK_PATH', constraintName: "UK_NOTIFY_WEBHOOK_U1")
     }
+
+    changeSet(id: '2019-10-22-notify_webhook-add-default-value', author: 'longhe1996@icloud.com') {
+        addDefaultValue(tableName: 'NOTIFY_WEBHOOK', columnName: 'ENABLE_FLAG', defaultValue: 1)
+
+    }
 }

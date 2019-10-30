@@ -12,37 +12,25 @@
         AND wh.PROJECT_ID =#{project_id}
     </select>
 
-    <select id="selectWebHookAll" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
+    <select id="doFTR" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
         SELECT
-        nw.id,
-        nw.name,
-        nw.type,
-        nw.webhook_path,
-        nw.project_id,
-        nw.enable_flag,
-        nw.object_version_number
+        *
         FROM
-        notify_webhook nw
-        LEFT JOIN notify_webhook_message_setting nwms
-        ON nw.ID=nwms.WEBHOOK_ID
-        LEFT JOIN notify_send_setting nss
-        ON nss.ID=nwms.SEND_SETTING_ID
-        LEFT JOIN notify_send_setting_category nsc
-        ON nsc.`CODE`=nss.CATEGORY_CODE
+        notify_webhook
         where project_id=#{projectId}
-        <if test="name !=null">
-            AND nw.name=#{name}
+        <if test="filterDTO.name !=null">
+            AND name LIKE concat(concat('%',#{filterDTO.name}),'%')
         </if>
-        <if test="type !=null">
-            AND nw.type=#{type}
+        <if test="filterDTO.type !=null">
+            AND type=#{filterDTO.type}
         </if>
-        <if test="enableFlag !=null">
-            AND nw.enable_flag=#{enableFlag}
+        <if test="filterDTO.enableFlag !=null">
+            AND enable_flag=#{filterDTO.enableFlag}
         </if>
         <if test="params !=null">
             AND (
-            nw.name LIKE concat(concat('%',#{params}),'%') OR
-            nw.type LIKE concat(concat('%',#{params}),'%')
+            name LIKE concat(concat('%',#{params}),'%') OR
+            webhook_path LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>

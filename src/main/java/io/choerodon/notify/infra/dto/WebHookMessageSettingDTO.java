@@ -37,15 +37,17 @@ public class WebHookMessageSettingDTO extends BaseDTO {
         return webhookId;
     }
 
-    public void setWebhookId(Long webhookId) {
+    public WebHookMessageSettingDTO setWebhookId(Long webhookId) {
         this.webhookId = webhookId;
+        return this;
     }
 
     public Long getSendSettingId() {
         return sendSettingId;
     }
 
-    public void setSendSettingId(Long sendSettingId) {
+    public WebHookMessageSettingDTO setSendSettingId(Long sendSettingId) {
         this.sendSettingId = sendSettingId;
+        return this;
     }
 }

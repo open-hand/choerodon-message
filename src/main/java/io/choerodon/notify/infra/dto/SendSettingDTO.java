@@ -136,8 +136,9 @@ public class SendSettingDTO extends BaseDTO {
         return level;
     }
 
-    public void setLevel(String level) {
+    public SendSettingDTO setLevel(String level) {
         this.level = level;
+        return this;
     }
 
     public Integer getRetryCount() {

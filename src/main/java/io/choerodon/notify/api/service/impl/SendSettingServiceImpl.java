@@ -2,13 +2,17 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.SendSettingCategoryDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.mapper.SendSettingCategoryMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
@@ -18,7 +22,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,11 +35,13 @@ public class SendSettingServiceImpl implements SendSettingService {
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
     public static final String SEND_SETTING_UPDATE_EXCEPTION = "error.send.setting.update";
     private SendSettingMapper sendSettingMapper;
+    private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, TemplateMapper templateMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper) {
         this.sendSettingMapper = sendSettingMapper;
+        this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
     }
 
@@ -335,8 +343,17 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public List<SendSettingDTO> selectSendSetting() {
-        return sendSettingMapper.querySendSetting();
+    public WebHookVO.SendSetting getUnderProject() {
+        WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
+        //1.获取发送设置可选集合
+        List<SendSettingDTO> sendSettingSelection = sendSettingMapper.select(new SendSettingDTO().setLevel(ResourceType.PROJECT.value()));
+        if (CollectionUtils.isEmpty(sendSettingSelection)) {
+            return sendSetting;
+        }
+        //2.获取发送设置类别集合
+        Set<SendSettingCategoryDTO> sendSettingCategorySelection = sendSettingCategoryMapper.selectByCodeSet(sendSettingSelection.stream().map(SendSettingDTO::getCategoryCode).collect(Collectors.toSet()));
+        //3.构造返回数据
+        return sendSetting.setSendSettingSelection(new HashSet<>(sendSettingSelection)).setSendSettingCategorySelection(new HashSet<>(sendSettingCategorySelection));
     }
 
 }

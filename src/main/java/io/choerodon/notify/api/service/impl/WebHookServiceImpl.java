@@ -3,10 +3,14 @@ package io.choerodon.notify.api.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.exception.ext.InsertException;
+import io.choerodon.core.exception.ext.NotExistedException;
+import io.choerodon.core.exception.ext.UpdateException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.exception.WebHookException;
+import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.service.TemplateService;
+import io.choerodon.notify.api.service.WebHookMessageSettingService;
 import io.choerodon.notify.api.service.WebHookService;
 import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -17,8 +21,10 @@ import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.enums.WebHookTypeEnum;
 import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
 import io.choerodon.notify.infra.mapper.WebHookMapper;
+import io.choerodon.web.util.PageableHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,19 +35,23 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WebHookServiceImpl implements WebHookService {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebHookServiceImpl.class);
     private WebHookMapper webHookMapper;
+    private WebHookMessageSettingService webHookMessageSettingService;
     private TemplateService templateService;
+    private SendSettingService sendSettingService;
     private TemplateRender templateRender;
     private MessegeSettingMapper messegeSettingMapper;
 
-
-    public WebHookServiceImpl(WebHookMapper webHookMapper, TemplateService templateService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper) {
+    public WebHookServiceImpl(WebHookMapper webHookMapper, WebHookMessageSettingService webHookMessageSettingService, TemplateService templateService, SendSettingService sendSettingService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper) {
         this.webHookMapper = webHookMapper;
+        this.webHookMessageSettingService = webHookMessageSettingService;
         this.templateService = templateService;
+        this.sendSettingService = sendSettingService;
         this.templateRender = templateRender;
         this.messegeSettingMapper = messegeSettingMapper;
     }
@@ -134,115 +144,119 @@ public class WebHookServiceImpl implements WebHookService {
     }
 
     @Override
-    public PageInfo<WebHookDTO> pagingWebHook(Pageable pageable, Long projectId, String name, String type, Boolean enableFlag, String params) {
-        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize()).doSelectPageInfo(() -> webHookMapper.selectWebHookAll(projectId, name, type, enableFlag, params));
+    public PageInfo<WebHookDTO> pagingWebHook(Pageable pageable, Long projectId, WebHookDTO filterDTO, String params) {
+        return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize(), PageableHelper.getSortSql(pageable.getSort()))
+                .doSelectPageInfo(() -> webHookMapper.doFTR(projectId, filterDTO, params));
     }
 
     @Override
-    public void check(String name) {
-        if (StringUtils.isEmpty(name)) {
-            throw new WebHookException("error the name is not be null");
+    public Boolean checkPath(Long id, String path) {
+        if (StringUtils.isEmpty(path)) {
+            throw new CommonException("error.web.hook.check.path.can.not.be.empty");
         }
-        WebHookDTO webHookDTO = new WebHookDTO();
-        webHookDTO.setName(name);
-        if (!CollectionUtils.isEmpty(webHookMapper.select(webHookDTO))) {
-            throw new WebHookException("The name is already exited");
-        }
+        WebHookDTO existDTO = webHookMapper.selectOne(new WebHookDTO().setWebhookPath(path));
+        return ObjectUtils.isEmpty(existDTO)
+                || (!ObjectUtils.isEmpty(existDTO) && existDTO.getId().equals(id));
+    }
+
+    @Override
+    public WebHookVO getById(Long projectId, Long id) {
+        //1.查询WebHookVO
+        WebHookDTO webHookDTO = checkExistedById(id);
+        WebHookVO webHookVO = new WebHookVO();
+        BeanUtils.copyProperties(webHookDTO, webHookVO);
+        //2.查询可选的发送设置
+        webHookVO.setTriggerEventSelection(sendSettingService.getUnderProject());
+        //3.查询已选的发送设置主键
+        List<WebHookMessageSettingDTO> byWebHookId = webHookMessageSettingService.getByWebHookId(id);
+        webHookVO.setSendSettingIdList(CollectionUtils.isEmpty(byWebHookId) ? null : byWebHookId.stream().map(WebHookMessageSettingDTO::getSendSettingId).collect(Collectors.toSet()));
+        return webHookVO;
     }
 
     @Override
     @Transactional
-    public WebHookDTO createWebHook(Long projectId, WebHookVO webHookVO) {
-        if (projectId == null) {
-            throw new CommonException("error.the.projectId.is.not.be.null");
+    public WebHookVO create(Long projectId, WebHookVO webHookVO) {
+        //0.校验web hook path
+        if (!checkPath(null, webHookVO.getWebhookPath())) {
+            throw new CommonException("error.web.hook.path.duplicate");
         }
-        WebHookDTO webHookDTO=new WebHookDTO();
-        webHookDTO.setId(webHookVO.getId());
-        webHookDTO.setName(webHookVO.getName());
-        webHookDTO.setType(webHookVO.getType());
-        webHookDTO.setWebhookPath(webHookVO.getWebhookPath());
-        webHookDTO.setProjectId(projectId);
-        List<WebHookDTO> webHookDTOS = webHookMapper.select(webHookDTO);
-        if (!CollectionUtils.isEmpty(webHookDTOS)){
-            throw new CommonException("error.the.webhook.is.aready.exited");
-        }//不为空
-        if (webHookMapper.insertSelective(webHookDTO) !=1){
-            throw new CommonException("error.insert.is.failed!");
+        //1.新增WebHook
+        if (webHookMapper.insertSelective(webHookVO) != 1) {
+            throw new InsertException("error.web.hook.insert");
         }
-        List<WebHookMessageSettingDTO> webHookMessageSettingDTOs=new ArrayList<>();
-        WebHookMessageSettingDTO webHookMessageSettingDTO=null;
-        Long[] ids = webHookVO.getIds();
-        for (int i = 0; i < ids.length; i++) {
-            webHookMessageSettingDTO=new WebHookMessageSettingDTO();
-            webHookMessageSettingDTO.setWebhookId(webHookDTO.getId());
-            webHookMessageSettingDTO.setSendSettingId(ids[i]);
-            webHookMessageSettingDTOs.add(webHookMessageSettingDTO);
+        //2.新增WebHook的发送设置配置
+        webHookMessageSettingService.update(webHookVO.getId(), webHookVO.getSendSettingIdList());
+        //3.返回数据
+        return getById(projectId, webHookVO.getId());
+    }
+
+    @Override
+    @Transactional
+    public WebHookVO update(Long projectId, WebHookVO webHookVO) {
+        //0.校验web hook path
+        if (!checkPath(webHookVO.getId(), webHookVO.getWebhookPath())) {
+            throw new CommonException("error.web.hook.path.duplicate");
         }
-        messegeSettingMapper.insertMessage(webHookMessageSettingDTOs);
+        //1.更新WebHook
+        WebHookDTO webHookDTO = checkExistedById(webHookVO.getId());
+        webHookDTO.setObjectVersionNumber(webHookVO.getObjectVersionNumber());
+        if (webHookMapper.updateByPrimaryKeySelective(webHookDTO
+                .setName(webHookVO.getName())
+                .setType(webHookVO.getType())
+                .setWebhookPath(webHookVO.getWebhookPath())) != 1) {
+            throw new UpdateException("error.web.hook.update");
+        }
+        //2.更新WebHook的发送设置配置
+        webHookMessageSettingService.update(webHookDTO.getId(), webHookVO.getSendSettingIdList());
+        //3.返回更新数据
+        return getById(projectId, webHookDTO.getId());
+    }
+
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        //1.如 WebHook 不存在，则取消删除
+        try {
+            checkExistedById(id);
+        } catch (NotExistedException e) {
+            return;
+        }
+        //2.删除 WebHook
+        if (webHookMapper.deleteByPrimaryKey(id) != 1) {
+            throw new CommonException("error.web.hook.delete");
+        }
+        //3.删除 WebHook Message
+        webHookMessageSettingService.deleteByWebHookId(id);
+    }
+
+    @Override
+    public WebHookDTO disabled(Long id) {
+        WebHookDTO webHookDTO = checkExistedById(id);
+        if (webHookDTO.getEnableFlag() && webHookMapper.updateByPrimaryKeySelective(webHookDTO.setEnableFlag(false)) != 1) {
+            throw new UpdateException("error.web.hook.disabled");
+        }
         return webHookDTO;
     }
 
-    @Transactional(rollbackFor = CommonException.class)
     @Override
-    public WebHookDTO updateWebHook(Long projectId, WebHookDTO webHookDTO) {
-        WebHookDTO webHookDTO1 = webHookNotExisted(webHookDTO.getId());
-        webHookMapper.updateByPrimaryKeySelective(webHookDTO);
-        return webHookDTO1;
-    }
-
-
-    @Override
-    public WebHookDTO deleteWebHook(Long id) {
-        WebHookDTO webHookDTO = webHookNotExisted(id);
-        webHookMapper.delete(webHookDTO);
+    public WebHookDTO enabled(Long id) {
+        WebHookDTO webHookDTO = checkExistedById(id);
+        if (!webHookDTO.getEnableFlag() && webHookMapper.updateByPrimaryKeySelective(webHookDTO.setEnableFlag(true)) != 1) {
+            throw new UpdateException("error.web.hook.enabled");
+        }
         return webHookDTO;
     }
 
-    private WebHookDTO webHookNotExisted(Long id) {
-        WebHookDTO webHookDTO = new WebHookDTO();
-        webHookDTO.setId(id);
-        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
-        if (ObjectUtils.isEmpty(webHookDTO1)) {
-            throw new CommonException("error the webhook entity is null!");
-        }
-        return webHookDTO1;
-    }
-
-    @Override
-    public WebHookDTO disableWebHook(Long id) {
-        WebHookDTO webHookDTO=new WebHookDTO();
-        webHookDTO.setId(id);
-        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
-        if (ObjectUtils.isEmpty(webHookDTO1)){
-            throw new CommonException("error.the.webhook.not.exited");
-        }
-        if (webHookDTO1.getEnableFlag()==true){
-            throw new CommonException("error.the.update.enableFlage.status");
-        }
-        return updateStatus(id, false);
-    }
-
-    @Override
-    public WebHookDTO enableWebHook(Long id) {
-        WebHookDTO webHookDTO=new WebHookDTO();
-        webHookDTO.setId(id);
-        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
-        if (ObjectUtils.isEmpty(webHookDTO1)){
-            throw new CommonException("error.the.webhook.not.exited");
-        }
-        if (webHookDTO1.getEnableFlag()==true){
-            throw new CommonException("error.the.update.enableFlage.status");
-        }
-        return updateStatus(id, true);
-    }
-
-    private WebHookDTO updateStatus(Long id, boolean able) {
-        WebHookDTO webHookDTO = webHookNotExisted(id);
-        webHookDTO.setEnableFlag(able);
-        if (webHookMapper.updateByPrimaryKeySelective(webHookDTO) != 1) {
-            throw new CommonException("error.the.webhook.is.not.existsted");
-        }
-        return webHookDTO;
+    /**
+     * 根据主键校验WebHook是否存在
+     *
+     * @param id WebHook主键
+     * @return WebHook
+     */
+    private WebHookDTO checkExistedById(Long id) {
+        return Optional.ofNullable(webHookMapper.selectByPrimaryKey(id))
+                .orElseThrow(() -> new NotExistedException("error.web.hook.does.not.existed"));
     }
 
 }

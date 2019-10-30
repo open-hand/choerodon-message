@@ -1,102 +1,66 @@
 package io.choerodon.notify.api.vo;
 
-import io.choerodon.mybatis.entity.BaseDTO;
+import io.choerodon.notify.infra.dto.SendSettingCategoryDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.WebHookDTO;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * @author bgzyy
  * @since 2019/9/11
  */
-@Table(name = "NOTIFY_WEBHOOK")
-public class WebHookVO extends BaseDTO {
+public class WebHookVO extends WebHookDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty("主键ID")
-    private Long id;
+    @ApiModelProperty("可选发送设置主键集合")
+    private SendSetting triggerEventSelection;
 
-    @ApiModelProperty("webhook名称")
-    @NotNull(message = "error.the.name.is.not.be.null")
-    private String name;
+    @NotEmpty(message = "error.web.hook.create.or.update.send.setting.ids.can.not.be.empty")
+    @ApiModelProperty("已选发送设置主键集合")
+    private Set<Long> sendSettingIdList;
 
-    @ApiModelProperty("webhook类型/必填字段")
-    @NotNull(message = "error.the.type.is.not.be.null")
-    private String type;
-
-    @ApiModelProperty("webhook地址/必填字段")
-    @NotNull(message = "error.the.webhookPath.is.not.be.null")
-    private String webhookPath;
-
-    @ApiModelProperty("项目ID/必填字段")
-    private Long projectId;
-
-    @ApiModelProperty("webhook是否启用")
-    private Boolean enableFlag;
-
-    @ApiModelProperty("send_setting_id数组")
-    @NotEmpty(message = "error.the.ids.not.be.null")
-    private Long[] ids;
-
-    public Long getId() {
-        return id;
+    public Set<Long> getSendSettingIdList() {
+        return sendSettingIdList;
     }
 
-    public Long[] getIds() {
-        return ids;
+    public WebHookVO setSendSettingIdList(Set<Long> sendSettingIdList) {
+        this.sendSettingIdList = sendSettingIdList;
+        return this;
     }
 
-    public void setIds(Long[] ids) {
-        this.ids = ids;
+    public SendSetting getTriggerEventSelection() {
+        return triggerEventSelection;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public WebHookVO setTriggerEventSelection(SendSetting triggerEventSelection) {
+        this.triggerEventSelection = triggerEventSelection;
+        return this;
     }
 
-    public String getWebhookPath() {
-        return webhookPath;
-    }
+    public static class SendSetting {
+        @ApiModelProperty("可选发送类型集合")
+        private Set<SendSettingCategoryDTO> sendSettingCategorySelection;
+        @ApiModelProperty("可选发送设置集合")
+        private Set<SendSettingDTO> sendSettingSelection;
 
-    public void setWebhookPath(String webhookPath) {
-        this.webhookPath = webhookPath;
-    }
+        public Set<SendSettingCategoryDTO> getSendSettingCategorySelection() {
+            return sendSettingCategorySelection;
+        }
 
-    public Long getProjectId() {
-        return projectId;
-    }
+        public SendSetting setSendSettingCategorySelection(Set<SendSettingCategoryDTO> sendSettingCategorySelection) {
+            this.sendSettingCategorySelection = sendSettingCategorySelection;
+            return this;
+        }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
+        public Set<SendSettingDTO> getSendSettingSelection() {
+            return sendSettingSelection;
+        }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Boolean getEnableFlag() {
-        return enableFlag;
-    }
-
-    public void setEnableFlag(Boolean enableFlag) {
-        this.enableFlag = enableFlag;
+        public SendSetting setSendSettingSelection(Set<SendSettingDTO> sendSettingSelection) {
+            this.sendSettingSelection = sendSettingSelection;
+            return this;
+        }
     }
 }

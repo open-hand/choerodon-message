@@ -1,13 +1,14 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-
-import java.util.*;
-
-import io.choerodon.notify.infra.dto.SendSettingDTO;
-import org.springframework.data.domain.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.swagger.notify.*;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Set;
 
 public interface SendSettingService {
 
@@ -120,7 +121,7 @@ public interface SendSettingService {
     PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
 
     /**
-     * 查询项目层下的所有的SendSetting
+     * 查询项目层下的所有可选的SendSetting
      */
-    List<SendSettingDTO> selectSendSetting();
+    WebHookVO.SendSetting getUnderProject();
 }

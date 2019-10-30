@@ -18,9 +18,15 @@ public interface WebHookMapper extends Mapper<WebHookDTO> {
     Set<WebHookDTO> selectBySendSetting(@Param("project_id") Long projectId,
                                         @Param("send_setting_id") Long sendSettingId);
 
-    List<WebHookDTO> selectWebHookAll(@Param("projectId") Long projectId,
-                                      @Param("name") String name,
-                                      @Param("type") String type,
-                                      @Param("enableFlag") Boolean enableFlag,
-                                      @Param("params") String params);
+    /**
+     * WebHook全表过滤搜索
+     *
+     * @param projectId 项目主键
+     * @param filterDTO 过滤信息
+     * @param params    全局过滤参数（名称与地址）
+     * @return
+     */
+    List<WebHookDTO> doFTR(@Param("projectId") Long projectId,
+                           @Param("filterDTO") WebHookDTO filterDTO,
+                           @Param("params") String params);
 }
