@@ -128,6 +128,9 @@
         <if test="level != null">
             AND fd_level = #{level}
         </if>
+        <if test="categoryCode != null">
+            AND category_code = #{categoryCode}
+        </if>
         <if test="messageType != null">
             AND name LIKE concat(concat('%',#{messageType}),'%')
         </if>

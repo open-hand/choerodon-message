@@ -62,4 +62,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
         }
         dropColumn(tableName: 'NOTIFY_SITEMSG_RECORD', columnName: 'TYPE')
     }
+
+    changeSet(id: '2019-10-29-notify_sitemsg_record-modify-column', author: 'jiameng.cao') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "DELETE FROM notify_sitemsg_record WHERE IS_DELETED=1"
+        }
+        dropColumn(tableName: 'NOTIFY_SITEMSG_RECORD', columnName: 'IS_DELETED')
+    }
 }

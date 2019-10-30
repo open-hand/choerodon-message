@@ -4,7 +4,13 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -15,7 +21,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -48,11 +61,19 @@ public class SendSettingSiteController {
                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                @RequestParam(required = false) String messageType,
                                                                @RequestParam(required = false) String introduce,
-                                                               @RequestParam(required = false) String level,
                                                                @RequestParam(required = false) Boolean enabled,
                                                                @RequestParam(required = false) Boolean allowConfig,
-                                                               @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(sendSettingService.pagingAll(messageType, introduce, level, enabled, allowConfig, params, pageable), HttpStatus.OK);
+                                                               @RequestParam(required = false) String params,
+                                                               @RequestParam(required = false) String firstCode,
+                                                               @RequestParam(required = false) String secondCode) {
+        return new ResponseEntity<>(sendSettingService.pagingAll(messageType, introduce, enabled, allowConfig, params, pageable, firstCode, secondCode), HttpStatus.OK);
+    }
+
+    @GetMapping("/tree")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "获取消息服务树形结构")
+    public ResponseEntity<List<MsgServiceTreeVO>> getMsgServiceTree() {
+        return new ResponseEntity<>(sendSettingService.getMsgServiceTree(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

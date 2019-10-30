@@ -2,13 +2,24 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
+import io.choerodon.notify.infra.dto.SendSettingCategoryDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.LevelType;
+import io.choerodon.notify.infra.mapper.SendSettingCategoryMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
@@ -19,7 +30,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,10 +46,12 @@ public class SendSettingServiceImpl implements SendSettingService {
     private SendSettingMapper sendSettingMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
+    private SendSettingCategoryMapper sendSettingCategoryMapper;
 
-    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, TemplateMapper templateMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, TemplateMapper templateMapper, SendSettingCategoryMapper sendSettingCategoryMapper) {
         this.sendSettingMapper = sendSettingMapper;
         this.templateMapper = templateMapper;
+        this.sendSettingCategoryMapper = sendSettingCategoryMapper;
     }
 
     @Override
@@ -144,9 +161,9 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable) {
+    public PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, Boolean enabled, Boolean allowConfig, String params, Pageable pageable, String firstCode, String secondCode) {
         return PageHelper.startPage(pageable.getPageNumber(), pageable.getPageSize(), PageableHelper.getSortSql(pageable.getSort())).doSelectPageInfo(
-                () -> sendSettingMapper.doFTR(messageType, introduce, level, enabled, allowConfig, params));
+                () -> sendSettingMapper.doFTR(messageType, introduce, firstCode, secondCode, enabled, allowConfig, params));
     }
 
 
@@ -291,6 +308,92 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
         return getPmSendSetting(updateDTO.getId());
+    }
+
+    @Override
+    public List<MsgServiceTreeVO> getMsgServiceTree() {
+        List<SendSettingDTO> sendSettingDTOS = sendSettingMapper.selectAll();
+        List<MsgServiceTreeVO> msgServiceTreeVOS = new ArrayList<>();
+        MsgServiceTreeVO msgServiceTreeVO1 = new MsgServiceTreeVO();
+        msgServiceTreeVO1.setParentId(0L);
+        msgServiceTreeVO1.setId(1L);
+        msgServiceTreeVO1.setName(LevelType.SITE.value());
+        msgServiceTreeVO1.setCode(ResourceType.SITE.value());
+        msgServiceTreeVOS.add(msgServiceTreeVO1);
+
+        MsgServiceTreeVO msgServiceTreeVO2 = new MsgServiceTreeVO();
+        msgServiceTreeVO2.setParentId(0L);
+        msgServiceTreeVO2.setId(2L);
+        msgServiceTreeVO2.setName(LevelType.ORGANIZATION.value());
+        msgServiceTreeVO2.setCode(ResourceType.ORGANIZATION.value());
+        msgServiceTreeVOS.add(msgServiceTreeVO2);
+
+        MsgServiceTreeVO msgServiceTreeVO3 = new MsgServiceTreeVO();
+        msgServiceTreeVO3.setParentId(0L);
+        msgServiceTreeVO3.setId(3L);
+        msgServiceTreeVO3.setName(LevelType.PROJECT.value());
+        msgServiceTreeVO3.setCode(ResourceType.PROJECT.value());
+        msgServiceTreeVOS.add(msgServiceTreeVO3);
+
+        Map<String, Set<String>> categoryMap = new HashMap<>();
+        categoryMap.put(ResourceType.SITE.value(), new HashSet<>());
+        categoryMap.put(ResourceType.ORGANIZATION.value(), new HashSet<>());
+        categoryMap.put(ResourceType.PROJECT.value(), new HashSet<>());
+        for (SendSettingDTO sendSettingDTO : sendSettingDTOS) {
+            Set<String> categoryCodes = categoryMap.get(sendSettingDTO.getLevel());
+            if (categoryCodes != null) {
+                categoryCodes.add(sendSettingDTO.getCategoryCode());
+            }
+        }
+        getSecondMsgServiceTreeVOS(categoryMap, msgServiceTreeVOS, sendSettingDTOS);
+
+
+        return msgServiceTreeVOS;
+    }
+
+    private void getSecondMsgServiceTreeVOS(Map<String, Set<String>> categoryMap, List<MsgServiceTreeVO> msgServiceTreeVOS, List<SendSettingDTO> sendSettingDTOS) {
+        int i = 4;
+        for (String level : categoryMap.keySet()) {
+            for (String categoryCode : categoryMap.get(level)) {
+                MsgServiceTreeVO msgServiceTreeVO = new MsgServiceTreeVO();
+                if (level.equals(ResourceType.SITE.value())) {
+                    msgServiceTreeVO.setParentId(1L);
+                } else if (level.equals(ResourceType.ORGANIZATION.value())) {
+                    msgServiceTreeVO.setParentId(2L);
+                } else {
+                    msgServiceTreeVO.setParentId(3L);
+                }
+
+                SendSettingCategoryDTO categoryDTO = new SendSettingCategoryDTO();
+                categoryDTO.setCode(categoryCode);
+                categoryDTO = sendSettingCategoryMapper.selectOne(categoryDTO);
+                msgServiceTreeVO.setName(categoryDTO.getName());
+                msgServiceTreeVO.setId((long) i);
+                msgServiceTreeVO.setCode(categoryDTO.getCode());
+                msgServiceTreeVOS.add(msgServiceTreeVO);
+                int secondParentId = i;
+                i = i + 1;
+
+                i = getThirdMsgServiceTreeVOS(sendSettingDTOS, level, categoryCode, secondParentId, msgServiceTreeVOS, i);
+
+            }
+        }
+    }
+
+    private int getThirdMsgServiceTreeVOS(List<SendSettingDTO> sendSettingDTOS, String level, String categoryCode, Integer secondParentId, List<MsgServiceTreeVO> msgServiceTreeVOS, Integer i) {
+        for (SendSettingDTO sendSettingDTO : sendSettingDTOS) {
+            if (sendSettingDTO.getLevel().equals(level) && sendSettingDTO.getCategoryCode().equals(categoryCode)) {
+                MsgServiceTreeVO treeVO = new MsgServiceTreeVO();
+                treeVO.setParentId((long) secondParentId);
+                treeVO.setId((long) i);
+                treeVO.setName(sendSettingDTO.getName());
+                treeVO.setEnabled(sendSettingDTO.getEnabled());
+                treeVO.setCode(sendSettingDTO.getCode());
+                msgServiceTreeVOS.add(treeVO);
+                i = i + 1;
+            }
+        }
+        return i;
     }
 
     /**

@@ -26,11 +26,9 @@ public class SiteMsgRecordDTO {
     @NotEmpty(message = "error.siteMsgRecord.contentEmpty")
     private String content;
 
-    private String type;
+    private Boolean backlogFlag;
 
     private Boolean read;
-
-    private Boolean deleted;
 
     private Long sendBy;
 
@@ -90,28 +88,12 @@ public class SiteMsgRecordDTO {
         this.content = content;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Boolean getRead() {
         return read;
     }
 
     public void setRead(Boolean read) {
         this.read = read;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
     }
 
     public Long getSendBy() {
@@ -177,9 +159,8 @@ public class SiteMsgRecordDTO {
                 ", userId=" + userId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", type='" + type + '\'' +
+                ", backlogFlag='" + backlogFlag + '\'' +
                 ", read=" + read +
-                ", deleted=" + deleted +
                 ", sendBy=" + sendBy +
                 ", senderType='" + senderType + '\'' +
                 ", sendTime=" + sendTime +
@@ -188,5 +169,13 @@ public class SiteMsgRecordDTO {
                 ", sendByProject=" + sendByProject +
                 ", sendByOrganization=" + sendByOrganization +
                 '}';
+    }
+
+    public Boolean getBacklogFlag() {
+        return backlogFlag;
+    }
+
+    public void setBacklogFlag(Boolean backlogFlag) {
+        this.backlogFlag = backlogFlag;
     }
 }

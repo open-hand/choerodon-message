@@ -1,13 +1,20 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-
-import java.util.*;
-
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
-import org.springframework.data.domain.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.swagger.notify.*;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Set;
 
 public interface SendSettingService {
 
@@ -41,10 +48,10 @@ public interface SendSettingService {
      * @param enabled
      * @param allowConfig
      * @param params
-     * @param pageable 分页信息
+     * @param pageable    分页信息
      * @return 分页结果
      */
-    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable);
+    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, Boolean enabled, Boolean allowConfig, String params, Pageable pageable, String firstCode, String secondCode);
 
     /**
      * 根据id启用消息服务（对应表；notify_send_setting）
@@ -119,4 +126,5 @@ public interface SendSettingService {
      */
     PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
 
+    List<MsgServiceTreeVO> getMsgServiceTree();
 }
