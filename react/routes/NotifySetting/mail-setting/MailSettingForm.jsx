@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Form, TextField, Select, SelectBox, Password } from 'choerodon-ui/pro';
+import { Form, TextField, Select, SelectBox, Password, NumberField } from 'choerodon-ui/pro';
 import '../index.less';
 
 const { Option } = Select;
@@ -16,6 +16,6 @@ export default (props) => (
       <Option value>是</Option>
       <Option value={false}>否</Option>
     </SelectBox>
-    <TextField name="port" />
+    <NumberField name="port" />
   </Form>
 );
