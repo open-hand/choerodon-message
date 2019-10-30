@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Pageable;
@@ -69,55 +70,68 @@ public class TemplateSiteController {
     }
 
 
-    @PostMapping(value = "/email")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层创建邮件模版")
-    public ResponseEntity<TemplateCreateVO> createEmailTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
-                                                                @RequestBody @Validated({Insert.class}) TemplateCreateVO.EmailTemplateCreateVO createVO) {
-        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
-    }
+//    @PostMapping(value = "/email")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层创建邮件模版")
+//    public ResponseEntity<TemplateCreateVO> createEmailTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
+//                                                                @RequestBody @Validated({Insert.class}) TemplateCreateVO.EmailTemplateCreateVO createVO) {
+//        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
+//    }
+//
+//    @PostMapping(value = "/pm")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层创建站内信模版")
+//    public ResponseEntity<TemplateCreateVO> createPmTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
+//                                                             @RequestBody @Validated({Insert.class}) TemplateCreateVO.PmTemplateCreateVO createVO) {
+//        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
+//    }
+//
+//    @PostMapping(value = "/sms")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层创建短信模版")
+//    public ResponseEntity<TemplateCreateVO> createSmsTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
+//                                                              @RequestBody @Validated({Insert.class}) TemplateCreateVO.SmsTemplateCreateVO createVO) {
+//        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
+//    }
+//
+//    @PutMapping(value = "/ /{id}")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层更新邮件模版")
+//    public ResponseEntity<TemplateCreateVO> updateEmailTemplate(@PathVariable("id") long id,
+//                                                                @RequestParam(value = "set_to_the_current") Boolean current,
+//                                                                @RequestBody @Validated({Update.class}) TemplateCreateVO.EmailTemplateCreateVO updateVO) {
+//        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
+//    }
+//
+//    @PutMapping(value = "/pm/{id}")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层更新站内信模版")
+//    public ResponseEntity<TemplateCreateVO> updatePmTemplate(@PathVariable("id") long id,
+//                                                             @RequestParam(value = "set_to_the_current") Boolean current,
+//                                                             @RequestBody @Validated({Update.class}) TemplateCreateVO.PmTemplateCreateVO updateVO) {
+//        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
+//    }
+//
+//    @PutMapping(value = "/sms/{id}")
+//    @Permission(type = ResourceType.SITE)
+//    @ApiOperation(value = "全局层更新短信模版")
+//    public ResponseEntity<TemplateCreateVO> updateSmsTemplate(@PathVariable("id") long id,
+//                                                              @RequestParam(value = "set_to_the_current") Boolean current,
+//                                                              @RequestBody @Validated({Update.class}) TemplateCreateVO.SmsTemplateCreateVO updateVO) {
+//        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
+//    }
 
-    @PostMapping(value = "/pm")
+    @PostMapping
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层创建站内信模版")
-    public ResponseEntity<TemplateCreateVO> createPmTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
-                                                             @RequestBody @Validated({Insert.class}) TemplateCreateVO.PmTemplateCreateVO createVO) {
-        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
+    @ApiOperation(value = "全局层创建和更新模版")
+    public ResponseEntity<Template> createAndUpdateTemplate(
+            @RequestParam(value = "set_to_the_current") Boolean current,
+            @RequestBody @Validated Template template) {
+        if(template.getId() == null) {
+            return new ResponseEntity<>(templateService.createTemplate(current, template), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(templateService.updateTemplate(current, template), HttpStatus.OK);
+        }
     }
-
-    @PostMapping(value = "/sms")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层创建短信模版")
-    public ResponseEntity<TemplateCreateVO> createSmsTemplate(@RequestParam(value = "set_to_the_current") Boolean current,
-                                                              @RequestBody @Validated({Insert.class}) TemplateCreateVO.SmsTemplateCreateVO createVO) {
-        return new ResponseEntity<>(templateService.createTemplate(current, createVO), HttpStatus.OK);
-    }
-
-    @PutMapping(value = "/email/{id}")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层更新邮件模版")
-    public ResponseEntity<TemplateCreateVO> updateEmailTemplate(@PathVariable("id") long id,
-                                                                @RequestParam(value = "set_to_the_current") Boolean current,
-                                                                @RequestBody @Validated({Update.class}) TemplateCreateVO.EmailTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
-    }
-
-    @PutMapping(value = "/pm/{id}")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层更新站内信模版")
-    public ResponseEntity<TemplateCreateVO> updatePmTemplate(@PathVariable("id") long id,
-                                                             @RequestParam(value = "set_to_the_current") Boolean current,
-                                                             @RequestBody @Validated({Update.class}) TemplateCreateVO.PmTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
-    }
-
-    @PutMapping(value = "/sms/{id}")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层更新短信模版")
-    public ResponseEntity<TemplateCreateVO> updateSmsTemplate(@PathVariable("id") long id,
-                                                              @RequestParam(value = "set_to_the_current") Boolean current,
-                                                              @RequestBody @Validated({Update.class}) TemplateCreateVO.SmsTemplateCreateVO updateVO) {
-        return new ResponseEntity<>(templateService.updateTemplate(current, updateVO), HttpStatus.OK);
-    }
-
 }
