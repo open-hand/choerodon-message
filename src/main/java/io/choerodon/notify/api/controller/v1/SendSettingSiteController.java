@@ -4,13 +4,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
-import io.choerodon.notify.api.dto.MessageServiceVO;
-import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -21,14 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -107,7 +94,6 @@ public class SendSettingSiteController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-
     @PutMapping("/{id}/enabled")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "根据id启用消息服务")
@@ -143,13 +129,12 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.getEmailSendSetting(id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/email_send_setting")
+    @PutMapping("/{id}/send_setting")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "修改邮件内容的发送设置信息")
-    public ResponseEntity<EmailSendSettingVO> updateEmailSendSetting(@PathVariable("id") Long id,
-                                                                     @RequestBody EmailSendSettingVO updateVO) {
-        updateVO.setId(id);
-        return new ResponseEntity<>(sendSettingService.updateEmailSendSetting(updateVO), HttpStatus.OK);
+    @ApiOperation(value = "修改发送设置")
+    public ResponseEntity<SendSettingDTO> updateSendSetting(@PathVariable("id") Long id, @RequestBody SendSettingDTO sendSettingDTO) {
+        sendSettingDTO.setId(id);
+        return new ResponseEntity<>(sendSettingService.updateSendSetting(sendSettingDTO), HttpStatus.OK);
     }
 
 
@@ -160,12 +145,4 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.getPmSendSetting(id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/pm_send_setting")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "修改站内信内容的发送设置信息")
-    public ResponseEntity<PmSendSettingVO> updatePmSendSetting(@PathVariable("id") Long id,
-                                                               @RequestBody PmSendSettingVO updateVO) {
-        updateVO.setId(id);
-        return new ResponseEntity<>(sendSettingService.updatePmSendSetting(updateVO), HttpStatus.OK);
-    }
 }

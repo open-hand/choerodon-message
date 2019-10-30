@@ -1,16 +1,11 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
-import io.choerodon.notify.api.dto.MessageServiceVO;
-import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -127,4 +122,11 @@ public interface SendSettingService {
     PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
 
     List<MsgServiceTreeVO> getMsgServiceTree();
+
+    /**
+     * 修改发送设置
+     * @param sendSettingDTO 更新信息
+     * @return
+     */
+    SendSettingDTO updateSendSetting(SendSettingDTO sendSettingDTO);
 }
