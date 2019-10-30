@@ -3,6 +3,7 @@ package io.choerodon.notify.infra.dto;
 
 
 import io.choerodon.mybatis.entity.BaseDTO;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,17 +21,26 @@ public class Template extends BaseDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(value = "模板id/非必填")
     private Long id;
 
+    @ApiModelProperty(value = "模板是否为预定义/必填")
     @NotNull(message = "error.template.isPredefined.null")
     private Boolean isPredefined;
 
+    @ApiModelProperty(value = "模版类型:email,sms,pm,webhook/必填")
+    @NotNull(message = "error.template.sendingType.null")
     private String sendingType;
 
+    @ApiModelProperty(value = "模版业务类型/必填")
+    @NotNull(message = "error.template.sendSettingCode.null")
     private String sendSettingCode;
 
+    @ApiModelProperty(value = "模版标题/非必填")
     private String title;
 
+    @ApiModelProperty(value = "模版内容/必填")
+    @NotEmpty(message = "error.template.content.empty")
     private String content;
 
 
