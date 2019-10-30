@@ -1,36 +1,22 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.notify.api.dto.ScheduleTaskDTO;
-import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.infra.feign.AsgardFeignClient;
-import org.aspectj.weaver.ast.Not;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.*;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
+import io.choerodon.notify.infra.feign.AsgardFeignClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -41,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,6 +74,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void sendNotice(NoticeSendDTO noticeSendDTO) {
+        LOGGER.info(">>>START_SENDING_MESSAGE>>> NOTICE_SEND_DTO:{}", noticeSendDTO);
         // 0 发送短信
         if (!ObjectUtils.isEmpty(noticeSendDTO) && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS()) {
             smsService.send(noticeSendDTO);

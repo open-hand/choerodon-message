@@ -84,7 +84,7 @@ public class EmailSendServiceImpl implements EmailSendService {
 
     @Override
     public void sendEmail(Map<String, Object> params, Set<UserDTO> targetUsers, SendSettingDTO sendSettingDTO) {
-        LOGGER.warn(">>>START_SENDING_EMAIL>>> Send a message to the user.[INFO:send_setting_code:'{}' - users:{} ]", sendSettingDTO.getCode(), targetUsers);
+        LOGGER.info(">>>START_SENDING_EMAIL>>> Send a email to the user.[INFO:send_setting_code:'{}' - users:{} ]", sendSettingDTO.getCode(), targetUsers);
 
         //1. 获取该发送设置的邮件模版
         Template tmp = null;

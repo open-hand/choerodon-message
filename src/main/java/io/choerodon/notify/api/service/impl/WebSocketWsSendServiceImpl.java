@@ -49,6 +49,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
 
     @Override
     public void sendSiteMessage(String code, Map<String, Object> params, Set<UserDTO> targetUsers, Long sendBy, String senderType, SendSettingDTO sendSettingDTO) {
+        LOGGER.info(">>>START_SENDING_SITE_MESSAGE>>> Send a site message to the user.[INFO:send_setting_code:'{}' - users:{} ]", sendSettingDTO.getCode(), targetUsers);
         //1. 获取该发送设置的站内信模版
         Template tmp = null;
         try {

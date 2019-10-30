@@ -58,6 +58,7 @@ public class WebHookServiceImpl implements WebHookService {
 
     @Override
     public void trySendWebHook(NoticeSendDTO dto, SendSettingDTO sendSetting) {
+        LOGGER.info(">>>START_SENDING_WEB_HOOK>>> Send a web hook.[INFO:send_setting_code:'{}']", sendSetting.getCode());
         //0. 若发送设置非项目层 / 发送信息未指定项目Id 则取消发送
         if (!ResourceLevel.PROJECT.value().equalsIgnoreCase(sendSetting.getLevel())
                 || ObjectUtils.isEmpty(dto.getSourceId())
