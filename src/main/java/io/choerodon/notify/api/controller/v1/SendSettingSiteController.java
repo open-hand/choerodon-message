@@ -5,7 +5,14 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.*;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
@@ -64,11 +71,11 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.getMsgServiceTree(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/detail")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "全局层查看发送设置详情")
-    public ResponseEntity<SendSettingDetailDTO> query(@PathVariable Long id) {
-        return new ResponseEntity<>(sendSettingService.query(id), HttpStatus.OK);
+    public ResponseEntity<SendSettingVO> query(@RequestParam String code) {
+        return new ResponseEntity<>(sendSettingService.query(code), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
@@ -95,18 +102,18 @@ public class SendSettingSiteController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/enabled")
+    @PutMapping("/enabled")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "根据id启用消息服务")
-    public ResponseEntity<MessageServiceVO> enabled(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.enabled(id), HttpStatus.OK);
+    public ResponseEntity<MessageServiceVO> enabled(@RequestParam("code") String code) {
+        return new ResponseEntity<>(sendSettingService.enabled(code), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/disabled")
+    @PutMapping("/disabled")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "根据id停用消息服务")
-    public ResponseEntity<MessageServiceVO> disabled(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.disabled(id), HttpStatus.OK);
+    public ResponseEntity<MessageServiceVO> disabled(@RequestParam("code") String code) {
+        return new ResponseEntity<>(sendSettingService.disabled(code), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/allow_configuration")

@@ -1,11 +1,17 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
-
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -25,7 +31,7 @@ public interface SendSettingService {
 
     SendSettingDTO update(SendSettingUpdateDTO updateDTO);
 
-    SendSettingDetailDTO query(Long id);
+    SendSettingVO query(String code);
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
@@ -54,7 +60,7 @@ public interface SendSettingService {
      * @param id 记录主键
      * @return 启用的消息服务信息
      */
-    MessageServiceVO enabled(Long id);
+    MessageServiceVO enabled(String code);
 
     /**
      * 根据id停用消息服务（对应表；notify_send_setting）
@@ -62,7 +68,7 @@ public interface SendSettingService {
      * @param id 记录主键
      * @return 停用的消息服务信息
      */
-    MessageServiceVO disabled(Long id);
+    MessageServiceVO disabled(String code);
 
 
     /**
@@ -106,6 +112,7 @@ public interface SendSettingService {
 
     /**
      * 修改发送设置
+     *
      * @param sendSettingDTO 更新信息
      * @return
      */
