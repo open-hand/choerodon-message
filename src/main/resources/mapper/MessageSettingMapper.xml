@@ -2,21 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.notify.infra.mapper.MessegeSettingMapper">
 
-    <insert id="insertMessageByIds">
+    <insert id="insertMessage">
         insert into
-        notify_webhook_message_setting(send_setting_id)
+        notify_webhook_message_setting(webhook_id,send_setting_id)
         values
-        <foreach collection="ids" item="id" separator=",">
-            (#{id})
-        </foreach>
-        where webhook_id=#{webHookId}
-    </insert>
-    <insert id="insertWebHookIds">
-        insert into
-        notify_webhook_message_setting(webhook_id)
-        values
-        <foreach collection="webHookIds" item="id" separator=",">
-            (#{id})
+        <foreach collection="webHookMessageSettingDTOs" item="WebHookMessageSettingDTO" separator=",">
+            (#{WebHookMessageSettingDTO.webhookId},#{WebHookMessageSettingDTO.sendSettingId})
         </foreach>
     </insert>
 </mapper>

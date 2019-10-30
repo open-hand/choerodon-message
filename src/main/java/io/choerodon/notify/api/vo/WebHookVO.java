@@ -1,9 +1,12 @@
-package io.choerodon.notify.infra.dto;
+package io.choerodon.notify.api.vo;
 
 import io.choerodon.mybatis.entity.BaseDTO;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -12,7 +15,7 @@ import javax.validation.constraints.NotNull;
  * @since 2019/9/11
  */
 @Table(name = "NOTIFY_WEBHOOK")
-public class WebHookDTO extends BaseDTO {
+public class WebHookVO extends BaseDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +40,20 @@ public class WebHookDTO extends BaseDTO {
     @ApiModelProperty("webhook是否启用")
     private Boolean enableFlag;
 
+    @ApiModelProperty("send_setting_id数组")
+    @NotEmpty(message = "error.the.ids.not.be.null")
+    private Long[] ids;
+
     public Long getId() {
         return id;
+    }
+
+    public Long[] getIds() {
+        return ids;
+    }
+
+    public void setIds(Long[] ids) {
+        this.ids = ids;
     }
 
     public void setId(Long id) {

@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.notify.api.service.WebHookService;
+import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.ApiOperation;
@@ -54,8 +55,8 @@ public class WebHookController {
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "添加webhook")
     @PostMapping
-    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId,@RequestBody @Validated WebHookDTO webHookDTO) {
-        return new ResponseEntity<>(webHookService.createWebHook(projectId,webHookDTO), HttpStatus.OK);
+    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId,@RequestBody @Validated WebHookVO webHookVO) {
+        return new ResponseEntity<>(webHookService.createWebHook(projectId,webHookVO), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.PROJECT)

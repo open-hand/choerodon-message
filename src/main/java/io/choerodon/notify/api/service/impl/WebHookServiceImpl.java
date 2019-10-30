@@ -8,9 +8,11 @@ import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.exception.WebHookException;
 import io.choerodon.notify.api.service.TemplateService;
 import io.choerodon.notify.api.service.WebHookService;
+import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.dto.WebHookDTO;
+import io.choerodon.notify.infra.dto.WebHookMessageSettingDTO;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.enums.WebHookTypeEnum;
 import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
@@ -150,23 +152,33 @@ public class WebHookServiceImpl implements WebHookService {
 
     @Override
     @Transactional
-    public WebHookDTO createWebHook(Long projectId,WebHookDTO webHookDTO) {
+    public WebHookDTO createWebHook(Long projectId, WebHookVO webHookVO) {
         if (projectId == null) {
             throw new CommonException("error.the.projectId.is.not.be.null");
         }
+        WebHookDTO webHookDTO=new WebHookDTO();
+        webHookDTO.setId(webHookVO.getId());
+        webHookDTO.setName(webHookVO.getName());
+        webHookDTO.setType(webHookVO.getType());
+        webHookDTO.setWebhookPath(webHookVO.getWebhookPath());
         webHookDTO.setProjectId(projectId);
+        List<WebHookDTO> webHookDTOS = webHookMapper.select(webHookDTO);
+        if (!CollectionUtils.isEmpty(webHookDTOS)){
+            throw new CommonException("error.the.webhook.is.aready.exited");
+        }//不为空
         if (webHookMapper.insertSelective(webHookDTO) !=1){
             throw new CommonException("error.insert.is.failed!");
         }
-          Long[] webHookIds=new Long[webHookDTO.getIds().length];
-        for (int i = 0; i < webHookIds.length; i++) {
-            webHookIds[i]=webHookDTO.getId();
+        List<WebHookMessageSettingDTO> webHookMessageSettingDTOs=new ArrayList<>();
+        WebHookMessageSettingDTO webHookMessageSettingDTO=null;
+        Long[] ids = webHookVO.getIds();
+        for (int i = 0; i < ids.length; i++) {
+            webHookMessageSettingDTO=new WebHookMessageSettingDTO();
+            webHookMessageSettingDTO.setWebhookId(webHookDTO.getId());
+            webHookMessageSettingDTO.setSendSettingId(ids[i]);
+            webHookMessageSettingDTOs.add(webHookMessageSettingDTO);
         }
-        List resultList=messegeSettingMapper.insertWebHookIds(webHookIds);
-        if (CollectionUtils.isEmpty(resultList)){
-            throw new CommonException("error.insert.is.failed!");
-        }
-        messegeSettingMapper.insertMessageByIds(webHookDTO.getId(),webHookDTO.getIds());
+        messegeSettingMapper.insertMessage(webHookMessageSettingDTOs);
         return webHookDTO;
     }
 

@@ -2,6 +2,7 @@ package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import org.springframework.data.domain.Pageable;
@@ -40,10 +41,10 @@ public interface WebHookService {
     /**
      * 添加webhook
      * @param projectId 项目ID
-     * @param webHookDTO
+     * @param webHookVO
      * @return
      */
-    WebHookDTO createWebHook(Long projectId, WebHookDTO webHookDTO);
+    WebHookDTO createWebHook(Long projectId, WebHookVO webHookVO);
 
     /**
      * 跟新webhook
