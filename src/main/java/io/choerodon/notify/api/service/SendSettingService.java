@@ -94,16 +94,6 @@ public interface SendSettingService {
      */
     EmailSendSettingVO getEmailSendSetting(Long id);
 
-
-    /**
-     * 修改邮件内容的发送设置信息
-     *
-     * @param updateVO 更新信息
-     * @return 更新结果
-     */
-    EmailSendSettingVO updateEmailSendSetting(EmailSendSettingVO updateVO);
-
-
     /**
      * 获取站内信内容的发送设置信息
      *
@@ -111,15 +101,6 @@ public interface SendSettingService {
      * @return 站内信内容的发送设置信息
      */
     PmSendSettingVO getPmSendSetting(Long id);
-
-
-    /**
-     * 修改站内信内容的发送设置信息
-     *
-     * @param updateVO 更新信息
-     * @return 更新结果
-     */
-    PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
 
     List<MsgServiceTreeVO> getMsgServiceTree();
 

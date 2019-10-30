@@ -3,6 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.exception.*;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.SendSettingService;
@@ -132,9 +133,11 @@ public class SendSettingSiteController {
     @PutMapping("/{id}/send_setting")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "修改发送设置")
-    public ResponseEntity<SendSettingDTO> updateSendSetting(@PathVariable("id") Long id, @RequestBody SendSettingDTO sendSettingDTO) {
-        sendSettingDTO.setId(id);
-        return new ResponseEntity<>(sendSettingService.updateSendSetting(sendSettingDTO), HttpStatus.OK);
+    public ResponseEntity<SendSettingDTO> updateSendSetting(@PathVariable("id") Long id, @RequestBody SendSettingDTO updateDTO) {
+        if (!id.equals(updateDTO.getId())) {
+            throw new CommonException("error.update.primary.key.not.equal.to.the.path.id");
+        }
+        return new ResponseEntity<>(sendSettingService.updateSendSetting(updateDTO), HttpStatus.OK);
     }
 
 
