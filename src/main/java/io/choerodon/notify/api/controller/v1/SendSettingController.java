@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2019/10/29
  */
 @RestController
-@RequestMapping("/v1/project/{project_id}/sendsetting")
+@RequestMapping("/v1/project/{project_id}")
 public class SendSettingController {
 
     private SendSettingService sendSettingService;
