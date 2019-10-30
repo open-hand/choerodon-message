@@ -17,7 +17,7 @@ public interface SiteMsgRecordMapper extends Mapper<SiteMsgRecord> {
 
     List<SiteMsgRecordDTO> selectByUserIdAndReadAndDeleted(@Param("userId") Long userId,
                                                            @Param("read") Boolean read,
-                                                           @Param("type") String type);
+                                                           @Param("backlogFlag") Boolean backlogFlag);
 
     int selectCountOfUnRead(@Param("userId") Long userId);
 

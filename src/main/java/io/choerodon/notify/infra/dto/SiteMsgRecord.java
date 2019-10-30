@@ -25,14 +25,13 @@ public class SiteMsgRecord extends BaseDTO {
     @Column(name = "is_read")
     private Boolean read;
 
-    @Column(name = "is_deleted")
-    private Boolean deleted;
-
     private Long sendBy;
 
     private String senderType;
 
     private Date sendTime;
+
+    private Boolean backlogFlag;
 
     public Long getId() {
         return id;
@@ -74,14 +73,6 @@ public class SiteMsgRecord extends BaseDTO {
         this.read = read;
     }
 
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public Long getSendBy() {
         return sendBy;
     }
@@ -103,7 +94,6 @@ public class SiteMsgRecord extends BaseDTO {
         this.title = title;
         this.content = content;
         this.read = false;
-        this.deleted = false;
         this.sendTime = new Date();
         this.setCreationDate(new Date());
         this.setLastUpdateDate(new Date());
@@ -121,7 +111,6 @@ public class SiteMsgRecord extends BaseDTO {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", read=" + read +
-                ", deleted=" + deleted +
                 ", sendBy=" + sendBy +
                 ", senderType='" + senderType + '\'' +
                 ", sendTime=" + sendTime +
@@ -134,5 +123,13 @@ public class SiteMsgRecord extends BaseDTO {
 
     public void setSenderType(String senderType) {
         this.senderType = senderType;
+    }
+
+    public Boolean getBacklogFlag() {
+        return backlogFlag;
+    }
+
+    public void setBacklogFlag(Boolean backlogFlag) {
+        this.backlogFlag = backlogFlag;
     }
 }

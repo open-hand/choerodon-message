@@ -12,7 +12,7 @@ public interface SiteMsgRecordService {
     /**
      * 分页查询用户所有未删除消息
      */
-    PageInfo<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, int page, int size);
+    PageInfo<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, Boolean backlogFlag, int page, int size);
 
     /**
      * 批量修改消息为已读

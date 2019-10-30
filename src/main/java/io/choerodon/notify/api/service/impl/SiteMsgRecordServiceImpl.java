@@ -21,7 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
@@ -48,8 +53,8 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
     }
 
     @Override
-    public PageInfo<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, String type, int page, int size) {
-        PageInfo<SiteMsgRecordDTO> result = PageHelper.startPage(page, size).doSelectPageInfo(() -> siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, type));
+    public PageInfo<SiteMsgRecordDTO> pagingQueryByUserId(Long userId, Boolean isRead, Boolean backlogFlag, int page, int size) {
+        PageInfo<SiteMsgRecordDTO> result = PageHelper.startPage(page, size).doSelectPageInfo(() -> siteMsgRecordMapper.selectByUserIdAndReadAndDeleted(userId, isRead, backlogFlag));
         List<SiteMsgRecordDTO> records = result.getList();
         Map<String, Set<Long>> senderMap = getSenderMap(records);
         processSendBy(records, senderMap);
@@ -138,7 +143,7 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
         for (Long id : ids) {
             if (id == null) continue;
             SiteMsgRecord siteMsgRecord = siteMsgRecordMapper.selectByPrimaryKey(id);
-            if (siteMsgRecord != null && siteMsgRecord.getUserId().equals(userId) && !siteMsgRecord.getDeleted()) {
+            if (siteMsgRecord != null && siteMsgRecord.getUserId().equals(userId)) {
                 siteMsgRecordMapper.deleteByPrimaryKey(siteMsgRecord);
             }
         }
