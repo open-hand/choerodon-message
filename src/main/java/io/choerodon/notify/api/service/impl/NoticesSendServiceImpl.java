@@ -74,7 +74,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     @Override
     public void sendNotice(NoticeSendDTO noticeSendDTO) {
-        LOGGER.info(">>>START_SENDING_MESSAGE>>> NOTICE_SEND_DTO:{}", noticeSendDTO);
+        LOGGER.info(">>>START_SENDING_MESSAGE>>>");
         // 0 发送短信
         if (!ObjectUtils.isEmpty(noticeSendDTO) && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS()) {
             smsService.send(noticeSendDTO);
@@ -102,6 +102,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         Set<UserDTO> users = getNeedSendUsers(noticeSendDTO);
         // 2.获取是否启用自定义发送类型
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
+        LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
         // 3.1.发送邮件
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag) && sendSettingDTO.getEmailEnabledFlag()) {
             trySendEmail(noticeSendDTO, sendSettingDTO, users);
