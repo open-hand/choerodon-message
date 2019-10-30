@@ -7,10 +7,6 @@ import javax.persistence.*;
 /**
  * 消息业务类型
  */
-
-/**
- * 消息业务类型
- */
 @Table(name = "notify_send_setting")
 public class SendSettingDTO extends BaseDTO {
 

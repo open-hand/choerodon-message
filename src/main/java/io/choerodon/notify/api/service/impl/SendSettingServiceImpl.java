@@ -4,14 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
-import io.choerodon.notify.api.dto.MessageServiceVO;
-import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
@@ -29,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -262,23 +256,6 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
 
-    @Override
-    public EmailSendSettingVO updateEmailSendSetting(EmailSendSettingVO updateVO) {
-        SendSettingDTO updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
-        if (updateDTO == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        updateDTO.setRetryCount(updateVO.getRetryCount());
-        updateDTO.setIsSendInstantly(updateVO.getSendInstantly());
-        updateDTO.setIsManualRetry(updateVO.getManualRetry());
-        //todo
-//        updateDTO.setEmailTemplateId(updateVO.getEmailTemplateId());
-        updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
-        if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
-            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
-        }
-        return getEmailSendSetting(updateDTO.getId());
-    }
 
     @Override
     public PmSendSettingVO getPmSendSetting(Long id) {
@@ -292,22 +269,6 @@ public class SendSettingServiceImpl implements SendSettingService {
 //            pmTemplate = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
 //        }
         return getPmSendSettingVO(sendSetting, pmTemplate);
-    }
-
-    @Override
-    public PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO) {
-        SendSettingDTO updateDTO = sendSettingMapper.selectByPrimaryKey(updateVO.getId());
-        if (updateDTO == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        //todo
-//        updateDTO.setPmType(updateVO.getPmType());
-//        updateDTO.setPmTemplateId(updateVO.getPmTemplateId());
-        updateDTO.setObjectVersionNumber(updateVO.getObjectVersionNumber());
-        if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
-            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
-        }
-        return getPmSendSetting(updateDTO.getId());
     }
 
     @Override
@@ -349,6 +310,19 @@ public class SendSettingServiceImpl implements SendSettingService {
 
 
         return msgServiceTreeVOS;
+    }
+
+    @Override
+    public SendSettingDTO updateSendSetting(SendSettingDTO updateDTO) {
+        SendSettingDTO sendSettingDTO = sendSettingMapper.selectByPrimaryKey(updateDTO);
+        if (StringUtils.isEmpty(sendSettingDTO)) {
+            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
+        }
+
+        if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
+            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
+        }
+        return updateDTO;
     }
 
     private void getSecondMsgServiceTreeVOS(Map<String, Set<String>> categoryMap, List<MsgServiceTreeVO> msgServiceTreeVOS, List<SendSettingDTO> sendSettingDTOS) {

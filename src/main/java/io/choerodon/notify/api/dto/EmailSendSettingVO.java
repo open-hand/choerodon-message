@@ -3,6 +3,8 @@ package io.choerodon.notify.api.dto;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.*;
+
 /**
  * 该VO用于邮件内容设置的发送设置(对应库表 notify_send_setting {@link SendSettingDTO})
  *
