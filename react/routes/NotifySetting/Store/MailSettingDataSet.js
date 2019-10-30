@@ -18,7 +18,7 @@ export default (intl, intlPrefix) => {
       { name: 'protocol', type: 'string', label: protocal },
       { name: 'host', type: 'string', label: host, required: true },
       { name: 'ssl', type: 'boolean', label: ssl },
-      { name: 'port', type: 'string', label: port, required: true },
+      { name: 'port', type: 'number', min: 1, max: 65535, label: port, required: true },
     ],
     transport: {
       read: {
