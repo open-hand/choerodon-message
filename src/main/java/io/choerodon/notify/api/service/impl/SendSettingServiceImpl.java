@@ -4,7 +4,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
@@ -112,11 +120,18 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public SendSettingDetailDTO query(Long id) {
-        SendSettingDetailDTO sendSetting = sendSettingMapper.selectById(id);
-        if (sendSetting == null) {
+    public SendSettingVO query(String code) {
+        SendSettingDTO sendSettingDTO = new SendSettingDTO();
+        sendSettingDTO.setCode(code);
+        sendSettingDTO = sendSettingMapper.selectOne(sendSettingDTO);
+        if (sendSettingDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
+        SendSettingVO sendSetting = new SendSettingVO();
+        BeanUtils.copyProperties(sendSettingDTO, sendSetting);
+        Template template = new Template();
+        template.setSendSettingCode(code);
+        sendSetting.setTemplates(templateMapper.select(template));
         return sendSetting;
     }
 
@@ -162,8 +177,10 @@ public class SendSettingServiceImpl implements SendSettingService {
 
 
     @Override
-    public MessageServiceVO enabled(Long id) {
-        SendSettingDTO enabledDTO = sendSettingMapper.selectByPrimaryKey(id);
+    public MessageServiceVO enabled(String code) {
+        SendSettingDTO enabledDTO = new SendSettingDTO();
+        enabledDTO.setCode(code);
+        enabledDTO = sendSettingMapper.selectOne(enabledDTO);
         if (enabledDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -177,8 +194,10 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public MessageServiceVO disabled(Long id) {
-        SendSettingDTO disabledDTO = sendSettingMapper.selectByPrimaryKey(id);
+    public MessageServiceVO disabled(String code) {
+        SendSettingDTO disabledDTO = new SendSettingDTO();
+        disabledDTO.setCode(code);
+        disabledDTO = sendSettingMapper.selectOne(disabledDTO);
         if (disabledDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
@@ -254,7 +273,6 @@ public class SendSettingServiceImpl implements SendSettingService {
 //        }
         return getEmailSendSettingVO(sendSetting, emailTemplate);
     }
-
 
 
     @Override

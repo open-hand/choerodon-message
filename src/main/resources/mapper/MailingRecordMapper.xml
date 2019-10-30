@@ -9,11 +9,11 @@
         rc.receive_account AS email,
         rc.retry_count,
         nts.is_manual_retry,
-        tl.name AS template_type,
+        tl.title AS template_type,
         rc.failed_reason,
         rc.creation_date
-        FROM notify_record rc
-        LEFT JOIN notify_send_setting nts ON nts.code = rc.business_type
+        FROM notify_mailing_record rc
+        LEFT JOIN notify_send_setting nts ON nts.code = rc.send_setting_code
         LEFT JOIN notify_template tl ON rc.template_id = tl.id
         WHERE rc.status IS NOT NULL
         <if test="level != null">

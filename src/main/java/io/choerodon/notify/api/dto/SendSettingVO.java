@@ -1,21 +1,15 @@
-package io.choerodon.notify.infra.dto;
+package io.choerodon.notify.api.dto;
 
-import io.choerodon.mybatis.entity.BaseDTO;
+import io.choerodon.notify.infra.dto.Template;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.List;
 
 /**
- * 消息业务类型
+ * @author jiameng.cao
+ * @date 2019/10/30
  */
-@Table(name = "notify_send_setting")
-public class SendSettingDTO extends BaseDTO {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class SendSettingVO {
     private Long id;
 
     private String code;
@@ -24,15 +18,11 @@ public class SendSettingDTO extends BaseDTO {
 
     private String description;
 
-    @Column(name = "fd_level")
-    private String level;
-
     private String categoryCode;
 
     @Column(name = "is_allow_config")
     private Boolean isAllowConfig;
 
-    @Column(name = "is_enabled")
     private Boolean enabled;
 
     private Integer retryCount;
@@ -53,48 +43,7 @@ public class SendSettingDTO extends BaseDTO {
 
     private Boolean backlogFlag;
 
-
-    public SendSettingDTO(String code) {
-        this.code = code;
-    }
-
-    public SendSettingDTO(String code, String name, String description,
-                          String level, Integer retryCount,
-                          Boolean isSendInstantly, Boolean isManualRetry) {
-        this.code = code;
-        this.name = name;
-        this.description = description;
-        this.level = level;
-        this.retryCount = retryCount;
-        this.isSendInstantly = isSendInstantly;
-        this.isManualRetry = isManualRetry;
-    }
-
-    public SendSettingDTO() {
-    }
-
-    @Override
-    public String toString() {
-        return "SendSettingDTO{" +
-                "id=" + id +
-                ", code='" + code + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", categoryCode=" + categoryCode +
-                ", emailEnabledFlag=" + emailEnabledFlag +
-                ", pmEnabledFlag=" + pmEnabledFlag +
-                ", level='" + level + '\'' +
-                ", smsEnabledFlag='" + smsEnabledFlag + '\'' +
-                ", isAllowConfig=" + isAllowConfig +
-                ", enabled=" + enabled +
-                ", retryCount=" + retryCount +
-                ", isSendInstantly=" + isSendInstantly +
-                ", isManualRetry=" + isManualRetry +
-                ", backlogFlag=" + backlogFlag +
-                ", webhookEnabledFlag=" + webhookEnabledFlag +
-                '}';
-    }
-
+    private List<Template> templates;
 
     public Long getId() {
         return id;
@@ -108,9 +57,8 @@ public class SendSettingDTO extends BaseDTO {
         return code;
     }
 
-    public SendSettingDTO setCode(String code) {
+    public void setCode(String code) {
         this.code = code;
-        return this;
     }
 
     public String getName() {
@@ -129,13 +77,28 @@ public class SendSettingDTO extends BaseDTO {
         this.description = description;
     }
 
-
-    public String getLevel() {
-        return level;
+    public String getCategoryCode() {
+        return categoryCode;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public void setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Integer getRetryCount() {
@@ -160,30 +123,6 @@ public class SendSettingDTO extends BaseDTO {
 
     public void setIsManualRetry(Boolean manualRetry) {
         isManualRetry = manualRetry;
-    }
-
-    public Boolean getAllowConfig() {
-        return isAllowConfig;
-    }
-
-    public void setAllowConfig(Boolean allowConfig) {
-        isAllowConfig = allowConfig;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public void setCategoryCode(String categoryCode) {
-        this.categoryCode = categoryCode;
-    }
-
-    public String getCategoryCode() {
-        return categoryCode;
     }
 
     public Boolean getEmailEnabledFlag() {
@@ -224,5 +163,13 @@ public class SendSettingDTO extends BaseDTO {
 
     public void setBacklogFlag(Boolean backlogFlag) {
         this.backlogFlag = backlogFlag;
+    }
+
+    public List<Template> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<Template> templates) {
+        this.templates = templates;
     }
 }
