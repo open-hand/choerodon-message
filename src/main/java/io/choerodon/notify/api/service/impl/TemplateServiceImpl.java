@@ -15,7 +15,6 @@ import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Optional;
@@ -112,22 +111,20 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Template createTemplate(Boolean setToTheCurrent, Template templateDTO) {
-        if(SendingTypeEnum.EMAIL.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
+    public Template createTemplate(Template templateDTO) {
+        if (SendingTypeEnum.EMAIL.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
             throw new CommonException("error.email.title.null");
-        }
-        else if (SendingTypeEnum.PM.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
+        } else if (SendingTypeEnum.PM.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
             throw new CommonException("error.pm.title.null");
         }
         if (templateMapper.insertSelective(templateDTO) != 1) {
             throw new CommonException("error.template.insert");
         }
-        Template template = templateMapper.selectByPrimaryKey(templateDTO.getId());
-        return template;
+        return templateDTO;
     }
 
     @Override
-    public Template updateTemplate(Boolean setToTheCurrent, Template templateDTO) {
+    public Template updateTemplate(Template templateDTO) {
         Template template = templateMapper.selectByPrimaryKey(templateDTO.getId());
         if (template == null) {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
@@ -135,7 +132,6 @@ public class TemplateServiceImpl implements TemplateService {
         if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
-        template = templateMapper.selectByPrimaryKey(template.getId());
         return template;
     }
 

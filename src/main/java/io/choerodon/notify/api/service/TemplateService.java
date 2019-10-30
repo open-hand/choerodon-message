@@ -1,7 +1,6 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.TemplateCreateVO;
 import io.choerodon.notify.api.dto.TemplateVO;
 import io.choerodon.notify.infra.dto.Template;
 import org.springframework.data.domain.Pageable;
@@ -48,11 +47,10 @@ public interface TemplateService {
     /**
      * 创建模版
      *
-     * @param setToTheCurrent 是否设为当前模版
-     * @param template        创建信息
+     * @param template 创建信息
      * @return 创建结果
      */
-    Template createTemplate(Boolean setToTheCurrent, Template template);
+    Template createTemplate(Template template);
 
 
     /**
@@ -61,7 +59,7 @@ public interface TemplateService {
      * @param template 更新VO
      * @return 更新结果
      */
-    Template updateTemplate(Boolean setToTheCurrent, Template template);
+    Template updateTemplate(Template template);
 
 
     /**
