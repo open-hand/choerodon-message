@@ -129,10 +129,10 @@ public class TemplateServiceImpl implements TemplateService {
         if (template == null) {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
         }
-        if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
+        if (templateMapper.updateByPrimaryKeySelective(templateDTO) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
-        return template;
+        return templateDTO;
     }
 
 //    @Override

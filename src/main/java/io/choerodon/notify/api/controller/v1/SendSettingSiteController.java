@@ -78,15 +78,6 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.query(code), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层更新发送设置")
-    public ResponseEntity<SendSettingDTO> update(@PathVariable Long id,
-                                                 @RequestBody @Valid SendSettingUpdateDTO updateDTO) {
-        updateDTO.setId(id);
-        return new ResponseEntity<>(sendSettingService.update(updateDTO), HttpStatus.OK);
-    }
-
     @GetMapping("/list/allow_config")
     @Permission(permissionLogin = true)
     @ApiOperation(value = "根据层级查询未禁用通知配置的启用状态的发送设置列表")
@@ -104,14 +95,14 @@ public class SendSettingSiteController {
 
     @PutMapping("/enabled")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "根据id启用消息服务")
+    @ApiOperation(value = "根据code启用消息服务")
     public ResponseEntity<MessageServiceVO> enabled(@RequestParam("code") String code) {
         return new ResponseEntity<>(sendSettingService.enabled(code), HttpStatus.OK);
     }
 
     @PutMapping("/disabled")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "根据id停用消息服务")
+    @ApiOperation(value = "根据code停用消息服务")
     public ResponseEntity<MessageServiceVO> disabled(@RequestParam("code") String code) {
         return new ResponseEntity<>(sendSettingService.disabled(code), HttpStatus.OK);
     }

@@ -115,25 +115,12 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             Long templateId;
             if (query == null) {
                 templateMapper.insertSelective(t);
-                templateId = t.getId();
             } else {
                 templateId = query.getId();
                 t.setId(templateId);
                 t.setObjectVersionNumber(query.getObjectVersionNumber());
                 templateMapper.updateByPrimaryKeySelective(t);
             }
-            SendSettingDTO sendSetting = sendSettingMapper.selectOne(new SendSettingDTO(t.getSendSettingCode()));
-            //todo
-//            if (sendSetting != null) {
-//                if (NotifyType.EMAIL.getValue().equals(t.getSendingType()) && sendSetting.getEmailTemplateId() == null) {
-//                    sendSetting.setEmailTemplateId(templateId);
-//                } else if (NotifyType.PM.getValue().equals(t.getSendingType()) && sendSetting.getPmTemplateId() == null) {
-//                    sendSetting.setPmTemplateId(templateId);
-//                } else if (NotifyType.SMS.getValue().equals(t.getSendingType()) && sendSetting.getSmsTemplateId() == null) {
-//                    sendSetting.setSmsTemplateId(templateId);
-//                }
-//                sendSettingMapper.updateByPrimaryKey(sendSetting);
-//            }
         });
 
     }

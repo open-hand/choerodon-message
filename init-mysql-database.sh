@@ -10,7 +10,7 @@ mvn org.apache.maven.plugins:maven-dependency-plugin:get \
 
 java -Dspring.datasource.url="jdbc:mysql://localhost/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true" \
  -Dspring.datasource.username=root \
- -Dspring.datasource.password=password \
+ -Dspring.datasource.password=root \
  -Ddata.drop=false -Ddata.init=true \
  -Ddata.dir=src/main/resources \
  -jar ${TOOL_JAR_PATH}
