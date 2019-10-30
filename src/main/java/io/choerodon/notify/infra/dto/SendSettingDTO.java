@@ -58,16 +58,22 @@ public class SendSettingDTO extends BaseDTO {
         this.code = code;
     }
 
-    public SendSettingDTO(String code, String name, String description,
-                          String level, Integer retryCount,
-                          Boolean isSendInstantly, Boolean isManualRetry) {
+    public SendSettingDTO(String code, String name, String description, String level, String categoryCode, Boolean isAllowConfig, Boolean enabled, Integer retryCount, Boolean isSendInstantly, Boolean isManualRetry, Boolean emailEnabledFlag, Boolean pmEnabledFlag, Boolean smsEnabledFlag, Boolean webhookEnabledFlag, Boolean backlogFlag) {
         this.code = code;
         this.name = name;
         this.description = description;
         this.level = level;
+        this.categoryCode = categoryCode;
+        this.isAllowConfig = isAllowConfig;
+        this.enabled = enabled;
         this.retryCount = retryCount;
         this.isSendInstantly = isSendInstantly;
         this.isManualRetry = isManualRetry;
+        this.emailEnabledFlag = emailEnabledFlag;
+        this.pmEnabledFlag = pmEnabledFlag;
+        this.smsEnabledFlag = smsEnabledFlag;
+        this.webhookEnabledFlag = webhookEnabledFlag;
+        this.backlogFlag = backlogFlag;
     }
 
     public SendSettingDTO() {
@@ -94,7 +100,6 @@ public class SendSettingDTO extends BaseDTO {
                 ", webhookEnabledFlag=" + webhookEnabledFlag +
                 '}';
     }
-
 
     public Long getId() {
         return id;
@@ -134,8 +139,9 @@ public class SendSettingDTO extends BaseDTO {
         return level;
     }
 
-    public void setLevel(String level) {
+    public SendSettingDTO setLevel(String level) {
         this.level = level;
+        return this;
     }
 
     public Integer getRetryCount() {

@@ -1,8 +1,10 @@
 package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,11 +15,14 @@ import javax.persistence.Table;
 @Table(name = "notify_webhook_message_setting")
 public class WebHookMessageSettingDTO extends BaseDTO {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty("必填字段")
     private Long id;
 
+    @ApiModelProperty("WEBHOOK主键")
     private Long webhookId;
 
+    @ApiModelProperty("发送设置主键")
     private Long sendSettingId;
 
     public Long getId() {
@@ -32,15 +37,17 @@ public class WebHookMessageSettingDTO extends BaseDTO {
         return webhookId;
     }
 
-    public void setWebhookId(Long webhookId) {
+    public WebHookMessageSettingDTO setWebhookId(Long webhookId) {
         this.webhookId = webhookId;
+        return this;
     }
 
     public Long getSendSettingId() {
         return sendSettingId;
     }
 
-    public void setSendSettingId(Long sendSettingId) {
+    public WebHookMessageSettingDTO setSendSettingId(Long sendSettingId) {
         this.sendSettingId = sendSettingId;
+        return this;
     }
 }

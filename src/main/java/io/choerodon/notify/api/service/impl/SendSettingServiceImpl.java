@@ -46,12 +46,15 @@ public class SendSettingServiceImpl implements SendSettingService {
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
     public static final String SEND_SETTING_UPDATE_EXCEPTION = "error.send.setting.update";
     private SendSettingMapper sendSettingMapper;
+    private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
     private final ModelMapper modelMapper = new ModelMapper();
     private SendSettingCategoryMapper sendSettingCategoryMapper;
 
     public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, TemplateMapper templateMapper, SendSettingCategoryMapper sendSettingCategoryMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper) {
         this.sendSettingMapper = sendSettingMapper;
+        this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
         this.sendSettingCategoryMapper = sendSettingCategoryMapper;
     }
@@ -428,4 +431,19 @@ public class SendSettingServiceImpl implements SendSettingService {
         }
         return pmSendSettingVO;
     }
+
+    @Override
+    public WebHookVO.SendSetting getUnderProject() {
+        WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
+        //1.获取发送设置可选集合
+        List<SendSettingDTO> sendSettingSelection = sendSettingMapper.select(new SendSettingDTO().setLevel(ResourceType.PROJECT.value()));
+        if (CollectionUtils.isEmpty(sendSettingSelection)) {
+            return sendSetting;
+        }
+        //2.获取发送设置类别集合
+        Set<SendSettingCategoryDTO> sendSettingCategorySelection = sendSettingCategoryMapper.selectByCodeSet(sendSettingSelection.stream().map(SendSettingDTO::getCategoryCode).collect(Collectors.toSet()));
+        //3.构造返回数据
+        return sendSetting.setSendSettingSelection(new HashSet<>(sendSettingSelection)).setSendSettingCategorySelection(new HashSet<>(sendSettingCategorySelection));
+    }
+
 }
