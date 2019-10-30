@@ -169,7 +169,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             Set<UserDTO> mailRecipient = getNeedReceiveNoticeTargetUsers(noticeSendDTO, sendSettingDTO, users, SendingTypeEnum.EMAIL);
             //2.发送邮件
             emailSendService.sendEmail(noticeSendDTO.getParams(), mailRecipient, sendSettingDTO);
-        } catch (CommonException e) {
+        } catch (Exception e) {
             LOGGER.warn(">>>SENDING_EMAIL_ERROR>>> An error occurred while sending the message.", e);
         }
     }
@@ -194,7 +194,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             //3.发送站内信
             webSocketSendService.sendSiteMessage(noticeSendDTO.getCode(), noticeSendDTO.getParams(), needSendPmUsers,
                     sender.get(senderType), senderType, sendSettingDTO);
-        } catch (CommonException e) {
+        } catch (Exception e) {
             LOGGER.warn(">>>SENDING_SITE_MESSAGE_ERROR>>> An error occurred while sending the message.", e);
         }
     }
