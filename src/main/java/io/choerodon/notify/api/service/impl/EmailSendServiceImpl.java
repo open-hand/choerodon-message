@@ -93,7 +93,7 @@ public class EmailSendServiceImpl implements EmailSendService {
                     .setSendingType(SendingTypeEnum.EMAIL.getValue())
                     .setSendSettingCode(sendSettingDTO.getCode()));
         } catch (Exception e) {
-            LOGGER.warn(">>>CANCEL_SENDING_EMAIL>>> No valid templates available.");
+            LOGGER.warn(">>>CANCEL_SENDING_EMAIL>>> No valid templates available.",e);
             return;
         }
         Template template = tmp;

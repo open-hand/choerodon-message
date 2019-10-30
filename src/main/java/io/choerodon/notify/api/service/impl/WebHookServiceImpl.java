@@ -74,7 +74,7 @@ public class WebHookServiceImpl implements WebHookService {
                     .setSendingType(SendingTypeEnum.WH.getValue())
                     .setSendSettingCode(sendSetting.getCode()));
         } catch (Exception e) {
-            LOGGER.warn(">>>CANCEL_SENDING_WEBHOOK>>> No valid templates available.");
+            LOGGER.warn(">>>CANCEL_SENDING_WEBHOOK>>> No valid templates available.",e);
             return;
         }
 

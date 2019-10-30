@@ -57,7 +57,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                     .setSendingType(SendingTypeEnum.PM.getValue())
                     .setSendSettingCode(sendSettingDTO.getCode()));
         } catch (Exception e) {
-            LOGGER.error(">>>CANCEL_SENDING_SITE_MSG>>> No valid templates available.");
+            LOGGER.error(">>>CANCEL_SENDING_SITE_MSG>>> No valid templates available.",e);
             return;
         }
         Template template = tmp;
