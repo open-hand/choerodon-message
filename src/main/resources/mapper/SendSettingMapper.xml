@@ -7,6 +7,20 @@
         <result column="fd_level" property="level" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <resultMap id="sendSettingCategoryDTO" type="io.choerodon.notify.infra.dto.SendSettingCategoryDTO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="description" column="description"/>
+        <result property="objectVersionNumber" column="Object_Version_Number"/>
+        <association property="sendSettingDTO" javaType="io.choerodon.notify.infra.dto.SendSettingDTO">
+            <id property="id" column="id"/>
+            <result property="name" column="cateName"/>
+            <result property="description" column="description"/>
+            <result property="categoryCode" column="Category_Code"/>
+        </association>
+    </resultMap>
+
     <select id="fulltextSearch" resultMap="SendSettingListDTO">
         SELECT
         nts.id,
@@ -148,7 +162,12 @@
         </if>
     </select>
 
-    <select id="selectCategoryCodes" resultType="io.choerodon.notify.infra.dto.SendSettingDTO">
-        SELECT category_code FROM notify_send_setting;
+    <select id="querySendSetting" resultMap="sendSettingCategoryDTO">
+        SELECT nsc.id,nsc.name,nsc.code,nsc.description,nsc.Object_Version_Number,nss.id,nss.name as cateName,nss.description
+        FROM notify_send_setting_category nsc
+         LEFT JOIN notify_send_setting nss
+         ON nsc.code=nss.Category_Code
+        WHERE fd_level = 'project'
+      GROUP BY nsc.name
     </select>
 </mapper>

@@ -13,6 +13,7 @@ import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.enums.WebHookTypeEnum;
+import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
 import io.choerodon.notify.infra.mapper.WebHookMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 @Service
 public class WebHookServiceImpl implements WebHookService {
@@ -36,12 +34,14 @@ public class WebHookServiceImpl implements WebHookService {
     private WebHookMapper webHookMapper;
     private TemplateService templateService;
     private TemplateRender templateRender;
+    private MessegeSettingMapper messegeSettingMapper;
 
 
-    public WebHookServiceImpl(WebHookMapper webHookMapper, TemplateService templateService, TemplateRender templateRender) {
+    public WebHookServiceImpl(WebHookMapper webHookMapper, TemplateService templateService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper) {
         this.webHookMapper = webHookMapper;
         this.templateService = templateService;
         this.templateRender = templateRender;
+        this.messegeSettingMapper = messegeSettingMapper;
     }
 
     @Override
@@ -149,12 +149,24 @@ public class WebHookServiceImpl implements WebHookService {
     }
 
     @Override
-    public WebHookDTO createWebHook(Long projectId, WebHookDTO webHookDTO) {
+    @Transactional
+    public WebHookDTO createWebHook(Long projectId,WebHookDTO webHookDTO) {
         if (projectId == null) {
-            throw new CommonException("error the projectId is not be null");
+            throw new CommonException("error.the.projectId.is.not.be.null");
         }
         webHookDTO.setProjectId(projectId);
-        webHookMapper.insertSelective(webHookDTO);
+        if (webHookMapper.insertSelective(webHookDTO) !=1){
+            throw new CommonException("error.insert.is.failed!");
+        }
+          Long[] webHookIds=new Long[webHookDTO.getIds().length];
+        for (int i = 0; i < webHookIds.length; i++) {
+            webHookIds[i]=webHookDTO.getId();
+        }
+        List resultList=messegeSettingMapper.insertWebHookIds(webHookIds);
+        if (CollectionUtils.isEmpty(resultList)){
+            throw new CommonException("error.insert.is.failed!");
+        }
+        messegeSettingMapper.insertMessageByIds(webHookDTO.getId(),webHookDTO.getIds());
         return webHookDTO;
     }
 
@@ -186,11 +198,29 @@ public class WebHookServiceImpl implements WebHookService {
 
     @Override
     public WebHookDTO disableWebHook(Long id) {
+        WebHookDTO webHookDTO=new WebHookDTO();
+        webHookDTO.setId(id);
+        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
+        if (ObjectUtils.isEmpty(webHookDTO1)){
+            throw new CommonException("error.the.webhook.not.exited");
+        }
+        if (webHookDTO1.getEnableFlag()==true){
+            throw new CommonException("error.the.update.enableFlage.status");
+        }
         return updateStatus(id, false);
     }
 
     @Override
     public WebHookDTO enableWebHook(Long id) {
+        WebHookDTO webHookDTO=new WebHookDTO();
+        webHookDTO.setId(id);
+        WebHookDTO webHookDTO1 = webHookMapper.selectByPrimaryKey(webHookDTO);
+        if (ObjectUtils.isEmpty(webHookDTO1)){
+            throw new CommonException("error.the.webhook.not.exited");
+        }
+        if (webHookDTO1.getEnableFlag()==true){
+            throw new CommonException("error.the.update.enableFlage.status");
+        }
         return updateStatus(id, true);
     }
 
@@ -199,7 +229,6 @@ public class WebHookServiceImpl implements WebHookService {
         webHookDTO.setEnableFlag(able);
         if (webHookMapper.updateByPrimaryKeySelective(webHookDTO) != 1) {
             throw new CommonException("error.the.webhook.is.not.existsted");
-
         }
         return webHookDTO;
     }

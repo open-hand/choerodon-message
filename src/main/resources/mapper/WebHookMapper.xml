@@ -14,29 +14,35 @@
 
     <select id="selectWebHookAll" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
         SELECT
-        id,
-        name,
-        type,
-        webhook_path,
-        project_id,
-        enable_flag,
-        object_version_number
+        nw.id,
+        nw.name,
+        nw.type,
+        nw.webhook_path,
+        nw.project_id,
+        nw.enable_flag,
+        nw.object_version_number
         FROM
-        notify_webhook
+        notify_webhook nw
+        LEFT JOIN notify_webhook_message_setting nwms
+        ON nw.ID=nwms.WEBHOOK_ID
+        LEFT JOIN notify_send_setting nss
+        ON nss.ID=nwms.SEND_SETTING_ID
+        LEFT JOIN notify_send_setting_category nsc
+        ON nsc.`CODE`=nss.CATEGORY_CODE
         where project_id=#{projectId}
         <if test="name !=null">
-            AND name=#{name}
+            AND nw.name=#{name}
         </if>
         <if test="type !=null">
-            AND type=#{type}
+            AND nw.type=#{type}
         </if>
         <if test="enableFlag !=null">
-            AND enable_flag=#{enableFlag}
+            AND nw.enable_flag=#{enableFlag}
         </if>
         <if test="params !=null">
             AND (
-            name LIKE concat(concat('%',#{params}),'%') OR
-            type LIKE concat(concat('%',#{params}),'%')
+            nw.name LIKE concat(concat('%',#{params}),'%') OR
+            nw.type LIKE concat(concat('%',#{params}),'%')
             )
         </if>
     </select>

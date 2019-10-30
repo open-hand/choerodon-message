@@ -335,7 +335,8 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public List<SendSettingDTO> getCategoryCodes() {
-        return sendSettingMapper.selectCategoryCodes();
+    public List<SendSettingDTO> selectSendSetting() {
+        return sendSettingMapper.querySendSetting();
     }
+
 }

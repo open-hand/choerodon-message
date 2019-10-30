@@ -120,8 +120,7 @@ public interface SendSettingService {
     PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
 
     /**
-     * 查询项目层下的所有的CategoryCode
+     * 查询项目层下的所有的SendSetting
      */
-    List<SendSettingDTO> getCategoryCodes();
-
+    List<SendSettingDTO> selectSendSetting();
 }

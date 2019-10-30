@@ -1,5 +1,7 @@
 package io.choerodon.notify.infra.dto;
 
+import io.choerodon.mybatis.entity.BaseDTO;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,7 +12,7 @@ import javax.persistence.Table;
  * @date 2019/10/25
  */
 @Table(name = "notify_send_setting_category")
-public class SendSettingCategoryDTO {
+public class SendSettingCategoryDTO extends BaseDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +22,16 @@ public class SendSettingCategoryDTO {
     private String name;
 
     private String description;
+
+    private SendSettingDTO sendSettingDTO;
+
+    public SendSettingDTO getSendSettingDTO() {
+        return sendSettingDTO;
+    }
+
+    public void setSendSettingDTO(SendSettingDTO sendSettingDTO) {
+        this.sendSettingDTO = sendSettingDTO;
+    }
 
     public Long getId() {
         return id;

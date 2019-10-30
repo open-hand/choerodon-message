@@ -21,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @since 2019/10/28
  */
 @RestController
-@RequestMapping(value = "/v1/{project_id}/webhooks")
+@RequestMapping(value = "/v1/project/{project_id}/webhooks")
 public class WebHookController {
 
     private WebHookService webHookService;
@@ -54,8 +54,8 @@ public class WebHookController {
     @Permission(type = ResourceType.PROJECT)
     @ApiOperation(value = "添加webhook")
     @PostMapping
-    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId, @RequestBody @Validated WebHookDTO webHookDTO) {
-        return new ResponseEntity<>(webHookService.createWebHook(projectId, webHookDTO), HttpStatus.OK);
+    public ResponseEntity<WebHookDTO> save(@PathVariable(name = "project_id") Long projectId,@RequestBody @Validated WebHookDTO webHookDTO) {
+        return new ResponseEntity<>(webHookService.createWebHook(projectId,webHookDTO), HttpStatus.OK);
     }
 
     @Permission(type = ResourceType.PROJECT)
