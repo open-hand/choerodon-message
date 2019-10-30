@@ -1,14 +1,14 @@
 package io.choerodon.notify.infra.mapper;
 
+import io.choerodon.mybatis.common.Mapper;
+import io.choerodon.notify.api.dto.RecordListDTO;
+import io.choerodon.notify.infra.dto.MailingRecordDTO;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
-import io.choerodon.mybatis.common.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.domain.*;
-
-public interface RecordMapper extends Mapper<Record> {
+public interface MailingRecordMapper extends Mapper<MailingRecordDTO> {
 
     List<RecordListDTO> fulltextSearchEmail(@Param("status") String status,
                                             @Param("receiveEmail") String receiveEmail,

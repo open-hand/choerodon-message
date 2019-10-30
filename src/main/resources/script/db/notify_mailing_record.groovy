@@ -39,4 +39,23 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-record.groovy') {
     changeSet(author: 'superlee', id: '2019-05-21-modify-type') {
         modifyDataType(columnName: 'FAILED_REASON', newDataType: 'VARCHAR(255)', tableName: 'NOTIFY_RECORD')
     }
+
+    changeSet(id: '2019-10-22-notify_record-modify-column', author: 'longhe1996@icloud.com') {
+        addColumn(tableName: 'NOTIFY_RECORD') {
+            column(name: 'SEND_SETTING_CODE', type: 'VARCHAR(32)', remarks: '触发此邮件的发送设置CODE', afterColumn: 'BUSINESS_TYPE') {
+                constraints(nullable: false)
+            }
+        }
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE NOTIFY_RECORD SET SEND_SETTING_CODE=BUSINESS_TYPE"
+        }
+        dropColumn(tableName: 'NOTIFY_RECORD', columnName: 'BUSINESS_TYPE')
+        dropColumn(tableName: 'NOTIFY_RECORD', columnName: 'MESSAGE_TYPE')
+    }
+
+    changeSet(id: '2019-10-22-notify_record-rename-table', author: 'longhe1996@icloud.com') {
+        renameTable(oldTableName: 'NOTIFY_RECORD', newTableName: 'NOTIFY_MAILING_RECORD')
+    }
+
+    // NOTE：已更新表名，之后的 changeSet 需要用新表名 NOTIFY_MAILING_RECORD
 }

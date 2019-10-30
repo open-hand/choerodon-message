@@ -70,4 +70,44 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
             column(name: 'WH_ENABLED_FLAG', type: 'TINYINT UNSIGNED', remarks: '是否启用WebHook发送')
         }
     }
+
+
+    changeSet(id: '2019-10-22-notify_send_setting-modify-column', author: 'longhe1996@icloud.com') {
+        addColumn(tableName: 'NOTIFY_SEND_SETTING') {
+            column(name: 'CATEGORY_CODE', type: 'VARCHAR(32)', remarks: '发送设置类目编码', afterColumn: 'FD_LEVEL', defaultValue: 'default') {
+                constraints(nullable: false)
+            }
+            column(name: 'BACKLOG_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否为待办提醒消息。0：不是（默认）；1：是') {
+                constraints(nullable: false)
+            }
+            column(name: 'EMAIL_ENABLED_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否启用邮件方式发送消息。0：不启用（默认）；1：启用') {
+                constraints(nullable: false)
+            }
+            column(name: 'PM_ENABLED_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否启用站内信方式发送消息。0：不启用（默认）；1：启用') {
+                constraints(nullable: false)
+            }
+            column(name: 'SMS_ENABLED_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否启用短信方式发送消息。0：不启用（默认）；1：启用') {
+                constraints(nullable: false)
+            }
+            column(name: 'WEBHOOK_ENABLED_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否启用WEBHOOK方式发送消息。0：不启用（默认）；1：启用') {
+                constraints(nullable: false)
+            }
+        }
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE NOTIFY_SEND_SETTING \n" +
+                    "SET BACKLOG_FLAG=CASE WHEN PM_TYPE='notice' THEN 1 ELSE 0 END,\n" +
+                    "EMAIL_ENABLED_FLAG =CASE WHEN EMAIL_TEMPLATE_ID IS NULL THEN 0 ELSE 1 END,\n" +
+                    "PM_ENABLED_FLAG =CASE WHEN PM_TEMPLATE_ID IS NULL THEN 0 ELSE 1 END,\n" +
+                    "SMS_ENABLED_FLAG =CASE WHEN SMS_TEMPLATE_ID IS NULL THEN 0 ELSE 1 END,\n" +
+                    "WEBHOOK_ENABLED_FLAG =CASE WHEN WH_TEMPLATE_ID IS NULL OR  WH_ENABLED_FLAG =0 THEN 0 ELSE 1 END"
+        }
+        /*以下列需要提供template做数据迁移，所以在template.groovy中做删除
+
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TYPE')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'EMAIL_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'SMS_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')*/
+    }
 }

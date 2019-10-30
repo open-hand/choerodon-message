@@ -6,10 +6,10 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.PmTemplateDTO;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.dto.TemplateQueryDTO;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.service.PmTemplateService;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.modelmapper.ModelMapper;
@@ -37,10 +37,11 @@ public class PmTemplateServiceImpl implements PmTemplateService {
                                  SendSettingMapper sendSettingMapper) {
         this.templateMapper = templateMapper;
         this.sendSettingMapper = sendSettingMapper;
-        modelMapper.addMappings(PmTemplateDTO.entity2Dto());
-        modelMapper.addMappings(PmTemplateDTO.dto2Entity());
-        modelMapper.addMappings(TemplateQueryDTO.dto2Entity());
-        modelMapper.addMappings(TemplateQueryDTO.entity2Dto());
+        //todo
+//        modelMapper.addMappings(PmTemplateDTO.entity2Dto());
+//        modelMapper.addMappings(PmTemplateDTO.dto2Entity());
+//        modelMapper.addMappings(TemplateQueryDTO.dto2Entity());
+//        modelMapper.addMappings(TemplateQueryDTO.entity2Dto());
         modelMapper.validate();
     }
 
@@ -58,17 +59,17 @@ public class PmTemplateServiceImpl implements PmTemplateService {
 
     @Override
     public List<TemplateNamesDTO> listNames(final String level, final String businessType) {
-        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, MessageType.PM.getValue());
+        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, SendingTypeEnum.PM.getValue());
     }
 
     @Override
     public PmTemplateDTO query(Long id) {
         Template template = templateMapper.selectByPrimaryKey(id);
-        if (template == null || !template.getMessageType().equals(MessageType.PM.getValue())) {
+        if (template == null || !template.getSendingType().equals(SendingTypeEnum.PM.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         PmTemplateDTO dto = modelMapper.map(template, PmTemplateDTO.class);
-        dto.setType(template.getBusinessType());
+        dto.setType(template.getSendSettingCode());
         return dto;
     }
 
@@ -76,20 +77,20 @@ public class PmTemplateServiceImpl implements PmTemplateService {
     public PmTemplateDTO create(PmTemplateDTO dto) {
         valid(dto.getType());
         Template template = modelMapper.map(dto, Template.class);
-        template.setMessageType(MessageType.PM.getValue());
-        template.setBusinessType(dto.getType());
+        template.setSendingType(SendingTypeEnum.PM.getValue());
+        template.setSendSettingCode(dto.getType());
         if (templateMapper.insertSelective(template) != 1) {
             throw new CommonException("error.pmTemplate.save");
         }
         PmTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), PmTemplateDTO.class);
-        returnDto.setType(template.getBusinessType());
+        returnDto.setType(template.getSendSettingCode());
         return returnDto;
     }
 
     @Override
     public PmTemplateDTO update(PmTemplateDTO dto) {
         Template dbTemplate = templateMapper.selectByPrimaryKey(dto.getId());
-        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.PM.getValue())) {
+        if (dbTemplate == null || !dbTemplate.getSendingType().equals(SendingTypeEnum.PM.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         if (dto.getType() != null) {
@@ -100,12 +101,12 @@ public class PmTemplateServiceImpl implements PmTemplateService {
             throw new CommonException("error.pmTemplate.update");
         }
         PmTemplateDTO returnDto = modelMapper.map(templateMapper.selectByPrimaryKey(template.getId()), PmTemplateDTO.class);
-        returnDto.setType(template.getBusinessType());
+        returnDto.setType(template.getSendSettingCode());
         return returnDto;
     }
 
     private void valid(final String type) {
-        if (sendSettingMapper.selectOne(new SendSetting(type)) == null) {
+        if (sendSettingMapper.selectOne(new SendSettingDTO(type)) == null) {
             throw new CommonException("error.pmTemplate.businessTypeNotExist");
         }
     }
@@ -113,7 +114,7 @@ public class PmTemplateServiceImpl implements PmTemplateService {
     @Override
     public void delete(Long id) {
         Template dbTemplate = templateMapper.selectByPrimaryKey(id);
-        if (dbTemplate == null || !dbTemplate.getMessageType().equals(MessageType.PM.getValue())) {
+        if (dbTemplate == null || !dbTemplate.getSendingType().equals(SendingTypeEnum.PM.getValue())) {
             throw new CommonException(ERROR_TEMPLATE_NOT_EXIST);
         }
         if (dbTemplate.getIsPredefined() == null || dbTemplate.getIsPredefined()) {
@@ -127,7 +128,7 @@ public class PmTemplateServiceImpl implements PmTemplateService {
 
     @Override
     public void check(String code) {
-        String level = templateMapper.selectLevelByCode(code, MessageType.PM.getValue());
+        String level = templateMapper.selectLevelByCode(code, SendingTypeEnum.PM.getValue());
         if (StringUtils.isEmpty(level)) {
             return;
         }

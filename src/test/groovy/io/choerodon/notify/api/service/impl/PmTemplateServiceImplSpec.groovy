@@ -1,9 +1,9 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.exception.CommonException
-import io.choerodon.notify.api.pojo.MessageType
+import io.choerodon.notify.infra.enums.SendingTypeEnum
 import io.choerodon.notify.api.service.PmTemplateService
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import spock.lang.Specification
@@ -20,7 +20,7 @@ class PmTemplateServiceImplSpec extends Specification {
     def "Delete"() {
         given: "构造请求参数"
         Template template = new Template()
-        template.setMessageType(MessageType.EMAIL.value)
+        template.setMessageType(SendingTypeEnum.EMAIL.value)
         template.setIsPredefined(true)
 
         when: "调用方法-[异常-模板不存在]"
@@ -31,7 +31,7 @@ class PmTemplateServiceImplSpec extends Specification {
         exception.getCode().equals("error.pmTemplate.notExist")
 
         when: "调用方法-[异常-预定义]"
-        template.setMessageType(MessageType.PM.value)
+        template.setMessageType(SendingTypeEnum.PM.value)
         pmTemplateService.delete(1L)
         then: "校验结果"
         templateMapper.selectByPrimaryKey(_) >> { template }

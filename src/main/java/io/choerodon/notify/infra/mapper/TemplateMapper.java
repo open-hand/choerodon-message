@@ -1,5 +1,6 @@
 package io.choerodon.notify.infra.mapper;
 
+import io.choerodon.notify.infra.dto.Template;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.*;
@@ -7,8 +8,6 @@ import java.util.*;
 import io.choerodon.mybatis.common.*;
 import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.query.*;
-import io.choerodon.notify.api.vo.*;
-import io.choerodon.notify.domain.*;
 
 public interface TemplateMapper extends Mapper<Template> {
 

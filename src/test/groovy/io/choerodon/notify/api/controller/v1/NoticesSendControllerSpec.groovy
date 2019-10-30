@@ -5,9 +5,9 @@ import io.choerodon.notify.api.dto.NoticeSendDTO
 import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.service.WebSocketSendService
 import io.choerodon.notify.api.service.impl.NoticesSendServiceImpl
-import io.choerodon.notify.domain.Config
-import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Config
+import io.choerodon.notify.infra.dto.SendSettingDTO
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.ConfigMapper
 import io.choerodon.notify.infra.mapper.SendSettingMapper
@@ -25,8 +25,7 @@ import spock.lang.Specification
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan* */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 class NoticesSendControllerSpec extends Specification {
@@ -76,7 +75,7 @@ class NoticesSendControllerSpec extends Specification {
         noticeSendDTO.setParams(paramsMap)
 
         and: "关联发送设置和站内信模板"
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
         sendSetting.setCode("addUser")
         sendSetting = sendSettingMapper.selectOne(sendSetting)
         Template template = new Template()
@@ -87,7 +86,7 @@ class NoticesSendControllerSpec extends Specification {
         sendSettingMapper.updateByPrimaryKeySelective(sendSetting)
 
         and: "关联发送设置和邮件模板"
-        sendSetting = new SendSetting()
+        sendSetting = new SendSettingDTO()
         sendSetting.setCode("forgetPassword")
         sendSetting = sendSettingMapper.selectOne(sendSetting)
         template = new Template()

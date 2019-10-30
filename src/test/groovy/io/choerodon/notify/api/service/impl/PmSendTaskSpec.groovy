@@ -1,8 +1,8 @@
 package io.choerodon.notify.api.service.impl
 
 import io.choerodon.notify.api.service.SiteMsgRecordService
-import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.SendSettingDTO
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
@@ -32,7 +32,7 @@ class PmSendTaskSpec extends Specification {
         Map<String, Object> map = new HashMap<>()
         map.put("code", "addFunction")
         map.put("variables", "{'content':'定时任务'}")
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
         sendSetting.setPmTemplateId(1L)
         Template template = new Template()
         template.setPmContent("content")
@@ -61,7 +61,7 @@ class PmSendTaskSpec extends Specification {
         when: "调用方法"
         pmSendTask.sendStationLetter(map)
         then: "校验结果"
-        1 * sendSettingMapper.selectOne(_) >> { new SendSetting() }
+        1 * sendSettingMapper.selectOne(_) >> { new SendSettingDTO() }
 
         when: "调用方法"
         pmSendTask.sendStationLetter(map)

@@ -5,7 +5,6 @@
     <resultMap id="SiteMsgRecordDTO" type="io.choerodon.notify.api.dto.SiteMsgRecordDTO">
         <id column="id" property="id"></id>
         <result column="is_read" property="read" jdbcType="BOOLEAN"/>
-        <result column="is_deleted" property="deleted" jdbcType="BOOLEAN"/>
     </resultMap>
 
     <insert id="batchInsert" parameterType="java.util.List">
@@ -60,9 +59,6 @@
         <if test="query.read != null">
             AND nsr.is_read = #{query.read}
         </if>
-        <if test="query.deleted != null">
-            AND nsr.is_deleted = #{query.deleted}
-        </if>
         <if test="query.params != null">
             AND (
             nsr.title LIKE concat(concat('%',#{query.title}),'%') OR
@@ -76,12 +72,11 @@
         nsr.*
         FROM notify_sitemsg_record nsr
         WHERE nsr.user_id = #{userId}
-        AND nsr.is_deleted = 0
         <if test="read != null">
             AND nsr.is_read = #{read}
         </if>
-        <if test="type != null">
-            AND nsr.type = #{type}
+        <if test="backlogFlag != null">
+            AND nsr.backlog_flag = #{backlogFlag}
         </if>
         order by nsr.id desc
     </select>
@@ -92,7 +87,6 @@
         COUNT(*)
         FROM notify_sitemsg_record
         WHERE user_id = #{userId}
-        AND is_deleted = 0
         AND is_read = 0
     </select>
 

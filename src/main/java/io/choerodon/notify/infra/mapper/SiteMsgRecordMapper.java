@@ -3,7 +3,7 @@ package io.choerodon.notify.infra.mapper;
 import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO;
 import io.choerodon.notify.api.pojo.SiteMsgRecordQueryParam;
-import io.choerodon.notify.domain.SiteMsgRecord;
+import io.choerodon.notify.infra.dto.SiteMsgRecord;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface SiteMsgRecordMapper extends Mapper<SiteMsgRecord> {
 
     List<SiteMsgRecordDTO> selectByUserIdAndReadAndDeleted(@Param("userId") Long userId,
                                                            @Param("read") Boolean read,
-                                                           @Param("type") String type);
+                                                           @Param("backlogFlag") Boolean backlogFlag);
 
     int selectCountOfUnRead(@Param("userId") Long userId);
 

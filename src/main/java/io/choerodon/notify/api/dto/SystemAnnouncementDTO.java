@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
 
-import io.choerodon.notify.domain.SystemAnnouncement;
+import io.choerodon.notify.infra.dto.SystemAnnouncement;
 
 /**
  * @author dengyouquan

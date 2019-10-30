@@ -1,9 +1,10 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.notify.api.dto.TemplateCreateVO;
+import io.choerodon.notify.api.dto.TemplateVO;
+import io.choerodon.notify.infra.dto.Template;
 import org.springframework.data.domain.Pageable;
-
-import io.choerodon.notify.api.dto.*;
 
 /**
  * @author Eugen
@@ -47,18 +48,26 @@ public interface TemplateService {
     /**
      * 创建模版
      *
-     * @param setToTheCurrent 是否设为当前模版
-     * @param createVO        创建信息
+     * @param template 创建信息
      * @return 创建结果
      */
-    TemplateCreateVO createTemplate(Boolean setToTheCurrent, TemplateCreateVO createVO);
+    Template createTemplate(Template template);
 
 
     /**
      * 更新模版
      *
-     * @param updateVO 更新VO
+     * @param template 更新VO
      * @return 更新结果
      */
-    TemplateCreateVO updateTemplate(Boolean setToTheCurrent, TemplateCreateVO updateVO);
+    Template updateTemplate(Template template);
+
+
+    /**
+     * 查询模版
+     *
+     * @param template
+     * @return 模版详情
+     */
+    Template getOne(Template template);
 }

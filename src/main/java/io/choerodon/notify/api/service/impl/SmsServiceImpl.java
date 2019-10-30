@@ -8,12 +8,16 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.SmsService;
-import io.choerodon.notify.domain.*;
+import io.choerodon.notify.domain.CrlandSmsResponse;
+import io.choerodon.notify.domain.Record;
 import io.choerodon.notify.infra.asserts.SendSettingAssertHelper;
 import io.choerodon.notify.infra.asserts.SmsConfigAssertHelper;
 import io.choerodon.notify.infra.asserts.TemplateAssertHelper;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.SmsConfigDTO;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.enums.SmsSendType;
-import io.choerodon.notify.infra.mapper.RecordMapper;
+import io.choerodon.notify.infra.mapper.MailingRecordMapper;
 import io.choerodon.notify.infra.mapper.SmsConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,17 +59,17 @@ public class SmsServiceImpl implements SmsService {
 
     private final SmsConfigMapper smsConfigMapper;
 
-    private final RecordMapper recordMapper;
+    private final MailingRecordMapper mailingRecordMapper;
 
     public SmsServiceImpl(SendSettingAssertHelper sendSettingAssertHelper,
                           TemplateAssertHelper templateAssertHelper,
                           SmsConfigAssertHelper smsConfigAssertHelper,
-                          RecordMapper recordMapper,
+                          MailingRecordMapper mailingRecordMapper,
                           SmsConfigMapper smsConfigMapper) {
         this.sendSettingAssertHelper = sendSettingAssertHelper;
         this.templateAssertHelper = templateAssertHelper;
         this.smsConfigAssertHelper = smsConfigAssertHelper;
-        this.recordMapper = recordMapper;
+        this.mailingRecordMapper = mailingRecordMapper;
         this.smsConfigMapper = smsConfigMapper;
     }
 
@@ -80,29 +83,30 @@ public class SmsServiceImpl implements SmsService {
         if (code == null) {
             throw new FeignException("error.send.sms.code.null");
         }
-        SendSetting sendSetting = sendSettingAssertHelper.sendSettingNotExisted(code);
+        SendSettingDTO sendSetting = sendSettingAssertHelper.sendSettingNotExisted(code);
 
-        Long templateId = sendSetting.getSmsTemplateId();
-        Template template = templateAssertHelper.templateNotExisted(templateId);
-        String content = template.getSmsContent();
-        if (!"sms".equals(template.getMessageType()) || StringUtils.isEmpty(content)) {
-            LOGGER.warn("illegal sms template, id: {}", templateId);
-            throw new FeignException("error.illegal.sms.template");
-        }
-
-        SmsConfigDTO smsConfig =
-                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
-        Map<String, Object> variable = noticeSendDTO.getParams();
-        variable.put("secretKey", smsConfig.getSecretKey());
-        variable.put("source", smsConfig.getSignature());
-        JsonNode node = null;
-        try {
-            node = objectMapper.readTree(content);
-            substitutionVariable(variable, node);
-        } catch (IOException e) {
-            throw new FeignException("error.parse.sms.template.json");
-        }
-        sendSms(smsConfig, node, template, variable);
+        //todo
+//        Long templateId = sendSetting.getSmsTemplateId();
+//        Template template = templateAssertHelper.templateNotExisted(templateId);
+//        String content = template.getContent();
+//        if (!"sms".equals(template.getSendingType()) || StringUtils.isEmpty(content)) {
+//            LOGGER.warn("illegal sms template, id: {}", templateId);
+//            throw new FeignException("error.illegal.sms.template");
+//        }
+//
+//        SmsConfigDTO smsConfig =
+//                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
+//        Map<String, Object> variable = noticeSendDTO.getParams();
+//        variable.put("secretKey", smsConfig.getSecretKey());
+//        variable.put("source", smsConfig.getSignature());
+//        JsonNode node = null;
+//        try {
+//            node = objectMapper.readTree(content);
+//            substitutionVariable(variable, node);
+//        } catch (IOException e) {
+//            throw new FeignException("error.parse.sms.template.json");
+//        }
+//        sendSms(smsConfig, node, template, variable);
     }
 
     @Override
@@ -187,7 +191,7 @@ public class SmsServiceImpl implements SmsService {
             LOGGER.error("invoke single sms api failed, exception: {}", message);
             throw new FeignException("error.invoke.single.sms.api", message);
         } finally {
-            recordMapper.insertSelective(record);
+            mailingRecordMapper.insertSelective(record);
         }
     }
 
@@ -202,9 +206,9 @@ public class SmsServiceImpl implements SmsService {
     }
 
     private Record initRecord(Template template, Map<String, Object> variable) {
-        String businessType = template.getBusinessType();
+        String businessType = template.getSendSettingCode();
         Record record = new Record();
-        record.setBusinessType(businessType);
+        record.setSendSettingCode(businessType);
         record.setRetryCount(0);
         try {
             record.setVariables(objectMapper.writeValueAsString(variable));
@@ -212,7 +216,8 @@ public class SmsServiceImpl implements SmsService {
             throw new FeignException("error.parse.object.to.string");
         }
         record.setTemplateId(template.getId());
-        record.setMessageType("sms");
+        //todo
+//        record.setMessageType("sms");
         return record;
     }
 
@@ -251,7 +256,7 @@ public class SmsServiceImpl implements SmsService {
             crlandSmsResponses.forEach(resp -> {
                 Record record = initRecord(template, variable);
                 processRecordByResponse(record, resp);
-                recordMapper.insertSelective(record);
+                mailingRecordMapper.insertSelective(record);
             });
         } else {
             String mobile = (String) variable.get("mobile");
@@ -261,7 +266,7 @@ public class SmsServiceImpl implements SmsService {
                 record.setReceiveAccount(m);
                 record.setStatus(FAILED);
                 record.setFailedReason("调用远程接口发短信异常");
-                recordMapper.insertSelective(record);
+                mailingRecordMapper.insertSelective(record);
             });
         }
     }

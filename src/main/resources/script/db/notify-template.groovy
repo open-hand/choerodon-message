@@ -47,10 +47,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         }
     }
     changeSet(author: 'youquan.deng@hand-china.com', id: '2018-09-26-change-column') {
-        if(helper.isOracle()) {
-            modifyDataType(columnName: 'CODE', newDataType:'VARCHAR(64)', tableName: 'NOTIFY_TEMPLATE')
+        if (helper.isOracle()) {
+            modifyDataType(columnName: 'CODE', newDataType: 'VARCHAR(64)', tableName: 'NOTIFY_TEMPLATE')
         }
-        if(helper.isMysql()) {
+        if (helper.isMysql()) {
             //会删掉注释
             addNotNullConstraint(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE', columnDataType: 'VARCHAR(64)')
         }
@@ -60,5 +60,59 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-template.groovy') {
         addColumn(tableName: "NOTIFY_TEMPLATE") {
             column(name: 'WH_CONTENT', type: 'TEXT', remarks: 'webhook 文本消息模版', afterColumn: 'PM_CONTENT')
         }
+    }
+
+
+    changeSet(id: '2019-10-22-notify_template-modify-column', author: 'longhe1996@icloud.com') {
+        addColumn(tableName: 'NOTIFY_TEMPLATE') {
+            column(name: 'SEND_SETTING_CODE', type: 'VARCHAR(32)', defaultValue: "EMPTY STRING", remarks: '模版所属的发送设置CODE', afterColumn: 'BUSINESS_TYPE') {
+                constraints(nullable: false)
+            }
+            column(name: 'SENDING_TYPE', type: 'VARCHAR(16)', defaultValue: "EMPTY STRING", remarks: '模版类型:email,sms,pm,webhook', afterColumn: 'SEND_SETTING_CODE') {
+                constraints(nullable: false)
+            }
+            column(name: 'TITLE', type: 'VARCHAR(64)', remarks: '模版标题')
+            column(name: 'CONTENT', type: 'TEXT', remarks: '模版内容')
+        }
+        //数据迁移
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE notify_template " +
+                    "SET SEND_SETTING_CODE=BUSINESS_TYPE," +
+                    "SENDING_TYPE=MESSAGE_TYPE," +
+                    "TITLE=CASE WHEN MESSAGE_TYPE='pm' THEN PM_TITLE WHEN MESSAGE_TYPE='email' THEN EMAIL_TITLE END," +
+                    "CONTENT=CASE WHEN MESSAGE_TYPE='pm' THEN PM_CONTENT WHEN MESSAGE_TYPE='email' THEN EMAIL_CONTENT WHEN MESSAGE_TYPE='sms' THEN SMS_CONTENT WHEN MESSAGE_TYPE='webhook' THEN WH_CONTENT END;"
+        }
+        dropUniqueConstraint(constraintName: 'UK_NOTIFY_TEMPLATE_U1', tableName: 'NOTIFY_TEMPLATE')
+
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'CODE')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'NAME')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'MESSAGE_TYPE')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'BUSINESS_TYPE')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'EMAIL_TITLE')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'EMAIL_CONTENT')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'PM_TITLE')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'PM_CONTENT')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'SMS_CONTENT')
+        dropColumn(tableName: 'NOTIFY_TEMPLATE', columnName: 'WH_CONTENT')
+
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "DELETE FROM notify_template WHERE ID NOT IN (\n" +
+                    "SELECT EMAIL_TEMPLATE_ID AS id FROM notify_send_setting WHERE EMAIL_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT PM_TEMPLATE_ID AS id FROM notify_send_setting WHERE PM_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT SMS_TEMPLATE_ID AS id FROM notify_send_setting WHERE SMS_TEMPLATE_ID IS NOT NULL UNION \n" +
+                    "SELECT WH_TEMPLATE_ID AS id FROM notify_send_setting WHERE WH_TEMPLATE_ID IS NOT NULL AND WH_ENABLED_FLAG=1)"
+        }
+
+        addUniqueConstraint(tableName: 'NOTIFY_TEMPLATE', columnNames: 'SENDING_TYPE,SEND_SETTING_CODE', constraintName: "UK_NOTIFY_TEMPLATE_U1")
+    }
+
+    changeSet(id: '2019-10-22-notify_send_setting-drop-column', author: 'longhe1996@icloud.com') {
+        //以下列属send_setting,但需要供template做数据修复，故保存在此
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TYPE')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'EMAIL_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'SMS_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'PM_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_TEMPLATE_ID')
+        dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')
     }
 }

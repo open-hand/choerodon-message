@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.infra.config.NotifyProperties;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;

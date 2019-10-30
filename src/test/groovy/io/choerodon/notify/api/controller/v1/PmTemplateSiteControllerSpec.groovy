@@ -3,8 +3,8 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.core.domain.Page
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.PmTemplateDTO
-import io.choerodon.notify.api.pojo.MessageType
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.enums.SendingTypeEnum
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -132,7 +132,7 @@ class PmTemplateSiteControllerSpec extends Specification {
         template.setEmailContent("{content}")
         template.setIsPredefined(false)
         template.setEmailTitle("测试站内信")
-        template.setMessageType(MessageType.PM.getValue())
+        template.setMessageType(SendingTypeEnum.PM.getValue())
         templateMapper.insert(template)
 
         and: "构造请求参数"
@@ -171,7 +171,7 @@ class PmTemplateSiteControllerSpec extends Specification {
         template.setEmailContent("\${content}")
         template.setIsPredefined(false)
         template.setEmailTitle("测试站内信")
-        template.setMessageType(MessageType.PM.value)
+        template.setMessageType(SendingTypeEnum.PM.value)
         templateMapper.insert(template)
         def params = new HashMap<String, Object>()
         params.put("id", template.getId())

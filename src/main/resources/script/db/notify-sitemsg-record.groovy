@@ -49,4 +49,24 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-sitemsg-record.groovy') {
         }
         renameColumn(tableName: 'NOTIFY_SITEMSG_RECORD', oldColumnName: 'SEND_BY', newColumnName: 'SEND_BY', columnDataType: 'BIGINT UNSIGNED', remarks: '触发此站内信的发送者的id')
     }
+
+    changeSet(id: '2019-10-22-notify_sitemsg_record-modify-column', author: 'longhe1996@icloud.com') {
+        addColumn(tableName: 'NOTIFY_SITEMSG_RECORD') {
+            column(name: 'BACKLOG_FLAG', type: 'TINYINT UNSIGNED', defaultValue: 0, remarks: '是否是待办消息。0：不是（默认）；1：是') {
+                constraints(nullable: false)
+            }
+        }
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "UPDATE notify_sitemsg_record " +
+                    "SET BACKLOG_FLAG=CASE WHEN TYPE='msg' THEN 0 WHEN TYPE='notice' THEN 1 END"
+        }
+        dropColumn(tableName: 'NOTIFY_SITEMSG_RECORD', columnName: 'TYPE')
+    }
+
+    changeSet(id: '2019-10-29-notify_sitemsg_record-modify-column', author: 'jiameng.cao') {
+        sql(stripComments: true, splitStatements: false, endDelimiter: ';') {
+            "DELETE FROM notify_sitemsg_record WHERE IS_DELETED=1"
+        }
+        dropColumn(tableName: 'NOTIFY_SITEMSG_RECORD', columnName: 'IS_DELETED')
+    }
 }

@@ -3,7 +3,7 @@ package io.choerodon.notify.api.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.service.ConfigService;
-import io.choerodon.notify.domain.Config;
+import io.choerodon.notify.infra.dto.Config;
 import io.choerodon.notify.infra.cache.ConfigCache;
 import io.choerodon.notify.infra.mapper.ConfigMapper;
 import org.modelmapper.ModelMapper;

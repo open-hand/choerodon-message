@@ -1,6 +1,5 @@
 package io.choerodon.notify.api.dto;
 
-import io.choerodon.notify.domain.ReceiveSetting;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
@@ -26,8 +25,8 @@ public class ReceiveSettingDTO {
     @NotNull(message = "error.receiveSetting.userIdNull")
     private Long userId;
 
-    public static PropertyMap<ReceiveSettingDTO, ReceiveSetting> dto2Entity() {
-        return new PropertyMap<ReceiveSettingDTO, ReceiveSetting>() {
+    public static PropertyMap<ReceiveSettingDTO, io.choerodon.notify.infra.dto.ReceiveSettingDTO> dto2Entity() {
+        return new PropertyMap<ReceiveSettingDTO, io.choerodon.notify.infra.dto.ReceiveSettingDTO>() {
             @Override
             protected void configure() {
                 skip().setCreatedBy(null);
@@ -65,8 +64,8 @@ public class ReceiveSettingDTO {
     }
 
 
-    public static PropertyMap<ReceiveSetting, ReceiveSettingDTO> entity2Dto() {
-        return new PropertyMap<ReceiveSetting, ReceiveSettingDTO>() {
+    public static PropertyMap<io.choerodon.notify.infra.dto.ReceiveSettingDTO, ReceiveSettingDTO> entity2Dto() {
+        return new PropertyMap<io.choerodon.notify.infra.dto.ReceiveSettingDTO, ReceiveSettingDTO>() {
             protected void configure() {
                 //因为ReceiveSetting 和 ReceiveSettingDTO 字段完全相同，我们使用默认转换
             }

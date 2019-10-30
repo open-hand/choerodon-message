@@ -6,7 +6,7 @@ import io.choerodon.core.oauth.DetailsHelper
 import io.choerodon.notify.api.dto.SystemAnnouncementDTO
 import io.choerodon.notify.api.service.utils.SpockUtils
 import io.choerodon.notify.domain.QuartzTask
-import io.choerodon.notify.domain.SystemAnnouncement
+import io.choerodon.notify.infra.dto.SystemAnnouncement
 import io.choerodon.notify.infra.feign.AsgardFeignClient
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SystemAnnouncementMapper

@@ -4,7 +4,7 @@ import io.choerodon.core.domain.Page
 import io.choerodon.core.exception.ExceptionResponse
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.domain.Record
-import io.choerodon.notify.infra.mapper.RecordMapper
+import io.choerodon.notify.infra.mapper.MailingRecordMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -24,7 +24,7 @@ class MessageRecordSiteControllerSpec extends Specification {
     @Autowired
     private TestRestTemplate restTemplate
     @Autowired
-    private RecordMapper recordMapper
+    private MailingRecordMapper recordMapper
     @Shared
     List<Record> records = new ArrayList<>()
     @Shared

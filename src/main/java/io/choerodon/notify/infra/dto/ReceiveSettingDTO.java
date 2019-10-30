@@ -1,37 +1,37 @@
-package io.choerodon.notify.domain;
-
+package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Objects;
 
 /**
- * @author dengyouquan
- **/
+ * @author jiameng.cao
+ * @date 2019/10/25
+ */
 @Table(name = "notify_receive_setting")
-public class ReceiveSetting extends BaseDTO {
+public class ReceiveSettingDTO extends BaseDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long sendSettingId;
-    private String messageType;
-    @Column(name = "is_disabled")
-    private Boolean disable;
     private Long sourceId;
     private String sourceType;
     private Long userId;
+    private String sendingType;
 
-    public ReceiveSetting() {
+    public ReceiveSettingDTO() {
     }
 
-    public ReceiveSetting(Long sendSettingId, String messageType, Long sourceId, String sourceType, Long userId) {
+    public ReceiveSettingDTO(Long sendSettingId, String sendingType, Long sourceId, String sourceType, Long userId) {
         this.sendSettingId = sendSettingId;
-        this.messageType = messageType;
         this.sourceId = sourceId;
         this.sourceType = sourceType;
         this.userId = userId;
-        this.disable = true;
+        this.sendingType = sendingType;
     }
 
     public Long getId() {
@@ -48,22 +48,6 @@ public class ReceiveSetting extends BaseDTO {
 
     public void setSendSettingId(Long sendSettingId) {
         this.sendSettingId = sendSettingId;
-    }
-
-    public String getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
-    }
-
-    public Boolean getDisable() {
-        return disable;
-    }
-
-    public void setDisable(Boolean disable) {
-        this.disable = disable;
     }
 
     public Long getSourceId() {
@@ -94,9 +78,9 @@ public class ReceiveSetting extends BaseDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReceiveSetting that = (ReceiveSetting) o;
+        ReceiveSettingDTO that = (ReceiveSettingDTO) o;
         return Objects.equals(getSendSettingId(), that.getSendSettingId()) &&
-                Objects.equals(getMessageType(), that.getMessageType()) &&
+                Objects.equals(getSendingType(), that.getSendingType()) &&
                 Objects.equals(getSourceId(), that.getSourceId()) &&
                 Objects.equals(getSourceType(), that.getSourceType()) &&
                 Objects.equals(getUserId(), that.getUserId());
@@ -104,6 +88,14 @@ public class ReceiveSetting extends BaseDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSendSettingId(), getMessageType(), getSourceId(), getSourceType(), getUserId());
+        return Objects.hash(getSendSettingId(), getSendingType(), getSourceId(), getSourceType(), getUserId());
+    }
+
+    public String getSendingType() {
+        return sendingType;
+    }
+
+    public void setSendingType(String sendingType) {
+        this.sendingType = sendingType;
     }
 }

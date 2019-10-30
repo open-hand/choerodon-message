@@ -6,7 +6,7 @@ import io.choerodon.notify.api.dto.ProjectDTO
 import io.choerodon.notify.api.dto.SiteMsgRecordDTO
 import io.choerodon.notify.api.dto.UserDTO
 import io.choerodon.notify.api.service.SiteMsgRecordService
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper
 import io.choerodon.websocket.helper.WebSocketHelper

@@ -6,7 +6,7 @@ import io.choerodon.core.enums.ResourceType;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
 import io.choerodon.notify.api.query.TemplateQuery;
 import io.choerodon.notify.api.service.SmsTemplateService;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

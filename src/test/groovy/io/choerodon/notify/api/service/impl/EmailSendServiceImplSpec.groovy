@@ -1,35 +1,26 @@
 package io.choerodon.notify.api.service.impl
 
-
 import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.api.dto.UserDTO
-import io.choerodon.notify.api.pojo.MessageType
-import io.choerodon.notify.api.pojo.RecordSendData
 import io.choerodon.notify.api.service.EmailSendService
-import io.choerodon.notify.domain.Config
-import io.choerodon.notify.domain.Record
-import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
 import io.choerodon.notify.infra.cache.ConfigCache
-import io.choerodon.notify.infra.mapper.RecordMapper
+import io.choerodon.notify.infra.dto.Config
+import io.choerodon.notify.infra.dto.SendSettingDTO
+import io.choerodon.notify.infra.dto.Template
+import io.choerodon.notify.infra.mapper.MailingRecordMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mail.MailAuthenticationException
-import org.springframework.mail.MailSendException
-import org.springframework.mail.javamail.JavaMailSenderImpl
 import spock.lang.Specification
 
-import javax.mail.MessagingException
 import java.util.concurrent.Executor
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan*  */
 class EmailSendServiceImplSpec extends Specification {
     private TemplateMapper templateMapper = Mock(TemplateMapper)
     private ConfigCache configCache = Mock(ConfigCache)
     private TemplateRender templateRender = Mock(TemplateRender)
-    private RecordMapper recordMapper = Mock(RecordMapper)
+    private MailingRecordMapper recordMapper = Mock(MailingRecordMapper)
     private EmailQueueObservable emailQueueObservable = new EmailQueueObservable()
     private Executor executor = Mock(Executor)
     private EmailSendService emailSendService = new EmailSendServiceImpl(
@@ -55,7 +46,7 @@ class EmailSendServiceImplSpec extends Specification {
         Map<String, Object> params = new HashMap<>()
         Set<UserDTO> targetUsers = new HashSet<>()
         targetUsers.add(new UserDTO(email: "123@qq.com"))
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
         sendSetting.setEmailTemplateId(1L)
         sendSetting.setIsSendInstantly(true)
         sendSetting.setRetryCount(1)

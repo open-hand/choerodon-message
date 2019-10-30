@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import org.modelmapper.PropertyMap;
 
 public class TemplateQueryDTO {
@@ -31,16 +31,12 @@ public class TemplateQueryDTO {
         return new PropertyMap<TemplateQueryDTO, Template>() {
             @Override
             protected void configure() {
-                skip().setMessageType(null);
-                skip().setSmsContent(null);
+                skip().setSendingType(null);
+                skip().setContent(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
-                skip().setWhContent(null);
+                skip().setTitle(null);
                 skip().setObjectVersionNumber(null);
-                skip().setEmailTitle(null);
-                skip().setEmailContent(null);
-                skip().setPmTitle(null);
-                skip().setPmContent(null);
                 skip().setLastUpdateDate(null);
                 skip().setLastUpdatedBy(null);
 
@@ -69,7 +65,7 @@ public class TemplateQueryDTO {
                 skip().setAttribute14(null);
                 skip().setAttribute15(null);
 
-                map().setBusinessType(source.getType());
+                map().setSendSettingCode(source.getType());
             }
         };
     }
@@ -78,7 +74,7 @@ public class TemplateQueryDTO {
         return new PropertyMap<Template, TemplateQueryDTO>() {
             @Override
             protected void configure() {
-                map().setType(source.getBusinessType());
+                map().setType(source.getSendSettingCode());
                 skip().setParams(null);
             }
         };

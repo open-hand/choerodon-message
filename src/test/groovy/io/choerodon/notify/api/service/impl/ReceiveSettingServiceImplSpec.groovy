@@ -3,7 +3,7 @@ package io.choerodon.notify.api.service.impl
 import io.choerodon.core.iam.ResourceLevel
 import io.choerodon.notify.api.dto.OrganizationProjectDTO
 import io.choerodon.notify.api.service.ReceiveSettingService
-import io.choerodon.notify.domain.SendSetting
+import io.choerodon.notify.infra.dto.SendSettingDTO
 import io.choerodon.notify.infra.feign.UserFeignClient
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper
 import io.choerodon.notify.infra.mapper.SendSettingMapper
@@ -28,8 +28,8 @@ class ReceiveSettingServiceImplSpec extends Specification {
         Long sourceId = 1L
         String messageType = "site"
         boolean disable = true
-        List<SendSetting> settingList = new ArrayList<>()
-        SendSetting setting = new SendSetting()
+        List<SendSettingDTO> settingList = new ArrayList<>()
+        SendSettingDTO setting = new SendSettingDTO()
         setting.setId(1L)
         settingList << setting
 
@@ -45,16 +45,16 @@ class ReceiveSettingServiceImplSpec extends Specification {
         Long userId = 1L
         String messageType = "site"
         boolean disable = true
-        List<SendSetting> settingList = new ArrayList<>()
-        SendSetting setting = new SendSetting()
+        List<SendSettingDTO> settingList = new ArrayList<>()
+        SendSettingDTO setting = new SendSettingDTO()
         setting.setId(1L)
         setting.setLevel(ResourceLevel.SITE.value())
         settingList << setting
-        SendSetting setting1 = new SendSetting()
+        SendSettingDTO setting1 = new SendSettingDTO()
         setting1.setId(1L)
         setting1.setLevel(ResourceLevel.ORGANIZATION.value())
         settingList << setting1
-        SendSetting setting2 = new SendSetting()
+        SendSettingDTO setting2 = new SendSettingDTO()
         setting2.setId(1L)
         setting2.setLevel(ResourceLevel.PROJECT.value())
         settingList << setting2

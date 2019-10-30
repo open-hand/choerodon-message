@@ -1,4 +1,4 @@
-package io.choerodon.notify.domain;
+package io.choerodon.notify.infra.dto;
 
 
 import io.choerodon.mybatis.entity.BaseDTO;

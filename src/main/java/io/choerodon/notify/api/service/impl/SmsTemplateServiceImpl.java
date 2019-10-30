@@ -5,11 +5,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.TemplateNamesDTO;
-import io.choerodon.notify.api.pojo.MessageType;
 import io.choerodon.notify.api.query.TemplateQuery;
 import io.choerodon.notify.api.service.SmsTemplateService;
-import io.choerodon.notify.domain.SendSetting;
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
     @Override
     public List<TemplateNamesDTO> listNames(String level, String businessType) {
-        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, MessageType.SMS.getValue());
+        return templateMapper.selectNamesByLevelAndTypeAnyMessageType(level, businessType, SendingTypeEnum.SMS.getValue());
     }
 
 
@@ -65,13 +65,12 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         validateBusinessType(templateDTO);
 
         validateContent(templateDTO);
-        templateDTO.setMessageType("sms");
+        templateDTO.setSendingType("sms");
 
         if (dto.getIsPredefined()) {
-            templateDTO.setCode(dto.getCode());
-            templateDTO.setName(dto.getName());
+
             templateDTO.setIsPredefined(dto.getIsPredefined());
-            templateDTO.setBusinessType(dto.getBusinessType());
+            templateDTO.setSendSettingCode(dto.getSendSettingCode());
         }
 
         if (templateMapper.updateByPrimaryKeySelective(templateDTO) != 1) {
@@ -81,7 +80,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     public void validateContent(Template templateDTO) {
-        String content = templateDTO.getSmsContent();
+        String content = templateDTO.getContent();
         if (StringUtils.isEmpty(content)) {
             throw new CommonException("error.template.content.empty");
         }
@@ -93,8 +92,8 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     }
 
     public void validateBusinessType(Template templateDTO) {
-        String businessType = templateDTO.getBusinessType();
-        SendSetting sendSetting = new SendSetting();
+        String businessType = templateDTO.getSendSettingCode();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(businessType);
         if (sendSettingMapper.selectOne(sendSetting) == null) {
             throw new CommonException("error.template.illegal.businessType");
@@ -107,7 +106,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
 
         validateContent(templateDTO);
         templateDTO.setId(null);
-        templateDTO.setMessageType("sms");
+        templateDTO.setSendSettingCode("sms");
         templateDTO.setIsPredefined(false);
         templateMapper.insertSelective(templateDTO);
 
@@ -117,8 +116,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @Override
     public void check(String code) {
         Template dto = new Template();
-        dto.setCode(code);
-        dto.setMessageType("sms");
+        dto.setSendingType("sms");
         if (templateMapper.selectOne(dto) != null) {
             throw new CommonException("error.sms.template.code.exist");
         }
@@ -130,7 +128,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         if (dto == null) {
             return;
         }
-        if (!"sms".equalsIgnoreCase(dto.getMessageType())) {
+        if (!"sms".equalsIgnoreCase(dto.getSendingType())) {
             throw new CommonException("error.not.sms.template");
         }
         if (dto.getIsPredefined()) {

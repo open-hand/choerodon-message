@@ -1,13 +1,29 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-
-import java.util.*;
-
-import org.springframework.data.domain.*;
 import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.domain.*;
-import io.choerodon.swagger.notify.*;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Set;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.SendSettingVO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Set;
 
 public interface SendSettingService {
 
@@ -21,9 +37,9 @@ public interface SendSettingService {
     PageInfo<SendSettingListDTO> page(String name, String code,
                                       String description, String params, int page, int size);
 
-    SendSetting update(SendSettingUpdateDTO updateDTO);
+    SendSettingDTO update(SendSettingUpdateDTO updateDTO);
 
-    SendSettingDetailDTO query(Long id);
+    SendSettingVO query(String code);
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
@@ -41,10 +57,10 @@ public interface SendSettingService {
      * @param enabled
      * @param allowConfig
      * @param params
-     * @param pageable 分页信息
+     * @param pageable    分页信息
      * @return 分页结果
      */
-    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, String level, Boolean enabled, Boolean allowConfig, String params, Pageable pageable);
+    PageInfo<MessageServiceVO> pagingAll(String messageType, String introduce, Boolean enabled, Boolean allowConfig, String params, Pageable pageable, String firstCode, String secondCode);
 
     /**
      * 根据id启用消息服务（对应表；notify_send_setting）
@@ -52,7 +68,7 @@ public interface SendSettingService {
      * @param id 记录主键
      * @return 启用的消息服务信息
      */
-    MessageServiceVO enabled(Long id);
+    MessageServiceVO enabled(String code);
 
     /**
      * 根据id停用消息服务（对应表；notify_send_setting）
@@ -60,7 +76,7 @@ public interface SendSettingService {
      * @param id 记录主键
      * @return 停用的消息服务信息
      */
-    MessageServiceVO disabled(Long id);
+    MessageServiceVO disabled(String code);
 
 
     /**
@@ -92,16 +108,6 @@ public interface SendSettingService {
      */
     EmailSendSettingVO getEmailSendSetting(Long id);
 
-
-    /**
-     * 修改邮件内容的发送设置信息
-     *
-     * @param updateVO 更新信息
-     * @return 更新结果
-     */
-    EmailSendSettingVO updateEmailSendSetting(EmailSendSettingVO updateVO);
-
-
     /**
      * 获取站内信内容的发送设置信息
      *
@@ -110,13 +116,18 @@ public interface SendSettingService {
      */
     PmSendSettingVO getPmSendSetting(Long id);
 
+    List<MsgServiceTreeVO> getMsgServiceTree();
 
     /**
-     * 修改站内信内容的发送设置信息
+     * 修改发送设置
      *
-     * @param updateVO 更新信息
-     * @return 更新结果
+     * @param sendSettingDTO 更新信息
+     * @return
      */
-    PmSendSettingVO updatePmSendSetting(PmSendSettingVO updateVO);
+    SendSettingDTO updateSendSetting(SendSettingDTO sendSettingDTO);
 
+    /**
+     * 查询项目层下的所有可选的SendSetting
+     */
+    WebHookVO.SendSetting getUnderProject();
 }

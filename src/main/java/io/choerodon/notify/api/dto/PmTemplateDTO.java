@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.dto;
 
-import io.choerodon.notify.domain.Template;
+import io.choerodon.notify.infra.dto.Template;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
@@ -46,11 +46,7 @@ public class PmTemplateDTO {
         return new PropertyMap<PmTemplateDTO, Template>() {
             @Override
             protected void configure() {
-                skip().setMessageType(null);
-                skip().setSmsContent(null);
-                skip().setEmailTitle(null);
-                skip().setEmailContent(null);
-                skip().setWhContent(null);
+                skip().setSendingType(null);
                 skip().setCreatedBy(null);
                 skip().setCreationDate(null);
                 skip().setLastUpdateDate(null);
@@ -81,9 +77,9 @@ public class PmTemplateDTO {
                 skip().setAttribute14(null);
                 skip().setAttribute15(null);
 
-                map().setBusinessType(source.getType());
-                map().setPmContent(source.getContent());
-                map().setPmTitle(source.getTitle());
+                map().setSendSettingCode(source.getType());
+                skip().setContent(null);
+                skip().setTitle(null);
             }
         };
     }
@@ -91,9 +87,9 @@ public class PmTemplateDTO {
     public static PropertyMap<Template, PmTemplateDTO> entity2Dto() {
         return new PropertyMap<Template, PmTemplateDTO>() {
             protected void configure() {
-                map().setType(source.getBusinessType());
-                map().setContent(source.getPmContent());
-                map().setTitle(source.getPmTitle());
+                map().setType(source.getSendSettingCode());
+                map().setContent(source.getContent());
+                map().setTitle(source.getTitle());
             }
         };
     }

@@ -2,19 +2,24 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.exception.ext.NotExistedException;
+import io.choerodon.notify.api.dto.TemplateCreateVO;
+import io.choerodon.notify.api.dto.TemplateVO;
+import io.choerodon.notify.api.service.TemplateService;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import io.choerodon.notify.infra.mapper.TemplateMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
-import io.choerodon.core.exception.*;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.pojo.*;
-import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.domain.*;
-import io.choerodon.notify.infra.mapper.*;
+import java.util.Optional;
 
-import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.*;
+import static io.choerodon.notify.api.service.impl.SendSettingServiceImpl.SEND_SETTING_DOES_NOT_EXIST;
 
 @Component
 public class TemplateServiceImpl implements TemplateService {
@@ -63,13 +68,13 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException("error.template.delete.predefined");
         }
         // 3. 不可删除发送设置的当前模版
-        SendSetting sendSetting = new SendSetting();
-        sendSetting.setCode(template.getBusinessType());
+        SendSettingDTO sendSetting = new SendSettingDTO();
+        sendSetting.setCode(template.getSendSettingCode());
         sendSetting = sendSettingMapper.selectOne(sendSetting);
-        if (sendSetting != null &&
-                (id.equals(sendSetting.getEmailTemplateId()) || id.equals(sendSetting.getPmTemplateId()) || id.equals(sendSetting.getSmsTemplateId()))) {
-            throw new CommonException("error.template.delete.current");
-        }
+//        if (sendSetting != null &&
+//                (id.equals(sendSetting.getEmailTemplateId()) || id.equals(sendSetting.getPmTemplateId()) || id.equals(sendSetting.getSmsTemplateId()))) {
+//            throw new CommonException("error.template.delete.current");
+//        }
         // 4.删除
         if (templateMapper.deleteByPrimaryKey(id) != 1) {
             throw new CommonException("error.template.delete");
@@ -85,20 +90,20 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
         }
         // 2.获取发送设置
-        SendSetting sendSetting = new SendSetting();
-        sendSetting.setCode(template.getBusinessType());
+        SendSettingDTO sendSetting = new SendSettingDTO();
+        sendSetting.setCode(template.getSendSettingCode());
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
         // 3.设为当前模版
-        if (MessageType.EMAIL.getValue().equalsIgnoreCase(template.getMessageType())) {
-            sendSetting.setEmailTemplateId(id);
-        } else if (MessageType.PM.getValue().equalsIgnoreCase(template.getMessageType())) {
-            sendSetting.setPmTemplateId(id);
-        } else if (MessageType.SMS.getValue().equalsIgnoreCase(template.getMessageType())) {
-            sendSetting.setSmsTemplateId(id);
-        }
+//        if (SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            sendSetting.setEmailTemplateId(id);
+//        } else if (SendingTypeEnum.PM.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            sendSetting.setPmTemplateId(id);
+//        } else if (SendingTypeEnum.SMS.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            sendSetting.setSmsTemplateId(id);
+//        }
         if (sendSettingMapper.updateByPrimaryKeySelective(sendSetting) != 1) {
             throw new CommonException("error.send.setting.update");
         }
@@ -106,50 +111,94 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    @Transactional
-    public TemplateCreateVO createTemplate(Boolean setToTheCurrent, TemplateCreateVO createVO) {
-        // 获取创建信息并创建模版
-        Template createDTO = getTemplate(createVO);
-        if (templateMapper.insertSelective(createDTO) != 1) {
+    public Template createTemplate(Template templateDTO) {
+        if (SendingTypeEnum.EMAIL.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
+            throw new CommonException("error.email.title.null");
+        } else if (SendingTypeEnum.PM.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
+            throw new CommonException("error.pm.title.null");
+        }
+        if (templateMapper.insertSelective(templateDTO) != 1) {
             throw new CommonException("error.template.insert");
         }
-        // 设置当前模板
-        if (setToTheCurrent) {
-            updateSendSettingTemplate(createDTO.getId(), createVO, setToTheCurrent);
-        }
-        // 返回创建结果
-        Template template = templateMapper.selectByPrimaryKey(createDTO.getId());
-        BeanUtils.copyProperties(template, createVO);
-        return createVO;
+        return templateDTO;
     }
 
-
     @Override
-    public TemplateCreateVO updateTemplate(Boolean setToTheCurrent, TemplateCreateVO updateVO) {
-        // 更新模版
-        Template template = templateMapper.selectByPrimaryKey(updateVO.getId());
+    public Template updateTemplate(Template templateDTO) {
+        Template template = templateMapper.selectByPrimaryKey(templateDTO.getId());
         if (template == null) {
             throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
         }
-        if (MessageType.EMAIL.getValue().equalsIgnoreCase(template.getMessageType())) {
-            template.setEmailTitle(((TemplateCreateVO.EmailTemplateCreateVO) updateVO).getEmailTitle());
-            template.setEmailContent(((TemplateCreateVO.EmailTemplateCreateVO) updateVO).getEmailContent());
-        } else if (MessageType.PM.getValue().equalsIgnoreCase(template.getMessageType())) {
-            template.setPmTitle(((TemplateCreateVO.PmTemplateCreateVO) updateVO).getPmTitle());
-            template.setPmContent(((TemplateCreateVO.PmTemplateCreateVO) updateVO).getPmContent());
-        } else if (MessageType.SMS.getValue().equalsIgnoreCase(template.getMessageType())) {
-            template.setSmsContent(((TemplateCreateVO.SmsTemplateCreateVO) updateVO).getSmsContent());
-        }
-        if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
+        if (templateMapper.updateByPrimaryKeySelective(templateDTO) != 1) {
             throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
         }
-        // 设置或取消当前模板
-        updateSendSettingTemplate(template.getId(), updateVO, setToTheCurrent);
-        // 返回创建结果
-        template = templateMapper.selectByPrimaryKey(updateVO.getId());
-        TemplateCreateVO resultVO = new TemplateCreateVO();
-        BeanUtils.copyProperties(template, resultVO);
-        return resultVO;
+        return templateDTO;
+    }
+
+//    @Override
+//    @Transactional
+//    public TemplateCreateVO createTemplate(Boolean setToTheCurrent, Template templateDTO) {
+//        // 获取创建信息并创建模版
+//        Template createDTO = getTemplate(createVO);
+//        if (templateMapper.insertSelective(createDTO) != 1) {
+//            throw new CommonException("error.template.insert");
+//        }
+//        // 设置当前模板
+//        if (setToTheCurrent) {
+//            updateSendSettingTemplate(createDTO.getId(), createVO, setToTheCurrent);
+//        }
+//        // 返回创建结果
+//        Template template = templateMapper.selectByPrimaryKey(createDTO.getId());
+//        BeanUtils.copyProperties(template, createVO);
+//        return createVO;
+//    }
+//
+//
+//    @Override
+//    public TemplateCreateVO updateTemplate(Boolean setToTheCurrent, Template templateDTO) {
+//        // 更新模版
+//        Template template = templateMapper.selectByPrimaryKey(updateVO.getId());
+//        if (template == null) {
+//            throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
+//        }
+//        if (SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            template.setTitle(((TemplateCreateVO.EmailTemplateCreateVO) updateVO).getEmailTitle());
+//            template.setContent(((TemplateCreateVO.EmailTemplateCreateVO) updateVO).getEmailContent());
+//        } else if (SendingTypeEnum.PM.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            template.setTitle(((TemplateCreateVO.PmTemplateCreateVO) updateVO).getPmTitle());
+//            template.setContent(((TemplateCreateVO.PmTemplateCreateVO) updateVO).getPmContent());
+//        } else if (SendingTypeEnum.SMS.getValue().equalsIgnoreCase(template.getSendingType())) {
+//            template.setContent(((TemplateCreateVO.SmsTemplateCreateVO) updateVO).getSmsContent());
+//        }
+//        if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
+//            throw new CommonException(TEMPLATE_UPDATE_EXCEPTION);
+//        }
+//        // 设置或取消当前模板
+//        updateSendSettingTemplate(template.getId(), updateVO, setToTheCurrent);
+//        // 返回创建结果
+//        template = templateMapper.selectByPrimaryKey(updateVO.getId());
+//        TemplateCreateVO resultVO = new TemplateCreateVO();
+//        BeanUtils.copyProperties(template, resultVO);
+//        return resultVO;
+//    }
+
+    @Override
+    public Template getOne(Template template) {
+        //1.获取模版
+        Template result = Optional.ofNullable(templateMapper.selectOne(template))
+                .orElseThrow(() -> new NotExistedException("error.template.does.not.exist"));
+        //2.校验模版内容不能为空
+        if (ObjectUtils.isEmpty(result.getContent())) {
+            throw new CommonException("error.template.content.empty");
+        }
+        //3.校验 邮件/站内信 模版标题不能为空
+        if ((SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(result.getSendingType())
+                || SendingTypeEnum.PM.getValue().equalsIgnoreCase(result.getSendingType()))
+                && ObjectUtils.isEmpty(result.getTitle())) {
+            throw new CommonException("error.template.title.empty");
+        }
+        //4.返回结果
+        return result;
     }
 
     /**
@@ -162,19 +211,20 @@ public class TemplateServiceImpl implements TemplateService {
      * @return 该类型的当前模版id
      */
     private Long getCurrentId(String businessType, String messageType) {
-        SendSetting sendSetting = new SendSetting();
+        SendSettingDTO sendSetting = new SendSettingDTO();
         sendSetting.setCode(businessType);
         sendSetting = sendSettingMapper.selectOne(sendSetting);
         if (sendSetting == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
-        if (MessageType.EMAIL.getValue().equalsIgnoreCase(messageType)) {
-            return sendSetting.getEmailTemplateId();
-        } else if (MessageType.PM.getValue().equalsIgnoreCase(messageType)) {
-            return sendSetting.getPmTemplateId();
-        } else if (MessageType.SMS.getValue().equalsIgnoreCase(messageType)) {
-            return sendSetting.getSmsTemplateId();
-        }
+        //todo
+//        if (SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(messageType)) {
+//            return sendSetting.getEmailTemplateId();
+//        } else if (SendingTypeEnum.PM.getValue().equalsIgnoreCase(messageType)) {
+//            return sendSetting.getPmTemplateId();
+//        } else if (SendingTypeEnum.SMS.getValue().equalsIgnoreCase(messageType)) {
+//            return sendSetting.getSmsTemplateId();
+//        }
         return null;
     }
 
@@ -189,11 +239,11 @@ public class TemplateServiceImpl implements TemplateService {
         createDTO.setIsPredefined(false);
         BeanUtils.copyProperties(createVO, createDTO);
         if (createVO instanceof TemplateCreateVO.EmailTemplateCreateVO) {
-            createDTO.setMessageType(MessageType.EMAIL.getValue());
+            createDTO.setSendingType(SendingTypeEnum.EMAIL.getValue());
         } else if (createVO instanceof TemplateCreateVO.PmTemplateCreateVO) {
-            createDTO.setMessageType(MessageType.PM.getValue());
+            createDTO.setSendingType(SendingTypeEnum.PM.getValue());
         } else if (createVO instanceof TemplateCreateVO.SmsTemplateCreateVO) {
-            createDTO.setMessageType(MessageType.SMS.getValue());
+            createDTO.setSendingType(SendingTypeEnum.SMS.getValue());
         }
         return createDTO;
     }
@@ -205,44 +255,45 @@ public class TemplateServiceImpl implements TemplateService {
      * @param createVO   更新的模版信息
      */
     private void updateSendSettingTemplate(Long templateId, TemplateCreateVO createVO, Boolean setToTheCurrent) {
-        SendSetting updateDTO = new SendSetting();
+        SendSettingDTO updateDTO = new SendSettingDTO();
         updateDTO.setCode(createVO.getBusinessType());
         updateDTO = sendSettingMapper.selectOne(updateDTO);
         if (updateDTO == null) {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
-        if (createVO instanceof TemplateCreateVO.EmailTemplateCreateVO) {
-            // 设为当前模板
-            if (setToTheCurrent) {
-                updateDTO.setEmailTemplateId(templateId);
-            } else {
-                // 只有当前使用模板可取消
-                if (templateId.equals(updateDTO.getEmailTemplateId())) {
-                    updateDTO.setEmailTemplateId(null);
-                }
-            }
-        } else if (createVO instanceof TemplateCreateVO.PmTemplateCreateVO) {
-            // 设为当前模板
-            if (setToTheCurrent) {
-                updateDTO.setPmTemplateId(templateId);
-            } else {
-                // 只有当前使用模板可取消
-                if (templateId.equals(updateDTO.getPmTemplateId())) {
-                    updateDTO.setPmTemplateId(null);
-                }
-            }
-            updateDTO.setPmType(((TemplateCreateVO.PmTemplateCreateVO) createVO).getPmType());
-        } else if (createVO instanceof TemplateCreateVO.SmsTemplateCreateVO) {
-            // 设为当前模板
-            if (setToTheCurrent) {
-                updateDTO.setSmsTemplateId(templateId);
-            } else {
-                // 只有当前使用模板可取消
-                if (templateId.equals(updateDTO.getSmsTemplateId())) {
-                    updateDTO.setSmsTemplateId(null);
-                }
-            }
-        }
+        //todo
+//        if (createVO instanceof TemplateCreateVO.EmailTemplateCreateVO) {
+//            // 设为当前模板
+//            if (setToTheCurrent) {
+//                updateDTO.setEmailTemplateId(templateId);
+//            } else {
+//                // 只有当前使用模板可取消
+//                if (templateId.equals(updateDTO.getEmailTemplateId())) {
+//                    updateDTO.setEmailTemplateId(null);
+//                }
+//            }
+//        } else if (createVO instanceof TemplateCreateVO.PmTemplateCreateVO) {
+//            // 设为当前模板
+//            if (setToTheCurrent) {
+//                updateDTO.setPmTemplateId(templateId);
+//            } else {
+//                // 只有当前使用模板可取消
+//                if (templateId.equals(updateDTO.getPmTemplateId())) {
+//                    updateDTO.setPmTemplateId(null);
+//                }
+//            }
+//            updateDTO.setPmType(((TemplateCreateVO.PmTemplateCreateVO) createVO).getPmType());
+//        } else if (createVO instanceof TemplateCreateVO.SmsTemplateCreateVO) {
+//            // 设为当前模板
+//            if (setToTheCurrent) {
+//                updateDTO.setSmsTemplateId(templateId);
+//            } else {
+//                // 只有当前使用模板可取消
+//                if (templateId.equals(updateDTO.getSmsTemplateId())) {
+//                    updateDTO.setSmsTemplateId(null);
+//                }
+//            }
+//        }
         if (sendSettingMapper.updateByPrimaryKey(updateDTO) != 1) {
             throw new CommonException("error.send.setting.update");
         }

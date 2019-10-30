@@ -3,7 +3,7 @@ package io.choerodon.notify.api.controller.v1;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.notify.api.service.SmsService;
-import io.choerodon.notify.domain.SmsConfigDTO;
+import io.choerodon.notify.infra.dto.SmsConfigDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

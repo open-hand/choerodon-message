@@ -2,10 +2,10 @@ package io.choerodon.notify.api.service.impl
 
 import io.choerodon.core.exception.CommonException
 import io.choerodon.notify.IntegrationTestConfiguration
-import io.choerodon.notify.api.pojo.MessageType
+import io.choerodon.notify.infra.enums.SendingTypeEnum
 import io.choerodon.notify.api.service.EmailTemplateService
-import io.choerodon.notify.domain.SendSetting
-import io.choerodon.notify.domain.Template
+import io.choerodon.notify.infra.dto.SendSettingDTO
+import io.choerodon.notify.infra.dto.Template
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import io.choerodon.notify.infra.mapper.TemplateMapper
 import io.choerodon.swagger.notify.NotifyTemplateScanData
@@ -16,8 +16,7 @@ import spock.lang.Specification
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 /**
- * @author dengyouquan
- * */
+ * @author dengyouquan* */
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @Import(IntegrationTestConfiguration)
 class EmailTemplateServiceImplSpec extends Specification {
@@ -41,7 +40,7 @@ class EmailTemplateServiceImplSpec extends Specification {
             set.add(scanData)
         }
         Template template = new Template()
-        SendSetting sendSetting = new SendSetting()
+        SendSettingDTO sendSetting = new SendSettingDTO()
 
         when: "调用方法"
         emailTemplateService.createByScan(set)
@@ -56,7 +55,7 @@ class EmailTemplateServiceImplSpec extends Specification {
     def "Delete"() {
         given: "构造请求参数"
         Template dbTemplate = new Template()
-        dbTemplate.setMessageType(MessageType.EMAIL.getValue())
+        dbTemplate.setMessageType(SendingTypeEnum.EMAIL.getValue())
 
         when: "调用方法[异常-邮件模板不存在]"
         emailTemplateService.delete(1L)
