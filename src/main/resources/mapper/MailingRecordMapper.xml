@@ -9,12 +9,11 @@
         rc.receive_account AS email,
         rc.retry_count,
         nts.is_manual_retry,
-        tl.title AS template_type,
+        nts.name AS template_type,
         rc.failed_reason,
         rc.creation_date
         FROM notify_mailing_record rc
         LEFT JOIN notify_send_setting nts ON nts.code = rc.send_setting_code
-        LEFT JOIN notify_template tl ON rc.template_id = tl.id
         WHERE rc.status IS NOT NULL
         <if test="level != null">
             AND nts.fd_level = #{level}
@@ -26,14 +25,14 @@
             AND rc.receive_account LIKE concat(concat('%',#{receiveEmail}),'%')
         </if>
         <if test="templateType != null">
-            AND tl.name LIKE concat(concat('%',#{templateType}),'%')
+            AND nts.name LIKE concat(concat('%',#{templateType}),'%')
         </if>
         <if test="failedReason != null">
             AND rc.failed_reason LIKE concat(concat('%',#{failedReason}),'%')
         </if>
         <if test="params != null">
             AND (
-            tl.name LIKE concat(concat('%',#{params}),'%') OR
+            nts.name LIKE concat(concat('%',#{params}),'%') OR
             rc.receive_account LIKE concat(concat('%',#{params}),'%') OR
             rc.failed_reason LIKE concat(concat('%',#{params}),'%')
             )

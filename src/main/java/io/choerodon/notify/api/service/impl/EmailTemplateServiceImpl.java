@@ -116,10 +116,12 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
             if (query == null) {
                 templateMapper.insertSelective(t);
             } else {
-                templateId = query.getId();
-                t.setId(templateId);
-                t.setObjectVersionNumber(query.getObjectVersionNumber());
-                templateMapper.updateByPrimaryKeySelective(t);
+                if (query.getIsPredefined()) {
+                    templateId = query.getId();
+                    t.setId(templateId);
+                    t.setObjectVersionNumber(query.getObjectVersionNumber());
+                    templateMapper.updateByPrimaryKeySelective(t);
+                }
             }
         });
 
