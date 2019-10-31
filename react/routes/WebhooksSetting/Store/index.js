@@ -13,13 +13,13 @@ export default Store;
 export const StoreProvider = injectIntl(inject('AppState')(
   (props) => {
     const { AppState: { currentMenuType: { type, id } }, intl, children } = props;
-    const webhooksDataSet = useMemo(() => new DataSet(WebhooksDataSet(1180)), []);
-    const createTriggerEventsSettingDataSet = useMemo(() => new DataSet(TriggerEventsSettingDataSet('create', 1180)), []);
-    const editTriggerEventsSettingDataSet = useMemo(() => new DataSet(TriggerEventsSettingDataSet('edit', 1180)), []);
-    const editWebhooksFormDataSet = useMemo(() => new DataSet(WebhooksFormDataSet('edit', 1180, editTriggerEventsSettingDataSet)), []);
-    const createWebhooksFormDataSet = useMemo(() => new DataSet(WebhooksFormDataSet('create', 1180)), []);
+    const webhooksDataSet = useMemo(() => new DataSet(WebhooksDataSet(id)), []);
+    const createTriggerEventsSettingDataSet = useMemo(() => new DataSet(TriggerEventsSettingDataSet('create', id)), []);
+    const editTriggerEventsSettingDataSet = useMemo(() => new DataSet(TriggerEventsSettingDataSet('edit', id)), []);
+    const editWebhooksFormDataSet = useMemo(() => new DataSet(WebhooksFormDataSet('edit', id, editTriggerEventsSettingDataSet)), []);
+    const createWebhooksFormDataSet = useMemo(() => new DataSet(WebhooksFormDataSet('create', id)), []);
     const value = {
-      projectId: '1180',
+      projectId: id,
       webhooksDataSet,
       editWebhooksFormDataSet,
       editTriggerEventsSettingDataSet,
