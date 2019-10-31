@@ -57,7 +57,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                     .setSendingType(SendingTypeEnum.PM.getValue())
                     .setSendSettingCode(sendSettingDTO.getCode()));
         } catch (Exception e) {
-            LOGGER.error(">>>CANCEL_SENDING_SITE_MSG>>> No valid templates available.",e);
+            LOGGER.error(">>>CANCEL_SENDING_SITE_MSG>>> No valid templates available.", e);
             return;
         }
         Template template = tmp;
@@ -69,6 +69,8 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                 if (siteMsgRecords.size() >= 99) {
                     int num = siteMsgRecordMapper.batchInsert(siteMsgRecords);
                     LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
+//                    siteMsgRecords.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
+//                    LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", siteMsgRecords.size());
                     siteMsgRecords.clear();
                 }
                 //2.2.user主键不为空，则发送站内信
@@ -94,6 +96,8 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
         //2.3.插入剩余记录
         int num = siteMsgRecordMapper.batchInsert(siteMsgRecords);
         LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
+//        siteMsgRecords.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
+//        LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", siteMsgRecords.size());
         //2.4.发送站内信
         if (ObjectUtils.isEmpty(sendSettingDTO.getIsSendInstantly()) && sendSettingDTO.getIsSendInstantly()) {
             targetUsers.forEach(user -> {

@@ -421,8 +421,8 @@ public class SendSettingServiceImpl implements SendSettingService {
     @Override
     public WebHookVO.SendSetting getUnderProject() {
         WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
-        //1.获取发送设置可选集合
-        List<SendSettingDTO> sendSettingSelection = sendSettingMapper.select(new SendSettingDTO().setLevel(ResourceType.PROJECT.value()));
+        //1.获取WebHook 发送设置可选集合(启用,且启用WebHook的发送设置)
+        List<SendSettingDTO> sendSettingSelection = sendSettingMapper.select(new SendSettingDTO().setEnabled(true).setLevel(ResourceType.PROJECT.value()).setWebhookEnabledFlag(true));
         if (CollectionUtils.isEmpty(sendSettingSelection)) {
             return sendSetting;
         }

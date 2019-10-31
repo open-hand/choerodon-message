@@ -21,12 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.choerodon.notify.api.service.impl.WebSocketWsSendServiceImpl.MSG_TYPE_PM;
@@ -161,11 +156,13 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             records.add(record);
             if (records.size() >= 999) {
                 siteMsgRecordMapper.batchInsert(records);
+//                records.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
                 records.clear();
             }
             count.incrementAndGet();
         }
         siteMsgRecordMapper.batchInsert(records);
+//        records.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
         records.clear();
         logger.debug("PmSendTask insert database count:{}", count);
     }

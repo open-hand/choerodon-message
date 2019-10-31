@@ -28,7 +28,7 @@ public class SendSettingProjectController {
 
     @GetMapping
     @Permission(type = ResourceType.PROJECT)
-    @ApiOperation("查询项目下可选的发送设置")
+    @ApiOperation("查询项目下可选的发送设置（用于WebHook）")
     public ResponseEntity<WebHookVO.SendSetting> getSendSettings(@PathVariable("project_id") Long projectId) {
         return new ResponseEntity<>(sendSettingService.getUnderProject(), HttpStatus.OK);
     }

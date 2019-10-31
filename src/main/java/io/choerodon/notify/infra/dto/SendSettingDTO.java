@@ -2,11 +2,7 @@ package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 消息业务类型
@@ -180,8 +176,9 @@ public class SendSettingDTO extends BaseDTO {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public SendSettingDTO setEnabled(Boolean enabled) {
         this.enabled = enabled;
+        return this;
     }
 
     public void setCategoryCode(String categoryCode) {
@@ -220,8 +217,9 @@ public class SendSettingDTO extends BaseDTO {
         return webhookEnabledFlag;
     }
 
-    public void setWebhookEnabledFlag(Boolean webhookEnabledFlag) {
+    public SendSettingDTO setWebhookEnabledFlag(Boolean webhookEnabledFlag) {
         this.webhookEnabledFlag = webhookEnabledFlag;
+        return this;
     }
 
     public Boolean getBacklogFlag() {
