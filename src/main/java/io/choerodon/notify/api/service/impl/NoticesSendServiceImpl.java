@@ -6,23 +6,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.exception.ext.InsertException;
+import io.choerodon.core.exception.ext.UpdateException;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.domain.QuartzTask;
+import io.choerodon.notify.infra.dto.NotifyScheduleRecordDTO;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.enums.SenderType;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.AsgardFeignClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
+import io.choerodon.notify.infra.mapper.NotifyScheduleRecordMapper;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -44,6 +50,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private UserFeignClient userFeignClient;
     private AsgardFeignClient asgardFeignClient;
     private SmsService smsService;
+    private NotifyScheduleRecordMapper notifyScheduleRecordMapper;
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService,
@@ -51,7 +58,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                                   SendSettingMapper sendSettingMapper,
                                   UserFeignClient userFeignClient,
                                   AsgardFeignClient asgardFeignClient,
-                                  SmsService smsService) {
+                                  SmsService smsService,
+                                  NotifyScheduleRecordMapper notifyScheduleRecordMapper) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
         this.webHookService = webHookService;
@@ -60,6 +68,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         this.userFeignClient = userFeignClient;
         this.smsService = smsService;
         this.asgardFeignClient = asgardFeignClient;
+        this.notifyScheduleRecordMapper = notifyScheduleRecordMapper;
     }
 
     //单元测试
@@ -70,6 +79,53 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     @Override
     public void testEmailConnect(EmailConfigDTO config) {
         emailSendService.testEmailConnect(config);
+    }
+
+    /**
+     * 删除定时任务
+     * @param notifyScheduleRecordDTO
+     */
+    @Override
+    public void deleteScheduleNotice(NotifyScheduleRecordDTO notifyScheduleRecordDTO) {
+        NotifyScheduleRecordDTO notifyDTO = new NotifyScheduleRecordDTO();
+        notifyDTO.setScheduleNoticeCode(notifyScheduleRecordDTO.getScheduleNoticeCode());
+        NotifyScheduleRecordDTO result = notifyScheduleRecordMapper.selectOne(notifyDTO);
+        if(result == null) {
+            throw new CommonException("error.delete.notice.not.match");
+        }
+        asgardFeignClient.deleteSiteTaskByTaskId(result.getTaskId());
+        if(notifyScheduleRecordMapper.deleteByPrimaryKey(result.getId()) != 1) {
+            throw new CommonException("error.notice.delete");
+        }
+    }
+
+    /**
+     * 更新定时任务
+     * @param scheduleNoticeCode
+     * @param noticeSendDTO
+     * @param date
+     */
+    @Override
+    public void updateScheduleNotice(String scheduleNoticeCode, Date date, NoticeSendDTO noticeSendDTO) {
+        NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
+        notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
+        NotifyScheduleRecordDTO result = notifyScheduleRecordMapper.selectOne(notifyScheduleRecordDTO);
+        if(result == null) {
+            throw new CommonException("error.update.notify.not.exist");
+        }
+        asgardFeignClient.deleteSiteTaskByTaskId(result.getTaskId());
+        //这里是不可能为null的
+        if(noticeSendDTO == null) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            try {
+                noticeSendDTO = objectMapper.readValue(result.getNoticeContent(), NoticeSendDTO.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        notifyScheduleRecordMapper.deleteByPrimaryKey(result.getId());
+        sendScheduleNotice(noticeSendDTO, date, scheduleNoticeCode);
     }
 
     @Override
@@ -119,7 +175,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     }
 
     @Override
-    public Long sendScheduleNotice(NoticeSendDTO dto, Date date) {
+    public Long sendScheduleNotice(NoticeSendDTO dto, Date date, String scheduleNoticeCode) {
         Long methodId = asgardFeignClient.getMethodIdByCode(SITE_SCHEDULE_NOTYFICATION_CODE).getBody();
         Long[] assignUserIds = new Long[1];
         assignUserIds[0] = DetailsHelper.getUserDetails().getUserId();
@@ -134,7 +190,17 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         params.put("noticeSendDTO", jsonStr);
         ScheduleTaskDTO createTskDTO = new ScheduleTaskDTO(
                 methodId, params, "通知消息","消息信息", date, assignUserIds);
-        return asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
+        Long taskId = asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
+        //存储定时任务和消息的映射关系
+        NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
+        notifyScheduleRecordDTO.setTaskId(taskId);
+        //notifyScheduleRecordDTO.setServiceCode();
+        notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
+        notifyScheduleRecordDTO.setNoticeContent(jsonStr);
+        if(notifyScheduleRecordMapper.insertSelective(notifyScheduleRecordDTO) != 1) {
+            throw new InsertException("error.insert.scheduleTaskRecord");
+        }
+        return taskId;
     }
     /**
      * 通知消息 JobTask

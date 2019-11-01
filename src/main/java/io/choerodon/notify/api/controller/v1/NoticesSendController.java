@@ -6,6 +6,7 @@ import io.choerodon.core.exception.FeignException;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.NoticesSendService;
 import io.choerodon.notify.api.service.WebSocketSendService;
+import io.choerodon.notify.infra.dto.NotifyScheduleRecordDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -67,7 +68,9 @@ public class NoticesSendController {
     @PostMapping("/schedule")
     @ApiOperation(value = "发送定时邮件，定时站内信，定时短信")
     @Permission(type = ResourceType.SITE)
-    public void postScheduleNotice(@RequestBody NoticeSendDTO dto,@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date) {
+    public void postScheduleNotice(@RequestBody NoticeSendDTO dto,
+                                   @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date,
+                                   @RequestParam String scheduleNoticeCode) {
         if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.postNotify.codeEmpty");
         }
@@ -80,8 +83,25 @@ public class NoticesSendController {
         if (dto.getParams() == null) {
             dto.setParams(new HashMap<>(0));
         }
-        noticesSendService.sendScheduleNotice(dto,date);
+        noticesSendService.sendScheduleNotice(dto,date, scheduleNoticeCode);
     }
+
+    @PutMapping("/schedule")
+    @ApiOperation(value = "修改定时消息发送时间")
+    @Permission(type = ResourceType.SITE)
+    public void updateScheduleNotice(@RequestBody NoticeSendDTO noticeSendDTO,
+                                     @RequestParam(value = "date") Date date,
+                                     @RequestParam String scheduleNoticeCode) {
+       noticesSendService.updateScheduleNotice(scheduleNoticeCode, date, noticeSendDTO);
+    }
+
+    @DeleteMapping("/schdule")
+    @ApiOperation(value = "删除定时消息")
+    @Permission(type = ResourceType.SITE)
+    public void deleteSchduleNotice(@RequestBody NotifyScheduleRecordDTO notifyScheduleRecordDTO) {
+        noticesSendService.deleteScheduleNotice(notifyScheduleRecordDTO);
+    }
+
 
     @PostMapping("/ws/{code}/{id}")
     @ApiOperation(value = "发送自定义消息到webSocket")

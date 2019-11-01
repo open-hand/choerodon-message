@@ -116,6 +116,8 @@ public class TemplateServiceImpl implements TemplateService {
             throw new CommonException("error.email.title.null");
         } else if (SendingTypeEnum.PM.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
             throw new CommonException("error.pm.title.null");
+        } else if (SendingTypeEnum.WH.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {
+            throw new CommonException("error.webhook.title.null");
         }
         if (templateMapper.insertSelective(templateDTO) != 1) {
             throw new CommonException("error.template.insert");
