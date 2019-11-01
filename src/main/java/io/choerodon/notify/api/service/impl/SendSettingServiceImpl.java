@@ -326,6 +326,7 @@ public class SendSettingServiceImpl implements SendSettingService {
             throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
         }
 
+        updateDTO.setObjectVersionNumber(sendSettingDTO.getObjectVersionNumber());
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
             throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
