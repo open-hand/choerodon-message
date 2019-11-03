@@ -22,6 +22,7 @@ import io.choerodon.notify.infra.enums.WebHookTypeEnum;
 import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
 import io.choerodon.notify.infra.mapper.WebHookMapper;
 import io.choerodon.web.util.PageableHelper;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,7 +80,7 @@ public class WebHookServiceImpl implements WebHookService {
                     .setSendingType(SendingTypeEnum.WH.getValue())
                     .setSendSettingCode(sendSetting.getCode()));
         } catch (Exception e) {
-            LOGGER.warn(">>>CANCEL_SENDING_WEBHOOK>>> No valid templates available.",e);
+            LOGGER.warn(">>>CANCEL_SENDING_WEBHOOK>>> No valid templates available.", e);
             return;
         }
 
@@ -90,7 +96,8 @@ public class WebHookServiceImpl implements WebHookService {
                 Map<String, Object> userParams = dto.getParams();
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
                 if (WebHookTypeEnum.DINGTALK.getValue().equalsIgnoreCase(hook.getType())) {
-                    sendDingTalk(hook, content);
+                    String title = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
+                    sendDingTalk(hook, content, title);
                 } else if (WebHookTypeEnum.WECHAT.getValue().equalsIgnoreCase(hook.getType())) {
                     sendWeChat(hook, content);
                 } else if (WebHookTypeEnum.JSON.getValue().equalsIgnoreCase(hook.getType())) {
@@ -104,26 +111,68 @@ public class WebHookServiceImpl implements WebHookService {
         }
     }
 
-    private void sendDingTalk(WebHookDTO hook, String content) {
+
+    /**
+     * 触发钉钉的 WebHook 机器人
+     * 钉钉的 WebHook 自定义机器人的配置文档：https://ding-doc.dingtalk.com/doc#/serverapi3/iydd5h
+     *
+     * @param hook  WebHook 配置
+     * @param text  发送内容
+     * @param title 发送主题
+     */
+    private void sendDingTalk(WebHookDTO hook, String text, String title) {
         RestTemplate template = new RestTemplate();
-        Map<String, Object> request = new TreeMap<>();
-        request.put("msgtype", "text");
-        Map<String, Object> text = new TreeMap<>();
-        text.put("content", content);
-        request.put("text", text);
-        ResponseEntity<String> response = template.postForEntity(hook.getWebhookPath(), request, String.class);
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            LOGGER.warn("Web hook response not success {}", response);
+        try {
+            //1.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
+            long timestamp = System.currentTimeMillis();
+            URI uri = new URI(hook.getWebhookPath() + "&timestamp=" + timestamp + "&sign=" + addSignature(hook.getSecret(), timestamp));
+            //2.添加发送内容
+            Map<String, Object> request = new HashMap<>();
+            request.put("msgtype", "markdown");
+            Map<String, Object> markdown = new HashMap<>();
+            markdown.put("text", text);
+            markdown.put("title", title);
+            request.put("markdown", markdown);
+            ResponseEntity<String> response = template.postForEntity(uri, request, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                LOGGER.warn(">>>SENDING_WEBHOOK_ERROR>>> Sending the web hook was not successful,response:{}", response);
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * 钉钉加签方法
+     * 第一步，把timestamp+"\n"+密钥当做签名字符串，使用HmacSHA256算法计算签名，然后进行Base64 encode，最后再把签名参数再进行urlEncode，得到最终的签名（需要使用UTF-8字符集）
+     *
+     * @param secret
+     * @param timestamp
+     * @return
+     */
+    private String addSignature(String secret, Long timestamp) {
+        //第一步，把timestamp+"\n"+密钥当做签名字符串
+        String stringToSign = timestamp + "\n" + secret;
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
+            byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
+            return URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
+        } catch (Exception e) {
+            LOGGER.error(">>>SENDING_WEBHOOK_ERROR>>> An error occurred while adding the signature", e.getMessage());
+            return null;
         }
     }
 
     private void sendWeChat(WebHookDTO hook, String content) {
         RestTemplate template = new RestTemplate();
         Map<String, Object> request = new TreeMap<>();
-        request.put("msgtype", "text");
-        Map<String, Object> text = new TreeMap<>();
-        text.put("content", content);
-        request.put("text", text);
+        request.put("msgtype", "markdown");
+        Map<String, Object> markdown = new TreeMap<>();
+        markdown.put("content", content);
+        request.put("markdown", markdown);
         ResponseEntity<String> response = template.postForEntity(hook.getWebhookPath(), request, String.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
             LOGGER.warn("Web hook response not success {}", response);
@@ -202,6 +251,7 @@ public class WebHookServiceImpl implements WebHookService {
         WebHookDTO webHookDTO = checkExistedById(webHookVO.getId());
         webHookDTO.setObjectVersionNumber(webHookVO.getObjectVersionNumber());
         if (webHookMapper.updateByPrimaryKeySelective(webHookDTO
+                .setSecret(webHookVO.getSecret())
                 .setName(webHookVO.getName())
                 .setType(webHookVO.getType())
                 .setWebhookPath(webHookVO.getWebhookPath())) != 1) {

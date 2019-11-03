@@ -36,9 +36,7 @@ public class TemplateRender {
 
     public String renderTemplate(final Template template, final Map<String, Object> variables, TemplateType type) throws IOException, TemplateException {
         String messageType = template.getSendingType();
-        String templateKey =
-                //todo
-//                template.getCode() + "-" +
+        String templateKey = template.getSendSettingCode() + "-" +
                 messageType + ":" + type.getValue() + template.getObjectVersionNumber();
         freemarker.template.Template ft = freeMarkerConfigBuilder.getTemplate(templateKey);
         String content = "";
@@ -47,6 +45,8 @@ public class TemplateRender {
                 if (SendingTypeEnum.EMAIL.getValue().equals(messageType)) {
                     content = template.getTitle();
                 } else if (SendingTypeEnum.PM.getValue().equals(messageType)) {
+                    content = template.getTitle();
+                } else if (SendingTypeEnum.WH.getValue().equals(messageType)) {
                     content = template.getTitle();
                 } else {
                     throw new CommonException("error.templateRender.renderError");

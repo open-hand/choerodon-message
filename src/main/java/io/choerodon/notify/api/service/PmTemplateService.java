@@ -19,8 +19,6 @@ public interface PmTemplateService {
 
     PmTemplateDTO update(PmTemplateDTO template);
 
-    void delete(Long id);
-
     void check(String code);
 
 }

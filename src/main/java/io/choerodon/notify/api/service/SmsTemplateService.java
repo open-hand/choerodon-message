@@ -64,11 +64,4 @@ public interface SmsTemplateService {
      * @param code
      */
     void check(String code);
-
-    /**
-     * 根据id删除模版，只能删除自定义模版
-     *
-     * @param id
-     */
-    void delete(Long id);
 }

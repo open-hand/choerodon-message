@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
@@ -69,12 +70,10 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
                 if (siteMsgRecords.size() >= 99) {
                     int num = siteMsgRecordMapper.batchInsert(siteMsgRecords);
                     LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
-//                    siteMsgRecords.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
-//                    LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", siteMsgRecords.size());
                     siteMsgRecords.clear();
                 }
                 //2.2.user主键不为空，则发送站内信
-                if (ObjectUtils.isEmpty(user.getId())) {
+                if (!ObjectUtils.isEmpty(user.getId())) {
                     //2.2.1.完善参数信息
                     Map<String, Object> userParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
                     //2.2.2.融参
@@ -94,10 +93,10 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             }
         });
         //2.3.插入剩余记录
-        int num = siteMsgRecordMapper.batchInsert(siteMsgRecords);
-        LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
-//        siteMsgRecords.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
-//        LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", siteMsgRecords.size());
+        if (!CollectionUtils.isEmpty(siteMsgRecords)) {
+            int num = siteMsgRecordMapper.batchInsert(siteMsgRecords);
+            LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
+        }
         //2.4.发送站内信
         if (ObjectUtils.isEmpty(sendSettingDTO.getIsSendInstantly()) && sendSettingDTO.getIsSendInstantly()) {
             targetUsers.forEach(user -> {

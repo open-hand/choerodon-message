@@ -121,19 +121,4 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
             throw new CommonException("error.sms.template.code.exist");
         }
     }
-
-    @Override
-    public void delete(Long id) {
-        Template dto = templateMapper.selectByPrimaryKey(id);
-        if (dto == null) {
-            return;
-        }
-        if (!"sms".equalsIgnoreCase(dto.getSendingType())) {
-            throw new CommonException("error.not.sms.template");
-        }
-        if (dto.getIsPredefined()) {
-            throw new CommonException("error.predefined.template.can.not.delete");
-        }
-        templateMapper.deleteByPrimaryKey(dto);
-    }
 }

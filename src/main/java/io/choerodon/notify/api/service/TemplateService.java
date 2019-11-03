@@ -1,7 +1,6 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.TemplateCreateVO;
 import io.choerodon.notify.api.dto.TemplateVO;
 import io.choerodon.notify.infra.dto.Template;
 import org.springframework.data.domain.Pageable;
@@ -26,24 +25,6 @@ public interface TemplateService {
      * @return 模版信息
      */
     TemplateVO getById(Long id);
-
-
-    /**
-     * 删除模版
-     *
-     * @param id 模版主键
-     * @return 删除结果
-     */
-    Boolean deleteById(Long id);
-
-    /**
-     * 将模版设成
-     * 所属发送设置对应消息类型的当前模版
-     *
-     * @param id 模版主键
-     * @return 设置结果
-     */
-    Boolean setToTheCurrent(Long id);
 
     /**
      * 创建模版

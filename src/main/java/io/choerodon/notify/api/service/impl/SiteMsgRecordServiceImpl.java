@@ -14,6 +14,7 @@ import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.SiteMsgRecordMapper;
 import io.choerodon.websocket.helper.WebSocketHelper;
 import io.choerodon.websocket.send.SendMessagePayload;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,14 +157,14 @@ public class SiteMsgRecordServiceImpl implements SiteMsgRecordService {
             records.add(record);
             if (records.size() >= 999) {
                 siteMsgRecordMapper.batchInsert(records);
-//                records.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
                 records.clear();
             }
             count.incrementAndGet();
         }
-        siteMsgRecordMapper.batchInsert(records);
-//        records.forEach(sr -> siteMsgRecordMapper.insertSelective(sr));
-        records.clear();
+        if (CollectionUtils.isNotEmpty(records)) {
+            siteMsgRecordMapper.batchInsert(records);
+            records.clear();
+        }
         logger.debug("PmSendTask insert database count:{}", count);
     }
 }

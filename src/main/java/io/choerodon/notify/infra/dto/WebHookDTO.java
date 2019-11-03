@@ -33,6 +33,9 @@ public class WebHookDTO extends BaseDTO {
     @NotEmpty(message = "error.web.hook.create.or.update.path.can.not.be.empty")
     private String webhookPath;
 
+    @ApiModelProperty("钉钉的加签密钥")
+    private String secret;
+
     @ApiModelProperty("项目ID/必填字段")
     private Long projectId;
 
@@ -72,6 +75,15 @@ public class WebHookDTO extends BaseDTO {
 
     public WebHookDTO setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public WebHookDTO setSecret(String secret) {
+        this.secret = secret;
         return this;
     }
 

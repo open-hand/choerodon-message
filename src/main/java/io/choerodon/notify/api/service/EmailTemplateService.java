@@ -23,8 +23,6 @@ public interface EmailTemplateService {
 
     void createByScan(Set<NotifyTemplateScanData> set);
 
-    void delete(Long id);
-
     void check(String code);
 
 }

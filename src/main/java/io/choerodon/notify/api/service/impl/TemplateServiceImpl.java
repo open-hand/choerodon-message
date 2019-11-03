@@ -55,61 +55,6 @@ public class TemplateServiceImpl implements TemplateService {
         return resultVO.setPredefined(template.getIsPredefined());
     }
 
-
-    @Override
-    public Boolean deleteById(Long id) {
-        // 1.校验存在
-        Template template = templateMapper.selectByPrimaryKey(id);
-        if (template == null) {
-            throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
-        }
-        // 2.不可删除预定义模版
-        if (template.getIsPredefined()) {
-            throw new CommonException("error.template.delete.predefined");
-        }
-        // 3. 不可删除发送设置的当前模版
-        SendSettingDTO sendSetting = new SendSettingDTO();
-        sendSetting.setCode(template.getSendSettingCode());
-        sendSetting = sendSettingMapper.selectOne(sendSetting);
-//        if (sendSetting != null &&
-//                (id.equals(sendSetting.getEmailTemplateId()) || id.equals(sendSetting.getPmTemplateId()) || id.equals(sendSetting.getSmsTemplateId()))) {
-//            throw new CommonException("error.template.delete.current");
-//        }
-        // 4.删除
-        if (templateMapper.deleteByPrimaryKey(id) != 1) {
-            throw new CommonException("error.template.delete");
-        }
-        return true;
-    }
-
-    @Override
-    public Boolean setToTheCurrent(Long id) {
-        //  1.校验存在
-        Template template = templateMapper.selectByPrimaryKey(id);
-        if (template == null) {
-            throw new CommonException(TEMPLATE_DOES_NOT_EXIST);
-        }
-        // 2.获取发送设置
-        SendSettingDTO sendSetting = new SendSettingDTO();
-        sendSetting.setCode(template.getSendSettingCode());
-        sendSetting = sendSettingMapper.selectOne(sendSetting);
-        if (sendSetting == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        // 3.设为当前模版
-//        if (SendingTypeEnum.EMAIL.getValue().equalsIgnoreCase(template.getSendingType())) {
-//            sendSetting.setEmailTemplateId(id);
-//        } else if (SendingTypeEnum.PM.getValue().equalsIgnoreCase(template.getSendingType())) {
-//            sendSetting.setPmTemplateId(id);
-//        } else if (SendingTypeEnum.SMS.getValue().equalsIgnoreCase(template.getSendingType())) {
-//            sendSetting.setSmsTemplateId(id);
-//        }
-        if (sendSettingMapper.updateByPrimaryKeySelective(sendSetting) != 1) {
-            throw new CommonException("error.send.setting.update");
-        }
-        return true;
-    }
-
     @Override
     public Template createTemplate(Template templateDTO) {
         if (SendingTypeEnum.EMAIL.getValue().equals(templateDTO.getSendingType()) && templateDTO.getTitle() == null) {

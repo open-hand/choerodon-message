@@ -1,7 +1,7 @@
 package io.choerodon.notify.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;;
+import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.EmailTemplateDTO;
@@ -16,15 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -101,12 +93,4 @@ public class EmailTemplateSiteController {
         }
         return new ResponseEntity<>(templateService.update(template), HttpStatus.OK);
     }
-
-    @DeleteMapping("/{id}")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层删除邮件模版")
-    public void delete(@PathVariable Long id) {
-        templateService.delete(id);
-    }
-
 }
