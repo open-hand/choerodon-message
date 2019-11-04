@@ -7,14 +7,12 @@ import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.ext.InsertException;
-import io.choerodon.core.exception.ext.UpdateException;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.notify.api.dto.EmailConfigDTO;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.dto.ScheduleTaskDTO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.*;
-import io.choerodon.notify.domain.QuartzTask;
 import io.choerodon.notify.infra.dto.NotifyScheduleRecordDTO;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -28,7 +26,6 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -83,6 +80,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
 
     /**
      * 删除定时任务
+     *
      * @param notifyScheduleRecordDTO
      */
     @Override
@@ -90,17 +88,18 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         NotifyScheduleRecordDTO notifyDTO = new NotifyScheduleRecordDTO();
         notifyDTO.setScheduleNoticeCode(notifyScheduleRecordDTO.getScheduleNoticeCode());
         NotifyScheduleRecordDTO result = notifyScheduleRecordMapper.selectOne(notifyDTO);
-        if(result == null) {
+        if (result == null) {
             throw new CommonException("error.delete.notice.not.match");
         }
         asgardFeignClient.deleteSiteTaskByTaskId(result.getTaskId());
-        if(notifyScheduleRecordMapper.deleteByPrimaryKey(result.getId()) != 1) {
+        if (notifyScheduleRecordMapper.deleteByPrimaryKey(result.getId()) != 1) {
             throw new CommonException("error.notice.delete");
         }
     }
 
     /**
      * 更新定时任务
+     *
      * @param scheduleNoticeCode
      * @param noticeSendDTO
      * @param date
@@ -111,11 +110,11 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
         notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
         NotifyScheduleRecordDTO result = notifyScheduleRecordMapper.selectOne(notifyScheduleRecordDTO);
-        if(result == null) {
+        if (result == null) {
             throw new CommonException("error.update.notify.not.exist");
         }
         asgardFeignClient.deleteSiteTaskByTaskId(result.getTaskId());
-        if( ! isNewNotice) {
+        if (!isNewNotice) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
@@ -169,7 +168,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         // 3.3.发送WebHook
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
-            webHookService.trySendWebHook(noticeSendDTO, sendSettingDTO);
+            trySendWebHook(noticeSendDTO, sendSettingDTO, users);
         }
 
     }
@@ -189,18 +188,19 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         Map<String, Object> params = new HashMap<>();
         params.put("noticeSendDTO", jsonStr);
         ScheduleTaskDTO createTskDTO = new ScheduleTaskDTO(
-                methodId, params, "通知消息","消息信息", date, assignUserIds);
+                methodId, params, "通知消息", "消息信息", date, assignUserIds);
         Long taskId = asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
         //存储定时任务和消息的映射关系
         NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
         notifyScheduleRecordDTO.setTaskId(taskId);
         notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
         notifyScheduleRecordDTO.setNoticeContent(jsonStr);
-        if(notifyScheduleRecordMapper.insertSelective(notifyScheduleRecordDTO) != 1) {
+        if (notifyScheduleRecordMapper.insertSelective(notifyScheduleRecordDTO) != 1) {
             throw new InsertException("error.insert.scheduleTaskRecord");
         }
         return taskId;
     }
+
     /**
      * 通知消息 JobTask
      *
@@ -220,6 +220,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         sendNotice(dto);
     }
+
     /**
      * 发送邮件
      * 需要捕获异常并LOG
@@ -236,6 +237,25 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             emailSendService.sendEmail(noticeSendDTO.getParams(), mailRecipient, sendSettingDTO);
         } catch (Exception e) {
             LOGGER.warn(">>>SENDING_EMAIL_ERROR>>> An error occurred while sending the message.", e);
+        }
+    }
+
+    /**
+     * 发送WebHook
+     * 需要捕获异常并LOG
+     *
+     * @param noticeSendDTO  发送信息
+     * @param sendSettingDTO 发送设置信息
+     * @param users          用户
+     */
+    private void trySendWebHook(NoticeSendDTO noticeSendDTO, SendSettingDTO sendSettingDTO, final Set<UserDTO> users) {
+        try {
+            //1.获取邮件接收用户
+            Set<String> mobiles = users.stream().map(UserDTO::getPhone).collect(Collectors.toSet());
+            //2.发送邮件
+            webHookService.trySendWebHook(noticeSendDTO, sendSettingDTO,mobiles);
+        } catch (Exception e) {
+            LOGGER.warn(">>>SENDING_WEBHOOL_ERROR>>> An error occurred while sending the message.", e);
         }
     }
 

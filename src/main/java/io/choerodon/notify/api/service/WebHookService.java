@@ -7,6 +7,8 @@ import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
+
 
 public interface WebHookService {
     /**
@@ -15,7 +17,7 @@ public interface WebHookService {
      * @param noticeSendDTO  发送信息
      * @param sendSettingDTO 发送设置信息
      */
-    void trySendWebHook(NoticeSendDTO noticeSendDTO, SendSettingDTO sendSettingDTO);
+    void trySendWebHook(NoticeSendDTO noticeSendDTO, SendSettingDTO sendSettingDTO, Set<String> mobiles);
 
 
     /**

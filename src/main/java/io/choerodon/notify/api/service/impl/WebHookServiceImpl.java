@@ -63,7 +63,7 @@ public class WebHookServiceImpl implements WebHookService {
     }
 
     @Override
-    public void trySendWebHook(NoticeSendDTO dto, SendSettingDTO sendSetting) {
+    public void trySendWebHook(NoticeSendDTO dto, SendSettingDTO sendSetting, Set<String> mobiles) {
         LOGGER.info(">>>START_SENDING_WEB_HOOK>>> Send a web hook.[INFO:send_setting_code:'{}']", sendSetting.getCode());
         //0. 若发送设置非项目层 / 发送信息未指定项目Id 则取消发送
         if (!ResourceLevel.PROJECT.value().equalsIgnoreCase(sendSetting.getLevel())
@@ -97,7 +97,7 @@ public class WebHookServiceImpl implements WebHookService {
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
                 if (WebHookTypeEnum.DINGTALK.getValue().equalsIgnoreCase(hook.getType())) {
                     String title = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
-                    sendDingTalk(hook, content, title);
+                    sendDingTalk(hook, content, title, mobiles);
                 } else if (WebHookTypeEnum.WECHAT.getValue().equalsIgnoreCase(hook.getType())) {
                     sendWeChat(hook, content);
                 } else if (WebHookTypeEnum.JSON.getValue().equalsIgnoreCase(hook.getType())) {
@@ -120,19 +120,31 @@ public class WebHookServiceImpl implements WebHookService {
      * @param text  发送内容
      * @param title 发送主题
      */
-    private void sendDingTalk(WebHookDTO hook, String text, String title) {
+    private void sendDingTalk(WebHookDTO hook, String text, String title, Set<String> mobiles) {
         RestTemplate template = new RestTemplate();
         try {
             //1.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
             long timestamp = System.currentTimeMillis();
             URI uri = new URI(hook.getWebhookPath() + "&timestamp=" + timestamp + "&sign=" + addSignature(hook.getSecret(), timestamp));
-            //2.添加发送内容
+            //2.添加发送类型
             Map<String, Object> request = new HashMap<>();
             request.put("msgtype", "markdown");
+            //3.添加@对象
+            Map<String, Object> at = new HashMap<>();
+            at.put("isAtAll", CollectionUtils.isEmpty(mobiles));
+            if (!CollectionUtils.isEmpty(mobiles)) {
+                at.put("atMobiles", mobiles);
+            }
+            request.put("at", at);
+            for (String mobile : mobiles) {
+                text = "@" + mobile + text;
+            }
+            //4.添加发送内容
             Map<String, Object> markdown = new HashMap<>();
             markdown.put("text", text);
             markdown.put("title", title);
             request.put("markdown", markdown);
+            //5.发送请求
             ResponseEntity<String> response = template.postForEntity(uri, request, String.class);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 LOGGER.warn(">>>SENDING_WEBHOOK_ERROR>>> Sending the web hook was not successful,response:{}", response);

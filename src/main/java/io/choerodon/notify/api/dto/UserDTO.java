@@ -17,6 +17,8 @@ public class UserDTO {
 
     private String email;
 
+    private String phone;
+
     public Long getId() {
         return id;
     }
@@ -57,6 +59,14 @@ public class UserDTO {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,12 +76,13 @@ public class UserDTO {
                 Objects.equals(loginName, userDTO.loginName) &&
                 Objects.equals(realName, userDTO.realName) &&
                 Objects.equals(imageUrl, userDTO.imageUrl) &&
-                Objects.equals(email, userDTO.email);
+                Objects.equals(email, userDTO.email) &&
+                Objects.equals(phone, userDTO.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, loginName, realName, imageUrl, email);
+        return Objects.hash(id, loginName, realName, imageUrl, email, phone);
     }
 
     @Override
@@ -82,6 +93,7 @@ public class UserDTO {
                 ", realName='" + realName + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
                 '}';
     }
 }
