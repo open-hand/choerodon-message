@@ -5,24 +5,25 @@ export default function () {
     autoQuery: false,
     selection: false,
     paging: true,
-    fields: [{
-      name: 'type',
-      type: 'string',
-      label: '类型',
-    }, {
-      name: 'content',
-      type: 'string',
-      label: '预览',
-    }, {
-      name: 'theme',
-      type: 'string',
-      label: '发送主题',
-    }],
+    fields: [
+      { name: 'type', type: 'string', label: '类型' },
+      { name: 'content', type: 'string' },
+    ],
     transport: {
       read: {
         url: '/notify/v1/notices/send_settings',
         method: 'get',
       },
+      create: ({ data: [data] }) => ({
+        url: '/notify/v1/templates',
+        method: 'post',
+        data,
+      }),
+      update: ({ data: [data] }) => ({
+        url: '/notify/v1/templates',
+        method: 'post',
+        data,
+      }),
     },
   };
 }

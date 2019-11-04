@@ -1,7 +1,10 @@
 import React, { Component, useContext, useState } from 'react/index';
 import classnames from 'classnames';
-import { Table, Button, Tree, Icon, TextField } from 'choerodon-ui/pro';
-import { Action, axios, Page, Breadcrumb, Content, TabPage, PageTab } from '@choerodon/boot';
+import { Table, Button, Tree, Icon, TextField, Modal } from 'choerodon-ui/pro';
+import { Header, axios, Page, Breadcrumb, Content, PageTab } from '@choerodon/boot';
+import { observer } from 'mobx-react-lite';
+import EditSendSettings from './Sider/EditSendSettings';
+import EditTemplate from './Sider/EditTemplate';
 import Store from './Store';
 
 import ToggleMessageType from './ToggleMessageType';
@@ -10,9 +13,9 @@ import './TableMessage.less';
 const { Column } = Table;
 const cssPrefix = 'c7n-notify-contentList';
 // 设置邮件，设置短信，设置站内信
-
-export default function Tab() {
-  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, match, setCurrentPageType } = useContext(Store);
+export default observer(() => {
+  const context = useContext(Store);
+  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
 
   const treeNodeRenderer = ({ record }) => {
     const treeIcon = () => {
@@ -69,16 +72,43 @@ export default function Tab() {
     );
   };
 
+  function editSendSettings() {
+    Modal.open({
+      title: '修改发送设置',
+      drawer: true,
+      style: { width: '3.8rem' },
+      children: <EditSendSettings context={context} />,
+    });
+  }
+
+  function editTemplate(type, title) {
+    Modal.open({
+      title,
+      drawer: true,
+      style: { width: type === 'sms' ? '3.8rem' : '7.4rem' },
+      children: <EditTemplate type={type} context={context} />,
+    });
+  }
+
+  function getPageHeader() {
+    return currentPageType.currentSelectedType === 'form' && (
+      <Header>
+        <Button icon="mode_edit" onClick={editSendSettings}>修改发送设置</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('email', '修改邮件模板')}>修改邮件模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('pm', '修改站内信模板')}>修改站内信模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('sms', '修改短信模板')}>修改短信模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('webhook', '修改webhook模板')}>修改webhook模板</Button>
+      </Header>
+    );
+  }
+
   return (
     <Page>
-      {/* /!* <Header> */}
-      {/*  <div className="title">消息服务</div> */}
-      {/* </Header> *!/ */}
+      {getPageHeader()}
       <Breadcrumb />
       <Content className={cssPrefix}>
         <div className={`${cssPrefix}-tree`}>
           <TextField
-            // dataSet={queryTreeDataSet.queryDataSet}
             name="id"
             className={`${cssPrefix}-tree-query`}
             prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,0.65)' }} />}
@@ -95,4 +125,4 @@ export default function Tab() {
       </Content>
     </Page>
   );
-}
+});
