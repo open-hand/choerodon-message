@@ -22,8 +22,23 @@ public class TemplateAssertHelper {
         return templateNotExisted(id, "error.template.not.exist");
     }
 
+    public Template templateNotExistedNotById(String code, String type) {
+        return templateNotExistedNotById(code, type, "error.template.not.exist");
+    }
+
     public Template templateNotExisted(Long id, String message) {
         Template template = templateMapper.selectByPrimaryKey(id);
+        if (template == null) {
+            throw new FeignException(message);
+        }
+        return template;
+    }
+
+    public Template templateNotExistedNotById(String code, String type, String message) {
+        Template template = new Template();
+        template.setSendSettingCode(code);
+        template.setSendingType(type);
+        template = templateMapper.selectOne(template);
         if (template == null) {
             throw new FeignException(message);
         }
