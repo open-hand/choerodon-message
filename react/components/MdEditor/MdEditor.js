@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { Tabs, Button } from 'choerodon-ui';
 import 'codemirror/lib/codemirror.css';
 import './MdEditor.less';
-import './preview.css';
+import './preview.less';
 
 require('codemirror/mode/markdown/markdown');
 
