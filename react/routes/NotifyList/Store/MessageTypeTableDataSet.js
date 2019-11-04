@@ -37,23 +37,15 @@ export default function (optionDs) {
       name: 'introduce',
       type: 'string',
       label: '说明',
-    },
-    {
-      name: 'level',
-      type: 'string',
-      label: '层级',
-    },
-    {
+    }, {
       name: 'enabled',
       type: 'boolean',
       label: '状态',
-    },
-    {
+    }, {
       name: 'allowConfig',
       type: 'boolean',
       label: '允许配置接收',
-    },
-    ],
+    }],
     queryFields: [{
       name: 'messageType',
       type: 'string',
@@ -62,13 +54,6 @@ export default function (optionDs) {
       name: 'introduce',
       type: 'string',
       label: '说明',
-    }, {
-      name: 'level',
-      type: 'string',
-      label: '层级',
-      textField: 'value',
-      valueField: 'key',
-      options: optionDs,
     }, {
       name: 'enabled',
       type: 'string',
@@ -83,12 +68,18 @@ export default function (optionDs) {
       textField: 'value',
       valueField: 'key',
       options: queryAllowConfig,
+    }, {
+      name: 'secondCode',
+      type: 'string',
+    }, {
+      name: 'firstCode',
+      type: 'string',
     }],
     transport: {
-      read: {
+      read: (props) => ({
         url: '/notify/v1/notices/send_settings',
         method: 'get',
-      },
+      }),
     },
   };
 }

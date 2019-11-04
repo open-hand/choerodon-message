@@ -1,0 +1,76 @@
+@import (reference) '../../../common/style/mixin/template.less';
+.c7n-notify-messageTypeDetail {
+  &-htmlContainer {
+    width:648px;
+    background:rgba(248,248,248,1);
+    border-radius:4px;
+    overflow:auto;
+    padding: 0.24rem;
+  }
+  &-form {
+    .overloadViewForm();
+  }
+
+  &-header {
+    padding-top: 0.15rem;
+    padding-bottom: 0.2rem;
+    &-name {
+      .headerFont();
+    }
+    &-circle {
+      .circleIcon(0.14rem);
+      margin-right: 0.1rem;
+    }
+  }
+  &-preview {
+    .template();
+  }
+}
+
+.headerFont() {
+  font-weight: 500;
+  font-size: 0.2rem;
+}
+
+.circleIcon(@diameter: 0.1rem) {
+  display: inline-block;
+  width: @diameter;
+  height: @diameter;
+  border-radius: 50%;
+}
+
+.overloadViewForm(@verticalAlign: middle, @paddingBottom: 0.3rem) {
+  font-size: 0.14rem !important;
+  padding-bottom: 0.24rem !important;
+  .c7n-pro-form-header {
+    font-weight: 500;
+    padding-bottom: 0.05rem !important;
+    padding-left: 0.03rem !important;
+    margin-bottom: 0.14rem !important;
+  }
+  .c7n-pro-field-label, .c7n-pro-field-wrapper {
+    padding: 0.04rem 0.05rem !important;
+  }
+  table > tbody > tr > td {
+    vertical-align: @verticalAlign !important;
+    line-height: 2.15384615;
+  }
+  tr > td > label {
+    color: rgba(0, 0, 0, 0.65);
+    line-height: 1.42;
+  }
+  .c7n-pro-field-label-left {
+    padding: 0.04rem 0.05rem !important;
+  }
+  .c7n-pro-form {
+    .c7n-pro-output {
+      line-height: 1.42;
+    }
+  }
+  tr > td > div {
+    padding: 4px 0 !important;
+  }
+  .c7n-pro-field-required:after {
+    content: '' !important;
+  }
+};

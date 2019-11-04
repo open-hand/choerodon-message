@@ -1827,6 +1827,12 @@ const zh_CN = {
   'download.failed.detail': '点击下载失败详情',
   'download.failed.error': '失败详情文件丢失，无法下载',
 
+  'md.placeholder': '在下面编辑您的webhook模板，支持MarkDown格式',
+  write: '编辑',
+  preview: '预览',
+  expand: '展开',
+  shrink: '收起',
+
   // page
   ...pageDetail,
 

@@ -1,142 +1,128 @@
-import React, { Component, useContext } from 'react/index';
+import React, { Component, useContext, useState } from 'react/index';
 import classnames from 'classnames';
-import { Table, Button } from 'choerodon-ui/pro';
-import { Action, axios, Page, Breadcrumb, Content, Header } from '@choerodon/boot';
+import { Table, Button, Tree, Icon, TextField, Modal } from 'choerodon-ui/pro';
+import { Header, axios, Page, Breadcrumb, Content, PageTab } from '@choerodon/boot';
+import { observer } from 'mobx-react-lite';
+import EditSendSettings from './Sider/EditSendSettings';
+import EditTemplate from './Sider/EditTemplate';
 import Store from './Store';
 
+import ToggleMessageType from './ToggleMessageType';
 import './TableMessage.less';
 
 const { Column } = Table;
+const cssPrefix = 'c7n-notify-contentList';
 // 设置邮件，设置短信，设置站内信
+export default observer(() => {
+  const context = useContext(Store);
+  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
 
-const StatusCard = ({ enabled }) => (
-  <div
-    className={classnames('c7n-notify-status', {
-      'c7n-notify-enable': enabled,
-      'c7n-notify-disable': !enabled,
-    })}
-  >
-    {enabled ? '启用' : '停用'}
-  </div>
-);
+  const treeNodeRenderer = ({ record }) => {
+    const treeIcon = () => {
+      const { parent, children, level } = record;
+      // 最上层节点, 展开
+      if (!parent && record.get('expand')) {
+        return <Icon type="folder_open2" />;
+      }
+      // 最上层节点，未展开
+      if (!parent && !record.get('expand')) {
+        return <Icon type="folder_open" />;
+      }
+      // 最底层节点
+      if (level === 2) {
+        return (
+          <span
+            className={`${cssPrefix}-circle`}
+            style={{ backgroundColor: record.get('enabled') ? '#00BFA5' : 'rgba(0,0,0,0.20)' }}
+          />
+        );
+      }
+      return <Icon type="textsms" />;
+    };
+    const toggleContentRenderer = () => {
+      const { parent, children, level } = record;
+      if (!parent) {
+        messageTypeTableDataSet.setQueryParameter('secondCode', undefined);
+        messageTypeTableDataSet.setQueryParameter('firstCode', record.get('code'));
+        messageTypeTableDataSet.query();
+        setCurrentPageType({
+          currentSelectedType: 'table',
+        });
+      } else if (level === 2) {
+        messageTypeDetailDataSet.setQueryParameter('code', record.get('code'));
+        messageTypeDetailDataSet.query();
+        setCurrentPageType({
+          currentSelectedType: 'form',
+        });
+      } else {
+        messageTypeTableDataSet.setQueryParameter('firstCode', record.parent.get('code'));
+        messageTypeTableDataSet.setQueryParameter('secondCode', record.get('code'));
+        messageTypeTableDataSet.query();
+        setCurrentPageType({
+          currentSelectedType: 'table',
+        });
+      }
+    };
 
-export default function Tab() {
-  const { sendSettingDataSet, history, match } = useContext(Store);
-  function deleteLink(mes) {
-    const id = sendSettingDataSet.current.get('id');
-    const businessType = sendSettingDataSet.current.get('code');
-    const { search } = history.location;
-    if (mes === 'email') {
-      history.push(`${match.path}/send-setting/${id}/${businessType}/email${search}`);
-    } else if (mes === 'sms') {
-      history.push(`${match.path}/send-setting/${id}/${businessType}/sms${search}`);
-    } else if (mes === 'pm') {
-      history.push(`${match.path}/send-setting/${id}/${businessType}/pm${search}`);
-    }
-  }
-  // 启用状态改变切换
-  async function changeMake() {
-    const status = sendSettingDataSet.current.get('enabled');
-    const id = sendSettingDataSet.current.get('id');
-    const url = `/notify/v1/notices/send_settings/${id}/${status ? 'disabled' : 'enabled'}`;
-    const res = await axios.put(url);
-    sendSettingDataSet.query();
-  }
-  // 允许配置接收
-  async function changeReceive() {
-    const config = sendSettingDataSet.current.get('allowConfig');
-    const id = sendSettingDataSet.current.get('id');
-    const url = `/notify/v1/notices/send_settings/${id}/${config ? 'forbidden_configuration' : 'allow_configuration'}`;
-    const res = await axios.put(url);
-    sendSettingDataSet.query();
-  }
-  // 渲染消息类型
-  function getNameMethod({ value, record }) {
-    const messageType = record.get('messageType');
-    const id = record.get('id');
-    const actionDatas = [{
-      service: [],
-      text: '设置邮件内容',
-      action: () => deleteLink('email'),
-    },
-    {
-      service: [],
-      text: '设置站内信内容',
-      action: () => deleteLink('pm'),
-    },
-    {
-      service: [],
-      text: '设置短信内容',
-      action: () => deleteLink('sms'),
-    },
-    {
-      service: [],
-      text: record.get('enabled') ? '停用' : '启用',
-      action: () => changeMake(),
-    },
-    {
-      service: [],
-      text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
-      action: () => changeReceive(),
-    }];
     return (
-      <React.Fragment>
-        <span className="c7n-tableMessage-name">{value}</span>
-        <Action className="action-icon" data={actionDatas} />
-      </React.Fragment>
+      <div onClick={toggleContentRenderer}>
+        <span className={`${cssPrefix}-icon`}>{treeIcon()}</span>
+        <span>{record.get('name')}</span>
+      </div>
+    );
+  };
+
+  function editSendSettings() {
+    Modal.open({
+      title: '修改发送设置',
+      drawer: true,
+      style: { width: '3.8rem' },
+      children: <EditSendSettings context={context} />,
+    });
+  }
+
+  function editTemplate(type, title) {
+    Modal.open({
+      title,
+      drawer: true,
+      style: { width: type === 'sms' ? '3.8rem' : '7.4rem' },
+      children: <EditTemplate type={type} context={context} />,
+    });
+  }
+
+  function getPageHeader() {
+    return currentPageType.currentSelectedType === 'form' && (
+      <Header>
+        <Button icon="mode_edit" onClick={editSendSettings}>修改发送设置</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('email', '修改邮件模板')}>修改邮件模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('pm', '修改站内信模板')}>修改站内信模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('sms', '修改短信模板')}>修改短信模板</Button>
+        <Button icon="mode_edit" onClick={() => editTemplate('webhook', '修改webhook模板')}>修改webhook模板</Button>
+      </Header>
     );
   }
-  // 渲染启用状态
-  const getEnabled = ({ record }) => <StatusCard enabled={record.get('enabled')} />;
 
-  // 接收配置渲染
-  function getAllowConfig({ record }) {
-    if (record.get('allowConfig')) {
-      return (
-        <div className="font">
-          允许
-        </div>
-      );
-    } else {
-      return (
-        <div className="font">
-          禁止
-        </div>
-      );
-    }
-  }
-  // 平台渲染
-  function getLevel({ record }) {
-    if (record.get('level') === 'site') {
-      return (
-        <div>平台</div>
-      );
-    } else if (record.get('level') === 'organization') {
-      return (
-        <div>组织</div>
-      );
-    } else if (record.get('level') === 'project') {
-      return (
-        <div>项目</div>
-      );
-    }
-  }
   return (
     <Page>
-      {/* <Header>
-        <div className="title">消息服务</div>
-      </Header> */}
+      {getPageHeader()}
       <Breadcrumb />
-
-      <Content className="">
-        <Table className="message-service" dataSet={sendSettingDataSet}>
-          <Column align="left" className="column1" name="messageType" renderer={getNameMethod} />
-          <Column name="introduce" />
-          <Column name="level" width={80} renderer={getLevel} />
-          <Column width={80} name="enabled" renderer={getEnabled} align="left" />
-          <Column width={147} className="column5" name="allowConfig" renderer={getAllowConfig} />
-        </Table>
+      <Content className={cssPrefix}>
+        <div className={`${cssPrefix}-tree`}>
+          <TextField
+            name="id"
+            className={`${cssPrefix}-tree-query`}
+            prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,0.65)' }} />}
+            placeholder="请输入搜索条件"
+          />
+          <Tree
+            dataSet={queryTreeDataSet}
+            renderer={treeNodeRenderer}
+          />
+        </div>
+        <div className={`${cssPrefix}-rightContent`}>
+          <ToggleMessageType />
+        </div>
       </Content>
     </Page>
   );
-}
+});
