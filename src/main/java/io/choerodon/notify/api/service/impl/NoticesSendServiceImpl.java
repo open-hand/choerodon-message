@@ -104,9 +104,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
      * @param scheduleNoticeCode
      * @param noticeSendDTO
      * @param date
+     * @param isNewNotice
      */
     @Override
-    public void updateScheduleNotice(String scheduleNoticeCode, Date date, NoticeSendDTO noticeSendDTO) {
+    public void updateScheduleNotice(String scheduleNoticeCode, Date date, NoticeSendDTO noticeSendDTO, Boolean isNewNotice) {
         NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
         notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
         NotifyScheduleRecordDTO result = notifyScheduleRecordMapper.selectOne(notifyScheduleRecordDTO);
@@ -114,8 +115,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             throw new CommonException("error.update.notify.not.exist");
         }
         asgardFeignClient.deleteSiteTaskByTaskId(result.getTaskId());
-        //这里是不可能为null的
-        if(noticeSendDTO == null) {
+        if( ! isNewNotice) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             try {
@@ -194,7 +194,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         //存储定时任务和消息的映射关系
         NotifyScheduleRecordDTO notifyScheduleRecordDTO = new NotifyScheduleRecordDTO();
         notifyScheduleRecordDTO.setTaskId(taskId);
-        //notifyScheduleRecordDTO.setServiceCode();
         notifyScheduleRecordDTO.setScheduleNoticeCode(scheduleNoticeCode);
         notifyScheduleRecordDTO.setNoticeContent(jsonStr);
         if(notifyScheduleRecordMapper.insertSelective(notifyScheduleRecordDTO) != 1) {

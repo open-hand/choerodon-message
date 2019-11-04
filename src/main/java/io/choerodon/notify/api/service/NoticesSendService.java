@@ -16,5 +16,5 @@ public interface NoticesSendService {
 
     void deleteScheduleNotice(NotifyScheduleRecordDTO notifyScheduleRecordDTO);
 
-    void updateScheduleNotice(String scheduleNoticeCode, Date date,  NoticeSendDTO noticeSendDTO);
+    void updateScheduleNotice(String scheduleNoticeCode, Date date,  NoticeSendDTO noticeSendDTO, Boolean isNewNotice);
 }

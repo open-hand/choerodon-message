@@ -89,10 +89,11 @@ public class NoticesSendController {
     @PutMapping("/schedule")
     @ApiOperation(value = "修改定时消息发送时间")
     @Permission(type = ResourceType.SITE)
-    public void updateScheduleNotice(@RequestBody NoticeSendDTO noticeSendDTO,
-                                     @RequestParam(value = "date") Date date,
-                                     @RequestParam String scheduleNoticeCode) {
-       noticesSendService.updateScheduleNotice(scheduleNoticeCode, date, noticeSendDTO);
+    public void updateScheduleNotice(@RequestBody(required = false) NoticeSendDTO noticeSendDTO,
+                                     @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")  Date date,
+                                     @RequestParam String scheduleNoticeCode,
+                                     @RequestParam Boolean isNewNotice) {
+       noticesSendService.updateScheduleNotice(scheduleNoticeCode, date, noticeSendDTO, isNewNotice);
     }
 
     @DeleteMapping("/schdule")
