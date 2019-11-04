@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Table, Form, Output } from 'choerodon-ui/pro';
-import { Tabs } from 'choerodon-ui';
+import { Table, Icon, Output } from 'choerodon-ui/pro';
 import { Action, axios, Content, StatusTag, PageTab, PageWrap } from '@choerodon/boot';
 import Store from '../Store';
 
@@ -8,7 +7,7 @@ const { Column } = Table;
 
 const MessageTypeTable = () => {
   const cssPrefix = 'c7n-notify-MessageTypeTable';
-  const { messageTypeTableDataSet, messageTypeDetailDataSet, setCurrentPageType } = useContext(Store);
+  const { messageTypeTableDataSet, messageTypeDetailDataSet, setCurrentPageType, currentPageType } = useContext(Store);
 
   // 启用状态改变切换
   async function changeMake() {
@@ -51,25 +50,30 @@ const MessageTypeTable = () => {
   const getAllowConfig = ({ record }) => (record.get('allowConfig') ? '允许' : '禁止');
 
   return (
-    <Table className="message-service" dataSet={messageTypeTableDataSet} header="问题管理">
-      <Column
-        name="messageType"
-        className={`${cssPrefix}-nameContainer`}
-        onCell={({ record }) => ({
-          onClick: () => {
-            messageTypeDetailDataSet.setQueryParameter('code', record.get('code'));
-            messageTypeDetailDataSet.query();
-            setCurrentPageType({
-              currentSelectedType: 'form',
-            });
-          },
-        })}
-      />
-      <Column renderer={ActionRenderer} width={40} />
-      <Column name="introduce" />
-      <Column width={80} name="enabled" renderer={getEnabled} align="left" />
-      <Column width={147} name="allowConfig" renderer={getAllowConfig} />
-    </Table>
+    <div>
+      <div className="c7n-notify-messageTypeDetail-title">
+        <Icon type={currentPageType.icon} />{currentPageType.title}
+      </div>
+      <Table className="message-service" dataSet={messageTypeTableDataSet}>
+        <Column
+          name="messageType"
+          className={`${cssPrefix}-nameContainer`}
+          onCell={({ record }) => ({
+            onClick: () => {
+              messageTypeDetailDataSet.setQueryParameter('code', record.get('code'));
+              messageTypeDetailDataSet.query();
+              setCurrentPageType({
+                currentSelectedType: 'form',
+              });
+            },
+          })}
+        />
+        <Column renderer={ActionRenderer} width={40} />
+        <Column name="introduce" />
+        <Column width={80} name="enabled" renderer={getEnabled} align="left" />
+        <Column width={147} name="allowConfig" renderer={getAllowConfig} />
+      </Table>
+    </div>
   );
 };
 

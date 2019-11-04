@@ -2,6 +2,7 @@ import React, { Component, useContext, useState } from 'react/index';
 import classnames from 'classnames';
 import { Table, Button, Tree, Icon, TextField, Modal } from 'choerodon-ui/pro';
 import { Header, axios, Page, Breadcrumb, Content, PageTab } from '@choerodon/boot';
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import EditSendSettings from './Sider/EditSendSettings';
 import EditTemplate from './Sider/EditTemplate';
@@ -16,6 +17,27 @@ const cssPrefix = 'c7n-notify-contentList';
 export default observer(() => {
   const context = useContext(Store);
   const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
+  const [inputValue, setInputValue] = useState('');
+
+  function getTitle(record) {
+    const name = record.get('name').toLowerCase();
+    const searchValue = inputValue.toLowerCase();
+    const index = name.indexOf(searchValue);
+    const beforeStr = name.substr(0, index).toLowerCase();
+    const afterStr = name.substr(index + searchValue.length).toLowerCase();
+    const title = index > -1 ? (
+      <span>
+        {beforeStr}
+        <span style={{ color: '#f50' }}>{inputValue.toLowerCase()}</span>
+        {afterStr}
+      </span>
+    ) : (
+      <span>
+        {name}
+      </span>
+    );
+    return title;
+  }
 
   const treeNodeRenderer = ({ record }) => {
     const treeIcon = () => {
@@ -47,6 +69,8 @@ export default observer(() => {
         messageTypeTableDataSet.query();
         setCurrentPageType({
           currentSelectedType: 'table',
+          icon: 'folder_open2',
+          title: record.get('name'),
         });
       } else if (level === 2) {
         messageTypeDetailDataSet.setQueryParameter('code', record.get('code'));
@@ -60,6 +84,8 @@ export default observer(() => {
         messageTypeTableDataSet.query();
         setCurrentPageType({
           currentSelectedType: 'table',
+          icon: 'textsms',
+          title: record.get('name'),
         });
       }
     };
@@ -67,7 +93,7 @@ export default observer(() => {
     return (
       <div onClick={toggleContentRenderer}>
         <span className={`${cssPrefix}-icon`}>{treeIcon()}</span>
-        <span>{record.get('name')}</span>
+        {getTitle(record)}
       </div>
     );
   };
@@ -101,6 +127,28 @@ export default observer(() => {
       </Header>
     );
   }
+  function handleSearch(value) {
+    setInputValue(value);
+  }
+  function handleInput(e) {
+    setInputValue(e.target.value);
+  }
+
+  function handleExpand(e) {
+    runInAction(() => {
+      queryTreeDataSet.forEach((record) => {
+        record.set('expand', false);
+      });
+      queryTreeDataSet.forEach((record) => {
+        if (record.get('name').toLowerCase().includes(inputValue.toLowerCase())) {
+          while (record.parent) {
+            record.parent.set('expand', true);
+            record = record.parent;
+          }
+        }
+      });
+    });
+  }
 
   return (
     <Page>
@@ -113,6 +161,10 @@ export default observer(() => {
             className={`${cssPrefix}-tree-query`}
             prefix={<Icon type="search" style={{ color: 'rgba(0,0,0,0.65)' }} />}
             placeholder="请输入搜索条件"
+            onInput={handleInput}
+            onChange={handleSearch}
+            value={inputValue}
+            onEnterDown={handleExpand}
           />
           <Tree
             dataSet={queryTreeDataSet}

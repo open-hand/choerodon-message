@@ -18,13 +18,15 @@ export const StoreProvider = withRouter(injectIntl(inject('AppState')(
     const { AppState: { currentMenuType: { type, id } }, intl, children } = props;
     const [currentPageType, setCurrentPageType] = useState({
       currentSelectedType: 'table',
+      icon: 'folder_open2',
+      title: '全部',
       id: null,
     });
     const levelDataSet = useMemo(() => new DataSet(LevelDataSet()), []);
     const messageTypeTableDataSet = useMemo(() => new DataSet(MessageTypeTableDataSet(levelDataSet)), []);
     const templateDataSet = useMemo(() => new DataSet(TemplateDataSet()), []);
     const messageTypeDetailDataSet = useMemo(() => new DataSet(MessageTypeDetailDataSet(templateDataSet)), []);
-    const queryTreeDataSet = useMemo(() => new DataSet(QueryTreeDataSet()), []);
+    const queryTreeDataSet = useMemo(() => new DataSet(QueryTreeDataSet({ setCurrentPageType })), []);
     const value = {
       ...props,
       messageTypeTableDataSet,
