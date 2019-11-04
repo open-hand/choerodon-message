@@ -28,7 +28,7 @@ export const StoreProvider = injectIntl(inject('AppState')(
       webhooksTypeMap: {
         WeChat: '企业微信',
         DingTalk: '钉钉',
-        Json: 'json',
+        Json: 'JSON',
       },
       ENABLED_GREEN: 'rgba(0, 191, 165, 1)',
       DISABLED_GRAY: 'rgba(0, 0, 0, 0.2)',

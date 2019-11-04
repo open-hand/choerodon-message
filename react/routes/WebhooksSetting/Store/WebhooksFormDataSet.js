@@ -9,7 +9,7 @@ const typeOptionDataSet = new DataSet({
   data: [
     { name: '钉钉', value: 'DingTalk' },
     { name: '企业微信', value: 'WeChat' },
-    { name: 'json', value: 'Json' },
+    { name: 'JSON', value: 'Json' },
   ],
 });
 
@@ -40,9 +40,10 @@ export default function (type, id, children) {
     dataKey: false,
     fields: [
       { name: 'id', type: 'string' },
-      { name: 'name', type: 'string', label: 'Webhooks名称' },
-      { name: 'type', type: 'string', label: 'Webhooks类型', options: typeOptionDataSet, valueField: 'value', textField: 'name' },
-      { name: 'webhookPath', type: 'string', label: 'Webhooks地址', validator: validateWebhooksPath },
+      { name: 'name', type: 'string', label: 'Webhooks名称', required: true },
+      { name: 'type', type: 'string', label: 'Webhooks类型', options: typeOptionDataSet, valueField: 'value', textField: 'name', required: true },
+      { name: 'webhookPath', type: 'string', label: 'Webhooks地址', validator: validateWebhooksPath, required: true },
+      { name: 'secret', type: 'string', label: 'secret' },
       { name: 'id', type: 'number' },
       { name: 'objectVersionNumber', type: 'number' },
       { name: 'triggerEventSelection', ignore: 'always' },

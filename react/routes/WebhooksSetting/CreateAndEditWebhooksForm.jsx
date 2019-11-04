@@ -1,9 +1,10 @@
 import React from 'react';
 import { Form, TextField, TextArea, Select, Table, CheckBox } from 'choerodon-ui/pro';
+import { observer } from 'mobx-react-lite';
 
 const { Column } = Table;
 
-const CreateAndEditWebhooksForm = ({ dataSet, triggerEventsSettingDataSet }) => {
+const CreateAndEditWebhooksForm = observer(({ dataSet, triggerEventsSettingDataSet }) => {
   const checkBoxRenderer = ({ value, record }) => {
     const handleNodeChecked = (clicked) => (clicked ? triggerEventsSettingDataSet.select(record) : triggerEventsSettingDataSet.unSelect(record));
     return (
@@ -28,6 +29,7 @@ const CreateAndEditWebhooksForm = ({ dataSet, triggerEventsSettingDataSet }) => 
         <TextField name="name" />
         <Select name="type" />
         <TextArea name="webhookPath" />
+        {dataSet.current && dataSet.current.get('type') === 'DingTalk' && <TextArea name="secret" />}
       </Form>
       <Table dataSet={triggerEventsSettingDataSet} mode="tree">
         <Column name="name" />
@@ -36,6 +38,6 @@ const CreateAndEditWebhooksForm = ({ dataSet, triggerEventsSettingDataSet }) => 
     </React.Fragment>
 
   );
-};
+});
 
 export default CreateAndEditWebhooksForm;
