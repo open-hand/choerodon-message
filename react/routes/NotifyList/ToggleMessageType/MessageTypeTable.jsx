@@ -69,9 +69,9 @@ const MessageTypeTable = () => {
           })}
         />
         <Column renderer={ActionRenderer} width={40} />
-        <Column name="introduce" />
-        <Column width={80} name="enabled" renderer={getEnabled} align="left" />
-        <Column width={147} name="allowConfig" renderer={getAllowConfig} />
+        <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} name="introduce" />
+        <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} width={80} name="enabled" renderer={getEnabled} align="left" />
+        <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} width={147} name="allowConfig" renderer={getAllowConfig} />
       </Table>
     </div>
   );
