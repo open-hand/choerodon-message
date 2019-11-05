@@ -1,6 +1,5 @@
 package io.choerodon.notify.api.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,20 +8,26 @@ import io.choerodon.core.exception.FeignException;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
 import io.choerodon.notify.api.service.SmsService;
 import io.choerodon.notify.domain.CrlandSmsResponse;
-import io.choerodon.notify.domain.Record;
+import io.choerodon.notify.domain.SmsRecord;
 import io.choerodon.notify.infra.asserts.SendSettingAssertHelper;
 import io.choerodon.notify.infra.asserts.SmsConfigAssertHelper;
 import io.choerodon.notify.infra.asserts.TemplateAssertHelper;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.SmsConfigDTO;
 import io.choerodon.notify.infra.dto.Template;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.enums.SmsSendType;
 import io.choerodon.notify.infra.mapper.MailingRecordMapper;
 import io.choerodon.notify.infra.mapper.SmsConfigMapper;
+import io.choerodon.notify.infra.mapper.SmsRecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpServerErrorException;
@@ -30,7 +35,13 @@ import org.springframework.web.client.RestTemplate;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,18 +70,18 @@ public class SmsServiceImpl implements SmsService {
 
     private final SmsConfigMapper smsConfigMapper;
 
-    private final MailingRecordMapper mailingRecordMapper;
+    private SmsRecordMapper smsRecordMapper;
 
     public SmsServiceImpl(SendSettingAssertHelper sendSettingAssertHelper,
                           TemplateAssertHelper templateAssertHelper,
                           SmsConfigAssertHelper smsConfigAssertHelper,
-                          MailingRecordMapper mailingRecordMapper,
-                          SmsConfigMapper smsConfigMapper) {
+                          SmsConfigMapper smsConfigMapper,
+                          SmsRecordMapper smsRecordMapper) {
         this.sendSettingAssertHelper = sendSettingAssertHelper;
         this.templateAssertHelper = templateAssertHelper;
         this.smsConfigAssertHelper = smsConfigAssertHelper;
-        this.mailingRecordMapper = mailingRecordMapper;
         this.smsConfigMapper = smsConfigMapper;
+        this.smsRecordMapper = smsRecordMapper;
     }
 
     @Override
@@ -85,28 +96,27 @@ public class SmsServiceImpl implements SmsService {
         }
         SendSettingDTO sendSetting = sendSettingAssertHelper.sendSettingNotExisted(code);
 
-        //todo
-//        Long templateId = sendSetting.getSmsTemplateId();
-//        Template template = templateAssertHelper.templateNotExisted(templateId);
-//        String content = template.getContent();
-//        if (!"sms".equals(template.getSendingType()) || StringUtils.isEmpty(content)) {
-//            LOGGER.warn("illegal sms template, id: {}", templateId);
-//            throw new FeignException("error.illegal.sms.template");
-//        }
-//
-//        SmsConfigDTO smsConfig =
-//                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
-//        Map<String, Object> variable = noticeSendDTO.getParams();
-//        variable.put("secretKey", smsConfig.getSecretKey());
-//        variable.put("source", smsConfig.getSignature());
-//        JsonNode node = null;
-//        try {
-//            node = objectMapper.readTree(content);
-//            substitutionVariable(variable, node);
-//        } catch (IOException e) {
-//            throw new FeignException("error.parse.sms.template.json");
-//        }
-//        sendSms(smsConfig, node, template, variable);
+        Template template = templateAssertHelper.templateNotExistedNotById(code, SendingTypeEnum.SMS.getValue());
+        Long templateId = template.getId();
+        String content = template.getContent();
+        if (!"sms".equals(template.getSendingType()) || StringUtils.isEmpty(content)) {
+            LOGGER.warn("illegal sms template, id: {}", templateId);
+            throw new FeignException("error.illegal.sms.template");
+        }
+
+        SmsConfigDTO smsConfig =
+                smsConfigAssertHelper.smsConfigNotExisted(SmsConfigAssertHelper.WhichColumn.ORGANIZATION_ID, organizationId);
+        Map<String, Object> variable = noticeSendDTO.getParams();
+        variable.put("secretKey", smsConfig.getSecretKey());
+        variable.put("source", smsConfig.getSignature());
+        JsonNode node = null;
+        try {
+            node = objectMapper.readTree(content);
+            substitutionVariable(variable, node);
+        } catch (IOException e) {
+            throw new FeignException("error.parse.sms.template.json");
+        }
+        sendSms(smsConfig, node, template, variable);
     }
 
     @Override
@@ -177,7 +187,7 @@ public class SmsServiceImpl implements SmsService {
     }
 
     private void sendSingleSms(SmsConfigDTO smsConfig, Template template, Map<String, Object> variable, HttpEntity<JsonNode> entity, StringBuilder builder) {
-        Record record = initRecord(template, variable);
+        SmsRecord record = initRecord(template, variable,entity);
         builder.append(smsConfig.getSingleSendApi());
         try {
             ResponseEntity<CrlandSmsResponse> response = restTemplate.postForEntity(builder.toString(), entity, CrlandSmsResponse.class);
@@ -186,39 +196,46 @@ public class SmsServiceImpl implements SmsService {
         } catch (Exception e) {
             record.setReceiveAccount((String) variable.get("mobile"));
             record.setStatus(FAILED);
-            record.setFailedReason("调用远程接口发短信异常");
+//            record.setFailedReason("调用远程接口发短信异常");
             String message = ((HttpServerErrorException) e).getResponseBodyAsString();
             LOGGER.error("invoke single sms api failed, exception: {}", message);
             throw new FeignException("error.invoke.single.sms.api", message);
         } finally {
-            mailingRecordMapper.insertSelective(record);
+            smsRecordMapper.insertSelective(record);
         }
     }
 
-    private void processRecordByResponse(Record record, CrlandSmsResponse crlandSmsResponse) {
+    private void processRecordByResponse(SmsRecord record, CrlandSmsResponse crlandSmsResponse) {
         record.setReceiveAccount(crlandSmsResponse.getMobile());
         if (CrlandSmsResponse.SendStatus.isSuccess(crlandSmsResponse.getSendStatus())) {
             record.setStatus("COMPLETED");
         } else if (CrlandSmsResponse.SendStatus.isFail(crlandSmsResponse.getSendStatus())) {
             record.setStatus(FAILED);
-            record.setFailedReason(crlandSmsResponse.getDescription());
+//            record.setFailedReason(crlandSmsResponse.getDescription());
         }
     }
 
-    private Record initRecord(Template template, Map<String, Object> variable) {
+    private SmsRecord initRecord(Template template, Map<String, Object> variable,HttpEntity<JsonNode> entity) {
         String businessType = template.getSendSettingCode();
-        Record record = new Record();
+        SmsRecord record = new SmsRecord();
         record.setSendSettingCode(businessType);
-        record.setRetryCount(0);
         try {
-            record.setVariables(objectMapper.writeValueAsString(variable));
-        } catch (JsonProcessingException e) {
+            record.setContent(entity.getBody().toString());
+        } catch (Exception e) {
             throw new FeignException("error.parse.object.to.string");
         }
-        record.setTemplateId(template.getId());
-        //todo
-//        record.setMessageType("sms");
         return record;
+    }
+
+    public static String renderMessageMapToString(String content, Map<String, Object> messageMap) {
+        Set<Map.Entry<String, Object>> sets = messageMap.entrySet();
+        for (Map.Entry<String, Object> entry : sets) {
+            String regex = "\\$\\{" + entry.getKey() + "\\}";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(content);
+            content = matcher.replaceAll(entry.getValue().toString());
+        }
+        return content;
     }
 
     private void sendBatchSms(SmsConfigDTO smsConfig, Template template, Map<String, Object> variable, HttpEntity<JsonNode> entity, StringBuilder builder) {
@@ -226,6 +243,7 @@ public class SmsServiceImpl implements SmsService {
         Map<String, Object> map = new HashMap<>(5);
         map.put("variable", variable);
         map.put("template", template);
+        map.put("entity",entity);
         try {
             ResponseEntity<List<CrlandSmsResponse>> response = restTemplate.exchange(builder.toString(), HttpMethod.POST, entity, new ParameterizedTypeReference<List<CrlandSmsResponse>>() {
             });
@@ -254,19 +272,19 @@ public class SmsServiceImpl implements SmsService {
         if (success) {
             List<CrlandSmsResponse> crlandSmsResponses = (List<CrlandSmsResponse>) map.get("responses");
             crlandSmsResponses.forEach(resp -> {
-                Record record = initRecord(template, variable);
+                SmsRecord record = initRecord(template, variable,(HttpEntity<JsonNode>)map.get("entity"));
                 processRecordByResponse(record, resp);
-                mailingRecordMapper.insertSelective(record);
+                smsRecordMapper.insertSelective(record);
             });
         } else {
             String mobile = (String) variable.get("mobile");
             List<String> mobiles = Arrays.asList(mobile.split(","));
             mobiles.forEach(m -> {
-                Record record = initRecord(template, variable);
+                SmsRecord record = initRecord(template, variable,(HttpEntity<JsonNode>)map.get("entity"));
                 record.setReceiveAccount(m);
                 record.setStatus(FAILED);
-                record.setFailedReason("调用远程接口发短信异常");
-                mailingRecordMapper.insertSelective(record);
+//                record.setFailedReason("调用远程接口发短信异常");
+                smsRecordMapper.insertSelective(record);
             });
         }
     }

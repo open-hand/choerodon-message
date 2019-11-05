@@ -47,4 +47,9 @@ public class UserFeignClientFallback implements UserFeignClient {
     public ResponseEntity<OrganizationProjectDTO> queryByUserIdOrganizationProject(Long id) {
         throw new CommonException("error.iam.queryByUserIdOrganizationProject");
     }
+
+    @Override
+    public ResponseEntity<List<Long>> getProListByName(String name) {
+        throw new CommonException("error.iam.queryProListByName");
+    }
 }

@@ -2,12 +2,14 @@ package io.choerodon.notify.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import freemarker.core.InvalidReferenceException;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.ext.InsertException;
 import io.choerodon.core.exception.ext.NotExistedException;
 import io.choerodon.core.exception.ext.UpdateException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.service.TemplateService;
 import io.choerodon.notify.api.service.WebHookMessageSettingService;
@@ -17,10 +19,12 @@ import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.dto.WebHookDTO;
 import io.choerodon.notify.infra.dto.WebHookMessageSettingDTO;
+import io.choerodon.notify.infra.dto.WebhookRecordDTO;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.enums.WebHookTypeEnum;
 import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
 import io.choerodon.notify.infra.mapper.WebHookMapper;
+import io.choerodon.notify.infra.mapper.WebhookRecordMapper;
 import io.choerodon.web.util.PageableHelper;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -40,7 +44,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,14 +61,16 @@ public class WebHookServiceImpl implements WebHookService {
     private SendSettingService sendSettingService;
     private TemplateRender templateRender;
     private MessegeSettingMapper messegeSettingMapper;
+    private WebhookRecordMapper webhookRecordMapper;
 
-    public WebHookServiceImpl(WebHookMapper webHookMapper, WebHookMessageSettingService webHookMessageSettingService, TemplateService templateService, SendSettingService sendSettingService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper) {
+    public WebHookServiceImpl(WebHookMapper webHookMapper, WebHookMessageSettingService webHookMessageSettingService, TemplateService templateService, SendSettingService sendSettingService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper, WebhookRecordMapper webhookRecordMapper) {
         this.webHookMapper = webHookMapper;
         this.webHookMessageSettingService = webHookMessageSettingService;
         this.templateService = templateService;
         this.sendSettingService = sendSettingService;
         this.templateRender = templateRender;
         this.messegeSettingMapper = messegeSettingMapper;
+        this.webhookRecordMapper = webhookRecordMapper;
     }
 
     @Override
@@ -93,13 +104,14 @@ public class WebHookServiceImpl implements WebHookService {
         //3. 发送WebHook
         try {
             for (WebHookDTO hook : hooks) {
+
                 Map<String, Object> userParams = dto.getParams();
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
                 if (WebHookTypeEnum.DINGTALK.getValue().equalsIgnoreCase(hook.getType())) {
                     String title = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
-                    sendDingTalk(hook, content, title, mobiles);
+                    sendDingTalk(hook, content, title, mobiles,dto.getCode());
                 } else if (WebHookTypeEnum.WECHAT.getValue().equalsIgnoreCase(hook.getType())) {
-                    sendWeChat(hook, content);
+                    sendWeChat(hook, content,dto.getCode());
                 } else if (WebHookTypeEnum.JSON.getValue().equalsIgnoreCase(hook.getType())) {
                     sendJson(hook, dto);
                 } else {
@@ -120,7 +132,7 @@ public class WebHookServiceImpl implements WebHookService {
      * @param text  发送内容
      * @param title 发送主题
      */
-    private void sendDingTalk(WebHookDTO hook, String text, String title, Set<String> mobiles) {
+    private void sendDingTalk(WebHookDTO hook, String text, String title, Set<String> mobiles,String code) {
         RestTemplate template = new RestTemplate();
         try {
             //1.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
@@ -146,8 +158,19 @@ public class WebHookServiceImpl implements WebHookService {
             request.put("markdown", markdown);
             //5.发送请求
             ResponseEntity<String> response = template.postForEntity(uri, request, String.class);
+            WebhookRecordDTO webhookRecordDTO = new WebhookRecordDTO();
+            webhookRecordDTO.setWebhookPath(hook.getWebhookPath());
+            webhookRecordDTO.setProjectId(hook.getProjectId());
+            webhookRecordDTO.setContent(text);
+            webhookRecordDTO.setSendSettingCode(code);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 LOGGER.warn(">>>SENDING_WEBHOOK_ERROR>>> Sending the web hook was not successful,response:{}", response);
+                webhookRecordDTO.setStatus(RecordStatus.FAILED.getValue());
+                webhookRecordDTO.setFailedReason(response.getBody());
+                webhookRecordMapper.insertSelective(webhookRecordDTO);
+            } else {
+                webhookRecordDTO.setStatus(RecordStatus.COMPLETE.getValue());
+                webhookRecordMapper.insertSelective(webhookRecordDTO);
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -178,7 +201,7 @@ public class WebHookServiceImpl implements WebHookService {
         }
     }
 
-    private void sendWeChat(WebHookDTO hook, String content) {
+    private void sendWeChat(WebHookDTO hook, String content,String code) {
         RestTemplate template = new RestTemplate();
         Map<String, Object> request = new TreeMap<>();
         request.put("msgtype", "markdown");
@@ -186,16 +209,37 @@ public class WebHookServiceImpl implements WebHookService {
         markdown.put("content", content);
         request.put("markdown", markdown);
         ResponseEntity<String> response = template.postForEntity(hook.getWebhookPath(), request, String.class);
+        WebhookRecordDTO webhookRecordDTO = new WebhookRecordDTO();
+        webhookRecordDTO.setWebhookPath(hook.getWebhookPath());
+        webhookRecordDTO.setProjectId(hook.getProjectId());
+        webhookRecordDTO.setContent(content);
+        webhookRecordDTO.setSendSettingCode(code);
         if (!response.getStatusCode().is2xxSuccessful()) {
+            webhookRecordDTO.setStatus(RecordStatus.FAILED.getValue());
+            webhookRecordDTO.setFailedReason(response.getBody());
+            webhookRecordMapper.insertSelective(webhookRecordDTO);
             LOGGER.warn("Web hook response not success {}", response);
+        }else {
+            webhookRecordDTO.setStatus(RecordStatus.COMPLETE.getValue());
+            webhookRecordMapper.insertSelective(webhookRecordDTO);
         }
     }
 
     private void sendJson(WebHookDTO hook, NoticeSendDTO dto) {
         RestTemplate template = new RestTemplate();
         ResponseEntity<String> response = template.postForEntity(hook.getWebhookPath(), dto, String.class);
+        WebhookRecordDTO webhookRecordDTO = new WebhookRecordDTO();
+        webhookRecordDTO.setWebhookPath(hook.getWebhookPath());
+        webhookRecordDTO.setProjectId(hook.getProjectId());
+        webhookRecordDTO.setSendSettingCode(dto.getCode());
         if (!response.getStatusCode().is2xxSuccessful()) {
             LOGGER.warn("Web hook response not success {}", response);
+            webhookRecordDTO.setStatus(RecordStatus.FAILED.getValue());
+            webhookRecordDTO.setFailedReason(response.getBody());
+            webhookRecordMapper.insertSelective(webhookRecordDTO);
+        }else {
+            webhookRecordDTO.setStatus(RecordStatus.COMPLETE.getValue());
+            webhookRecordMapper.insertSelective(webhookRecordDTO);
         }
     }
 
