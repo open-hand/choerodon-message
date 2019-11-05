@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.notify.infra.mapper.WebhookRecordMapper">
+
+    <select id="fulltextSearch" resultType="io.choerodon.notify.api.dto.WebhookRecordVO">
+        SELECT nwr.*,nss.`NAME` AS sendSettingName
+        FROM notify_webhook_record nwr
+        LEFT JOIN notify_send_setting nss ON nss.`CODE`=nwr.SEND_SETTING_CODE
+        WHERE 1=1
+        <if test="webhookRecordVO.sendSettingName !=null">
+            AND nss.NAME LIKE concat(concat('%',#{webhookRecordVO.sendSettingName}),'%')
+        </if>
+        <if test="webhookRecordVO.status !=null">
+            AND nwr.status=#{webhookRecordVO.status}
+        </if>
+        <if test="webhookRecordVO.webhookPath !=null">
+            AND nwr.webhook_path=#{webhookRecordVO.webhookPath}
+        </if>
+        <if test="ids!=null and ids.size>0">
+            AND nwr.project_id in
+            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">#{item}
+            </foreach>
+        </if>
+        <if test="params !=null">
+            AND (
+            nss.NAME LIKE concat(concat('%',#{params}),'%') OR
+            nwr.webhook_path LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+    </select>
+</mapper>

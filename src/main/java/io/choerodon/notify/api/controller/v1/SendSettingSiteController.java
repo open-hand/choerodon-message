@@ -67,7 +67,7 @@ public class SendSettingSiteController {
     @GetMapping("/tree")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "获取消息服务树形结构")
-    public ResponseEntity<List<MsgServiceTreeVO>> getMsgServiceTree() {
+    public ResponseEntity<List<MsgServiceTreeVO>> getMsgServiceTree(@RequestParam(required = false) String name) {
         return new ResponseEntity<>(sendSettingService.getMsgServiceTree(), HttpStatus.OK);
     }
 
