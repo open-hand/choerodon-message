@@ -10,6 +10,7 @@
         WHERE
         wms.SEND_SETTING_ID = #{send_setting_id}
         AND wh.PROJECT_ID =#{project_id}
+        AND wh.enable_flag=1
     </select>
 
     <select id="doFTR" resultType="io.choerodon.notify.infra.dto.WebHookDTO">
