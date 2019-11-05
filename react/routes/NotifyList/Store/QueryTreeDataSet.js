@@ -1,6 +1,6 @@
 import { DataSet } from 'choerodon-ui/pro/lib';
 
-export default function (optionDs) {
+export default function ({ setCurrentPageType }) {
   return {
     autoQuery: true,
     selection: false,

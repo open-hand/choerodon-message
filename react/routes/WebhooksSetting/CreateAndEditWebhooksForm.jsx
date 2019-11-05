@@ -28,8 +28,8 @@ const CreateAndEditWebhooksForm = observer(({ dataSet, triggerEventsSettingDataS
       <Form dataSet={dataSet} style={{ width: '5.12rem' }}>
         <TextField name="name" />
         <Select name="type" />
-        <TextArea name="webhookPath" />
         {dataSet.current && dataSet.current.get('type') === 'DingTalk' && <TextArea name="secret" />}
+        <TextArea name="webhookPath" />
       </Form>
       <Table dataSet={triggerEventsSettingDataSet} mode="tree">
         <Column name="name" />

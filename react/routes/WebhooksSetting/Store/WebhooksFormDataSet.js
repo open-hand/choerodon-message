@@ -43,7 +43,7 @@ export default function (type, id, children) {
       { name: 'name', type: 'string', label: 'Webhooks名称', required: true },
       { name: 'type', type: 'string', label: 'Webhooks类型', options: typeOptionDataSet, valueField: 'value', textField: 'name', required: true },
       { name: 'webhookPath', type: 'string', label: 'Webhooks地址', validator: validateWebhooksPath, required: true },
-      { name: 'secret', type: 'string', label: 'secret' },
+      { name: 'secret', type: 'string', label: '钉钉加签密钥' },
       { name: 'id', type: 'number' },
       { name: 'objectVersionNumber', type: 'number' },
       { name: 'triggerEventSelection', ignore: 'always' },
