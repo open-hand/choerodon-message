@@ -109,11 +109,7 @@ public class WebHookServiceImpl implements WebHookService {
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
                 if (WebHookTypeEnum.DINGTALK.getValue().equalsIgnoreCase(hook.getType())) {
                     String title = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.TITLE);
-
-                    sendDingTalk(hook, content, title, mobiles);
-
-//                    sendDingTalk(hook, content, title, dto.getCode());
-
+                    sendDingTalk(hook, content, title, mobiles,dto.getCode());
                 } else if (WebHookTypeEnum.WECHAT.getValue().equalsIgnoreCase(hook.getType())) {
                     sendWeChat(hook, content,dto.getCode());
                 } else if (WebHookTypeEnum.JSON.getValue().equalsIgnoreCase(hook.getType())) {
@@ -136,8 +132,7 @@ public class WebHookServiceImpl implements WebHookService {
      * @param text  发送内容
      * @param title 发送主题
      */
-    private void sendDingTalk(WebHookDTO hook, String text, String title, Set<String> mobiles) {
-//    private void sendDingTalk(WebHookDTO hook, String text, String title, String code) {
+    private void sendDingTalk(WebHookDTO hook, String text, String title, Set<String> mobiles,String code) {
         RestTemplate template = new RestTemplate();
         try {
             //1.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
