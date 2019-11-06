@@ -5,6 +5,7 @@ export default function (templateDataSet) {
     autoQuery: false,
     selection: false,
     paging: false,
+    autoQueryAfterSubmit: false,
     children: {
       templates: templateDataSet,
     },

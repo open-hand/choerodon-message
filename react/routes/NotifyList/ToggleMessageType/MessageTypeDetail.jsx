@@ -44,7 +44,8 @@ const MessageTypeDetail = observer(() => {
         </div>
       )}
       <p style={{ marginTop: '0.16rem', marginBottom: '0.08rem', fontSize: '0.14rem', color: 'rgba(0,0,0,0.65)' }}>预览</p>
-      <div className={`${cssPrefix}-htmlContainer`} dangerouslySetInnerHTML={{ __html: record.getPristineValue('content') }} style={{ marginBottom: 0 }} />
+      {/* eslint-disable-next-line react/no-danger */}
+      <div className={`${cssPrefix}-htmlContainer`} dangerouslySetInnerHTML={{ __html: record.getPristineValue('content') }} style={{ marginBottom: '.2rem' }} />
     </React.Fragment>
   ) : null);
 
