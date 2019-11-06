@@ -4,7 +4,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.dto.BusinessTypeDTO;
+import io.choerodon.notify.api.dto.EmailSendSettingVO;
+import io.choerodon.notify.api.dto.MessageServiceVO;
+import io.choerodon.notify.api.dto.MsgServiceTreeVO;
+import io.choerodon.notify.api.dto.PmSendSettingVO;
+import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingListDTO;
+import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
+import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
@@ -26,7 +34,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,6 +147,7 @@ public class SendSettingServiceImpl implements SendSettingService {
                 query.setName(i.getName());
                 query.setDescription(i.getDescription());
                 query.setLevel(i.getLevel());
+                query.setCategoryCode(i.getCategoryCode());
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });

@@ -1,13 +1,12 @@
 package io.choerodon.notify.infra.template;
 
-import org.springframework.stereotype.Component;
-
 import io.choerodon.core.notify.Level;
 import io.choerodon.core.notify.NotifyBusinessType;
 import io.choerodon.core.notify.PmTemplate;
+import org.springframework.stereotype.Component;
 
 @NotifyBusinessType(code = "systemNotification", name = "系统公告", level = Level.SITE,
-        description = "系统全平台公告", isManualRetry = true)
+        description = "系统全平台公告", isManualRetry = true, categoryCode = "sys-management")
 @Component
 public class SystemNotificationPmTemplate implements PmTemplate {
     @Override
