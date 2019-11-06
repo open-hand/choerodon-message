@@ -5,6 +5,7 @@ import 'react-quill/dist/quill.snow.css';
 import './Editor.scss';
 import { Modal, Input, Button, Form, Tabs, Upload, Icon } from 'choerodon-ui';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import ChoerodonEditor from '../choerodonEditor';
 import CustomToolbar from './CustomToolbar';
 
 const { TabPane } = Tabs;
@@ -32,62 +33,43 @@ export default class Editor extends Component {
     this.urlFocusInput = React.createRef();
     this.onQuillChange = this.onQuillChange.bind(this);
     this.state = {
-      editor: null,
-      delta: null,
-      originalHtml: null,
       htmlString: null,
-      isShowHtmlContainer: false,
       isShowModal: false,
       previewUrl: null, // 网络上传预览图片url
-      changedHtml: null,
       range: null,
       file: null,
       localSrc: null, // 本地图片上传前的blob
       submitting: false,
       type: 'online',
+      isCode: false,
     };
   }
 
+  // eslint-disable-next-line react/no-deprecated
   componentWillMount() {
-    this.props.onRef(this);
+    this.originValue = this.props.value;
+    if (this.props.onRef) {
+      this.props.onRef(this);
+    }
   }
 
   // 点击code按钮
   changeToHtml = () => {
-    const { delta, originalHtml } = this.state;
-    if (delta) {
-      this.setState({
-        htmlString: originalHtml,
-        isShowHtmlContainer: true,
-      });
-    } else {
-      this.setState({
-        htmlString: null,
-        isShowHtmlContainer: true,
-      });
-    }
+    Modal.confirm({
+      title: 'html代码编辑器',
+      content: '切换编辑器后将无法切换回现有编辑器，且现有编辑内容将会丢失，是否继续？',
+      onOk: () => {
+        this.props.onChange(this.originValue);
+        this.setState({ isCode: true });
+      },
+    });
   }
 
   initEditor = () => {
-    const { isShowHtmlContainer } = this.state;
-    if (isShowHtmlContainer) {
-      this.setState({
-        isShowHtmlContainer: false,
-      });
-    }
     if (this.state.htmlString) {
       this.props.onChange(this.state.htmlString);
     }
   }
-
-  // 返回可视化编辑
-  backEdit = () => {
-    this.setState({
-      isShowHtmlContainer: false,
-    });
-    this.props.onChange(this.state.htmlString);
-  }
-
 
   handleChangedHTML = (e) => {
     this.setState({
@@ -230,13 +212,6 @@ export default class Editor extends Component {
    */
   onQuillChange = (content, delta, source, editor) => {
     if (this.props.onChange) this.props.onChange(content);
-    const currentDelta = editor.getContents();
-    const originalHtml = editor.getHTML();
-    this.setState({
-      delta: currentDelta,
-      originalHtml,
-      editor,
-    });
   }
 
   renderLocal = () => {
@@ -354,7 +329,7 @@ export default class Editor extends Component {
 
   render() {
     const { value } = this.props;
-    const { isShowHtmlContainer, isShowModal, htmlString, submitting, localSrc, type } = this.state;
+    const { isCode, isShowModal, htmlString, submitting, localSrc, type } = this.state;
     const style = { ...this.defaultStyle, ...this.props.style };
     const editHeight = style.height - 42;
     const modalFooter = [
@@ -365,6 +340,14 @@ export default class Editor extends Component {
         <FormattedMessage id="save" />
       </Button>,
     ];
+    if (isCode) {
+      return (
+        <ChoerodonEditor
+          value={value}
+          onChange={this.props.onChange}
+        />
+      );
+    }
     return (
       <div style={style} className="c7n-iam-react-quill-editor">
         <CustomToolbar nomore={this.props.nomore} toolbarContainer={this.props.toolbarContainer || 'toolbar'} />
@@ -379,15 +362,6 @@ export default class Editor extends Component {
           bounds="#c7n-iam-editor"
           ref={(el) => { this.quillRef = el; }}
         />
-        <div className="c7n-editor-changedHTML-container" style={{ display: isShowHtmlContainer ? 'block' : 'none' }}>
-          <div className="c7n-editor-changedHTML-container-toolbar">
-            <span onClick={this.backEdit}>
-              {'<< '}
-              <FormattedMessage id="editor.back.gui" />
-            </span>
-          </div>
-          <textarea className="c7n-editor-changedHTML-container-content" onChange={this.handleChangedHTML} value={htmlString} />
-        </div>
         <Modal
           width={560}
           visible={isShowModal}

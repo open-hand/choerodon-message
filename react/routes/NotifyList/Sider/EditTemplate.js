@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, TextField, TextArea, NumberField, message } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
-import ChoerodonEditor from '../../../components/choerodonEditor';
+import ChoerodonEditor from '../../../components/editor';
 import MdEditor from '../../../components/MdEditor';
 import './index.less';
 
@@ -36,6 +36,8 @@ export default observer(({ context, modal, type }) => {
           <Form record={record}>
             <TextField label={type === 'email' ? '邮件主题' : '站内信标题'} name="title" />
             <ChoerodonEditor
+              nomore
+              toolbarContainer="toolbar"
               value={record.get('content')}
               onChange={(value) => record.set('content', value)}
             />

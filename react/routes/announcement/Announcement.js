@@ -75,6 +75,7 @@ export default class Announcement extends Component {
     };
   }
 
+  // eslint-disable-next-line react/no-deprecated
   componentWillMount() {
     this.initAnnouncement();
   }
@@ -636,6 +637,7 @@ export default class Announcement extends Component {
             onCancel={this.handleCancel}
             confirmLoading={submitting}
             visible={sidebarVisible}
+            destroyOnClose
           >
             {(selectType === 'create' || selectType === 'modify') && this.renderForm()}
             {selectType === 'detail' && this.renderDetail(currentRecord)}
