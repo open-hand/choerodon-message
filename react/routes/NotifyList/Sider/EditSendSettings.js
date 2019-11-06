@@ -36,7 +36,7 @@ export default function ({ context, modal }) {
         <Radio colSpan={2} name="isSendInstantly" value={false}>否</Radio>
       </Form>
       <Form columns={4} dataSet={messageTypeDetailDataSet}>
-        <NumberField colSpan={4} newLine name="retryCount" showHelp="tooltip" />
+        <NumberField colSpan={4} newLine name="retryCount" help="邮件发送失败后系统默认重发的次数" showHelp="tooltip" />
       </Form>
       <div className="c7n-notify-contentList-sider-label">是否允许手动重发邮件</div>
       <Form columns={4} dataSet={messageTypeDetailDataSet}>

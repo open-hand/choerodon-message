@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Table, Form, Output, Spin } from 'choerodon-ui/pro';
+import { Table, Form, Output, Spin, Icon, Tooltip } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
 import { Tabs } from 'choerodon-ui';
 import { Action, axios, Content, StatusTag, PageTab, PageWrap } from '@choerodon/boot';
@@ -30,11 +30,10 @@ const MessageTypeDetail = observer(() => {
     if (record.getPristineValue('webhookEnabledFlag')) {
       ret.push('webhook');
     }
-    return ret.join('、');
+    return ret.length > 0 ? ret.join('、') : '无';
   };
 
   const yesOrNoRenderer = ({ value }) => (value ? '是' : '否');
-
   const TemplateForm = ({ record, showTheme }) => (record ? (
     <React.Fragment>
       {showTheme && (
@@ -46,8 +45,17 @@ const MessageTypeDetail = observer(() => {
       <p style={{ marginTop: '0.16rem', marginBottom: '0.08rem', fontSize: '0.14rem', color: 'rgba(0,0,0,0.65)' }}>预览</p>
       <div className={`${cssPrefix}-htmlContainer`} dangerouslySetInnerHTML={{ __html: record.getPristineValue('content') }} style={{ marginBottom: 0 }} />
     </React.Fragment>
-  ) : null);
-
+  ) : <div>无</div>);
+  const getIcon = (type) => {
+    if (!messageTypeDetailDataSet.current.get(`${type}EnabledFlag`)) {
+      return (
+        <Tooltip title="该模板未启用，请在发送设置中选择">
+          <Icon type="report" style={{ color: '#FFB100' }} />
+        </Tooltip>
+      );
+    }
+    return null;
+  };
   return current ? (
     <React.Fragment>
       <header className={`${cssPrefix}-header`}>
@@ -66,18 +74,19 @@ const MessageTypeDetail = observer(() => {
         <Output name="backlogFlag" renderer={yesOrNoRenderer} />
       </Form>
       <Tabs defaultActiveKey="1">
-        <TabPane tab="邮件模板" key="1">
+        <TabPane tab={(<span>邮件模板 {getIcon('email')}</span>)} key="1">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'email')} showTheme />
         </TabPane>
-        <TabPane tab="站内信模板" key="2">
+        <TabPane tab={(<span>站内信模板 {getIcon('pm')}</span>)} key="2">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'pm')} showTheme />
         </TabPane>
-        <TabPane tab="短信模板" key="3">
-          <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'sms')} />
-        </TabPane>
-        <TabPane tab="webhook模板" key="4">
+        <TabPane tab={(<span>webhook模板 {getIcon('webhook')}</span>)} key="3">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'webhook')} />
         </TabPane>
+        <TabPane tab={(<span>短信模板 {getIcon('sms')}</span>)} key="4">
+          <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'sms')} />
+        </TabPane>
+       
       </Tabs>
     </React.Fragment>
   ) : <Spin />;
