@@ -6,8 +6,8 @@ export default function ({ setCurrentPageType }) {
     selection: false,
     paging: true,
     parentField: 'parentId',
+    primaryKey: 'id',
     idField: 'id',
-    expandField: 'expand',
     queryFields: [
       { name: 'id', type: 'number' },
     ],
@@ -17,7 +17,6 @@ export default function ({ setCurrentPageType }) {
       { name: 'name', type: 'string', label: '节点名称' },
       { name: 'enabled', type: 'boolean', label: '是否启用' },
       { name: 'code', type: 'string' },
-      { name: 'expand', type: 'boolean' },
     ],
     transport: {
       read: {

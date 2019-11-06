@@ -1,7 +1,7 @@
 import React, { Component, useContext, useState } from 'react/index';
 import classnames from 'classnames';
 import { Table, Button, Tree, Icon, TextField, Modal } from 'choerodon-ui/pro';
-import { Header, axios, Page, Breadcrumb, Content, PageTab } from '@choerodon/boot';
+import { Header, axios, Page, Breadcrumb, Content, PageTab, Action } from '@choerodon/boot';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import EditSendSettings from './Sider/EditSendSettings';
@@ -18,7 +18,7 @@ export default observer(() => {
   const context = useContext(Store);
   const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
   const [inputValue, setInputValue] = useState('');
-
+  const [isEnable, setIsEnable] = useState(false);
   function getTitle(record) {
     const name = record.get('name').toLowerCase();
     const searchValue = inputValue.toLowerCase();
@@ -37,6 +37,33 @@ export default observer(() => {
       </span>
     );
     return title;
+  }
+  async function handleToggleState(record) {
+    const code = record.get('code');
+    
+    if (record.get('enabled')) {
+      // 停用
+      await axios.put(`/notify/v1/notices/send_settings/disabled?code=${code}`);
+    } else {
+      // 启用
+      await axios.put(`/notify/v1/notices/send_settings/enabled?code=${code}`);
+    }
+    await queryTreeDataSet.query();
+    await messageTypeDetailDataSet.query();
+  }
+  function getAction(record) {
+    const { parent, children, level } = record;
+
+    const actionDatas = [
+      {
+        text: record.get('enabled') ? '停用' : '启用',
+        action: () => handleToggleState(record),
+      },
+    ];
+    if (!children) {
+      return <Action data={actionDatas} />;
+    }
+    return null;
   }
 
   const treeNodeRenderer = ({ record }) => {
@@ -94,6 +121,7 @@ export default observer(() => {
       <div onClick={toggleContentRenderer}>
         <span className={`${cssPrefix}-icon`}>{treeIcon()}</span>
         {getTitle(record)}
+        {getAction(record)}
       </div>
     );
   };

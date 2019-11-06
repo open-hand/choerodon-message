@@ -66,16 +66,16 @@ const MessageTypeDetail = observer(() => {
         <Output name="backlogFlag" renderer={yesOrNoRenderer} />
       </Form>
       <Tabs defaultActiveKey="1">
-        <TabPane tab="邮件模版" key="1">
+        <TabPane tab="邮件模板" key="1">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'email')} showTheme />
         </TabPane>
-        <TabPane tab="站内信模版" key="2">
+        <TabPane tab="站内信模板" key="2">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'pm')} showTheme />
         </TabPane>
-        <TabPane tab="短信模版" key="3">
+        <TabPane tab="短信模板" key="3">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'sms')} />
         </TabPane>
-        <TabPane tab="webhook模版" key="4">
+        <TabPane tab="webhook模板" key="4">
           <TemplateForm record={templateDataSet.find((item) => item.getPristineValue('sendingType') === 'webhook')} />
         </TabPane>
       </Tabs>
