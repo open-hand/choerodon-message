@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @since 2019-05-17
  */
 @NotifyBusinessType(code = "devopsDeleteInstance4Sms", name = "删除实例发送消息", level = Level.SITE,
-        description = "删除实例发送消息", isAllowConfig = false)
+        description = "删除实例发送消息", isAllowConfig = false,categoryCode = "resource-security-notice")
 @Component
 public class DeleteInstanceTemplate implements SmsTemplate {
     @Override
