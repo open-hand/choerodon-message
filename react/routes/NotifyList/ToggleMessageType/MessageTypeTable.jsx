@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Table, Icon, Output } from 'choerodon-ui/pro';
 import { Action, axios, Content, StatusTag, PageTab, PageWrap } from '@choerodon/boot';
 import Store from '../Store';
+import './MessageTypeTable.less';
 
 const { Column } = Table;
 
@@ -57,7 +58,7 @@ const MessageTypeTable = () => {
       <Table className="message-service" dataSet={messageTypeTableDataSet}>
         <Column
           name="messageType"
-          className={`${cssPrefix}-nameContainer`}
+          className={`${cssPrefix}-nameContainer link`}
           onCell={({ record }) => ({
             onClick: () => {
               messageTypeDetailDataSet.setQueryParameter('code', record.get('code'));
