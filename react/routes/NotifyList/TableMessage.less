@@ -1,17 +1,25 @@
 .c7n-notify-contentList {
   display: flex;
   justify-content: space-between;
-  padding-left: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 0 !important;
   overflow: hidden;
   border-top: 1px solid #d3d3d3;
   .treeOverload();
+  .c7n-tree li ul {
+    margin: 0;
+    padding: 0 0 0 0.12rem;
+    .c7n-tree-switcher-noop {
+      width: 0.12rem;
+    }
+  }
 
   &-rightContent {
     width: 100%;
     overflow: auto;
     overflow-x: hidden;
+    > * {
+      margin-right: 0.2rem;
+    }
   }
 
   &-tree {

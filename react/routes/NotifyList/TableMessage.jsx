@@ -59,7 +59,7 @@ export default observer(() => {
       },
     ];
     if (!children) {
-      return <Action data={actionDatas} />;
+      return <Action style={{ position: 'absolute', top: '0.04rem', right: '0.05rem' }} data={actionDatas} />;
     }
     return null;
   }
