@@ -1,5 +1,4 @@
 import React, { Component, useContext, useState } from 'react/index';
-import classnames from 'classnames';
 import { Table, Button, Tree, Icon, TextField, Modal } from 'choerodon-ui/pro';
 import { Header, axios, Page, Breadcrumb, Content, PageTab, Action } from '@choerodon/boot';
 import { runInAction } from 'mobx';
@@ -18,7 +17,6 @@ export default observer(() => {
   const context = useContext(Store);
   const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
   const [inputValue, setInputValue] = useState('');
-  const [isEnable, setIsEnable] = useState(false);
   function getTitle(record) {
     const name = record.get('name').toLowerCase();
     const searchValue = inputValue.toLowerCase();
@@ -52,7 +50,7 @@ export default observer(() => {
     await messageTypeDetailDataSet.query();
   }
   function getAction(record) {
-    const { parent, children, level } = record;
+    const { children } = record;
 
     const actionDatas = [
       {

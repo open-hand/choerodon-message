@@ -14,7 +14,8 @@ const MessageTypeTable = () => {
   async function changeMake() {
     const status = messageTypeTableDataSet.current.get('enabled');
     const id = messageTypeTableDataSet.current.get('id');
-    const url = `/notify/v1/notices/send_settings/${id}/${status ? 'disabled' : 'enabled'}`;
+    const code = messageTypeTableDataSet.current.get('code');
+    const url = `/notify/v1/notices/send_settings/${status ? 'disabled' : 'enabled'}?code=${code}`;
     const res = await axios.put(url);
     messageTypeTableDataSet.query();
   }
