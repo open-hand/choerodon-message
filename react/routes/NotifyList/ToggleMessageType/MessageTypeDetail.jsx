@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { Tabs } from 'choerodon-ui';
 import { Action, axios, Content, StatusTag, PageTab, PageWrap } from '@choerodon/boot';
 import Store from '../Store';
+import ShadowView from './ShadowView';
 
 import './MessageTypeDetail.less';
 
@@ -43,15 +44,19 @@ const MessageTypeDetail = observer(() => {
         </div>
       )}
       <p style={{ marginTop: '0.16rem', marginBottom: '0.08rem', fontSize: '0.14rem', color: 'rgba(0,0,0,0.65)' }}>预览</p>
-      {/* eslint-disable-next-line react/no-danger */}
-      <div className={`${cssPrefix}-htmlContainer`} dangerouslySetInnerHTML={{ __html: record.getPristineValue('content') }} style={{ marginBottom: '.2rem' }} />
+      <div className={`${cssPrefix}-htmlContainer`}>
+        <ShadowView>
+          {/* eslint-disable-next-line react/no-danger */}
+          <div dangerouslySetInnerHTML={{ __html: record.getPristineValue('content') }} style={{ marginBottom: '.2rem' }} />
+        </ShadowView>
+      </div>
     </React.Fragment>
   ) : <div>无</div>);
   const getIcon = (type) => {
     if (!messageTypeDetailDataSet.current.get(`${type}EnabledFlag`)) {
-      return (
+      return (            
         <Tooltip title="该模板未启用，请在发送设置中选择">
-          <Icon type="report" style={{ color: '#FFB100' }} />
+          <Icon type="error" style={{ color: '#FFB100' }} />
         </Tooltip>
       );
     }
