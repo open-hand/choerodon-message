@@ -139,18 +139,32 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     @Override
     public void createByScan(Set<NotifyBusinessTypeScanData> businessTypes) {
-        businessTypes.stream().map(t -> modelMapper.map(t, SendSettingDTO.class)).forEach(i -> {
-            SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(i.getCode()));
+        businessTypes.forEach(t -> {
+            SendSettingDTO sendSettingDTO = new SendSettingDTO();
+            BeanUtils.copyProperties(t, sendSettingDTO);
+            SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(sendSettingDTO.getCode()));
             if (query == null) {
-                sendSettingMapper.insertSelective(i);
+                sendSettingMapper.insertSelective(sendSettingDTO);
             } else {
-                query.setName(i.getName());
-                query.setDescription(i.getDescription());
-                query.setLevel(i.getLevel());
-                query.setCategoryCode(i.getCategoryCode());
+                query.setName(sendSettingDTO.getName());
+                query.setDescription(sendSettingDTO.getDescription());
+                query.setLevel(sendSettingDTO.getLevel());
+                query.setCategoryCode(sendSettingDTO.getCategoryCode());
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });
+//        businessTypes.stream().map(t -> modelMapper.map(t, SendSettingDTO.class)).forEach(i -> {
+//            SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(i.getCode()));
+//            if (query == null) {
+//                sendSettingMapper.insertSelective(i);
+//            } else {
+//                query.setName(i.getName());
+//                query.setDescription(i.getDescription());
+//                query.setLevel(i.getLevel());
+//                query.setCategoryCode(i.getCategoryCode());
+//                sendSettingMapper.updateByPrimaryKeySelective(query);
+//            }
+//        });
     }
 
     @Override
