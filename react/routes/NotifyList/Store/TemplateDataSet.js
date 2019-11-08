@@ -4,7 +4,9 @@ export default function () {
   return {
     autoQuery: false,
     selection: false,
+    autoQueryAfterSubmit: false,
     paging: true,
+
     fields: [
       { name: 'type', type: 'string', label: '类型' },
       { name: 'content', type: 'string' },
