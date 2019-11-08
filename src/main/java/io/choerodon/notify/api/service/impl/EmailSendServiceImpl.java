@@ -99,11 +99,11 @@ public class EmailSendServiceImpl implements EmailSendService {
         Template template = tmp;
         //2.逐个发送邮件
         targetUsers.forEach(user -> {
-            Record mailingRecordDTO = (Record) new MailingRecordDTO()
-                    .setRetryCount(0)
-                    .setReceiveAccount(user.getEmail())
-                    .setSendSettingCode(sendSettingDTO.getCode())
-                    .setTemplateId(template.getId());
+            Record mailingRecordDTO = new Record();
+            mailingRecordDTO.setRetryCount(0);
+            mailingRecordDTO.setReceiveAccount(user.getEmail());
+            mailingRecordDTO.setSendSettingCode(sendSettingDTO.getCode());
+            mailingRecordDTO.setTemplateId(template.getId());
             //2.1.整理参数
             Map<String, Object> newParams = DefaultAutowiredField.autowiredDefaultParams(params, user);
             mailingRecordDTO.setVariables(ConvertUtils.convertMapToJson(objectMapper, newParams));

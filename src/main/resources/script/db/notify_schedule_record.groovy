@@ -26,4 +26,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_schedule_record.groovy') {
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+    changeSet(author: 'wkj', id: '2019-11-08-modify-type') {
+        modifyDataType(columnName: 'NOTICE_CONTENT', newDataType: 'TEXT', tableName: 'NOTIFY_SCHEDULE_RECORD')
+    }
 }
