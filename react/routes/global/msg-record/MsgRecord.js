@@ -1,16 +1,19 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { asyncRouter, PageWrap, PageTab } from '@choerodon/boot';
-
-const MsgEmail = asyncRouter(() => import('./msg-email'));
+import { PageWrap, PageTab } from '@choerodon/boot';
+import { StoreProvider } from './stores';
+import MsgEmail from './msg-email';
+import MsgWebhook from './msg-webhook';
 
 function MsgRecord(props) {
   return (
-    <PageWrap noHeader={['choerodon.code.site.message-log-email']}>
-      <PageTab title="邮件日志" tabKey="choerodon.code.site.message-log-email" component={withRouter(MsgEmail)} />
-      {/* <PageTab title="站内信日志" tabKey="tab2" component={withRouter(MsgEmail)} />    
-      <PageTab title="短信日志" tabKey="tab3" component={withRouter(MsgEmail)} />     */}
-    </PageWrap>
+    <StoreProvider {...props}>
+      <PageWrap noHeader={['choerodon.code.site.message-log-email', 'choerodon.code.site.message-log-webhook']}>
+        <PageTab title="邮件日志" tabKey="choerodon.code.site.message-log-email" component={MsgEmail} />
+        <PageTab title="webhook日志" tabKey="choerodon.code.site.message-log-webhook" component={MsgWebhook} />
+      </PageWrap>
+    </StoreProvider>
+    
   );
 }
 export default MsgRecord;

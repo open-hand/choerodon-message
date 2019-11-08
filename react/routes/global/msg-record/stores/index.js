@@ -4,6 +4,7 @@ import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import MsgRecordStoreObject from './MsgRecordStore';
 import MsgRecordDataSet from './MsgRecordDataSet';
+import MsgWebhookDataSet from './MsgWebhookDataSet';
 
 const Store = createContext();
 export function useStore() {
@@ -17,17 +18,18 @@ export const StoreProvider = injectIntl(inject('AppState')(
     const intlPrefix = 'msgrecord';
     const MsgRecordStore = useMemo(() => new MsgRecordStoreObject(), []);
     const msgRecordDataSet = useMemo(() => new DataSet(MsgRecordDataSet(organizationId, type, intl, intlPrefix)), []);
-
+    const msgWebhookDataSet = useMemo(() => new DataSet(MsgWebhookDataSet()), []);
     const value = {
       ...props,
-      prefixCls: 'user-info',
       intlPrefix,
       permissions: [
         'notify-service.message-record-site.pageEmail',
         'notify-service.message-record-org.pageEmail',
+        'notify-service.webhook-record.pagingByMessage',
       ],
       MsgRecordStore,
       msgRecordDataSet,
+      msgWebhookDataSet,
     };
     return (
       <Store.Provider value={value}>

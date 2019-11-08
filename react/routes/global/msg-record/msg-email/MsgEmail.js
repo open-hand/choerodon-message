@@ -5,7 +5,7 @@ import { Table } from 'choerodon-ui/pro';
 import classnames from 'classnames';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
-import { StatusTag, axios, Content, Header, TabPage, Permission, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
+import { StatusTag, axios, Content, Header, TabPage, Page, Permission, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
 import './MsgEmail.less';
 import MouseOverWrapper from '../../../../components/mouseOverWrapper';
 import { handleFiltersParams } from '../../../../common/util';
@@ -101,7 +101,8 @@ function MsgEmail(props) {
 
   function render() {
     return (
-      <TabPage
+      <Page
+        title="消息日志"
         className="c7n-msgrecord"
         service={permissions}
       >
@@ -119,7 +120,7 @@ function MsgEmail(props) {
             <Column name="creationDate" />
           </Table>
         </Content>
-      </TabPage>
+      </Page>
     );
   }
   return render();
