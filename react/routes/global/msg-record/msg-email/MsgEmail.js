@@ -101,9 +101,7 @@ function MsgEmail(props) {
 
   function render() {
     return (
-      <Page
-        title="消息日志"
-        className="c7n-msgrecord"
+      <TabPage
         service={permissions}
       >
         <Breadcrumb title="" />
@@ -120,7 +118,7 @@ function MsgEmail(props) {
             <Column name="creationDate" />
           </Table>
         </Content>
-      </Page>
+      </TabPage>
     );
   }
   return render();

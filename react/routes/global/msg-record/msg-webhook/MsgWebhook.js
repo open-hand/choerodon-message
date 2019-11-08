@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Table } from 'choerodon-ui/pro';
 import classnames from 'classnames';
 import { FormattedMessage } from 'react-intl';
-import { Content, Page, Breadcrumb } from '@choerodon/boot';
+import { Content, TabPage, Page, Breadcrumb } from '@choerodon/boot';
 
 import { useStore } from '../stores';
 
@@ -22,9 +22,8 @@ function MsgWebhook() {
     </div>
   );
   return (
-    <Page
-      title="消息日志"
-      service={permissions}
+    <TabPage
+      service={['notify-service.webhook-record.pagingByMessage']}
     >
       <Breadcrumb />
       <Content 
@@ -38,7 +37,7 @@ function MsgWebhook() {
           <Column name="webhookPath" />
         </Table>
       </Content>
-    </Page>
+    </TabPage>
   );
 }
 
