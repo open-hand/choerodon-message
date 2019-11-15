@@ -73,22 +73,19 @@
             nts.name,
             nts.description,
             nts.fd_level,
-            nts.pm_type,
+            nts.backlog_flag,
             nts.retry_count,
             nts.is_send_instantly,
             nts.is_manual_retry,
             nts.is_allow_config,
             nts.object_version_number,
             ntemail.id   AS email_template_id,
-            ntemail.code AS email_template_code,
             ntsms.id     AS sms_template_id,
-            ntsms.code   AS sms_template_code,
             ntpm.id      AS pm_template_id,
-            ntpm.code    AS pm_template_code
         FROM notify_send_setting nts
-                 LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
-                 LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
-                 LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
+        LEFT JOIN notify_template ntemail on nts.code = ntemail.send_setting_code and ntemail.sending_type='email'
+        LEFT JOIN notify_template ntsms on nts.code = ntsms.send_setting_code and ntsms.sending_type='sms'
+        LEFT JOIN notify_template ntpm on nts.code = ntpm.send_setting_code and ntpm.sending_type='pm'
         where nts.id = #{id}
     </select>
 
@@ -99,7 +96,7 @@
         nts.name,
         nts.description,
         nts.fd_level,
-        nts.pm_type,
+        nts.backlog_flag,
         nts.retry_count,
         nts.is_send_instantly,
         nts.is_manual_retry,
@@ -107,15 +104,12 @@
         nts.is_enabled,
         nts.object_version_number,
         ntemail.id AS email_template_id,
-        ntemail.code AS email_template_code,
         ntsms.id AS sms_template_id,
-        ntsms.code AS sms_template_code,
-        ntpm.id AS pm_template_id,
-        ntpm.code AS pm_template_code
+        ntpm.id AS pm_template_id
         FROM notify_send_setting nts
-        LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
-        LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
-        LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
+        LEFT JOIN notify_template ntemail on nts.code = ntemail.send_setting_code and ntemail.sending_type='email'
+        LEFT JOIN notify_template ntsms on nts.code = ntsms.send_setting_code and ntsms.sending_type='sms'
+        LEFT JOIN notify_template ntpm on nts.code = ntpm.send_setting_code and ntpm.sending_type='pm'
         where nts.is_enabled = 1
         <if test="level != null">
             AND nts.fd_level = #{level}

@@ -9,19 +9,13 @@ public class SendSettingDetailDTO {
 
     private String name;
 
-    private String pmType;
+    private Boolean backlogFlag;
 
     private String description;
 
-    private String emailTemplateCode;
-
     private Long emailTemplateId;
 
-    private String smsTemplateCode;
-
     private Long smsTemplateId;
-
-    private String pmTemplateCode;
 
     private Long pmTemplateId;
 
@@ -61,12 +55,12 @@ public class SendSettingDetailDTO {
         this.name = name;
     }
 
-    public String getPmType() {
-        return pmType;
+    public Boolean getBacklogFlag() {
+        return backlogFlag;
     }
 
-    public void setPmType(String pmType) {
-        this.pmType = pmType;
+    public void setBacklogFlag(Boolean backlogFlag) {
+        this.backlogFlag = backlogFlag;
     }
 
     public String getDescription() {
@@ -77,13 +71,6 @@ public class SendSettingDetailDTO {
         this.description = description;
     }
 
-    public String getEmailTemplateCode() {
-        return emailTemplateCode;
-    }
-
-    public void setEmailTemplateCode(String emailTemplateCode) {
-        this.emailTemplateCode = emailTemplateCode;
-    }
 
     public Long getEmailTemplateId() {
         return emailTemplateId;
@@ -93,28 +80,12 @@ public class SendSettingDetailDTO {
         this.emailTemplateId = emailTemplateId;
     }
 
-    public String getSmsTemplateCode() {
-        return smsTemplateCode;
-    }
-
-    public void setSmsTemplateCode(String smsTemplateCode) {
-        this.smsTemplateCode = smsTemplateCode;
-    }
-
     public Long getSmsTemplateId() {
         return smsTemplateId;
     }
 
     public void setSmsTemplateId(Long smsTemplateId) {
         this.smsTemplateId = smsTemplateId;
-    }
-
-    public String getPmTemplateCode() {
-        return pmTemplateCode;
-    }
-
-    public void setPmTemplateCode(String pmTemplateCode) {
-        this.pmTemplateCode = pmTemplateCode;
     }
 
     public Long getPmTemplateId() {
