@@ -1,9 +1,9 @@
 package io.choerodon.notify.api.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.PropertyMap;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,8 +15,8 @@ public class ReceiveSettingDTO {
     @NotNull(message = "error.receiveSetting.sendSettingIdNull")
     private Long sendSettingId;
     @ApiModelProperty(value = "消息类型（email,pm）/必填")
-    @NotEmpty(message = "error.receiveSetting.messageTypeEmpty")
-    private String messageType;
+    @NotEmpty(message = "error.receiveSetting.sendingTypeEmpty")
+    private String sendingType;
     @ApiModelProperty(value = "是否禁用消息通知/非必填")
     private Boolean disable;
     private Long sourceId;
@@ -88,12 +88,12 @@ public class ReceiveSettingDTO {
         this.sendSettingId = sendSettingId;
     }
 
-    public String getMessageType() {
-        return messageType;
+    public String getSendingType() {
+        return sendingType;
     }
 
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
+    public void setSendingType(String sendingType) {
+        this.sendingType = sendingType;
     }
 
     public Boolean getDisable() {
