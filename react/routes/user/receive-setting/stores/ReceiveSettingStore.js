@@ -124,7 +124,7 @@ class ReceiveSettingStore {
     this.dirty = true;
     if (id.split('-').length === 2) { // 当使用-分割然后id有2部分时，这是一个项目或组织或site的id，处理成组check的逻辑
       if (!this.isGroupAllSelected(id, type)) {
-        this.receiveSettingData.filter(v => v.messageType === type && id === `${v.sourceType}-${v.sourceId}`).forEach((v) => {
+        this.receiveSettingData.filter(v => v.sendingType === type && id === `${v.sourceType}-${v.sourceId}`).forEach((v) => {
           this.check(`${id}-${v.sendSettingId}`, type);
         });
       } else {
@@ -134,12 +134,12 @@ class ReceiveSettingStore {
           }
         });
       }
-    } else if (this.receiveSettingData.some(v => v.messageType === type && id === `${v.sourceType}-${v.sourceId}-${v.sendSettingId}` && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type])) {
-      this.receiveSettingData = this.receiveSettingData.filter(v => v.messageType !== type || (v.messageType === type && id !== `${v.sourceType}-${v.sourceId}-${v.sendSettingId}`));
+    } else if (this.receiveSettingData.some(v => v.sendingType === type && id === `${v.sourceType}-${v.sourceId}-${v.sendSettingId}` && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type])) {
+      this.receiveSettingData = this.receiveSettingData.filter(v => v.sendingType !== type || (v.sendingType === type && id !== `${v.sourceType}-${v.sourceId}-${v.sendSettingId}`));
     } else if (!this.allowConfigData.get(parseInt(id.split('-')[2], 10)).disabled[type]) {
       const temp = id.split('-');
       this.receiveSettingData.push({
-        messageType: type,
+        sendingType: type,
         disable: true,
         sourceType: temp[0],
         sourceId: temp[1],
@@ -154,7 +154,7 @@ class ReceiveSettingStore {
    */
   @action checkAll(type) {
     this.dirty = true;
-    this.receiveSettingData = this.receiveSettingData.filter(v => v.messageType !== type || (this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]));
+    this.receiveSettingData = this.receiveSettingData.filter(v => v.sendingType !== type || (this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]));
   }
 
   /**
@@ -175,7 +175,7 @@ class ReceiveSettingStore {
     if (id.split('-').length === 2) {
       return this.isGroupAllSelected(id, type);
     }
-    return !this.receiveSettingData.some(v => v.messageType === type && id === `${v.sourceType}-${v.sourceId}-${v.sendSettingId}`);
+    return !this.receiveSettingData.some(v => v.sendingType === type && id === `${v.sourceType}-${v.sourceId}-${v.sendSettingId}`);
   }
 
   /**
@@ -185,7 +185,7 @@ class ReceiveSettingStore {
    * @returns {boolean} 这个组是否是全选中的
    */
   isGroupAllSelected(id, type) {
-    return !this.receiveSettingData.filter(v => v.messageType === type
+    return !this.receiveSettingData.filter(v => v.sendingType === type
       && id === `${v.sourceType}-${v.sourceId}` && this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type])
       .some(v => !this.isChecked(`${id}-${v.sendSettingId}`, type));
   }
@@ -196,7 +196,7 @@ class ReceiveSettingStore {
    * @returns {boolean}
    */
   isAllSelected(type) {
-    return this.receiveSettingData.filter(v => v.messageType === type && this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]).length === 0;
+    return this.receiveSettingData.filter(v => v.sendingType === type && this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]).length === 0;
   }
 
   /**
@@ -228,7 +228,7 @@ class ReceiveSettingStore {
    */
   isGroupIndeterminate(id, type) {
     // if (this.isGroupAllSelected(id, type)) return false;
-    const selectLength = this.receiveSettingData.filter(v => v.messageType === type && id === `${v.sourceType}-${v.sourceId}` && this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]).length;
+    const selectLength = this.receiveSettingData.filter(v => v.sendingType === type && id === `${v.sourceType}-${v.sourceId}` && this.allowConfigData.get(parseInt(v.sendSettingId, 10)) && !this.allowConfigData.get(parseInt(v.sendSettingId, 10)).disabled[type]).length;
     const checkAbleLength = [...this.allowConfigData.keys()].filter(value => this.allowConfigData.get(value).type === id.split('-')[0] && !this.allowConfigData.get(value).disabled[type]).length;
     return selectLength > 0 && selectLength < checkAbleLength;
   }
