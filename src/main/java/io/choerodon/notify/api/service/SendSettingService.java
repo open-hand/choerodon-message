@@ -1,23 +1,11 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.vo.WebHookVO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
-import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Set;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.dto.SendSettingVO;
+import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import org.springframework.data.domain.Pageable;
@@ -26,19 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface SendSettingService {
-
-    Set<BusinessTypeDTO> listNames(String level);
-
-    Set<BusinessTypeDTO> listNames();
-
-    PageInfo<SendSettingListDTO> page(String level, String name, String code,
-                                      String description, String params, int page, int size);
-
-    PageInfo<SendSettingListDTO> page(String name, String code,
-                                      String description, String params, int page, int size);
-
-    SendSettingDTO update(SendSettingUpdateDTO updateDTO);
-
     SendSettingVO query(String code);
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
@@ -53,7 +28,6 @@ public interface SendSettingService {
      *
      * @param messageType
      * @param introduce
-     * @param level
      * @param enabled
      * @param allowConfig
      * @param params
@@ -65,7 +39,6 @@ public interface SendSettingService {
     /**
      * 根据id启用消息服务（对应表；notify_send_setting）
      *
-     * @param id 记录主键
      * @return 启用的消息服务信息
      */
     MessageServiceVO enabled(String code);
@@ -73,48 +46,9 @@ public interface SendSettingService {
     /**
      * 根据id停用消息服务（对应表；notify_send_setting）
      *
-     * @param id 记录主键
      * @return 停用的消息服务信息
      */
     MessageServiceVO disabled(String code);
-
-
-    /**
-     * 根据id
-     * 允许配置接受设置
-     * 对应表；notify_send_setting
-     *
-     * @param id 记录主键
-     * @return 消息服务信息
-     */
-    MessageServiceVO allowConfiguration(Long id);
-
-    /**
-     * 根据id
-     * 禁止配置接受设置
-     * 对应表；notify_send_setting
-     *
-     * @param id 记录主键
-     * @return 消息服务信息
-     */
-    MessageServiceVO forbiddenConfiguration(Long id);
-
-
-    /**
-     * 获取邮件内容的发送设置信息
-     *
-     * @param id 发送设置主键
-     * @return 邮件内容的发送设置信息
-     */
-    EmailSendSettingVO getEmailSendSetting(Long id);
-
-    /**
-     * 获取站内信内容的发送设置信息
-     *
-     * @param id 发送设置主键
-     * @return 站内信内容的发送设置信息
-     */
-    PmSendSettingVO getPmSendSetting(Long id);
 
     List<MsgServiceTreeVO> getMsgServiceTree();
 

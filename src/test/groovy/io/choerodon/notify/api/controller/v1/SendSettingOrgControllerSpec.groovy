@@ -3,14 +3,11 @@ package io.choerodon.notify.api.controller.v1
 import io.choerodon.core.domain.Page
 import io.choerodon.notify.IntegrationTestConfiguration
 import io.choerodon.notify.api.dto.SendSettingDetailDTO
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO
 import io.choerodon.notify.infra.mapper.SendSettingMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
 import spock.lang.Specification
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -77,25 +74,5 @@ class SendSettingOrgControllerSpec extends Specification {
         then: "校验结果"
         entity.getStatusCode().is2xxSuccessful()
         entity.getBody().getId().equals(params.get("id"))
-    }
-
-    def "Update"() {
-        given: "构造请求参数"
-        SendSettingDetailDTO sendSetting = sendSettingMapper.selectById(5L)
-        SendSettingUpdateDTO dto = new SendSettingUpdateDTO()
-        dto.setEmailTemplateId(1L)
-        dto.setObjectVersionNumber(1)
-        def params = new HashMap<String, Object>()
-        params.put("organization_id", 1L)
-        params.put("id", sendSetting.getId())
-        HttpEntity httpEntity = new HttpEntity<Object>(dto)
-
-        when: "调用方法"
-        def entity = restTemplate.exchange(BASE_PATH + "/{id}/organizations/{organization_id}", HttpMethod.PUT, httpEntity, SendSettingDetailDTO, params)
-
-        then: "校验结果"
-        entity.getStatusCode().is2xxSuccessful()
-        entity.getBody().getId().equals(sendSetting.getId())
-        entity.getBody().getEmailTemplateId().equals(dto.getEmailTemplateId())
     }
 }

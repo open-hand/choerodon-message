@@ -3,15 +3,11 @@ package io.choerodon.notify.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.exception.*;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -26,9 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -39,13 +33,6 @@ public class SendSettingSiteController {
 
     public SendSettingSiteController(SendSettingService sendSettingService) {
         this.sendSettingService = sendSettingService;
-    }
-
-    @GetMapping("/names")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层获取业务类型名称列表")
-    public ResponseEntity<Set<BusinessTypeDTO>> listNames() {
-        return new ResponseEntity<>(sendSettingService.listNames(), HttpStatus.OK);
     }
 
     @GetMapping
@@ -107,27 +94,6 @@ public class SendSettingSiteController {
         return new ResponseEntity<>(sendSettingService.disabled(code), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/allow_configuration")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "允许配置接受设置")
-    public ResponseEntity<MessageServiceVO> allowConfig(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.allowConfiguration(id), HttpStatus.OK);
-    }
-
-    @PutMapping("/{id}/forbidden_configuration")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "禁止配置接受设置")
-    public ResponseEntity<MessageServiceVO> forbiddenConfig(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.forbiddenConfiguration(id), HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}/email_send_setting")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "获取邮件内容的发送设置信息")
-    public ResponseEntity<EmailSendSettingVO> getEmailSendSetting(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.getEmailSendSetting(id), HttpStatus.OK);
-    }
-
     @PutMapping("/{id}/send_setting")
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "修改发送设置")
@@ -137,13 +103,4 @@ public class SendSettingSiteController {
         }
         return new ResponseEntity<>(sendSettingService.updateSendSetting(updateDTO), HttpStatus.OK);
     }
-
-
-    @GetMapping("/{id}/pm_send_setting")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "获取站内信内容的发送设置信息")
-    public ResponseEntity<PmSendSettingVO> getPmSendSetting(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(sendSettingService.getPmSendSetting(id), HttpStatus.OK);
-    }
-
 }

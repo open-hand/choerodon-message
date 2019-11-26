@@ -1,7 +1,6 @@
 package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
-import io.choerodon.notify.api.pojo.PmType;
 
 import javax.persistence.*;
 import java.util.Date;

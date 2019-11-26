@@ -2,92 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.notify.infra.mapper.SendSettingMapper">
 
-    <resultMap id="SendSettingListDTO" type="io.choerodon.notify.api.dto.SendSettingListDTO">
-        <id column="id" property="id"></id>
-        <result column="fd_level" property="level" jdbcType="VARCHAR"/>
-    </resultMap>
-
-    <resultMap id="sendSettingCategoryDTO" type="io.choerodon.notify.infra.dto.SendSettingCategoryDTO">
-        <id property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="code" column="code"/>
-        <result property="description" column="description"/>
-        <result property="objectVersionNumber" column="Object_Version_Number"/>
-        <association property="sendSettingDTO" javaType="io.choerodon.notify.infra.dto.SendSettingDTO">
-            <id property="id" column="id"/>
-            <result property="name" column="cateName"/>
-            <result property="description" column="description"/>
-            <result property="categoryCode" column="Category_Code"/>
-        </association>
-    </resultMap>
-
-    <select id="fulltextSearch" resultMap="SendSettingListDTO">
-        SELECT
-        nts.id,
-        nts.code,
-        nts.name,
-        nts.fd_level,
-        nts.pm_type,
-        nts.description,
-        nts.is_allow_config,
-        ntemail.code AS email_template_code,
-        ntsms.code AS sms_template_code,
-        ntpm.code AS pm_template_code
-        FROM notify_send_setting nts
-        LEFT JOIN notify_template ntemail on nts.email_template_id = ntemail.id
-        LEFT JOIN notify_template ntsms on nts.sms_template_id = ntsms.id
-        LEFT JOIN notify_template ntpm on nts.pm_template_id = ntpm.id
-        WHERE 1 = 1
-        <if test="level != null">
-            AND nts.fd_level = #{level}
-        </if>
-        <if test="code != null">
-            AND nts.code LIKE concat(concat('%',#{code}),'%')
-        </if>
-
-        <if test="name != null">
-            AND nts.name LIKE concat(concat('%',#{name}),'%')
-        </if>
-        <if test="description != null">
-            AND nts.description LIKE concat(concat('%',#{description}),'%')
-        </if>
-        <if test="params != null">
-            AND (
-            nts.code LIKE concat(concat('%',#{params}),'%') OR
-            nts.name LIKE concat(concat('%',#{params}),'%') OR
-            nts.description LIKE concat(concat('%',#{params}),'%')
-            )
-        </if>
-        order by nts.id desc
-    </select>
-
     <resultMap id="SendSettingDetailDTO" type="io.choerodon.notify.api.dto.SendSettingDetailDTO">
         <id column="id" property="id"></id>
         <result column="fd_level" property="level" jdbcType="VARCHAR"/>
     </resultMap>
-
-    <select id="selectById" resultMap="SendSettingDetailDTO">
-        SELECT
-            nts.id,
-            nts.code,
-            nts.name,
-            nts.description,
-            nts.fd_level,
-            nts.backlog_flag,
-            nts.retry_count,
-            nts.is_send_instantly,
-            nts.is_manual_retry,
-            nts.is_allow_config,
-            nts.object_version_number,
-            ntemail.id   AS email_template_id,
-            ntsms.id     AS sms_template_id,
-            ntpm.id      AS pm_template_id,
-        FROM notify_send_setting nts
-        LEFT JOIN notify_template ntemail on nts.code = ntemail.send_setting_code and ntemail.sending_type='email'
-        LEFT JOIN notify_template ntsms on nts.code = ntsms.send_setting_code and ntsms.sending_type='sms'
-        LEFT JOIN notify_template ntpm on nts.code = ntpm.send_setting_code and ntpm.sending_type='pm'
-        where nts.id = #{id}
-    </select>
 
     <select id="queryByLevelAndAllowConfig" resultMap="SendSettingDetailDTO">
         SELECT
@@ -157,14 +75,5 @@
             description LIKE concat(concat('%',#{params}),'%')
             )
         </if>
-    </select>
-
-    <select id="querySendSetting" resultMap="sendSettingCategoryDTO">
-        SELECT nsc.id,nsc.name,nsc.code,nsc.description,nsc.Object_Version_Number,nss.id,nss.name as cateName,nss.description
-        FROM notify_send_setting_category nsc
-         LEFT JOIN notify_send_setting nss
-         ON nsc.code=nss.Category_Code
-        WHERE fd_level = 'project'
-      GROUP BY nsc.name
     </select>
 </mapper>

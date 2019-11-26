@@ -4,16 +4,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.BusinessTypeDTO;
-import io.choerodon.notify.api.dto.EmailSendSettingVO;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.PmSendSettingVO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingListDTO;
-import io.choerodon.notify.api.dto.SendSettingUpdateDTO;
 import io.choerodon.notify.api.dto.SendSettingVO;
-import io.choerodon.notify.api.pojo.PmType;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
 import io.choerodon.notify.api.vo.WebHookVO;
@@ -24,7 +18,6 @@ import io.choerodon.notify.infra.enums.LevelType;
 import io.choerodon.notify.infra.mapper.SendSettingCategoryMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.notify.infra.utils.ConvertUtils;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import io.choerodon.web.util.PageableHelper;
 import org.modelmapper.ModelMapper;
@@ -34,12 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,69 +44,6 @@ public class SendSettingServiceImpl implements SendSettingService {
         this.sendSettingMapper = sendSettingMapper;
         this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
-    }
-
-    @Override
-    public Set<BusinessTypeDTO> listNames(final String level) {
-        SendSettingDTO query = new SendSettingDTO();
-        query.setLevel(level);
-        return sendSettingMapper.select(query).stream()
-                .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
-    }
-
-    @Override
-    public Set<BusinessTypeDTO> listNames() {
-        return sendSettingMapper.selectAll().stream()
-                .map(ConvertUtils::convertBusinessTypeDTO).collect(Collectors.toSet());
-    }
-
-    @Override
-    public PageInfo<SendSettingListDTO> page(final String level, final String name, final String code,
-                                             final String description, final String params, int page, int size) {
-        return PageHelper.startPage(page, size).doSelectPageInfo(
-                () -> sendSettingMapper.fulltextSearch(level, code, name, description, params));
-    }
-
-    @Override
-    public PageInfo<SendSettingListDTO> page(final String name, final String code,
-                                             final String description, final String params, int page, int size) {
-        return PageHelper.startPage(page, size).doSelectPageInfo(
-                () -> sendSettingMapper.fulltextSearch(null, code, name, description, params));
-    }
-
-    @Override
-    public SendSettingDTO update(SendSettingUpdateDTO updateDTO) {
-        SendSettingDTO db = sendSettingMapper.selectByPrimaryKey(updateDTO.getId());
-        if (db == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        db.setObjectVersionNumber(updateDTO.getObjectVersionNumber());
-        //todo
-//        db.setEmailTemplateId(updateDTO.getEmailTemplateId());
-//        db.setSmsTemplateId(updateDTO.getSmsTemplateId());
-//        db.setPmTemplateId(updateDTO.getPmTemplateId());
-        if (updateDTO.getRetryCount() != null) {
-            db.setRetryCount(updateDTO.getRetryCount());
-        }
-        if (updateDTO.getIsManualRetry() != null) {
-            db.setIsManualRetry(updateDTO.getIsManualRetry());
-        }
-        if (updateDTO.getIsSendInstantly() != null) {
-            db.setIsSendInstantly(updateDTO.getIsSendInstantly());
-        }
-        if (PmType.NOTICE.getValue().equals(updateDTO.getPmType())) {
-            db.setBacklogFlag(true);
-        }
-        if (PmType.MSG.getValue().equals(updateDTO.getPmType())) {
-            db.setBacklogFlag(false);
-        }
-        if (updateDTO.getAllowConfig() != null) {
-            db.setAllowConfig(updateDTO.getAllowConfig());
-        }
-        if (sendSettingMapper.updateByPrimaryKey(db) != 1) {
-            throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
-        }
-        return sendSettingMapper.selectByPrimaryKey(db.getId());
     }
 
     @Override
@@ -153,18 +78,6 @@ public class SendSettingServiceImpl implements SendSettingService {
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
         });
-//        businessTypes.stream().map(t -> modelMapper.map(t, SendSettingDTO.class)).forEach(i -> {
-//            SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(i.getCode()));
-//            if (query == null) {
-//                sendSettingMapper.insertSelective(i);
-//            } else {
-//                query.setName(i.getName());
-//                query.setDescription(i.getDescription());
-//                query.setLevel(i.getLevel());
-//                query.setCategoryCode(i.getCategoryCode());
-//                sendSettingMapper.updateByPrimaryKeySelective(query);
-//            }
-//        });
     }
 
     @Override
@@ -227,37 +140,6 @@ public class SendSettingServiceImpl implements SendSettingService {
         return getMessageServiceVO(disabledDTO);
     }
 
-
-    @Override
-    public MessageServiceVO allowConfiguration(Long id) {
-        SendSettingDTO allowDTO = sendSettingMapper.selectByPrimaryKey(id);
-        if (allowDTO == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        if (!allowDTO.getAllowConfig()) {
-            allowDTO.setAllowConfig(true);
-            if (sendSettingMapper.updateByPrimaryKeySelective(allowDTO) != 1) {
-                throw new CommonException("error.send.setting.allow.configuration");
-            }
-        }
-        return getMessageServiceVO(allowDTO);
-    }
-
-    @Override
-    public MessageServiceVO forbiddenConfiguration(Long id) {
-        SendSettingDTO forbiddenDTO = sendSettingMapper.selectByPrimaryKey(id);
-        if (forbiddenDTO == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        if (forbiddenDTO.getAllowConfig()) {
-            forbiddenDTO.setAllowConfig(false);
-            if (sendSettingMapper.updateByPrimaryKeySelective(forbiddenDTO) != 1) {
-                throw new CommonException("error.send.setting.forbidden.configuration");
-            }
-        }
-        return getMessageServiceVO(forbiddenDTO);
-    }
-
     /**
      * 根据 notify_send_setting{@link SendSettingDTO}
      * 获取 MessageServiceVO {@link MessageServiceVO}
@@ -274,36 +156,6 @@ public class SendSettingServiceImpl implements SendSettingService {
                 .setAllowConfig(sendSetting.getAllowConfig())
                 .setEnabled(sendSetting.getEnabled())
                 .setObjectVersionNumber(sendSetting.getObjectVersionNumber());
-    }
-
-
-    @Override
-    public EmailSendSettingVO getEmailSendSetting(Long id) {
-        SendSettingDTO sendSetting = sendSettingMapper.selectByPrimaryKey(id);
-        if (sendSetting == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        Template emailTemplate = null;
-        //todo
-//        if (sendSetting.getEmailTemplateId() != null) {
-//            emailTemplate = templateMapper.selectByPrimaryKey(sendSetting.getEmailTemplateId());
-//        }
-        return getEmailSendSettingVO(sendSetting, emailTemplate);
-    }
-
-
-    @Override
-    public PmSendSettingVO getPmSendSetting(Long id) {
-        SendSettingDTO sendSetting = sendSettingMapper.selectByPrimaryKey(id);
-        if (sendSetting == null) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-        Template pmTemplate = null;
-        //todo
-//        if (sendSetting.getPmTemplateId() != null) {
-//            pmTemplate = templateMapper.selectByPrimaryKey(sendSetting.getPmTemplateId());
-//        }
-        return getPmSendSettingVO(sendSetting, pmTemplate);
     }
 
     @Override
@@ -404,47 +256,6 @@ public class SendSettingServiceImpl implements SendSettingService {
             }
         }
         return i;
-    }
-
-    /**
-     * 根据 notify_send_setting{@link SendSettingDTO} 和 notify_template{@link Template}
-     * 获取 EmailSendSettingVO {@link EmailSendSettingVO}
-     *
-     * @param sendSetting
-     * @param template
-     * @return
-     */
-    private EmailSendSettingVO getEmailSendSettingVO(SendSettingDTO sendSetting, Template template) {
-        EmailSendSettingVO emailSendSettingVO = new EmailSendSettingVO();
-        BeanUtils.copyProperties(sendSetting, emailSendSettingVO);
-        emailSendSettingVO.setSendInstantly(sendSetting.getIsSendInstantly());
-        emailSendSettingVO.setManualRetry(sendSetting.getIsManualRetry());
-        if (template != null) {
-            emailSendSettingVO
-                    .setEmailTemplateId(template.getId())
-                    .setEmailTemplateTitle(template.getTitle());
-        }
-        return emailSendSettingVO;
-    }
-
-
-    /**
-     * 根据 notify_send_setting{@link SendSettingDTO} 和 notify_template{@link Template}
-     * 获取 PmSendSettingVO {@link PmSendSettingVO}
-     *
-     * @param sendSetting
-     * @param template
-     * @return
-     */
-    private PmSendSettingVO getPmSendSettingVO(SendSettingDTO sendSetting, Template template) {
-        PmSendSettingVO pmSendSettingVO = new PmSendSettingVO();
-        BeanUtils.copyProperties(sendSetting, pmSendSettingVO);
-        if (template != null) {
-            pmSendSettingVO
-                    .setPmTemplateId(template.getId())
-                    .setPmTemplateTitle(template.getTitle());
-        }
-        return pmSendSettingVO;
     }
 
     @Override

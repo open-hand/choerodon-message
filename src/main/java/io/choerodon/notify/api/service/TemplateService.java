@@ -1,30 +1,11 @@
 package io.choerodon.notify.api.service;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.TemplateVO;
 import io.choerodon.notify.infra.dto.Template;
-import org.springframework.data.domain.Pageable;
 
 /**
  * @author Eugen
  */
 public interface TemplateService {
-    /**
-     * 分页获取模版信息
-     *
-     * @param pageable 分页对象
-     * @return 模板列表
-     */
-    PageInfo<TemplateVO> pagingTemplateByMessageType(Pageable pageable, String businessType, String messageType, String name, Boolean predefined, String params);
-
-
-    /**
-     * 根据id获取模版信息
-     *
-     * @param id 模版主键
-     * @return 模版信息
-     */
-    TemplateVO getById(Long id);
 
     /**
      * 创建模版
