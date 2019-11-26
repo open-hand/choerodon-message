@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import { injectIntl, FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import { StatusTag, axios, Content, Header, TabPage, Page, Permission, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
-import './MsgEmail.less';
 import MouseOverWrapper from '../../../../components/mouseOverWrapper';
 import { handleFiltersParams } from '../../../../common/util';
 import { useStore } from '../stores';
@@ -15,7 +14,7 @@ import { useStore } from '../stores';
 const { Column } = Table;
 function MsgEmail(props) {
   const context = useStore();
-  const { AppState, intl, permissions, MsgRecordStore, msgRecordDataSet } = context;
+  const { AppState, intl, permissions, MsgRecordStore, msgRecordDataSet, ENABLED_GREEN, DISABLED_GRAY } = context;
 
   function getPermission() {
     const { type } = AppState.currentMenuType;
@@ -68,16 +67,7 @@ function MsgEmail(props) {
       ) : null
     );
   };
-  const StatusCard = ({ value }) => (
-    <div
-      className={classnames('c7n-msgrecord-status',
-        value === 'FAILED' ? 'c7n-msgrecord-status-failed'
-          : 'c7n-msgrecord-status-completed')}
-    >
-      <FormattedMessage id={value.toLowerCase()} />
-      {/* 失败 */}
-    </div>
-  );
+  const StatusCard = ({ value }) => (<StatusTag name={<FormattedMessage id={value.toLowerCase()} />} color={value !== 'FAILED' ? ENABLED_GREEN : DISABLED_GRAY} />);
 
   const renderAction = ({ value, record }) => {
     const action = {
@@ -104,11 +94,12 @@ function MsgEmail(props) {
       <TabPage
         service={permissions}
       >
-        <Breadcrumb title="" />
+        <Breadcrumb />
         <Content
           values={{ name: AppState.getSiteInfo.systemName || 'Choerodon' }}
+          style={{ paddingTop: 0 }}
         >
-          <Table dataSet={msgRecordDataSet}>
+          <Table dataSet={msgRecordDataSet} style={{ paddingTop: 0 }}>
             <Column align="left" name="email" renderer={renderEmail} />
             <Column name="action" width={30} renderer={renderAction} />
             <Column align="left" width={100} name="status" renderer={StatusCard} />

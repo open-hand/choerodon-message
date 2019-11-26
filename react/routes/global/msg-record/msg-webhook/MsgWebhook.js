@@ -1,33 +1,26 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Table } from 'choerodon-ui/pro';
-import classnames from 'classnames';
+import { Button, Table } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
-import { Content, TabPage, Page, Breadcrumb } from '@choerodon/boot';
+import { Content, TabPage, Page, Breadcrumb, StatusTag, Header } from '@choerodon/boot';
 
 import { useStore } from '../stores';
 
 
 const { Column } = Table;
 function MsgWebhook() {
-  const context = useStore();
-  const { AppState, permissions, msgWebhookDataSet } = context;
-  const StatusCard = ({ value }) => (
-    <div
-      className={classnames('c7n-msgrecord-status',
-        value === 'FAILED' ? 'c7n-msgrecord-status-failed'
-          : 'c7n-msgrecord-status-completed')}
-    >
-      <FormattedMessage id={value.toLowerCase()} />
-    </div>
-  );
+  const { AppState, permissions, msgWebhookDataSet, ENABLED_GREEN, DISABLED_GRAY } = useStore();
+
+  const StatusCard = ({ value }) => (<StatusTag name={<FormattedMessage id={value.toLowerCase()} />} color={value !== 'FAILED' ? ENABLED_GREEN : DISABLED_GRAY} />);
+
   return (
     <TabPage
       service={['notify-service.webhook-record.pagingByMessage']}
     >
       <Breadcrumb />
-      <Content 
-        values={{ name: context.AppState.getSiteInfo.systemName || 'Choerodon' }}
+      <Content
+        values={{ name: AppState.getSiteInfo.systemName || 'Choerodon' }}
+        style={{ paddingTop: 0 }}
       >
         <Table dataSet={msgWebhookDataSet}>
           <Column align="left" name="sendTime" />

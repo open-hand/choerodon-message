@@ -8,12 +8,12 @@ import MsgWebhook from './msg-webhook';
 function MsgRecord(props) {
   return (
     <StoreProvider {...props}>
-      <PageWrap noHeader={[]}>
-        <PageTab title="邮件日志" tabKey="choerodon.code.msg-center.msg-log-email" component={MsgEmail} />
-        <PageTab title="webhook日志" tabKey="choerodon.code.msg-center.msg-log-webhook" component={MsgWebhook} />
+      <PageWrap noHeader={['choerodon.code.site.message-log-email', 'choerodon.code.site.message-log-webhook']}>
+        <PageTab title="邮件日志" tabKey="choerodon.code.site.message-log-email" component={MsgEmail} />
+        <PageTab title="webhook日志" tabKey="choerodon.code.site.message-log-webhook" component={MsgWebhook} />
       </PageWrap>
     </StoreProvider>
-    
+
   );
 }
 export default MsgRecord;
