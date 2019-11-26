@@ -27,6 +27,8 @@ export const StoreProvider = injectIntl(inject('AppState')(
         'notify-service.message-record-org.pageEmail',
         'notify-service.webhook-record.pagingByMessage',
       ],
+      ENABLED_GREEN: 'rgba(0, 191, 165, 1)',
+      DISABLED_GRAY: 'rgba(0, 0, 0, 0.2)',
       MsgRecordStore,
       msgRecordDataSet,
       msgWebhookDataSet,
