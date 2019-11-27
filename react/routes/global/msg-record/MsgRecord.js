@@ -1,5 +1,4 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import { PageWrap, PageTab } from '@choerodon/boot';
 import { StoreProvider } from './stores';
 import MsgEmail from './msg-email';

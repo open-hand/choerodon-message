@@ -1,15 +1,15 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Table } from 'choerodon-ui/pro';
+import { Table } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
-import { Content, TabPage, Page, Breadcrumb, StatusTag, Header } from '@choerodon/boot';
+import { Content, TabPage, Breadcrumb, StatusTag } from '@choerodon/boot';
 
 import { useStore } from '../stores';
 
 
 const { Column } = Table;
 function MsgWebhook() {
-  const { AppState, permissions, msgWebhookDataSet, ENABLED_GREEN, DISABLED_GRAY } = useStore();
+  const { AppState, msgWebhookDataSet, ENABLED_GREEN, DISABLED_GRAY } = useStore();
 
   const StatusCard = ({ value }) => (<StatusTag name={<FormattedMessage id={value.toLowerCase()} />} color={value !== 'FAILED' ? ENABLED_GREEN : DISABLED_GRAY} />);
 
