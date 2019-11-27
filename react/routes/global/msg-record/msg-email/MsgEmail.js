@@ -1,11 +1,8 @@
 import React, { Component, useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Table as OldTable, Tooltip, IconSelect, Menu, Dropdown } from 'choerodon-ui';
-import { Table } from 'choerodon-ui/pro';
-import classnames from 'classnames';
+import { Table, Tooltip } from 'choerodon-ui/pro';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { withRouter } from 'react-router-dom';
-import { StatusTag, axios, Content, Header, TabPage, Page, Permission, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
+import { StatusTag, axios, Content, Header, TabPage, Breadcrumb, Action, Choerodon } from '@choerodon/boot';
 import MouseOverWrapper from '../../../../components/mouseOverWrapper';
 import { handleFiltersParams } from '../../../../common/util';
 import { useStore } from '../stores';
@@ -14,23 +11,13 @@ import { useStore } from '../stores';
 const { Column } = Table;
 function MsgEmail(props) {
   const context = useStore();
-  const { AppState, intl, permissions, MsgRecordStore, msgRecordDataSet, ENABLED_GREEN, DISABLED_GRAY } = context;
-
-  function getPermission() {
-    const { type } = AppState.currentMenuType;
-    let retryService = ['notify-service.send-setting-site.update'];
-    if (type === 'organization') {
-      retryService = ['notify-service.send-setting-org.update'];
-    }
-    return retryService;
-  }
-
+  const { AppState, intl, permissions, msgRecordDataSet, ENABLED_GREEN, DISABLED_GRAY } = context;
 
   // 重发
   function retry(record) {
     const { type, id: orgId } = AppState.currentMenuType;
     // const getTypePath = () => (type === 'site' ? '' : `/organizations/${orgId}`);
-    axios({
+    return axios({
       // url: `/notify/v1/records/emails/${record.get('id')}/retry${getTypePath()}`,
       // method: type === 'site' ? 'post' : 'get',
       url: `/notify/v1/records/emails/${record.get('id')}/retry`,
@@ -46,38 +33,17 @@ function MsgEmail(props) {
       Choerodon.prompt(intl.formatMessage({ id: 'msgrecord.send.failed' }));
     });
   }
-  const renderDropDown = ({ text, action, disabled }) => {
-    const menu = (
-      <Menu onClick={action}>
-        <Menu.Item key="1">
-          {text}
-        </Menu.Item>
-      </Menu>
-    );
-    return (
-      disabled ? (
-        <Permission
-          service={getPermission()}
-        >
-          <Dropdown overlay={menu} trigger={['click']}>
-            <Button size="small" shape="circle" style={{ color: '#000' }} icon="more_vert" />
-          </Dropdown>
-        </Permission>
-
-      ) : null
-    );
-  };
   const StatusCard = ({ value }) => (<StatusTag name={<FormattedMessage id={value.toLowerCase()} />} color={value !== 'FAILED' ? ENABLED_GREEN : DISABLED_GRAY} />);
 
-  const renderAction = ({ value, record }) => {
-    const action = {
+  const actionRenderer = ({ value, record }) => {
+    const actionArr = [{
+      service: [],
       text: <FormattedMessage id="msgrecord.resend" />,
-      action: retry.bind(this, record),
-      disabled: record.get('status') === 'FAILED' && record.get('isManualRetry'),
-    };
-    // const ac=Action()
-    return renderDropDown(action);
+      action: () => retry(record),
+    }];
+    return record.get('status') === 'FAILED' && record.get('isManualRetry') && <Action className="action-icon" data={actionArr} />;
   };
+
   const renderMouseOver = ({ value }) => (
     <MouseOverWrapper text={value} width={0.2}>
       {value}
@@ -101,7 +67,7 @@ function MsgEmail(props) {
         >
           <Table dataSet={msgRecordDataSet} style={{ paddingTop: 0 }}>
             <Column align="left" name="email" renderer={renderEmail} />
-            <Column name="action" width={30} renderer={renderAction} />
+            <Column renderer={actionRenderer} width={48} />
             <Column align="left" width={100} name="status" renderer={StatusCard} />
             <Column name="templateType" renderer={renderMouseOver} />
             <Column name="failedReason" renderer={renderMouseOver} />

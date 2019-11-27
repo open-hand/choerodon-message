@@ -58,10 +58,10 @@ export default (orgId, type, intl, intlPrefix) => {
     ],
 
     transport: {
-      read: ({ params }) => ({
+      read: {
         url: '/notify/v1/records/emails',
         method: 'get',
-      }),
+      },
     },
   };
 };
