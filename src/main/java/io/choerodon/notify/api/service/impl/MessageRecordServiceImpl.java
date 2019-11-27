@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.exception.ext.NotExistedException;
 import io.choerodon.notify.api.dto.RecordListDTO;
 import io.choerodon.notify.api.pojo.RecordSendData;
 import io.choerodon.notify.api.pojo.RecordStatus;
 import io.choerodon.notify.api.service.EmailSendService;
 import io.choerodon.notify.api.service.MessageRecordService;
 import io.choerodon.notify.domain.Record;
+import io.choerodon.notify.infra.dto.MailingRecordDTO;
 import io.choerodon.notify.infra.dto.Template;
 import io.choerodon.notify.infra.mapper.MailingRecordMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.notify.infra.utils.ConvertUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class MessageRecordServiceImpl implements MessageRecordService {
@@ -43,7 +48,7 @@ public class MessageRecordServiceImpl implements MessageRecordService {
 
     @Override
     public Record manualRetrySendEmail(long recordId) {
-        Record record = (Record) mailingRecordMapper.selectByPrimaryKey(recordId);
+        Record record = getRecord(recordId);
         if (record == null) {
             throw new CommonException("error.record.notExist");
         }
@@ -58,6 +63,13 @@ public class MessageRecordServiceImpl implements MessageRecordService {
         record.setSendData(new RecordSendData(template, ConvertUtils.convertJsonToMap(objectMapper, record.getVariables()),
                 emailSendService.createEmailSender(), null));
         emailSendService.sendRecord(record, true);
-        return (Record) mailingRecordMapper.selectByPrimaryKey(record.getId());
+        return getRecord(record.getId());
+    }
+
+    private Record getRecord(Long recordId) {
+        Record record = new Record();
+        MailingRecordDTO mailingRecordDTO = Optional.ofNullable(mailingRecordMapper.selectByPrimaryKey(recordId)).orElseThrow(() -> new NotExistedException("error.mailing.record.does.not.existed"));
+        BeanUtils.copyProperties(mailingRecordDTO, record);
+        return record;
     }
 }
