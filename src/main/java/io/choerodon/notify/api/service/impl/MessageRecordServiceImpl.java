@@ -49,9 +49,6 @@ public class MessageRecordServiceImpl implements MessageRecordService {
     @Override
     public Record manualRetrySendEmail(long recordId) {
         Record record = getRecord(recordId);
-        if (record == null) {
-            throw new CommonException("error.record.notExist");
-        }
         if (!RecordStatus.FAILED.getValue().equals(record.getStatus())) {
             throw new CommonException("error.record.retryNotFailed");
         }
