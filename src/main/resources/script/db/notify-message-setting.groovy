@@ -1,0 +1,27 @@
+package script.db
+
+databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
+    changeSet(author: 'xiangwang04@gmail.com', id: '2019-12-03-add-notify-message-setting') {
+        if(helper.dbType().isSupportSequence()){
+            createSequence(sequenceName: 'NOTIFY_MESSAGE_SETTING_S', startValue:"1")
+        }
+        createTable(tableName: "NOTIFY_MESSAGE_SETTING") {
+            column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
+                constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
+            }
+            column(name: 'NOTIFY_TYPE', type: 'VARCHAR(64)', remarks: '通知类型。比如敏捷消息，DevOps消息等。')
+            column(name: 'CODE', type: 'VARCHAR(32)', remarks: '消息code，指向notify-send-setting表') {
+                constraints(nullable: false)
+            }
+            column(name: 'PROJECT_ID', type: 'BIGINT UNSIGNED', remarks: '项目ID。')
+            column(name: 'PM_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否发送站内信。1发送，0不发送')
+            column(name: 'EMAIL_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '是否发送邮件。1发送，0不发送')
+
+            column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")
+            column(name: "CREATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
+            column(name: "CREATION_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
+            column(name: "LAST_UPDATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
+            column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
+        }
+    }
+}
