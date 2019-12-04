@@ -21,6 +21,7 @@
         nts.is_allow_config,
         nts.is_enabled,
         nts.object_version_number,
+        nts.category_code,
         ntemail.id AS email_template_id,
         ntsms.id AS sms_template_id,
         ntpm.id AS pm_template_id
