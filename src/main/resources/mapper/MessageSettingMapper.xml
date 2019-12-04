@@ -12,13 +12,13 @@
         <result column="CODE" property="code"/>
         <result column="NAME" property="name"/>
         <result  column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
-        <association property="targetUserDTO" javaType="io.choerodon.notify.infra.dto.TargetUserDTO">
-            <id column="id" property="id"/>
+        <collection property="targetUserDTOS" ofType="io.choerodon.notify.infra.dto.TargetUserDTO">
+            <id column="U_ID" property="id"/>
             <result column="TYPE" property="type"/>
             <result column="USER_ID" property="userId"/>
             <result column="MESSAGE_SETTING_ID" property="messageSettingId"/>
             <result column="U_OBJECT_VERSION_NUMBER" property="objectVersionNumber" />
-        </association>
+        </collection>
     </resultMap>
 
     <select id="listMessageSettingByCondition" resultMap="messageSettingDTO">
@@ -30,20 +30,19 @@
          nms.PM_ENABLE,
          nms.EMAIL_ENABLE,
          nssc.name AS CATEGORY,
-		 ntu.TYPE,
-		 ntu.USER_ID,
 		 nms.OBJECT_VERSION_NUMBER,
+         ntu.TYPE,
+         ntu.USER_ID,
 		 ntu.MESSAGE_SETTING_ID,
+         ntu.ID AS U_ID,
          nss.name,
 		 ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
-         FROM notify_message_setting nms
-		 JOIN notify_send_setting    nss
-		 ON nms.`CODE`=nss.`CODE`
-		 JOIN notify_send_setting_category nssc
-		 ON nss.CATEGORY_CODE=nssc.`CODE`
-		 JOIN notify_target_user ntu
-		 ON nms.ID=ntu.MESSAGE_SETTING_ID
-		 WHERE 1=1
+        FROM notify_message_setting nms , notify_target_user ntu
+        , notify_send_setting  nss
+        , notify_send_setting_category nssc
+        WHERE nms.ID=ntu.MESSAGE_SETTING_ID
+        and nms.`CODE`=nss.`CODE`
+        and nss.CATEGORY_CODE=nssc.`CODE`
         <if test="messageSettingDTO.name !=null and messageSettingDTO.name !=''">
             and nss.name like "%"#{messageSettingDTO.name}"%"
         </if>

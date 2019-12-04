@@ -1,4 +1,4 @@
-package io.choerodon.notify.api.pojo;
+package io.choerodon.notify.infra.enums;
 
 import io.choerodon.notify.api.dto.UserDTO;
 

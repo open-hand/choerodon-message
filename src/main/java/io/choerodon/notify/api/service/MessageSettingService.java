@@ -13,5 +13,5 @@ public interface MessageSettingService {
 
     void updateMessageSetting(List<MessageSettingVO> messageSettingVOS);
 
-    Long[] checkTargetUser(Long[] ids);
+    Long[] checkTargetUser(Long[] ids, String code);
 }

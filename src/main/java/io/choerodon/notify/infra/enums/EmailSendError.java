@@ -1,4 +1,4 @@
-package io.choerodon.notify.api.pojo;
+package io.choerodon.notify.infra.enums;
 
 public enum EmailSendError {
     AUTH_ERROR("邮箱账号或者密码错误"),

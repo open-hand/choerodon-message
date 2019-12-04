@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Transient;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * User: Mr.Wang
@@ -33,7 +34,7 @@ public class MessageSettingDTO extends BaseDTO {
     @ApiModelProperty(value = "消息设置的分组")
     private transient String category;
     @ApiModelProperty(value = "消息接收对象")
-    private TargetUserDTO targetUserDTO;
+    private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
     private transient String name;
 
@@ -64,12 +65,12 @@ public class MessageSettingDTO extends BaseDTO {
         this.category = category;
     }
 
-    public TargetUserDTO getTargetUserDTO() {
-        return targetUserDTO;
+    public List<TargetUserDTO> getTargetUserDTOS() {
+        return targetUserDTOS;
     }
 
-    public void setTargetUserDTO(TargetUserDTO targetUserDTO) {
-        this.targetUserDTO = targetUserDTO;
+    public void setTargetUserDTOS(List<TargetUserDTO> targetUserDTOS) {
+        this.targetUserDTOS = targetUserDTOS;
     }
 
     public Long getId() {
@@ -131,7 +132,7 @@ public class MessageSettingDTO extends BaseDTO {
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + objectVersionNumber +
                 ", category='" + category + '\'' +
-                ", targetUserDTO=" + targetUserDTO +
+                ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';
     }

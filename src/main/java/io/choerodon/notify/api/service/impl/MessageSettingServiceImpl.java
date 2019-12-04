@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -64,17 +65,27 @@ public class MessageSettingServiceImpl implements MessageSettingService {
 
         messageSettingVOS.stream().forEach(e -> {
             messageSettingMapper.insertSelective(modelMapper.map(e, MessageSettingDTO.class));
-            TargetUserDTO targetUserDTO1 = e.getTargetUserDTO();
-            targetUserDTO.setId(targetUserDTO1.getId());
-            targetUserDTO.setMessageSettingId(e.getId());
-            targetUserDTO.setUserId(targetUserDTO1.getUserId());
-            targetUserDTO.setType(targetUserDTO1.getType());
-            targetUserMapper.insert(targetUserDTO);
+            List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
+            targetUserDTOS.stream().forEach(v -> {
+                targetUserDTO.setId(v.getId());
+                targetUserDTO.setMessageSettingId(e.getId());
+                targetUserDTO.setUserId(v.getUserId());
+                targetUserDTO.setType(v.getType());
+                targetUserMapper.insert(targetUserDTO);
+            });
         });
     }
 
     @Override
-    public Long[] checkTargetUser(Long[] ids) {
+    public Long[] checkTargetUser(Long[] ids, String code) {
+        //校验接收对象是否正确
+        ArrayList arrayList = new ArrayList();
+        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+        messageSettingDTO.setCode(code);
+        MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(messageSettingDTO);
+        if (Objects.isNull(messageSettingDTO1) || ids == null || ids.length == 0) {
+            return new Long[0];
+        }
         return new Long[0];
     }
 }

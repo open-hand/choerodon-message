@@ -75,6 +75,7 @@ public class TargetUserDTO extends BaseDTO {
                 ", type='" + type + '\'' +
                 ", userId='" + userId + '\'' +
                 ", messageSettingId=" + messageSettingId +
+                ", objectVersionNumber=" + objectVersionNumber +
                 '}';
     }
 }

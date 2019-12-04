@@ -4,6 +4,7 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * User: Mr.Wang
@@ -27,7 +28,7 @@ public class MessageSettingVO {
     @ApiModelProperty(value = "消息设置的分组")
     private String category;
     @ApiModelProperty(value = "消息接收对象")
-    private TargetUserDTO targetUserDTO;
+    private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
     private String name;
 
@@ -55,12 +56,12 @@ public class MessageSettingVO {
         this.category = category;
     }
 
-    public TargetUserDTO getTargetUserDTO() {
-        return targetUserDTO;
+    public List<TargetUserDTO> getTargetUserDTOS() {
+        return targetUserDTOS;
     }
 
-    public void setTargetUserDTO(TargetUserDTO targetUserDTO) {
-        this.targetUserDTO = targetUserDTO;
+    public void setTargetUserDTOS(List<TargetUserDTO> targetUserDTOS) {
+        this.targetUserDTOS = targetUserDTOS;
     }
 
     public Long getId() {
@@ -122,7 +123,7 @@ public class MessageSettingVO {
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + objectVersionNumber +
                 ", category='" + category + '\'' +
-                ", targetUserDTO=" + targetUserDTO +
+                ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';
     }
