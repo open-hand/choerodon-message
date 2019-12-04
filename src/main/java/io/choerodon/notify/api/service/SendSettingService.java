@@ -64,4 +64,24 @@ public interface SendSettingService {
      * 查询项目层下的所有可选的SendSetting
      */
     WebHookVO.SendSetting getUnderProject();
+
+    /**
+     * 根据id
+     * 允许配置接受设置
+     * 对应表；notify_send_setting
+     *
+     * @param id 记录主键
+     * @return 消息服务信息
+     */
+    MessageServiceVO allowConfiguration(Long id);
+
+    /**
+     * 根据id
+     * 禁止配置接受设置
+     * 对应表；notify_send_setting
+     *
+     * @param id 记录主键
+     * @return 消息服务信息
+     */
+    MessageServiceVO forbiddenConfiguration(Long id);
 }

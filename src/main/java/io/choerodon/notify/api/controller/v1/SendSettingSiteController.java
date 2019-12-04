@@ -103,4 +103,18 @@ public class SendSettingSiteController {
         }
         return new ResponseEntity<>(sendSettingService.updateSendSetting(updateDTO), HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/allow_configuration")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "允许配置接受设置")
+    public ResponseEntity<MessageServiceVO> allowConfig(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.allowConfiguration(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/forbidden_configuration")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "禁止配置接受设置")
+    public ResponseEntity<MessageServiceVO> forbiddenConfig(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(sendSettingService.forbiddenConfiguration(id), HttpStatus.OK);
+    }
 }

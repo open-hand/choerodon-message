@@ -272,4 +272,35 @@ public class SendSettingServiceImpl implements SendSettingService {
         return sendSetting.setSendSettingSelection(new HashSet<>(sendSettingSelection)).setSendSettingCategorySelection(new HashSet<>(sendSettingCategorySelection));
     }
 
+    @Override
+    public MessageServiceVO allowConfiguration(Long id) {
+        SendSettingDTO allowDTO = sendSettingMapper.selectByPrimaryKey(id);
+        if (allowDTO == null) {
+            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
+        }
+        if (!allowDTO.getAllowConfig()) {
+            allowDTO.setAllowConfig(true);
+            if (sendSettingMapper.updateByPrimaryKeySelective(allowDTO) != 1) {
+                throw new CommonException("error.send.setting.allow.configuration");
+            }
+        }
+        return getMessageServiceVO(allowDTO);
+    }
+
+    @Override
+    public MessageServiceVO forbiddenConfiguration(Long id) {
+        SendSettingDTO forbiddenDTO = sendSettingMapper.selectByPrimaryKey(id);
+        if (forbiddenDTO == null) {
+            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
+        }
+        if (forbiddenDTO.getAllowConfig()) {
+            forbiddenDTO.setAllowConfig(false);
+            if (sendSettingMapper.updateByPrimaryKeySelective(forbiddenDTO) != 1) {
+                throw new CommonException("error.send.setting.forbidden.configuration");
+            }
+        }
+        return getMessageServiceVO(forbiddenDTO);
+    }
+
+
 }
