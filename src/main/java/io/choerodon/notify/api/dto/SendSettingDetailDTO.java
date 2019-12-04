@@ -9,6 +9,8 @@ public class SendSettingDetailDTO {
 
     private String name;
 
+    private String categoryCode;
+
     private Boolean backlogFlag;
 
     private String description;
@@ -142,5 +144,13 @@ public class SendSettingDetailDTO {
 
     public void setAllowConfig(Boolean allowConfig) {
         isAllowConfig = allowConfig;
+    }
+
+    public String getCategoryCode() {
+        return categoryCode;
+    }
+
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
     }
 }

@@ -11,6 +11,7 @@ import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface SendSettingService {
@@ -18,7 +19,7 @@ public interface SendSettingService {
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
-    List<SendSettingDetailDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
+    Map<String, List<SendSettingDetailDTO>> queryByLevelAndAllowConfig(String level, boolean allowConfig);
 
     void delete(Long id);
 
