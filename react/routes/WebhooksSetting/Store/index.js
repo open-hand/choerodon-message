@@ -32,6 +32,7 @@ export const StoreProvider = injectIntl(inject('AppState')(
       },
       ENABLED_GREEN: 'rgba(0, 191, 165, 1)',
       DISABLED_GRAY: 'rgba(0, 0, 0, 0.2)',
+      prefixCls: 'webhook-setting',
       ...props,
     };
     return (

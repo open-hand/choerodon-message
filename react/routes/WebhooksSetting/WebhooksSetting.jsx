@@ -5,11 +5,24 @@ import { axios, Breadcrumb, Header, Content, StatusTag, Action } from '@choerodo
 import CreateAndEditWebhooksForm from './CreateAndEditWebhooksForm';
 import Store from './Store';
 
+import './index.less';
+
 const ModalKey = Modal.key();
 const { Column } = Table;
 
 const WebhooksSetting = () => {
-  const { projectId, webhooksDataSet, createWebhooksFormDataSet, createTriggerEventsSettingDataSet, editWebhooksFormDataSet, editTriggerEventsSettingDataSet, webhooksTypeMap, ENABLED_GREEN, DISABLED_GRAY } = useContext(Store);
+  const {
+    projectId,
+    webhooksDataSet,
+    createWebhooksFormDataSet,
+    createTriggerEventsSettingDataSet,
+    editWebhooksFormDataSet,
+    editTriggerEventsSettingDataSet,
+    webhooksTypeMap,
+    ENABLED_GREEN,
+    DISABLED_GRAY,
+    prefixCls,
+  } = useContext(Store);
 
   const handleCreateWebhooks = () => {
     Modal.open({
@@ -128,7 +141,7 @@ const WebhooksSetting = () => {
         <Button icon="playlist_add" onClick={handleCreateWebhooks}>创建Webhooks</Button>
       </Header>
       <Breadcrumb />
-      <Content>
+      <Content className={`${prefixCls}-content`}>
         <Table dataSet={webhooksDataSet}>
           <Column
             name="name"
