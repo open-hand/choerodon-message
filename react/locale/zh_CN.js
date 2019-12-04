@@ -665,6 +665,18 @@ const pageDetail = {
   'time.thirty.days': '近30天',
 };
 
+const projectNotify = {
+  'project.notify.tabs.agile': '敏捷消息',
+  'project.notify.tabs.devops': 'DevOps消息',
+  'project.notify.tabs.resource': '资源删除验证',
+  'project.notify.tabs.webhook': 'Webhook配置',
+  'project.notify.type': '信息类型',
+  'project.notify.pm': '站内信',
+  'project.notify.email': '邮件',
+  'project.notify.sms': '短信',
+  'project.notify.noticeObject': '通知对象',
+};
+
 /* eslint-disable-next-line */
 const zh_CN = {
 
@@ -1835,6 +1847,7 @@ const zh_CN = {
 
   // page
   ...pageDetail,
+  ...projectNotify,
 
 };
 /* eslint-disable-next-line */

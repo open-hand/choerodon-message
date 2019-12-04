@@ -17,6 +17,7 @@ const smsSetting = asyncRouter(() => import('./routes/NotifySetting/sms-setting'
 const notifySetting = asyncRouter(() => import('./routes/NotifySetting'));
 const notifyList = asyncRouter(() => import('./routes/NotifyList/route'));
 const webhooksSetting = asyncRouter(() => import('./routes/WebhooksSetting'));
+const projectNotify = asyncRouter(() => import('./routes/project-notify'));
 
 function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
   const IntlProviderAsync = asyncLocaleProvider(language, () => import(`./locale/${language}`));
@@ -36,6 +37,7 @@ function LowCodeIndex({ match, AppState: { currentLanguage: language } }) {
           <Route path={`${match.url}/msg-config`} component={notifySetting} />
           <Route path={`${match.url}/msg-service`} component={notifyList} />
           <Route path={`${match.url}/webhooks-setting`} component={webhooksSetting} />
+          <Route path={`${match.url}/project-notify`} component={projectNotify} />
           <Route path="*" component={nomatch} />
         </Switch>
         <ModalContainer />
