@@ -36,9 +36,13 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
     }
 
     @Override
-    public List<io.choerodon.notify.api.dto.ReceiveSettingDTO> queryByUserId(final Long userId) {
+    public List<io.choerodon.notify.api.dto.ReceiveSettingDTO> queryByUserId(final Long userId, String sourceType) {
+        if (sourceType != null) {
+            CommonValidator.validatorLevel(sourceType);
+        }
         ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
         receiveSettingDTO.setUserId(userId);
+        receiveSettingDTO.setSourceType(sourceType);
         return modelMapper.map(receiveSettingMapper.select(receiveSettingDTO), List.class);
     }
 

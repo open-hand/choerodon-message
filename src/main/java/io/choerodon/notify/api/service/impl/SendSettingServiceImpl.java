@@ -88,37 +88,15 @@ public class SendSettingServiceImpl implements SendSettingService {
         SendSettingDetailTreeDTO sendSettingDetailTreeDTO1 = new SendSettingDetailTreeDTO();
         sendSettingDetailTreeDTO1.setParentId(0L);
         sendSettingDetailTreeDTO1.setSequenceId(1L);
-        sendSettingDetailTreeDTO1.setName(LevelType.SITE.value());
-        sendSettingDetailTreeDTO1.setCode(ResourceType.SITE.value());
+        sendSettingDetailTreeDTO1.setName(LevelType.valueOf(level.toUpperCase()).value());
+        sendSettingDetailTreeDTO1.setCode(ResourceType.valueOf(level.toUpperCase()).value());
         sendSettingDetailTreeDTO1.setParentId(0L);
         //防止被过滤掉
         sendSettingDetailTreeDTO1.setEmailTemplateId(0L);
         sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO1);
 
-        SendSettingDetailTreeDTO sendSettingDetailTreeDTO2 = new SendSettingDetailTreeDTO();
-        sendSettingDetailTreeDTO2.setParentId(0L);
-        sendSettingDetailTreeDTO2.setSequenceId(2L);
-        sendSettingDetailTreeDTO2.setName(LevelType.ORGANIZATION.value());
-        sendSettingDetailTreeDTO2.setCode(ResourceType.ORGANIZATION.value());
-        sendSettingDetailTreeDTO2.setParentId(0L);
-        //防止被过滤掉
-        sendSettingDetailTreeDTO2.setEmailTemplateId(0L);
-        sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO2);
-
-        SendSettingDetailTreeDTO sendSettingDetailTreeDTO3 = new SendSettingDetailTreeDTO();
-        sendSettingDetailTreeDTO3.setParentId(0L);
-        sendSettingDetailTreeDTO3.setSequenceId(3L);
-        sendSettingDetailTreeDTO3.setName(LevelType.PROJECT.value());
-        sendSettingDetailTreeDTO3.setCode(ResourceType.PROJECT.value());
-        sendSettingDetailTreeDTO3.setParentId(0L);
-        //防止被过滤掉
-        sendSettingDetailTreeDTO3.setEmailTemplateId(0L);
-        sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO3);
-
         Map<String, Set<String>> categoryMap = new HashMap<>();
-        categoryMap.put(ResourceType.SITE.value(), new HashSet<>());
-        categoryMap.put(ResourceType.ORGANIZATION.value(), new HashSet<>());
-        categoryMap.put(ResourceType.PROJECT.value(), new HashSet<>());
+        categoryMap.put(ResourceType.valueOf(level.toUpperCase()).value(), new HashSet<>());
         for (SendSettingDetailDTO sendSettingDTO : list) {
             Set<String> categoryCodes = categoryMap.get(sendSettingDTO.getLevel());
             if (categoryCodes != null) {
@@ -133,17 +111,11 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     private void getSecondSendSettingDetailTreeDTOS(Map<String, Set<String>> categoryMap, List<SendSettingDetailTreeDTO> sendSettingDetailTreeDTOS, List<SendSettingDetailDTO> sendSettingDetailDTOS) {
-        int i = 4;
+        int i = 2;
         for (String level : categoryMap.keySet()) {
             for (String categoryCode : categoryMap.get(level)) {
                 SendSettingDetailTreeDTO sendSettingDetailTreeDTO = new SendSettingDetailTreeDTO();
-                if (level.equals(ResourceType.SITE.value())) {
-                    sendSettingDetailTreeDTO.setParentId(1L);
-                } else if (level.equals(ResourceType.ORGANIZATION.value())) {
-                    sendSettingDetailTreeDTO.setParentId(2L);
-                } else {
-                    sendSettingDetailTreeDTO.setParentId(3L);
-                }
+                sendSettingDetailTreeDTO.setParentId(1L);
 
                 SendSettingCategoryDTO categoryDTO = new SendSettingCategoryDTO();
                 categoryDTO.setCode(categoryCode);

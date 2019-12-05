@@ -30,9 +30,9 @@ public class ReceiveSettingController {
     @GetMapping
     @Permission(permissionLogin = true, type = ResourceType.SITE)
     @ApiOperation(value = "查询当前用户所有接收通知配置")
-    public List<ReceiveSettingDTO> queryByUserId() {
+    public List<ReceiveSettingDTO> queryByUserId(@RequestParam("source_type") String sourceType) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
-        return receiveSettingService.queryByUserId(userId);
+        return receiveSettingService.queryByUserId(userId,sourceType);
     }
 
     @PutMapping("/all")

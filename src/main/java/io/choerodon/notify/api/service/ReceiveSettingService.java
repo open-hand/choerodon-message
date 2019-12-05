@@ -14,7 +14,7 @@ public interface ReceiveSettingService {
      * @param userId
      * @return
      */
-    List<ReceiveSettingDTO> queryByUserId(Long userId);
+    List<ReceiveSettingDTO> queryByUserId(Long userId, String sourceType);
 
     /**
      * 遍历settingDTOList
