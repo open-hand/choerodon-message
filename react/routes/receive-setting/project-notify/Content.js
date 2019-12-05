@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { TabPage, Content, Breadcrumb } from '@choerodon/boot';
 import { Table, CheckBox } from 'choerodon-ui/pro';
-import { useAgileContentStore } from './stores';
+import { useProjectNotifyStore } from './stores';
 
 import './index.less';
 
@@ -13,10 +13,10 @@ export default props => {
     prefixCls,
     intl: { formatMessage },
     tableDs,
-  } = useAgileContentStore();
+  } = useProjectNotifyStore();
 
-  function handlePmHeaderChange(value) {
-    tableDs.forEach((record) => record.set('pmEnable', value));
+  function handleCheckBoxHeaderChange(value, name) {
+    tableDs.forEach((record) => record.set(name, value));
   }
 
   function handlePmChange(value) {
@@ -24,25 +24,25 @@ export default props => {
     record.set('pmEnable', value);
   }
   
-  function renderPmHeader(dataSet) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable'));
-    const pmRecords = tableDs.find((record) => record.get('pmEnable'));
+  function renderCheckBoxHeader(dataSet, name) {
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name));
+    const pmRecords = tableDs.find((record) => record.get(name));
     return (
       <CheckBox
         checked={isChecked}
         indeterminate={!!pmRecords}
-        onChange={handlePmHeaderChange}
+        onChange={(value) => handleCheckBoxHeaderChange(value, name)}
       >
-        {formatMessage({ id: `${intlPrefix}.pmEnable` })}
+        {formatMessage({ id: `receive.type.${name}` })}
       </CheckBox>
     );
   }
 
-  function renderPm({ record, value }) {
+  function renderCheckBox({ record, value, name }) {
     return (
       <CheckBox
         record={record}
-        name="pmEnable"
+        name={name}
         checked={value}
         // onChange={handlePmChange}
       />
@@ -52,11 +52,11 @@ export default props => {
   return (
     <Fragment>
       <Breadcrumb />
-      <Content className={`${prefixCls}-agile-content`}>
+      <Content className={`${prefixCls}-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
-          <Column name="pmEnable" header={renderPmHeader} renderer={renderPm} align="left" />
-          <Column name="targetUserDTOS" />
+          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
         </Table>
       </Content>
     </Fragment>

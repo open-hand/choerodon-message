@@ -55,9 +55,9 @@ export default props => {
       <Content className={`${prefixCls}-resource-content`}>
         <Table dataSet={tableDs}>
           <Column name="type" />
-          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="sms" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="pmEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="emailEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="smsEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
           <Column name="noticeObject" />
         </Table>
       </Content>
