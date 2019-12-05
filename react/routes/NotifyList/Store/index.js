@@ -35,6 +35,7 @@ export const StoreProvider = withRouter(injectIntl(inject('AppState')(
       queryTreeDataSet,
       currentPageType,
       setCurrentPageType,
+      intl,
     };
     return (
       <Store.Provider value={value}>
