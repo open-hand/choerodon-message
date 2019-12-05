@@ -27,6 +27,8 @@ public class MessageSettingVO {
     private Long objectVersionNumber;
     @ApiModelProperty(value = "消息设置的分组")
     private String category;
+    @ApiModelProperty(value = "分组的id")
+    private transient Long categoryId;
     @ApiModelProperty(value = "消息接收对象")
     private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
@@ -38,6 +40,14 @@ public class MessageSettingVO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Long getObjectVersionNumber() {
@@ -123,6 +133,7 @@ public class MessageSettingVO {
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + objectVersionNumber +
                 ", category='" + category + '\'' +
+                ", categoryId=" + categoryId +
                 ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';
