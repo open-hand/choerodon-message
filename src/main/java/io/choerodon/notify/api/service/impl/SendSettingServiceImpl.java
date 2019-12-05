@@ -388,6 +388,11 @@ public class SendSettingServiceImpl implements SendSettingService {
         }
         return getMessageServiceVO(forbiddenDTO);
     }
-
+    @Override
+    public SendSettingDTO queryByCode(String code) {
+        SendSettingDTO sendSettingDTO = new SendSettingDTO();
+        sendSettingDTO.setCode(code);
+        return sendSettingMapper.selectOne(sendSettingDTO);
+    }
 
 }
