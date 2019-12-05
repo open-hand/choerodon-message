@@ -30,7 +30,7 @@ export default props => {
     return (
       <CheckBox
         checked={isChecked}
-        indeterminate={!!pmRecords}
+        indeterminate={!isChecked && !!pmRecords}
         onChange={(value) => handleCheckBoxHeaderChange(value, name)}
       >
         {formatMessage({ id: `receive.type.${name}` })}
@@ -39,14 +39,19 @@ export default props => {
   }
 
   function renderCheckBox({ record, value, name }) {
+    const hasTemplateId = record.get(`${name}TemplateId`);
     return (
       <CheckBox
         record={record}
         name={name}
-        checked={value}
-        // onChange={handlePmChange}
+        checked={!!value}
+        disabled={!hasTemplateId}
       />
     );
+  }
+
+  function renderEditor(record, name) {
+    return !!record.get(`${name}TemplateId`);
   }
 
   return (
@@ -55,8 +60,8 @@ export default props => {
       <Content className={`${prefixCls}-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
-          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" editor={renderEditor} />
+          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" editor={renderEditor} />
         </Table>
       </Content>
     </Fragment>
