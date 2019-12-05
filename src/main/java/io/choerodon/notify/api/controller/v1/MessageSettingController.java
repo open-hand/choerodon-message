@@ -36,7 +36,6 @@ public class MessageSettingController {
     public ResponseEntity<List<MessageSettingVO>> listMessageSetting(
             @PathVariable(value = "project_id") Long projectId,
             @Valid @RequestBody MessageSettingVO messageSettingVO) {
-
         return Optional.ofNullable(messageSettingService.listMessageSetting(projectId, messageSettingVO))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.query"));
@@ -48,17 +47,17 @@ public class MessageSettingController {
     public void updateMessageSetting(
             @PathVariable(value = "project_id") Long projectId,
             @RequestBody List<MessageSettingVO> messageSettingVOS) {
-        messageSettingService.updateMessageSetting(messageSettingVOS);
+        messageSettingService.updateMessageSetting(projectId, messageSettingVOS);
     }
 
-    @PostMapping("/check_target_user")
+    @GetMapping("/check_target_user")
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "项目层敏捷消息和devops消息发送前校验接收对象")
     public ResponseEntity<Long[]> checkTargetUser(
             @PathVariable(value = "project_id") Long projectId,
-            @RequestBody Long[] ids,
-            @RequestBody String code) {
-        return Optional.ofNullable(messageSettingService.checkTargetUser(ids, code))
+            @RequestParam String code,
+            @RequestParam String ids) {
+        return Optional.ofNullable(messageSettingService.checkTargetUser(projectId, ids, code))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
     }

@@ -3,9 +3,7 @@ package io.choerodon.notify.infra.dto;
 import io.choerodon.mybatis.entity.BaseDTO;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
 import java.util.List;
@@ -33,11 +31,21 @@ public class MessageSettingDTO extends BaseDTO {
     private Long objectVersionNumber;
     @ApiModelProperty(value = "消息设置的分组")
     private transient String category;
+    @ApiModelProperty(value = "分组的id")
+    private transient Long categoryId;
     @ApiModelProperty(value = "消息接收对象")
     private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
     private transient String name;
 
+    public MessageSettingDTO() {
+
+    }
+
+
+    public MessageSettingDTO(String code) {
+        this.code = code;
+    }
 
     @Override
     public Long getObjectVersionNumber() {
@@ -47,6 +55,14 @@ public class MessageSettingDTO extends BaseDTO {
     @Override
     public void setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -132,6 +148,7 @@ public class MessageSettingDTO extends BaseDTO {
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + objectVersionNumber +
                 ", category='" + category + '\'' +
+                ", categoryId=" + categoryId +
                 ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';

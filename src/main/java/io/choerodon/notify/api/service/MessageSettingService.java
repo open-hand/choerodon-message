@@ -11,7 +11,7 @@ import java.util.List;
 public interface MessageSettingService {
     List<MessageSettingVO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO);
 
-    void updateMessageSetting(List<MessageSettingVO> messageSettingVOS);
+    void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
 
-    Long[] checkTargetUser(Long[] ids, String code);
+    Long[] checkTargetUser(Long projectId, String ids, String code);
 }

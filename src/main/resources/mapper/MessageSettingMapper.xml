@@ -11,41 +11,82 @@
         <result column="CATEGORY" property="category"/>
         <result column="CODE" property="code"/>
         <result column="NAME" property="name"/>
-        <result  column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
+        <result column="CATEGORY_ID" property="categoryId"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
         <collection property="targetUserDTOS" ofType="io.choerodon.notify.infra.dto.TargetUserDTO">
             <id column="U_ID" property="id"/>
             <result column="TYPE" property="type"/>
             <result column="USER_ID" property="userId"/>
             <result column="MESSAGE_SETTING_ID" property="messageSettingId"/>
-            <result column="U_OBJECT_VERSION_NUMBER" property="objectVersionNumber" />
+            <result column="U_OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
         </collection>
     </resultMap>
 
+    <!--先按code分组，其次选中分组的第一行-->
     <select id="listMessageSettingByCondition" resultMap="messageSettingDTO">
-         SELECT
-         nms.ID,
-         nms.NOTIFY_TYPE,
-         nms.`CODE`,
-         nms.PROJECT_ID,
-         nms.PM_ENABLE,
-         nms.EMAIL_ENABLE,
-         nssc.name AS CATEGORY,
-		 nms.OBJECT_VERSION_NUMBER,
-         ntu.TYPE,
-         ntu.USER_ID,
-		 ntu.MESSAGE_SETTING_ID,
-         ntu.ID AS U_ID,
-         nss.name,
-		 ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
+        SELECT m.* FROM (
+        SELECT
+        nms.ID,
+        nms.NOTIFY_TYPE,
+        nms.`CODE`,
+        nms.PROJECT_ID,
+        nms.PM_ENABLE,
+        nms.EMAIL_ENABLE,
+        nssc.name AS CATEGORY,
+        nssc.ID AS CATEGORY_ID,
+        nms.OBJECT_VERSION_NUMBER,
+        ntu.TYPE,
+        ntu.USER_ID,
+        ntu.MESSAGE_SETTING_ID,
+        ntu.ID AS U_ID,
+        nss.name,
+        ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
+        FROM notify_message_setting nms , notify_target_user ntu
+        , notify_send_setting nss
+        , notify_send_setting_category nssc
+        WHERE nms.ID=ntu.MESSAGE_SETTING_ID
+        and nms.`CODE`=nss.`CODE`
+        and nss.CATEGORY_CODE=nssc.`CODE`
+        and nms.NOTIFY_TYPE=#{messageSettingDTO.notifyType}
+        <if test="messageSettingDTO.name !=null and messageSettingDTO.name !=''">
+            and nss.name like "%"#{messageSettingDTO.name}"%"
+        </if>
+        <if test="projectId == '' or projectId ==null ">
+            and nms.PROJECT_ID is NULL
+        </if>
+        <if test="projectId !=null and projectId !=null">
+            and nms.PROJECT_ID =#{projectId} or nms.PROJECT_ID is NULL
+        </if>
+        ORDER BY nms.ID DESC limit 1000
+        LIMIT 100
+        ) m
+        GROUP BY m.CODE
+    </select>
+
+    <select id="listMessageSettingDefault" resultMap="messageSettingDTO">
+        SELECT
+        nms.ID,
+        nms.NOTIFY_TYPE,
+        nms.`CODE`,
+        nms.PROJECT_ID,
+        nms.PM_ENABLE,
+        nms.EMAIL_ENABLE,
+        nssc.name AS CATEGORY,
+        nssc.ID AS CATEGORY_ID,
+        nms.OBJECT_VERSION_NUMBER,
+        ntu.TYPE,
+        ntu.USER_ID,
+        ntu.MESSAGE_SETTING_ID,
+        ntu.ID AS U_ID,
+        nss.name,
+        ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
         FROM notify_message_setting nms , notify_target_user ntu
         , notify_send_setting  nss
         , notify_send_setting_category nssc
         WHERE nms.ID=ntu.MESSAGE_SETTING_ID
         and nms.`CODE`=nss.`CODE`
         and nss.CATEGORY_CODE=nssc.`CODE`
-        <if test="messageSettingDTO.name !=null and messageSettingDTO.name !=''">
-            and nss.name like "%"#{messageSettingDTO.name}"%"
-        </if>
-		and  nms.NOTIFY_TYPE=#{messageSettingDTO.notifyType}
+        and nms.PROJECT_ID is null
+        and  nms.NOTIFY_TYPE=#{messageSettingDTO.notifyType}
     </select>
 </mapper>
