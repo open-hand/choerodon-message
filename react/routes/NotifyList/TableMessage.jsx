@@ -10,13 +10,15 @@ import Store from './Store';
 import ToggleMessageType from './ToggleMessageType';
 import './TableMessage.less';
 
+const modalKey = Modal.key();
 const { Column } = Table;
 const cssPrefix = 'c7n-notify-contentList';
 // 设置邮件，设置短信，设置站内信
 export default observer(() => {
   const context = useContext(Store);
-  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType } = context;
+  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType, intl: { formatMessage } } = context;
   const [inputValue, setInputValue] = useState('');
+  let disableModal;
   function getTitle(record) {
     const name = record.get('name').toLowerCase();
     const searchValue = inputValue.toLowerCase();
@@ -29,19 +31,18 @@ export default observer(() => {
         <span style={{ color: '#f50' }}>{inputValue.toLowerCase()}</span>
         {afterStr}
       </span>
-    ) : (
-      <span>
-        {name}
-      </span>
-    );
+    ) : (<span>{name}</span>);
     return title;
   }
+
   async function handleToggleState(record) {
     const code = record.get('code');
-    
+
     if (record.get('enabled')) {
       // 停用
+      disableModal.close();
       await axios.put(`/notify/v1/notices/send_settings/disabled?code=${code}`);
+
     } else {
       // 启用
       await axios.put(`/notify/v1/notices/send_settings/enabled?code=${code}`);
@@ -49,13 +50,25 @@ export default observer(() => {
     await queryTreeDataSet.query();
     await messageTypeDetailDataSet.query();
   }
+
+
+  function openStopModal(record) {
+    disableModal = Modal.open({
+      key: modalKey,
+      title: formatMessage({ id: 'disable' }),
+      children: formatMessage({ id: 'notify-lists.disable.message' }),
+      okText: formatMessage({ id: 'disable' }),
+      onOk: () => handleToggleState(record),
+    });
+  }
+
   function getAction(record) {
     const { children } = record;
-
+    const enabled = record.get('enabled');
     const actionDatas = [
       {
-        text: record.get('enabled') ? '停用' : '启用',
-        action: () => handleToggleState(record),
+        text: enabled ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' }),
+        action: () => (enabled ? openStopModal(record) : handleToggleState(record)),
       },
     ];
     if (!children) {

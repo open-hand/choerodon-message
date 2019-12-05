@@ -171,12 +171,12 @@ const pageDetail = {
   'global.sendsetting.delete.title': '删除触发类型',
   'global.sendsetting.delete.content.has-template': '该触发类型下已有邮件模板或者站内信模板，确定要删除"{name}"触发类型？删除触发类型不会删除该类型下的模板。',
   'global.sendsetting.delete.content': '确定要删除触发类型为"{name}"的记录吗？',
-
+  
   // 消息记录
   'global.msgrecord.title': '平台"{name}"的邮件发送记录',
   'global.msgrecord.description': '通过此平台，您可以查看邮件发送状态回执，并且了解发送失败的原因，手动重发发送失败的消息。',
   'global.msgrecord.link': `${docServer}/user-guide/system-configuration/message/record/`,
-
+  
   // 邮件模板
   'global.mailtemplate.title': '平台"{name}"的邮件模板',
   'global.mailtemplate.description': '由特定的事件触发后，系统自动发送邮件给用户，邮件模板统一了用户接受的邮件内容。',
@@ -211,6 +211,7 @@ const pageDetail = {
   'global.inmailtemplate.modify.description': '修改站内信模板可以让您根据自己的需求，修改发送的主题、内容。',
   'global.inmailtemplate.modify.link': `${docServer}/user-guide/system-configuration/message/email-template/`,
 
+  'notify-lists.disable.message': '停用该消息服务后，事件触发将无法收到对应的通知，确定要停用吗？',
 
   'global.notifySetting.connect.success': '连接成功',
   // 邮箱配置

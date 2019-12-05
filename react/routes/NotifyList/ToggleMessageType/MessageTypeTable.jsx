@@ -1,23 +1,38 @@
 import React, { useContext } from 'react';
-import { Table, Icon, Output } from 'choerodon-ui/pro';
+import { Table, Icon, Output, Modal } from 'choerodon-ui/pro';
 import { Action, axios, Content, StatusTag, PageTab, PageWrap } from '@choerodon/boot';
 import Store from '../Store';
 import './MessageTypeTable.less';
 
 const { Column } = Table;
+const modalKey = Modal.key();
 
 const MessageTypeTable = () => {
   const cssPrefix = 'c7n-notify-MessageTypeTable';
-  const { messageTypeTableDataSet, messageTypeDetailDataSet, setCurrentPageType, currentPageType } = useContext(Store);
+  const { messageTypeTableDataSet, messageTypeDetailDataSet, setCurrentPageType, currentPageType, intl: { formatMessage } } = useContext(Store);
+  let disableModal;
 
   // 启用状态改变切换
   async function changeMake() {
     const status = messageTypeTableDataSet.current.get('enabled');
     const id = messageTypeTableDataSet.current.get('id');
     const code = messageTypeTableDataSet.current.get('code');
+    if (status) {
+      disableModal.close();
+    }
     const url = `/notify/v1/notices/send_settings/${status ? 'disabled' : 'enabled'}?code=${code}`;
     const res = await axios.put(url);
     messageTypeTableDataSet.query();
+  }
+
+  function openDisableModal(record) {
+    disableModal = Modal.open({
+      key: modalKey,
+      title: formatMessage({ id: 'disable' }),
+      children: formatMessage({ id: 'notify-lists.disable.message' }),
+      okText: formatMessage({ id: 'disable' }),
+      onOk: () => changeMake(),
+    });
   }
 
   // 允许配置接收
@@ -30,10 +45,11 @@ const MessageTypeTable = () => {
   }
 
   const ActionRenderer = ({ value, record }) => {
+    const enabled = record.get('enabled');
     const actionArr = [{
       service: [],
-      text: record.get('enabled') ? '停用' : '启用',
-      action: () => changeMake(),
+      text: enabled ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' }),
+      action: () => (enabled ? openDisableModal() : changeMake()),
     }, {
       service: [],
       text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
@@ -44,7 +60,7 @@ const MessageTypeTable = () => {
 
   const getEnabled = ({ record }) => (
     <StatusTag
-      name={record.get('enabled') ? '启用' : '停用'}
+      name={record.get('enabled') ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' })}
       color={record.get('enabled') ? '#00bfa5' : '#00000033'}
     />
   );
