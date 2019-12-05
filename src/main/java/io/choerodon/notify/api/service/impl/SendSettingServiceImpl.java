@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.MessageServiceVO;
-import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingVO;
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.validator.CommonValidator;
 import io.choerodon.notify.api.vo.WebHookVO;
@@ -20,6 +17,7 @@ import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TemplateMapper;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import io.choerodon.web.util.PageableHelper;
+import org.codehaus.jackson.map.util.BeanUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
@@ -81,13 +79,102 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public Map<String, List<SendSettingDetailDTO>> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
+    public List<SendSettingDetailTreeDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
         if (level != null) {
             CommonValidator.validatorLevel(level);
         }
         List<SendSettingDetailDTO> list = sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
-        return list.stream().filter(s -> s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null)
-                .collect(Collectors.groupingBy(SendSettingDetailDTO::getCategoryCode));
+        List<SendSettingDetailTreeDTO> sendSettingDetailTreeDTOS = new ArrayList<>();
+        SendSettingDetailTreeDTO sendSettingDetailTreeDTO1 = new SendSettingDetailTreeDTO();
+        sendSettingDetailTreeDTO1.setParentId(0L);
+        sendSettingDetailTreeDTO1.setSequenceId(1L);
+        sendSettingDetailTreeDTO1.setName(LevelType.SITE.value());
+        sendSettingDetailTreeDTO1.setCode(ResourceType.SITE.value());
+        sendSettingDetailTreeDTO1.setParentId(0L);
+        //防止被过滤掉
+        sendSettingDetailTreeDTO1.setEmailTemplateId(0L);
+        sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO1);
+
+        SendSettingDetailTreeDTO sendSettingDetailTreeDTO2 = new SendSettingDetailTreeDTO();
+        sendSettingDetailTreeDTO2.setParentId(0L);
+        sendSettingDetailTreeDTO2.setSequenceId(2L);
+        sendSettingDetailTreeDTO2.setName(LevelType.ORGANIZATION.value());
+        sendSettingDetailTreeDTO2.setCode(ResourceType.ORGANIZATION.value());
+        sendSettingDetailTreeDTO2.setParentId(0L);
+        //防止被过滤掉
+        sendSettingDetailTreeDTO2.setEmailTemplateId(0L);
+        sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO2);
+
+        SendSettingDetailTreeDTO sendSettingDetailTreeDTO3 = new SendSettingDetailTreeDTO();
+        sendSettingDetailTreeDTO3.setParentId(0L);
+        sendSettingDetailTreeDTO3.setSequenceId(3L);
+        sendSettingDetailTreeDTO3.setName(LevelType.PROJECT.value());
+        sendSettingDetailTreeDTO3.setCode(ResourceType.PROJECT.value());
+        sendSettingDetailTreeDTO3.setParentId(0L);
+        //防止被过滤掉
+        sendSettingDetailTreeDTO3.setEmailTemplateId(0L);
+        sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO3);
+
+        Map<String, Set<String>> categoryMap = new HashMap<>();
+        categoryMap.put(ResourceType.SITE.value(), new HashSet<>());
+        categoryMap.put(ResourceType.ORGANIZATION.value(), new HashSet<>());
+        categoryMap.put(ResourceType.PROJECT.value(), new HashSet<>());
+        for (SendSettingDetailDTO sendSettingDTO : list) {
+            Set<String> categoryCodes = categoryMap.get(sendSettingDTO.getLevel());
+            if (categoryCodes != null) {
+                categoryCodes.add(sendSettingDTO.getCategoryCode());
+            }
+        }
+        getSecondSendSettingDetailTreeDTOS(categoryMap, sendSettingDetailTreeDTOS, list);
+
+
+        return sendSettingDetailTreeDTOS.stream().filter(s -> s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null)
+                .collect(Collectors.toList());
+    }
+
+    private void getSecondSendSettingDetailTreeDTOS(Map<String, Set<String>> categoryMap, List<SendSettingDetailTreeDTO> sendSettingDetailTreeDTOS, List<SendSettingDetailDTO> sendSettingDetailDTOS) {
+        int i = 4;
+        for (String level : categoryMap.keySet()) {
+            for (String categoryCode : categoryMap.get(level)) {
+                SendSettingDetailTreeDTO sendSettingDetailTreeDTO = new SendSettingDetailTreeDTO();
+                if (level.equals(ResourceType.SITE.value())) {
+                    sendSettingDetailTreeDTO.setParentId(1L);
+                } else if (level.equals(ResourceType.ORGANIZATION.value())) {
+                    sendSettingDetailTreeDTO.setParentId(2L);
+                } else {
+                    sendSettingDetailTreeDTO.setParentId(3L);
+                }
+
+                SendSettingCategoryDTO categoryDTO = new SendSettingCategoryDTO();
+                categoryDTO.setCode(categoryCode);
+                categoryDTO = sendSettingCategoryMapper.selectOne(categoryDTO);
+                sendSettingDetailTreeDTO.setName(categoryDTO.getName());
+                sendSettingDetailTreeDTO.setSequenceId((long) i);
+                sendSettingDetailTreeDTO.setCode(categoryDTO.getCode());
+                //防止被过滤掉
+                sendSettingDetailTreeDTO.setEmailTemplateId(0L);
+                sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO);
+                int secondParentId = i;
+                i = i + 1;
+
+                i = getThirdSendSettingDetailTreeDTOS(sendSettingDetailDTOS, level, categoryCode, secondParentId, sendSettingDetailTreeDTOS, i);
+
+            }
+        }
+    }
+
+    private int getThirdSendSettingDetailTreeDTOS(List<SendSettingDetailDTO> sendSettingDetailDTOS, String level, String categoryCode, Integer secondParentId, List<SendSettingDetailTreeDTO> sendSettingDetailTreeDTOS, Integer i) {
+        for (SendSettingDetailDTO sendSettingDetailDTO : sendSettingDetailDTOS) {
+            if (sendSettingDetailDTO.getLevel().equals(level) && sendSettingDetailDTO.getCategoryCode().equals(categoryCode)) {
+                SendSettingDetailTreeDTO sendSettingDetailTreeDTO = new SendSettingDetailTreeDTO();
+                BeanUtils.copyProperties(sendSettingDetailDTO, sendSettingDetailTreeDTO);
+                sendSettingDetailTreeDTO.setParentId((long) secondParentId);
+                sendSettingDetailTreeDTO.setSequenceId((long) i);
+                sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO);
+                i = i + 1;
+            }
+        }
+        return i;
     }
 
 

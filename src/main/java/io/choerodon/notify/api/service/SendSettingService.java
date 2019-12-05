@@ -1,10 +1,7 @@
 package io.choerodon.notify.api.service;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.notify.api.dto.MessageServiceVO;
-import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
-import io.choerodon.notify.api.dto.SendSettingVO;
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.vo.WebHookVO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
@@ -19,7 +16,7 @@ public interface SendSettingService {
 
     void createByScan(Set<NotifyBusinessTypeScanData> businessTypes);
 
-    Map<String, List<SendSettingDetailDTO>> queryByLevelAndAllowConfig(String level, boolean allowConfig);
+    List<SendSettingDetailTreeDTO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
 
     void delete(Long id);
 
