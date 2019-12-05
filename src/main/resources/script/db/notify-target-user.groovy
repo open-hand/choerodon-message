@@ -10,7 +10,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-target-user.groovy') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }
             column(name: 'TYPE', type: 'VARCHAR(64)', remarks: '接收对象类型。比如经办人，报告人，指定用户等。')
-            column(name: 'USER_ID', type: 'BIGINT UNSIGNED', remarks: '接收对象ID，具体只存指定接收对象的ID。')
+            column(name: 'USER_ID', type: 'VARCHAR(225)', remarks: '接收对象ID，具体只存指定接收对象的ID。')
             column(name: 'MESSAGE_SETTING_ID', type: 'BIGINT UNSIGNED', remarks: 'notify-message-setting的ID')
 
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")

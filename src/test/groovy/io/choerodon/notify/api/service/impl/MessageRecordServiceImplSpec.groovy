@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.service.impl
 
-import io.choerodon.notify.api.pojo.RecordStatus
+
 import io.choerodon.notify.api.service.EmailSendService
 import io.choerodon.notify.api.service.MessageRecordService
 import io.choerodon.notify.domain.Record
