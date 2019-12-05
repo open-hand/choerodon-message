@@ -9,9 +9,9 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
   },
   fields: [
     { name: 'type', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
-    { name: 'pm', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pm` }) },
-    { name: 'email', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.email` }) },
-    { name: 'sms', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.sms` }) },
+    { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
+    { name: 'emailEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
+    { name: 'smsEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.smsEnable` }) },
     { name: 'noticeObject', type: 'string', label: formatMessage({ id: `${intlPrefix}.noticeObject` }) },
   ],
   queryFields: [],

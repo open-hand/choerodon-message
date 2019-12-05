@@ -671,10 +671,17 @@ const projectNotify = {
   'project.notify.tabs.resource': '资源删除验证',
   'project.notify.tabs.webhook': 'Webhook配置',
   'project.notify.type': '信息类型',
-  'project.notify.pm': '站内信',
-  'project.notify.email': '邮件',
-  'project.notify.sms': '短信',
+  'project.notify.pmEnable': '站内信',
+  'project.notify.emailEnable': '邮件',
+  'project.notify.smsEnable': '短信',
   'project.notify.noticeObject': '通知对象',
+};
+
+const receiveSetting = {
+  'receive.type': '信息类型',
+  'receive.type.pm': '站内信',
+  'receive.type.email': '邮件',
+  'receive.type.sms': '短信',
 };
 
 /* eslint-disable-next-line */
@@ -1848,6 +1855,7 @@ const zh_CN = {
   // page
   ...pageDetail,
   ...projectNotify,
+  ...receiveSetting,
 
 };
 /* eslint-disable-next-line */

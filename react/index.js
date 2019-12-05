@@ -11,7 +11,7 @@ const mailSetting = asyncRouter(() => import('./routes/NotifySetting/mail-settin
 const msgRecord = asyncRouter(() => import('./routes/global/msg-record'));
 const announcement = asyncRouter(() => import('./routes/announcement'));
 const userMsg = asyncRouter(() => import('./routes/user/user-msg'));
-const receiveSetting = asyncRouter(() => import('./routes/user/receive-setting'));
+const receiveSetting = asyncRouter(() => import('./routes/receive-setting'));
 const smsTemplate = asyncRouter(() => import('./routes/global/sms-template'));
 const smsSetting = asyncRouter(() => import('./routes/NotifySetting/sms-setting'));
 const notifySetting = asyncRouter(() => import('./routes/NotifySetting'));

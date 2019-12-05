@@ -21,7 +21,7 @@ export default props => {
 
   function handlePmChange(value) {
     const record = tableDs.current;
-    record.set('pm', value);
+    record.set('pmEnable', value);
   }
   
   function renderCheckBoxHeader(dataSet, name) {
@@ -54,10 +54,10 @@ export default props => {
       <Breadcrumb />
       <Content className={`${prefixCls}-devops-content`}>
         <Table dataSet={tableDs}>
-          <Column name="type" />
-          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="noticeObject" />
+          <Column name="name" />
+          <Column name="pmEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="emailEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
+          <Column name="targetUserDTOS" />
         </Table>
       </Content>
     </Fragment>
