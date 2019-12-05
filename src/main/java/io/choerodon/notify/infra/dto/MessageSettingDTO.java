@@ -1,12 +1,15 @@
 package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
-import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
 
+import io.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.*;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
 import java.util.List;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * User: Mr.Wang
@@ -27,35 +30,14 @@ public class MessageSettingDTO extends BaseDTO {
     private Boolean pmEnable;
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
-    @ApiModelProperty(value = "版本号")
-    private Long objectVersionNumber;
     @ApiModelProperty(value = "消息设置的分组")
     private transient String category;
-    @ApiModelProperty(value = "分组的id")
-    private transient Long categoryId;
     @ApiModelProperty(value = "消息接收对象")
-    private List<TargetUserDTO> targetUserDTOS;
+    private transient List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
     private transient String name;
-
-    public MessageSettingDTO() {
-
-    }
-
-
-    public MessageSettingDTO(String code) {
-        this.code = code;
-    }
-
-    @Override
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    @Override
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
+    @ApiModelProperty(value = "分组的id")
+    private transient Long categoryId;
 
     public Long getCategoryId() {
         return categoryId;
@@ -146,7 +128,7 @@ public class MessageSettingDTO extends BaseDTO {
                 ", projectId=" + projectId +
                 ", pmEnable=" + pmEnable +
                 ", emailEnable=" + emailEnable +
-                ", objectVersionNumber=" + objectVersionNumber +
+                ", objectVersionNumber=" + super.getObjectVersionNumber() +
                 ", category='" + category + '\'' +
                 ", categoryId=" + categoryId +
                 ", targetUserDTOS=" + targetUserDTOS +

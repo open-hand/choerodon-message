@@ -1,10 +1,13 @@
 package io.choerodon.notify.api.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TargetUserMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -27,6 +30,9 @@ import java.util.stream.Stream;
 public class MessageSettingServiceImpl implements MessageSettingService {
     @Autowired
     private MessageSettingMapper messageSettingMapper;
+
+    @Autowired
+    private SendSettingMapper sendSettingMapper;
 
     @Autowired
     private TargetUserMapper targetUserMapper;
