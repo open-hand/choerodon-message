@@ -82,4 +82,10 @@ public interface SendSettingService {
      * @return 消息服务信息
      */
     MessageServiceVO forbiddenConfiguration(Long id);
+    /**
+     * 根据code查询发送设置
+     * @param code
+     * @return
+     */
+    SendSettingDTO queryByCode(String code);
 }

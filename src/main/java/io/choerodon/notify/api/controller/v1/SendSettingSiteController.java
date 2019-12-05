@@ -117,4 +117,10 @@ public class SendSettingSiteController {
     public ResponseEntity<MessageServiceVO> forbiddenConfig(@PathVariable("id") Long id) {
         return new ResponseEntity<>(sendSettingService.forbiddenConfiguration(id), HttpStatus.OK);
     }
+    @GetMapping("/codes/{code}")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "根据code查询发送设置")
+    public ResponseEntity<SendSettingDTO> queryByCode(@PathVariable("code") String code) {
+        return new ResponseEntity<>(sendSettingService.queryByCode(code), HttpStatus.OK);
+    }
 }
