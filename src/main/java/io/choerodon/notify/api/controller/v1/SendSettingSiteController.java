@@ -7,7 +7,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.MsgServiceTreeVO;
-import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.SendSettingDetailTreeDTO;
 import io.choerodon.notify.api.dto.SendSettingVO;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -69,7 +68,7 @@ public class SendSettingSiteController {
     @GetMapping("/list/allow_config")
     @Permission(permissionLogin = true)
     @ApiOperation(value = "根据层级查询未禁用通知配置的启用状态的发送设置列表")
-    public ResponseEntity<Map<String, List<SendSettingDetailDTO>>> listLevelAndAllowConfig(@RequestParam(name = "source_type", required = false) String level) {
+    public ResponseEntity<List<SendSettingDetailTreeDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type", required = false) String level) {
         return new ResponseEntity<>(sendSettingService.queryByLevelAndAllowConfig(level, true), HttpStatus.OK);
     }
 
