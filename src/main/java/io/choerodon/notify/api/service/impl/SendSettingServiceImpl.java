@@ -76,6 +76,10 @@ public class SendSettingServiceImpl implements SendSettingService {
                 query.setDescription(sendSettingDTO.getDescription());
                 query.setLevel(sendSettingDTO.getLevel());
                 query.setCategoryCode(sendSettingDTO.getCategoryCode());
+                query.setPmEnabledFlag(sendSettingDTO.getPmEnabledFlag());
+                query.setEmailEnabledFlag(sendSettingDTO.getEmailEnabledFlag());
+                query.setSmsEnabledFlag(sendSettingDTO.getSmsEnabledFlag());
+                query.setWebhookEnabledFlag(sendSettingDTO.getWebhookEnabledFlag());
                 sendSettingMapper.updateByPrimaryKeySelective(query);
             }
 
