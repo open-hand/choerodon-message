@@ -385,8 +385,8 @@ public class SendSettingServiceImpl implements SendSettingService {
         if (queryDTO == null) {
             MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
             BeanUtils.copyProperties(typeScanData, messageSettingDTO);
-            messageSettingDTO.setEmailEnable(typeScanData.getEmailEnabledFlag());
-            messageSettingDTO.setPmEnable(typeScanData.getPmEnabledFlag());
+            messageSettingDTO.setEmailEnable(typeScanData.getProEmailEnabledFlag());
+            messageSettingDTO.setPmEnable(typeScanData.getProPmEnabledFlag());
             messageSettingMapper.insertSelective(messageSettingDTO);
             if (typeScanData.getTargetUserType().length > 0) {
                 for (String targetUserType : typeScanData.getTargetUserType()) {
@@ -397,8 +397,8 @@ public class SendSettingServiceImpl implements SendSettingService {
                 }
             }
         } else {
-            queryDTO.setPmEnable(typeScanData.getPmEnabledFlag());
-            queryDTO.setEmailEnable(typeScanData.getEmailEnabledFlag());
+            queryDTO.setPmEnable(typeScanData.getProPmEnabledFlag());
+            queryDTO.setEmailEnable(typeScanData.getProEmailEnabledFlag());
             queryDTO.setNotifyType(typeScanData.getNotifyType());
             if (messageSettingMapper.updateByPrimaryKeySelective(queryDTO) != 1) {
                 throw new CommonException("error.insert.message.setting");
