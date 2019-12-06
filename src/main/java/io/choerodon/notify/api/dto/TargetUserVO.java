@@ -12,7 +12,7 @@ public class TargetUserVO {
     @ApiModelProperty("接收消息对象的类型")
     private String type;
     @ApiModelProperty("接收消息对象的id")
-    private String userId;
+    private Long userId;
     @ApiModelProperty("平台设置表的id")
     private Long messageSettingId;
     @ApiModelProperty(value = "版本号")
@@ -42,11 +42,11 @@ public class TargetUserVO {
         this.type = type;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

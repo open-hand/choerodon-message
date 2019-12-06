@@ -2,19 +2,26 @@ package io.choerodon.notify.api.service.impl;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.MessageSettingVO;
+import io.choerodon.notify.api.dto.TargetUserVO;
+import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
+import io.choerodon.notify.infra.enums.TargetUserType;
+import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.TargetUserMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -28,14 +35,18 @@ import java.util.stream.Stream;
  */
 @Service
 public class MessageSettingServiceImpl implements MessageSettingService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageSettingServiceImpl.class);
     @Autowired
     private MessageSettingMapper messageSettingMapper;
+
+    @Autowired
+    private TargetUserMapper targetUserMapper;
 
     @Autowired
     private SendSettingMapper sendSettingMapper;
 
     @Autowired
-    private TargetUserMapper targetUserMapper;
+    private UserFeignClient userFeignClient;
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -115,40 +126,26 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
     @Override
-    public Long[] checkTargetUser(Long projectId, String ids, String code) {
-        if (StringUtils.isEmpty(ids)) {
-            return new Long[0];
-        }
-        //校验接收对象是否正确
-        Set<Long> idsList = new HashSet<>();
+    public List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code) {
+        //校验接收对象是否正确,校验三个部分组成 平台层设置，项目层设置，个人接收设置
+        //1.检验项目层发送设置是否存在，不存在就返回空集合
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
         messageSettingDTO.setCode(code);
         messageSettingDTO.setProjectId(projectId);
         MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(messageSettingDTO);
         if (Objects.isNull(messageSettingDTO1)) {
-            return new Long[0];
+            LOGGER.warn(">>>CANCEL_SENDING>>> The message setting code does not exist.[INFO:message_setting_code:'{}']", code);
+            return Collections.emptyList();
         }
+        //2.发送设置存在返回该设置下的接收对象
         TargetUserDTO targetUserDTO = new TargetUserDTO();
         targetUserDTO.setMessageSettingId(messageSettingDTO1.getId());
         List<TargetUserDTO> targetUserDTOS = targetUserMapper.select(targetUserDTO);
         if (targetUserDTOS == null || targetUserDTOS.size() == 0) {
-            return new Long[0];
+            LOGGER.warn(">>>CANCEL_SENDING>>> The message target user does not exist.[INFO:message_target_user_code:'{}']",
+                    code);
+            return Collections.emptyList();
         }
-        String idsStr = targetUserDTOS.stream()
-                .filter(e -> !Objects.isNull(e.getUserId()))
-                .map(e -> e.getUserId())
-                .collect(Collectors.joining(","));
-        Set<Long> targetIds = Stream.of(idsStr.split(",")).map(e -> Long.valueOf(e)).collect(Collectors.toSet());
-        Set<Long> originalIds = new HashSet<>();
-        if (ids.contains(",")) {
-            Set<Long> longSet = Arrays.stream(ids.trim().split(",")).map(e -> Long.valueOf(e)).collect(Collectors.toSet());
-            originalIds.addAll(longSet);
-        } else {
-            originalIds.add(Long.valueOf(ids));
-        }
-        Set<Long> allowTargetIds = new HashSet<>();
-        allowTargetIds.addAll(targetIds);
-        allowTargetIds.retainAll(originalIds);
-        return allowTargetIds.toArray(new Long[allowTargetIds.size()]);
+        return targetUserDTOS.stream().map(e -> modelMapper.map(e, TargetUserVO.class)).collect(Collectors.toList());
     }
 }

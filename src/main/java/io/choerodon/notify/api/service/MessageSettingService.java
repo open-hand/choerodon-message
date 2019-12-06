@@ -1,6 +1,7 @@
 package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.api.dto.MessageSettingVO;
+import io.choerodon.notify.api.dto.TargetUserVO;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ public interface MessageSettingService {
 
     void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
 
-    Long[] checkTargetUser(Long projectId, String ids, String code);
+    List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code);
 }

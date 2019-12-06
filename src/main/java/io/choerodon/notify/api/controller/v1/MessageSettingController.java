@@ -4,10 +4,13 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.core.notify.NoticeSendDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.SendSettingDetailDTO;
+import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
+import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +27,7 @@ import java.util.Optional;
  * Date: 2019/12/3
  */
 @RestController
-@RequestMapping("v1/projects/{project_id}/message/setting")
+@RequestMapping("v1/notices/{project_id}/message/setting")
 @Api("发送消息设置接口")
 public class MessageSettingController {
     @Autowired
@@ -50,14 +53,13 @@ public class MessageSettingController {
         messageSettingService.updateMessageSetting(projectId, messageSettingVOS);
     }
 
-    @GetMapping("/check_target_user")
+    @GetMapping("/target/user/list")
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "项目层敏捷消息和devops消息发送前校验接收对象")
-    public ResponseEntity<Long[]> checkTargetUser(
+    public ResponseEntity<List<TargetUserVO>> getProjectLevelTargetUser(
             @PathVariable(value = "project_id") Long projectId,
-            @RequestParam String code,
-            @RequestParam String ids) {
-        return Optional.ofNullable(messageSettingService.checkTargetUser(projectId, ids, code))
+            @RequestParam String code) {
+        return Optional.ofNullable(messageSettingService.getProjectLevelTargetUser(projectId, code))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
     }
