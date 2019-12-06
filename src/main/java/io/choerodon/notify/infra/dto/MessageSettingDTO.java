@@ -2,9 +2,9 @@ package io.choerodon.notify.infra.dto;
 
 import io.choerodon.mybatis.entity.BaseDTO;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.List;
 

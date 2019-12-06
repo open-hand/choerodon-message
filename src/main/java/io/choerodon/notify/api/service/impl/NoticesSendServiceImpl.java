@@ -48,6 +48,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     private AsgardFeignClient asgardFeignClient;
     private SmsService smsService;
     private NotifyScheduleRecordMapper notifyScheduleRecordMapper;
+    private MessageSettingService messageSettingService;
 
     public NoticesSendServiceImpl(EmailSendService emailSendService,
                                   @Qualifier("pmWsSendService") WebSocketSendService webSocketSendService,
@@ -56,7 +57,8 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                                   UserFeignClient userFeignClient,
                                   AsgardFeignClient asgardFeignClient,
                                   SmsService smsService,
-                                  NotifyScheduleRecordMapper notifyScheduleRecordMapper) {
+                                  NotifyScheduleRecordMapper notifyScheduleRecordMapper,
+                                  MessageSettingService messageSettingService) {
         this.emailSendService = emailSendService;
         this.webSocketSendService = webSocketSendService;
         this.webHookService = webHookService;
@@ -66,6 +68,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         this.smsService = smsService;
         this.asgardFeignClient = asgardFeignClient;
         this.notifyScheduleRecordMapper = notifyScheduleRecordMapper;
+        this.messageSettingService = messageSettingService;
     }
 
     //单元测试
@@ -155,6 +158,10 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         }
         // 1.获取发送对象
         Set<UserDTO> users = getNeedSendUsers(noticeSendDTO);
+
+        //1.5 项目层校验发送对象
+//        messageSettingService.checkTargetUser(users,noticeSendDTO.getCode())
+
         // 2.获取是否启用自定义发送类型
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
@@ -253,7 +260,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             //1.获取邮件接收用户
             Set<String> mobiles = users.stream().map(UserDTO::getPhone).collect(Collectors.toSet());
             //2.发送邮件
-            webHookService.trySendWebHook(noticeSendDTO, sendSettingDTO,mobiles);
+            webHookService.trySendWebHook(noticeSendDTO, sendSettingDTO, mobiles);
         } catch (Exception e) {
             LOGGER.warn(">>>SENDING_WEBHOOL_ERROR>>> An error occurred while sending the message.", e);
         }
