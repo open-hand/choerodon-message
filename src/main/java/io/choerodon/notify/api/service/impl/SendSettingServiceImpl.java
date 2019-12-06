@@ -1,23 +1,10 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.*;
-import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.api.validator.CommonValidator;
-import io.choerodon.notify.api.vo.WebHookVO;
-import io.choerodon.notify.infra.dto.SendSettingCategoryDTO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
-import io.choerodon.notify.infra.dto.Template;
-import io.choerodon.notify.infra.enums.LevelType;
-import io.choerodon.notify.infra.mapper.SendSettingCategoryMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import io.choerodon.notify.infra.mapper.TemplateMapper;
-import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
-import io.choerodon.web.util.PageableHelper;
-import org.codehaus.jackson.map.util.BeanUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.notify.Level;
+import io.choerodon.core.notify.ServiceNotifyType;
+import io.choerodon.notify.api.dto.*;
+import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.api.validator.CommonValidator;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.*;
+import io.choerodon.notify.infra.enums.LevelType;
+import io.choerodon.notify.infra.mapper.*;
+import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
+import io.choerodon.web.util.PageableHelper;
 
 @Service
 public class SendSettingServiceImpl implements SendSettingService {
@@ -36,12 +34,17 @@ public class SendSettingServiceImpl implements SendSettingService {
     private SendSettingMapper sendSettingMapper;
     private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
+    private MessageSettingMapper messageSettingMapper;
+    private TargetUserMapper targetUserMapper;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper,
+                                  MessageSettingMapper messageSettingMapper, TargetUserMapper targetUserMapper) {
         this.sendSettingMapper = sendSettingMapper;
         this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
+        this.messageSettingMapper = messageSettingMapper;
+        this.targetUserMapper = targetUserMapper;
     }
 
     @Override
@@ -74,6 +77,10 @@ public class SendSettingServiceImpl implements SendSettingService {
                 query.setLevel(sendSettingDTO.getLevel());
                 query.setCategoryCode(sendSettingDTO.getCategoryCode());
                 sendSettingMapper.updateByPrimaryKeySelective(query);
+            }
+
+            if (t.getLevel().equals(Level.PROJECT.getValue()) && !t.getNotifyType().equals(ServiceNotifyType.DEFAULT_NOTIFY.getTypeName())) {
+                updateMsgSetting(t);
             }
         });
     }
@@ -360,6 +367,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         }
         return getMessageServiceVO(forbiddenDTO);
     }
+
     @Override
     public SendSettingDTO queryByCode(String code) {
         SendSettingDTO sendSettingDTO = new SendSettingDTO();
@@ -367,4 +375,71 @@ public class SendSettingServiceImpl implements SendSettingService {
         return sendSettingMapper.selectOne(sendSettingDTO);
     }
 
+    /**
+     * 更新MessageSetting
+     *
+     * @param typeScanData
+     */
+    private void updateMsgSetting(NotifyBusinessTypeScanData typeScanData) {
+        MessageSettingDTO queryDTO = messageSettingMapper.queryByCodeWithoutProjectId(typeScanData.getCode());
+        if (queryDTO == null) {
+            MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+            BeanUtils.copyProperties(typeScanData, messageSettingDTO);
+            messageSettingDTO.setEmailEnable(typeScanData.getEmailEnabledFlag());
+            messageSettingDTO.setPmEnable(typeScanData.getPmEnabledFlag());
+            messageSettingMapper.insertSelective(messageSettingDTO);
+            if (typeScanData.getTargetUserType().length > 0) {
+                for (String targetUserType : typeScanData.getTargetUserType()) {
+                    TargetUserDTO targetUserDTO = new TargetUserDTO();
+                    targetUserDTO.setMessageSettingId(messageSettingDTO.getId());
+                    targetUserDTO.setType(targetUserType);
+                    targetUserMapper.insertSelective(targetUserDTO);
+                }
+            }
+        } else {
+            queryDTO.setPmEnable(typeScanData.getPmEnabledFlag());
+            queryDTO.setEmailEnable(typeScanData.getEmailEnabledFlag());
+            queryDTO.setNotifyType(typeScanData.getNotifyType());
+            if (messageSettingMapper.updateByPrimaryKeySelective(queryDTO) != 1) {
+                throw new CommonException("error.insert.message.setting");
+            }
+            updateTargetUser(typeScanData, queryDTO.getId());
+        }
+    }
+
+    /**
+     * 更新targetUser
+     *
+     * @param typeScanData
+     * @param mgsSettingId
+     */
+    private void updateTargetUser(NotifyBusinessTypeScanData typeScanData, Long mgsSettingId) {
+        List<String> oldTypeList = targetUserMapper.listByMsgSettingId(mgsSettingId).stream().map(TargetUserDTO::getType).collect(Collectors.toList());
+        List<String> newTypeList = Arrays.asList(typeScanData.getTargetUserType());
+        List<String> typeList = new ArrayList<>(newTypeList);
+        if (oldTypeList != null) {
+            newTypeList.forEach(type -> {
+                if (oldTypeList.contains(type)) {
+                    oldTypeList.remove(type);
+                    typeList.remove(type);
+                }
+            });
+        }
+
+        if (oldTypeList != null) {
+            oldTypeList.forEach(oldType -> {
+                TargetUserDTO targetUserDTO = new TargetUserDTO();
+                targetUserDTO.setMessageSettingId(mgsSettingId);
+                targetUserDTO.setType(oldType);
+                targetUserMapper.delete(targetUserDTO);
+            });
+        }
+
+        typeList.forEach(newType -> {
+            TargetUserDTO targetUserDTO = new TargetUserDTO();
+            targetUserDTO.setMessageSettingId(mgsSettingId);
+            targetUserDTO.setType(newType);
+            targetUserMapper.insertSelective(targetUserDTO);
+        });
+    }
 }

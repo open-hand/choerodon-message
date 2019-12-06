@@ -15,8 +15,8 @@ spring:
       max-request-size: 30MB
   datasource:
     url: jdbc:mysql://localhost/notify_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true
-    username: choerodon
-    password: 123456
+    username: root
+    password: root
   mail:
     username: choerodon
     password: choerodon
@@ -85,4 +85,5 @@ logging:
   level:
     javax.mail: info
     io.choerodon.notify.service.impl.PmSendTask: info
+    io.choerodon.notify.infra.mapper: debug
 

@@ -89,4 +89,11 @@
         and nms.PROJECT_ID is null
         and  nms.NOTIFY_TYPE=#{messageSettingDTO.notifyType}
     </select>
+
+    <select id="queryByCodeWithoutProjectId" resultType="io.choerodon.notify.infra.dto.MessageSettingDTO">
+        SELECT
+            nms.*
+        FROM notify_message_setting nms
+        WHERE nms.`CODE`=#{code} and nms.PROJECT_ID is null
+    </select>
 </mapper>

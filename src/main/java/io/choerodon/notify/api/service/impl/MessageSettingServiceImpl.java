@@ -1,6 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.core.notify.NoticeSendDTO;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.dto.UserDTO;
@@ -38,6 +38,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSettingServiceImpl.class);
     @Autowired
     private MessageSettingMapper messageSettingMapper;
+
+    @Autowired
+    private SendSettingMapper sendSettingMapper;
 
     @Autowired
     private TargetUserMapper targetUserMapper;
