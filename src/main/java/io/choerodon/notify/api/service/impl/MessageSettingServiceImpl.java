@@ -128,7 +128,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     @Override
     public List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code) {
         //校验接收对象是否正确,校验三个部分组成 平台层设置，项目层设置，个人接收设置
-        //这里只校验项目层的
         //1.检验项目层发送设置是否存在，不存在就返回空集合
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
         messageSettingDTO.setCode(code);
