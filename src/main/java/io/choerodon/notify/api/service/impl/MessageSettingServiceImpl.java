@@ -40,9 +40,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private MessageSettingMapper messageSettingMapper;
 
     @Autowired
-    private SendSettingMapper sendSettingMapper;
-
-    @Autowired
     private TargetUserMapper targetUserMapper;
 
     @Autowired
