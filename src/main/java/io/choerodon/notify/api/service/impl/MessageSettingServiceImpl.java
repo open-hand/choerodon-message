@@ -154,12 +154,12 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
         messageSettingDTO.setProjectId(projectId);
         messageSettingDTO.setCode(code);
-        MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(messageSettingDTO);
+        MessageSettingDTO messageSettingDTO1 = messageSettingMapper.queryByCodeOrProjectId(messageSettingDTO);
         if (messageSettingDTO1 != null) {
             return modelMapper.map(messageSettingDTO1, MessageSettingVO.class);
         }
         messageSettingDTO.setProjectId(null);
-        MessageSettingDTO messageSettingDTO2 = messageSettingMapper.selectOne(messageSettingDTO);
+        MessageSettingDTO messageSettingDTO2 = messageSettingMapper.queryByCodeOrProjectId(messageSettingDTO);
         if (messageSettingDTO2 == null) {
             LOGGER.warn(">>>CANCEL_SENDING>>> The message setting code does not exist.[INFO:message_setting_code:'{}']", code);
             return null;
