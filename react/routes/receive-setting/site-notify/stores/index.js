@@ -8,7 +8,7 @@ import useStore from './useStore';
 
 const Store = createContext();
 
-export function useProjectNotifyStore() {
+export function useSiteNotifyStore() {
   return useContext(Store);
 }
 
@@ -16,11 +16,12 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
   const {
     children,
     intl: { formatMessage },
+    AppState: { getUserInfo: { id } },
   } = props;
   const intlPrefix = 'receive.setting.site';
 
-  const receiveStore = useMemo(() => useStore(), []);
-  const tableDs = useMemo(() => new DataSet(TableDataSet({ formatMessage, intlPrefix, receiveStore })), []);
+  const receiveStore = useStore();
+  const tableDs = useMemo(() => new DataSet(TableDataSet({ formatMessage, intlPrefix, receiveStore, userId: id })), []);
   const value = {
     ...props,
     intlPrefix,
