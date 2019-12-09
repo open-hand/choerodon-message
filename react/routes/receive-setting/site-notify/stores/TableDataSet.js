@@ -1,8 +1,8 @@
-export default ({ formatMessage, intlPrefix, receiveStore }) => {
+export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
   function isChecked(record, type, templateIdName) {
     const hasTemplateId = record.get(templateIdName);
-    const isCheck = hasTemplateId && !receiveStore.getReceiveData.some(({ sendSettingId, sourceId, sendingType }) => (
-      sendSettingId === record.get('id') && sourceId === record.get('parentId') && sendingType === type
+    const isCheck = hasTemplateId && !receiveStore.getReceiveData.some(({ sendSettingId, sendingType }) => (
+      sendSettingId === record.get('id') && sendingType === type
     ));
     record.init(type, isCheck);
   }
@@ -15,7 +15,7 @@ export default ({ formatMessage, intlPrefix, receiveStore }) => {
   }
 
   return ({
-    autoQuery: true,
+    autoQuery: false,
     selection: false,
     paging: false,
     transport: {
@@ -23,7 +23,7 @@ export default ({ formatMessage, intlPrefix, receiveStore }) => {
         url: '/notify/v1/notices/send_settings/list/allow_config?source_type=site',
         method: 'get',
       },
-      update: ({ data }) => {
+      submit: ({ data }) => {
         const res = [];
         data.forEach(({ pm, email, id }) => {
           if (!pm) {
@@ -32,6 +32,7 @@ export default ({ formatMessage, intlPrefix, receiveStore }) => {
               disable: true,
               sourceType: 'site',
               sendSettingId: id,
+              userId,
             });
           }
           if (!email) {
@@ -40,6 +41,7 @@ export default ({ formatMessage, intlPrefix, receiveStore }) => {
               disable: true,
               sourceType: 'site',
               sendSettingId: id,
+              userId,
             });
           }
         });

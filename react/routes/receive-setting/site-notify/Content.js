@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import { TabPage, Content, Breadcrumb } from '@choerodon/boot';
-import { Table, CheckBox } from 'choerodon-ui/pro';
-import { useProjectNotifyStore } from './stores';
+import { Content, Breadcrumb, Choerodon } from '@choerodon/boot';
+import { Table, CheckBox, Button } from 'choerodon-ui/pro';
+import { FormattedMessage } from 'react-intl';
+import { useSiteNotifyStore } from './stores';
 
 import './index.less';
 
@@ -13,20 +14,32 @@ export default props => {
     prefixCls,
     intl: { formatMessage },
     tableDs,
-  } = useProjectNotifyStore();
+  } = useSiteNotifyStore();
 
-  function handleCheckBoxHeaderChange(value, name) {
-    tableDs.forEach((record) => record.set(name, value));
+  function refresh() {
+    tableDs.reset();
   }
 
-  function handlePmChange(value) {
-    const record = tableDs.current;
-    record.set('pmEnable', value);
+  async function saveSettings() {
+    try {
+      await tableDs.submit();
+    } catch (e) {
+      Choerodon.handleResponseError(e);
+    }
+  }
+
+  function handleCheckBoxHeaderChange(value, name) {
+    tableDs.forEach((record) => {
+      const hasTemplateId = record.get(`${name}TemplateId`);
+      if (hasTemplateId) {
+        record.set(name, value);
+      }
+    });
   }
   
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name));
-    const pmRecords = tableDs.find((record) => record.get(name));
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && (record.get(`${name}TemplateId`)));
+    const pmRecords = tableDs.find((record) => record.get(name) && (record.get(`${name}TemplateId`)));
     return (
       <CheckBox
         checked={isChecked}
@@ -38,20 +51,21 @@ export default props => {
     );
   }
 
-  function renderCheckBox({ record, value, name }) {
-    const hasTemplateId = record.get(`${name}TemplateId`);
+  function renderCheckBox({ record, name }) {
+    const isDisabled = !record.get(`${name}TemplateId`);
     return (
       <CheckBox
         record={record}
         name={name}
-        checked={!!value}
-        disabled={!hasTemplateId}
+        checked={record.get(name)}
+        disabled={!!isDisabled}
+        onChange={(value) => record.set(name, value)}
       />
     );
   }
 
   function renderEditor(record, name) {
-    return !!record.get(`${name}TemplateId`);
+    return !!(record.get(`${name}TemplateId`));
   }
 
   return (
@@ -60,9 +74,34 @@ export default props => {
       <Content className={`${prefixCls}-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
-          <Column name="pm" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" editor={renderEditor} />
-          <Column name="email" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" editor={renderEditor} />
+          <Column
+            header={(dataSet) => renderCheckBoxHeader(dataSet, 'pm')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'pm' })}
+            align="left"
+            editor={(record) => renderEditor(record, 'pm')}
+          />
+          <Column
+            header={(dataSet) => renderCheckBoxHeader(dataSet, 'email')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'email' })}
+            align="left"
+            editor={(record) => renderEditor(record, 'email')}
+          />
         </Table>
+        <div style={{ marginTop: 25 }}>
+          <Button
+            funcType="raised"
+            color="primary"
+            onClick={saveSettings}
+          >
+            <FormattedMessage id="save" />
+          </Button>
+          <Button
+            funcType="raised"
+            onClick={refresh}
+            style={{ marginLeft: 16, color: '#3F51B5' }}
+          ><FormattedMessage id="cancel" />
+          </Button>
+        </div>
       </Content>
     </Fragment>
   );
