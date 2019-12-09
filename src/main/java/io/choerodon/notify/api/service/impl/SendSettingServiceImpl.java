@@ -108,7 +108,7 @@ public class SendSettingServiceImpl implements SendSettingService {
         getSecondSendSettingDetailTreeDTOS(categoryMap, sendSettingDetailTreeDTOS, list);
 
 
-        return sendSettingDetailTreeDTOS.stream().filter(s -> s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null)
+        return sendSettingDetailTreeDTOS.stream().filter(s -> (s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null) || s.getParentId() == 0)
                 .collect(Collectors.toList());
     }
 
