@@ -63,7 +63,7 @@
         GROUP BY m.CODE
     </select>
 
-    <select id="listMessageSettingDefault" resultMap="messageSettingDTO">
+    <select id="queryByCodeOrProjectId" resultMap="messageSettingDTO">
         SELECT
         nms.ID,
         nms.NOTIFY_TYPE,
@@ -86,8 +86,15 @@
         WHERE nms.ID=ntu.MESSAGE_SETTING_ID
         and nms.`CODE`=nss.`CODE`
         and nss.CATEGORY_CODE=nssc.`CODE`
-        and nms.PROJECT_ID is null
-        and  nms.NOTIFY_TYPE=#{messageSettingDTO.notifyType}
+        <if test="messageSettingDTO.code !=null and messageSettingDTO.code !=null">
+            and nss.code=#{messageSettingDTO.code}
+        </if>
+        <if test="messageSettingDTO.projectId == '' or messageSettingDTO.projectId ==null ">
+            and nms.PROJECT_ID is NULL
+        </if>
+        <if test="messageSettingDTO.projectId !=null and messageSettingDTO.projectId !=null">
+            and nms.PROJECT_ID =#{messageSettingDTO.projectId}
+        </if>
     </select>
 
     <select id="queryByCodeWithoutProjectId" resultType="io.choerodon.notify.infra.dto.MessageSettingDTO">

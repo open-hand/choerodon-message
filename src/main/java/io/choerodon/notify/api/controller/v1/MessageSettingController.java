@@ -12,6 +12,7 @@ import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,5 +63,15 @@ public class MessageSettingController {
         return Optional.ofNullable(messageSettingService.getProjectLevelTargetUser(projectId, code))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
+    }
+    @GetMapping("/{code}")
+    @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
+    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
+    public ResponseEntity<MessageSettingVO> getMessageSetting(
+            @PathVariable(value = "project_id") Long projectId,
+            @PathVariable String code) {
+        return Optional.ofNullable(messageSettingService.getMessageSetting(projectId, code))
+                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+                .orElseThrow(() -> new CommonException("error.messageSetting.query"));
     }
 }

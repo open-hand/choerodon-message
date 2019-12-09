@@ -11,7 +11,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     List<MessageSettingDTO> listMessageSettingByCondition(@Param("projectId") Long projectId, @Param("messageSettingDTO") MessageSettingDTO messageSettingDTO);
 
-    List<MessageSettingDTO> listMessageSettingDefault(@Param("messageSettingDTO") MessageSettingDTO messageSettingDTO);
-
     MessageSettingDTO queryByCodeWithoutProjectId(@Param("code") String code);
+
+    List<MessageSettingDTO> queryByCodeOrProjectId(@Param("messageSettingDTO") MessageSettingDTO messageSettingDTO);
 }

@@ -148,4 +148,22 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         }
         return targetUserDTOS.stream().map(e -> modelMapper.map(e, TargetUserVO.class)).collect(Collectors.toList());
     }
+
+    @Override
+    public MessageSettingVO getMessageSetting(Long projectId, String code) {
+        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+        messageSettingDTO.setProjectId(projectId);
+        messageSettingDTO.setCode(code);
+        List<MessageSettingDTO> settingDTOS = messageSettingMapper.queryByCodeOrProjectId(messageSettingDTO);
+        if (settingDTOS != null && settingDTOS.size() > 0) {
+            return modelMapper.map(settingDTOS.get(0), MessageSettingVO.class);
+        }
+        messageSettingDTO.setProjectId(null);
+        List<MessageSettingDTO> messageSettingDTOS = messageSettingMapper.queryByCodeOrProjectId(messageSettingDTO);
+        if (messageSettingDTOS == null || messageSettingDTOS.size() == 0) {
+            LOGGER.warn(">>>CANCEL_SENDING>>> The message setting code does not exist.[INFO:message_setting_code:'{}']", code);
+            return null;
+        }
+        return modelMapper.map(messageSettingDTOS.get(0), MessageSettingVO.class);
+    }
 }
