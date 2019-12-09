@@ -69,7 +69,7 @@ public class MessageSettingController {
     @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
     public ResponseEntity<MessageSettingVO> getMessageSetting(
             @PathVariable(value = "project_id") Long projectId,
-            @RequestParam String code) {
+            @PathVariable String code) {
         return Optional.ofNullable(messageSettingService.getMessageSetting(projectId, code))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.query"));

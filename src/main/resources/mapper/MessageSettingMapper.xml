@@ -63,7 +63,7 @@
         GROUP BY m.CODE
     </select>
 
-    <select id="queryByCodeOrProjectId" resultType="io.choerodon.notify.infra.dto.MessageSettingDTO">
+    <select id="queryByCodeOrProjectId" resultMap="messageSettingDTO">
         SELECT
         nms.ID,
         nms.NOTIFY_TYPE,
@@ -87,7 +87,7 @@
         and nms.`CODE`=nss.`CODE`
         and nss.CATEGORY_CODE=nssc.`CODE`
         <if test="messageSettingDTO.code !=null and messageSettingDTO.code !=null">
-            nss.code=#{messageSettingDTO.code}
+            and nss.code=#{messageSettingDTO.code}
         </if>
         <if test="messageSettingDTO.projectId == '' or messageSettingDTO.projectId ==null ">
             and nms.PROJECT_ID is NULL
@@ -95,8 +95,6 @@
         <if test="messageSettingDTO.projectId !=null and messageSettingDTO.projectId !=null">
             and nms.PROJECT_ID =#{messageSettingDTO.projectId}
         </if>
-
-
     </select>
 
     <select id="queryByCodeWithoutProjectId" resultType="io.choerodon.notify.infra.dto.MessageSettingDTO">
