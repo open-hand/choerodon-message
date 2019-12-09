@@ -8,11 +8,10 @@ import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.ext.InsertException;
 import io.choerodon.core.oauth.DetailsHelper;
-import io.choerodon.notify.api.dto.EmailConfigDTO;
-import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.dto.ScheduleTaskDTO;
-import io.choerodon.notify.api.dto.UserDTO;
+import io.choerodon.notify.api.dto.*;
 import io.choerodon.notify.api.service.*;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.NotifyScheduleRecordDTO;
 import io.choerodon.notify.infra.dto.ReceiveSettingDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
@@ -162,12 +161,34 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         // 2.获取是否启用自定义发送类型
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
+        //项目层的是否有设置，如果没有则不发送
+        MessageSettingVO messageSettingVO = messageSettingService.getMessageSetting(noticeSendDTO.getSourceId(), noticeSendDTO.getCode());
+        if (Objects.isNull(messageSettingVO)) {
+            return;
+        }
         // 3.1.发送邮件
-        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag) && sendSettingDTO.getEmailEnabledFlag()) {
+        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag)
+                && sendSettingDTO.getEmailEnabledFlag()) {
+            //如果是项目层，项目层消息设置需开启才能发送
+            if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel())) {
+                if (messageSettingVO.getEmailEnable()) {
+                    trySendEmail(noticeSendDTO, sendSettingDTO, users);
+                } else {
+                    return;
+                }
+            }
             trySendEmail(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.2.发送站内信
-        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage()) || !customizedSendingTypesFlag) && sendSettingDTO.getPmEnabledFlag()) {
+        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage()) || !customizedSendingTypesFlag)
+                && sendSettingDTO.getPmEnabledFlag()) {
+            if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel())) {
+                if (messageSettingVO.getPmEnable()) {
+                    trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
+                } else {
+                    return;
+                }
+            }
             trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.3.发送WebHook
