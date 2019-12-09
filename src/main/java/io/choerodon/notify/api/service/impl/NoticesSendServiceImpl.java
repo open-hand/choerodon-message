@@ -159,9 +159,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         // 1.获取发送对象
         Set<UserDTO> users = getNeedSendUsers(noticeSendDTO);
 
-        //1.5 项目层校验发送对象
-//        messageSettingService.checkTargetUser(users,noticeSendDTO.getCode())
-
         // 2.获取是否启用自定义发送类型
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());

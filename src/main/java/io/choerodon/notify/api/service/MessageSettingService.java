@@ -15,4 +15,6 @@ public interface MessageSettingService {
     void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
 
     List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code);
+
+    MessageSettingVO getMessageSetting(Long projectId, String code);
 }
