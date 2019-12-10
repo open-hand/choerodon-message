@@ -72,8 +72,7 @@
         <if test="projectId !=null and projectId !=null">
             and nms.PROJECT_ID =#{projectId} or nms.PROJECT_ID is NULL
         </if>
-        ORDER BY nms.ID DESC limit 1000
-        LIMIT 100
+        ORDER BY nms.ID DESC limit 100
         ) m
         GROUP BY m.CODE
     </select>
