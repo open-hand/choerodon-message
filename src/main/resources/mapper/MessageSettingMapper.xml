@@ -25,21 +25,21 @@
     <!--先按code分组，其次选中分组的第一行-->
     <select id="listMessageSettingByCondition" resultMap="messageSettingDTO">
         SELECT
-        any_value(m.ID),
-        any_value( m.NOTIFY_TYPE),
-        any_value(m.PROJECT_ID),
-        any_value(m.PM_ENABLE),
-        any_value(m.EMAIL_ENABLE),
-        any_value(m.CATEGORY),
-        any_value(m.CATEGORY_ID),
-        any_value(m.OBJECT_VERSION_NUMBER),
-        any_value(m.TYPE),
-        any_value(m.USER_ID),
-        any_value(m.MESSAGE_SETTING_ID),
-        any_value(m.U_ID),
-        any_value(m.`NAME`),
-        any_value( m.U_OBJECT_VERSION_NUMBER),
-        m.`CODE`
+        any_value(m.ID) AS ID,
+        any_value(m.NOTIFY_TYPE) AS NOTIFY_TYPE,
+        m.`CODE`,
+        any_value(m.PROJECT_ID) AS PROJECT_ID,
+        any_value(m.PM_ENABLE) AS PM_ENABLE,
+        any_value(m.EMAIL_ENABLE) AS EMAIL_ENABLE,
+        any_value(m.CATEGORY) AS CATEGORY,
+        any_value(m.CATEGORY_ID) AS CATEGORY_ID,
+        any_value(m.OBJECT_VERSION_NUMBER) AS OBJECT_VERSION_NUMBER,
+        any_value(m.TYPE) AS TYPE,
+        any_value(m.USER_ID) AS USER_ID,
+        any_value(m.MESSAGE_SETTING_ID) AS MESSAGE_SETTING_ID ,
+        any_value(m.U_ID) AS U_ID,
+        any_value(m.`NAME`) AS NAME,
+        any_value( m.U_OBJECT_VERSION_NUMBER) AS U_OBJECT_VERSION_NUMBER
         FROM ( SELECT
         nms.ID,
         nms.NOTIFY_TYPE,
