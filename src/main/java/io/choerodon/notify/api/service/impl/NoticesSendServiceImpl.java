@@ -136,7 +136,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         if (!ObjectUtils.isEmpty(noticeSendDTO) && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS()) {
             smsService.send(noticeSendDTO);
         }
-
         // 0.1 校验SendSetting是否存在 : 不存在 则 取消发送
         SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(new SendSettingDTO().setCode(noticeSendDTO.getCode()));
         if (ObjectUtils.isEmpty(sendSettingDTO)) {
@@ -161,39 +160,23 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         // 2.获取是否启用自定义发送类型
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
-        //项目层的是否有设置，如果没有则不发送
+        //项目层的设置
         MessageSettingVO messageSettingVO = messageSettingService.getMessageSetting(noticeSendDTO.getSourceId(), noticeSendDTO.getCode());
-        if (Objects.isNull(messageSettingVO)) {
-            return;
-        }
         // 3.1.发送邮件
         //自定义发送类型如果发送邮件，平台层设置开启则发送，没有自定义类型，平台层设置开启，则发送
-        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag)
-                && sendSettingDTO.getEmailEnabledFlag()) {
-            //如果是项目层，项目层消息设置需开启才能发送
-            if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel())) {
-                if (messageSettingVO.getEmailEnable()) {
-                    trySendEmail(noticeSendDTO, sendSettingDTO, users);
-                } else {
-                    return;
-                }
-            }
-            else {
-                trySendEmail(noticeSendDTO, sendSettingDTO, users);
-            }
+        //如果自定义发送，项目层没有设置的，并且平台层设置发送则发送
+        //如果是非自定义，平台层发送 项目层发送则发送
+        //如果是非自定义的并且在项目层不存在的 平台层发送就发送
+        if ((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail() && sendSettingDTO.getEmailEnabledFlag())
+                || (!customizedSendingTypesFlag && sendSettingDTO.getEmailEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getEmailEnable())
+                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getEmailEnabledFlag())) {
+            trySendEmail(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.2.发送站内信
-        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage()) || !customizedSendingTypesFlag)
-                && sendSettingDTO.getPmEnabledFlag()) {
-            if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel())) {
-                if (messageSettingVO.getPmEnable()) {
-                    trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
-                } else {
-                    return;
-                }
-            }else {
-                trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
-            }
+        if ((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage() && sendSettingDTO.getPmEnabledFlag())
+                || (!customizedSendingTypesFlag && sendSettingDTO.getPmEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getPmEnable())
+                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getPmEnabledFlag())) {
+            trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.3.发送WebHook
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {

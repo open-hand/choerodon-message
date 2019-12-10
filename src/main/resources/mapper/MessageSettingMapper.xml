@@ -22,8 +22,33 @@
         </collection>
     </resultMap>
 
+    <resultMap type="io.choerodon.notify.api.dto.MessageSettingCategoryDTO" id="messageSettingCategoryDTO">
+        <result column="CATEGORY_ID" property="id"/>
+        <result column="CATEGORY" property="name"/>
+        <collection property="messageSettingDTO" ofType="io.choerodon.notify.infra.dto.MessageSettingDTO">
+            <id column="id" property="id"/>
+            <result column="NOTIFY_TYPE" property="notifyType"/>
+            <result column="PROJECT_ID" property="projectId"/>
+            <result column="PM_ENABLE" property="pmEnable"/>
+            <result column="EMAIL_ENABLE" property="emailEnable"/>
+            <result column="CATEGORY" property="category"/>
+            <result column="CODE" property="code"/>
+            <result column="NAME" property="name"/>
+            <result column="CATEGORY_ID" property="categoryId"/>
+            <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
+            <collection property="targetUserDTOS" ofType="io.choerodon.notify.infra.dto.TargetUserDTO">
+                <id column="U_ID" property="id"/>
+                <result column="TYPE" property="type"/>
+                <result column="USER_ID" property="userId"/>
+                <result column="MESSAGE_SETTING_ID" property="messageSettingId"/>
+                <result column="U_OBJECT_VERSION_NUMBER" property="objectVersionNumber"/>
+            </collection>
+        </collection>
+
+    </resultMap>
+
     <!--先按code分组，其次选中分组的第一行-->
-    <select id="listMessageSettingByCondition" resultMap="messageSettingDTO">
+    <select id="listMessageSettingByCondition" resultMap="messageSettingCategoryDTO">
         SELECT
         any_value(m.ID) AS ID,
         any_value(m.NOTIFY_TYPE) AS NOTIFY_TYPE,

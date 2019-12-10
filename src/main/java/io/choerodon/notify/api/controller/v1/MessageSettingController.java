@@ -4,6 +4,7 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.service.MessageSettingService;
@@ -33,7 +34,7 @@ public class MessageSettingController {
     @PostMapping("/list")
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
     @ApiOperation(value = "根据消息类型模糊查询消息发送设置,消息类型为空查询所有,消息类型不为空")
-    public ResponseEntity<List<MessageSettingVO>> listMessageSetting(
+    public ResponseEntity<List<MessageSettingCategoryDTO>> listMessageSetting(
             @PathVariable(value = "project_id") Long projectId,
             @Valid @RequestBody MessageSettingVO messageSettingVO) {
         return Optional.ofNullable(messageSettingService.listMessageSetting(projectId, messageSettingVO))

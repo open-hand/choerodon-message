@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
+import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.service.MessageSettingService;
@@ -49,20 +50,16 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
     @Override
-    public List<MessageSettingVO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO) {
+    public List<MessageSettingCategoryDTO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO) {
         //如果根据project_id查不到数据，那么查默认的数据
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
         messageSettingDTO.setProjectId(projectId);
         List<MessageSettingDTO> settingDTOS = messageSettingMapper.select(messageSettingDTO);
         if (Objects.isNull(settingDTOS) || settingDTOS.size() == 0) {
-            return modelMapper.map(messageSettingMapper.listMessageSettingByCondition(null, modelMapper.map(messageSettingVO,
-                    MessageSettingDTO.class)), new TypeToken<List<MessageSettingVO>>() {
-            }.getType());
+            return messageSettingMapper.listMessageSettingByCondition(null, modelMapper.map(messageSettingVO, MessageSettingDTO.class));
         } else {
             //如果project_id在后端有数据，那么有的照旧，没有的用默认的数据补上
-            return modelMapper.map(messageSettingMapper.listMessageSettingByCondition(projectId, modelMapper.map(messageSettingVO,
-                    MessageSettingDTO.class)), new TypeToken<List<MessageSettingVO>>() {
-            }.getType());
+            return messageSettingMapper.listMessageSettingByCondition(projectId, modelMapper.map(messageSettingVO, MessageSettingDTO.class));
         }
     }
 
@@ -78,41 +75,47 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         TargetUserDTO targetUserDTO = new TargetUserDTO();
         messageSettingVOS.stream().forEach(e -> {
             messageSettingDTO.setProjectId(projectId);
+            messageSettingDTO.setCode(e.getCode());
             List<MessageSettingDTO> settingDTOS = messageSettingMapper.select(messageSettingDTO);
             //如果是首次修改则插入带ProjectId的数据
             if (Objects.isNull(settingDTOS) || settingDTOS.size() == 0) {
                 e.setProjectId(projectId);
-                messageSettingMapper.insertSelective(modelMapper.map(e, MessageSettingDTO.class));
+                e.setId(null);
+                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
+                MessageSettingDTO condition = new MessageSettingDTO();
+                condition.setProjectId(projectId);
+                condition.setCode(e.getCode());
+                MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(condition);
                 List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
                 targetUserDTOS.stream().forEach(v -> {
-                    targetUserDTO.setId(v.getId());
-                    targetUserDTO.setMessageSettingId(e.getId());
-                    targetUserDTO.setUserId(v.getUserId());
-                    targetUserDTO.setType(v.getType());
-                    targetUserMapper.insert(targetUserDTO);
+                    v.setId(null);
+                    v.setMessageSettingId(messageSettingDTO1.getId());
+                    targetUserMapper.insert(v);
                 });
             } else {
                 //否则修改原来的数据
-                List<MessageSettingDTO> settingDTOS1 = messageSettingMapper.listMessageSettingByCondition(projectId, messageSettingDTO);
                 //先删除targetUser
                 TargetUserDTO targetUserDTO1 = new TargetUserDTO();
                 targetUserDTO1.setMessageSettingId(e.getId());
-                int delete = targetUserMapper.delete(targetUserDTO1);
+                targetUserMapper.delete(targetUserDTO1);
                 //再删除MessageSetting
                 MessageSettingDTO messageSettingDTO1 = new MessageSettingDTO();
                 messageSettingDTO1.setId(e.getId());
-                int delete1 = messageSettingMapper.delete(messageSettingDTO1);
+                messageSettingMapper.delete(messageSettingDTO1);
 
                 //然后插入更新后的数据
                 e.setProjectId(projectId);
-                int i = messageSettingMapper.insertSelective(modelMapper.map(e, MessageSettingDTO.class));
+                e.setId(null);
+                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
                 List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
+                MessageSettingDTO condition = new MessageSettingDTO();
+                condition.setProjectId(projectId);
+                condition.setCode(e.getCode());
+                MessageSettingDTO messageSettingDTO2 = messageSettingMapper.selectOne(condition);
                 targetUserDTOS.stream().forEach(v -> {
-                    targetUserDTO1.setId(v.getId());
-                    targetUserDTO1.setMessageSettingId(e.getId());
-                    targetUserDTO1.setUserId(v.getUserId());
-                    targetUserDTO1.setType(v.getType());
-                    int insert = targetUserMapper.insert(targetUserDTO1);
+                    v.setId(null);
+                    v.setMessageSettingId(messageSettingDTO2.getId());
+                    targetUserMapper.insert(v);
                 });
             }
         });
