@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
+import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.service.MessageSettingService;
@@ -49,20 +50,16 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
     @Override
-    public List<MessageSettingVO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO) {
+    public List<MessageSettingCategoryDTO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO) {
         //如果根据project_id查不到数据，那么查默认的数据
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
         messageSettingDTO.setProjectId(projectId);
         List<MessageSettingDTO> settingDTOS = messageSettingMapper.select(messageSettingDTO);
         if (Objects.isNull(settingDTOS) || settingDTOS.size() == 0) {
-            return modelMapper.map(messageSettingMapper.listMessageSettingByCondition(null, modelMapper.map(messageSettingVO,
-                    MessageSettingDTO.class)), new TypeToken<List<MessageSettingVO>>() {
-            }.getType());
+            return messageSettingMapper.listMessageSettingByCondition(null, modelMapper.map(messageSettingVO, MessageSettingDTO.class));
         } else {
             //如果project_id在后端有数据，那么有的照旧，没有的用默认的数据补上
-            return modelMapper.map(messageSettingMapper.listMessageSettingByCondition(projectId, modelMapper.map(messageSettingVO,
-                    MessageSettingDTO.class)), new TypeToken<List<MessageSettingVO>>() {
-            }.getType());
+            return messageSettingMapper.listMessageSettingByCondition(projectId, modelMapper.map(messageSettingVO, MessageSettingDTO.class));
         }
     }
 
@@ -97,7 +94,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 });
             } else {
                 //否则修改原来的数据
-                List<MessageSettingDTO> settingDTOS1 = messageSettingMapper.listMessageSettingByCondition(projectId, messageSettingDTO);
                 //先删除targetUser
                 TargetUserDTO targetUserDTO1 = new TargetUserDTO();
                 targetUserDTO1.setMessageSettingId(e.getId());
