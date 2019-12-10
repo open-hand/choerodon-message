@@ -59,6 +59,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
     autoQuery: false,
     selection: false,
     paging: false,
+    autoQueryAfterSubmit: false,
     parentField: 'sourceId',
     idField: 'key',
     primaryKey: 'key',

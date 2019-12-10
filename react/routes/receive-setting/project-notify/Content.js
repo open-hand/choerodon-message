@@ -18,13 +18,9 @@ export default props => {
     AppState: { getUserInfo: { id } },
   } = useProjectNotifyStore();
 
-  async function loadInitData() {
+  async function refresh() {
     await receiveStore.loadReceiveData(id);
     tableDs.query();
-  }
-
-  function refresh() {
-    tableDs.reset();
   }
 
   async function saveSettings() {
