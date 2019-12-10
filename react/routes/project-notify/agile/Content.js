@@ -18,11 +18,6 @@ export default props => {
   function handlePmHeaderChange(value) {
     tableDs.forEach((record) => record.set('pmEnable', value));
   }
-
-  function handlePmChange(value) {
-    const record = tableDs.current;
-    record.set('pmEnable', value);
-  }
   
   function renderPmHeader(dataSet) {
     const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable'));
@@ -30,7 +25,7 @@ export default props => {
     return (
       <CheckBox
         checked={isChecked}
-        indeterminate={!!pmRecords}
+        indeterminate={!isChecked && !!pmRecords}
         onChange={handlePmHeaderChange}
       >
         {formatMessage({ id: `${intlPrefix}.pmEnable` })}
@@ -38,13 +33,13 @@ export default props => {
     );
   }
 
-  function renderPm({ record, value }) {
+  function renderPm({ record }) {
     return (
       <CheckBox
         record={record}
         name="pmEnable"
-        checked={value}
-        // onChange={handlePmChange}
+        checked={record.get('pmEnable')}
+        onChange={(value) => record.set('pmEnable', value)}
       />
     );
   }
@@ -55,7 +50,7 @@ export default props => {
       <Content className={`${prefixCls}-agile-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
-          <Column name="pmEnable" header={renderPmHeader} renderer={renderPm} align="left" />
+          <Column header={renderPmHeader} renderer={renderPm} align="left" />
           <Column name="targetUserDTOS" />
         </Table>
       </Content>

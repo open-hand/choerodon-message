@@ -4,14 +4,14 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
   paging: false,
   transport: {
     read: {
-      url: `/notify/v1/projects/${projectId}/message/setting/list`,
+      url: `/notify/v1/notices/${projectId}/message/setting/list`,
       method: 'post',
-      data: { notifyType: 'agileNotify' },
+      data: { notifyType: 'agile' },
     },
   },
   fields: [
     { name: 'name', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
-    { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pm` }) },
+    { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
     { name: 'targetUserDTOS', type: 'object', label: formatMessage({ id: `${intlPrefix}.noticeObject` }) },
   ],
   queryFields: [],

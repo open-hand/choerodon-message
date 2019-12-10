@@ -675,7 +675,13 @@ const projectNotify = {
   'project.notify.pmEnable': '站内信',
   'project.notify.emailEnable': '邮件',
   'project.notify.smsEnable': '短信',
+  'project.notify.sendPm': '站内信',
+  'project.notify.sendEmail': '邮件',
+  'project.notify.sendSms': '短信',
   'project.notify.noticeObject': '通知对象',
+  'project.notify.object.handler': '操作者',
+  'project.notify.object.owner': '项目所有者',
+  'project.notify.object.specifier': '指定用户',
 };
 
 const receiveSetting = {
