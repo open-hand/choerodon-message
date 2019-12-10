@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
-import { TabPage, Content, Breadcrumb } from '@choerodon/boot';
-import { Table, CheckBox } from 'choerodon-ui/pro';
+import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
+import { Table, CheckBox, Icon, Button } from 'choerodon-ui/pro';
+import { FormattedMessage } from 'react-intl';
 import { useAgileContentStore } from './stores';
+import MouserOverWrapper from '../../../components/mouseOverWrapper';
 
 import './index.less';
 
@@ -15,51 +17,116 @@ export default props => {
     tableDs,
   } = useAgileContentStore();
 
-  function handlePmHeaderChange(value, type) {
+  async function refresh() {
+    tableDs.query();
+  }
+
+  async function saveSettings() {
+    try {
+      await tableDs.submit();
+    } catch (e) {
+      Choerodon.handleResponseError(e);
+    }
+  }
+
+  function handleHeaderChange(value, type) {
     tableDs.forEach((record) => record.set(type, value));
   }
 
-  function handlePmChange(value) {
-    const record = tableDs.current;
-    record.set('pmEnable', value);
-  }
-  
-  function renderCheckBoxHeader(dataSet, name) {
+  function renderCheckBoxHeader(name) {
     const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name));
     const hasCheckedRecord = tableDs.find((record) => record.get(name));
     return (
       <CheckBox
         checked={isChecked}
-        indeterminate={!!hasCheckedRecord}
-        onChange={(value) => handlePmHeaderChange(value, name)}
+        indeterminate={!isChecked && !!hasCheckedRecord}
+        onChange={(value) => handleHeaderChange(value, name)}
       >
         {formatMessage({ id: `${intlPrefix}.${name}` })}
       </CheckBox>
     );
   }
 
-  function renderCheckBox({ record, value, name }) {
+  function handleCheckBoxChange({ record, value, name }) {
+    record.set(name, value);
+    if (!record.get('categoryId')) {
+      tableDs.forEach((tableRecord) => {
+        if (tableRecord.get('categoryId') === record.get('key')) {
+          tableRecord.set(name, value);
+        }
+      });
+    } else {
+      const parentRecord = tableDs.find((tableRecord) => record.get('categoryId') === tableRecord.get('key'));
+      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('categoryId') && !tableRecord.get(name));
+      parentRecord.set(name, parentIsChecked);
+    }
+  }
+
+  function renderCheckBox({ record, name }) {
+    let isChecked = true;
+    let isIndeterminate = false;
+    if (!record.get('categoryId')) {
+      isChecked = !tableDs.find((tableRecord) => tableRecord.get('categoryId') === record.get('key') && !tableRecord.get(name));
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('categoryId') === record.get('key') && tableRecord.get(name));
+    }
     return (
       <CheckBox
         record={record}
         name={name}
-        checked={value}
-        // onChange={handlePmChange}
+        checked={record.get(name)}
+        indeterminate={!isChecked && isIndeterminate}
+        onChange={(value) => handleCheckBoxChange({ record, value, name })}
       />
     );
+  }
+
+  function renderNotifyObject({ record }) {
+    if (!record.get('categoryId')) {
+      return '-';
+    }
   }
 
   return (
     <Fragment>
       <Breadcrumb />
-      <Content className={`${prefixCls}-devops-content`}>
-        <Table dataSet={tableDs}>
+      <Content className={`${prefixCls}-resource-content`}>
+        <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
-          <Column name="pmEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="emailEnable" header={renderCheckBoxHeader} renderer={renderCheckBox} align="left" />
-          <Column name="targetUserDTOS" />
+          <Column
+            header={() => renderCheckBoxHeader('pmEnable')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable' })}
+            editor
+            width={150}
+            align="left"
+          />
+          <Column
+            header={() => renderCheckBoxHeader('emailEnable')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable' })}
+            editor
+            width={150}
+            align="left"
+          />
+          <Column
+            header={formatMessage({ id: `${intlPrefix}.noticeObject` })}
+            renderer={renderNotifyObject}
+          />
         </Table>
       </Content>
+      <div style={{ marginTop: 25, marginLeft: 24 }}>
+        <Button
+          funcType="raised"
+          color="primary"
+          onClick={saveSettings}
+        >
+          <FormattedMessage id="save" />
+        </Button>
+        <Button
+          funcType="raised"
+          onClick={refresh}
+          style={{ marginLeft: 16, color: '#3F51B5' }}
+        ><FormattedMessage id="cancel" />
+        </Button>
+      </div>
     </Fragment>
   );
 };
