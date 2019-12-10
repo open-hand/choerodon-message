@@ -167,6 +167,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             return;
         }
         // 3.1.发送邮件
+        //自定义发送类型如果发送邮件，平台层设置开启则发送，没有自定义类型，平台层设置开启，则发送
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail()) || !customizedSendingTypesFlag)
                 && sendSettingDTO.getEmailEnabledFlag()) {
             //如果是项目层，项目层消息设置需开启才能发送
@@ -177,7 +178,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                     return;
                 }
             }
-            trySendEmail(noticeSendDTO, sendSettingDTO, users);
+            else {
+                trySendEmail(noticeSendDTO, sendSettingDTO, users);
+            }
         }
         // 3.2.发送站内信
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage()) || !customizedSendingTypesFlag)
@@ -188,8 +191,9 @@ public class NoticesSendServiceImpl implements NoticesSendService {
                 } else {
                     return;
                 }
+            }else {
+                trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
             }
-            trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.3.发送WebHook
         if (((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
