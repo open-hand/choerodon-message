@@ -18,6 +18,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
     autoQuery: false,
     selection: false,
     paging: false,
+    autoQueryAfterSubmit: false,
     transport: {
       read: {
         url: '/notify/v1/notices/send_settings/list/allow_config?source_type=site',

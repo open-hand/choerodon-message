@@ -28,6 +28,7 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
     prefixCls: 'receive-setting-site',
     permissions: [],
     tableDs,
+    receiveStore,
   };
 
   async function loadInitData() {

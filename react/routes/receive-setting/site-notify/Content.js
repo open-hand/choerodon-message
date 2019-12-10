@@ -14,10 +14,12 @@ export default props => {
     prefixCls,
     intl: { formatMessage },
     tableDs,
+    receiveStore,
   } = useSiteNotifyStore();
 
-  function refresh() {
-    tableDs.reset();
+  async function refresh() {
+    await receiveStore.loadReceiveData();
+    tableDs.query();
   }
 
   async function saveSettings() {
