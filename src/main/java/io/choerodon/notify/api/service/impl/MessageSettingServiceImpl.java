@@ -1,14 +1,10 @@
 package io.choerodon.notify.api.service.impl;
 
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.TargetUserVO;
-import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
-import io.choerodon.notify.infra.enums.TargetUserType;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -21,13 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * User: Mr.Wang
