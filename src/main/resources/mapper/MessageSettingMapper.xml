@@ -24,8 +24,23 @@
 
     <!--先按code分组，其次选中分组的第一行-->
     <select id="listMessageSettingByCondition" resultMap="messageSettingDTO">
-        SELECT m.* FROM (
         SELECT
+        any_value(m.ID),
+        any_value( m.NOTIFY_TYPE),
+        any_value(m.PROJECT_ID),
+        any_value(m.PM_ENABLE),
+        any_value(m.EMAIL_ENABLE),
+        any_value(m.CATEGORY),
+        any_value(m.CATEGORY_ID),
+        any_value(m.OBJECT_VERSION_NUMBER),
+        any_value(m.TYPE),
+        any_value(m.USER_ID),
+        any_value(m.MESSAGE_SETTING_ID),
+        any_value(m.U_ID),
+        any_value(m.`NAME`),
+        any_value( m.U_OBJECT_VERSION_NUMBER),
+        m.`CODE`
+        FROM ( SELECT
         nms.ID,
         nms.NOTIFY_TYPE,
         nms.`CODE`,
