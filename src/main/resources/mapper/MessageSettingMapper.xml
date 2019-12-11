@@ -142,4 +142,67 @@
         FROM notify_message_setting nms
         WHERE nms.`CODE`=#{code} and nms.PROJECT_ID is null
     </select>
+    <select id="listCategoriesBySettingType" resultType="io.choerodon.notify.api.vo.NotifyEventGroupVO">
+        SELECT nssc.ID, nssc.NAME
+        FROM notify_message_setting nms
+        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
+        LEFT JOIN notify_send_setting_category nssc ON nssc.CODE = nss.CATEGORY_CODE
+        WHERE nms.NOTIFY_TYPE = #{notifyType}
+    </select>
+    <select id="listDefaultAndEnabledSettingByNotifyType"
+            resultType="io.choerodon.notify.api.vo.CustomMessageSettingVO">
+        SELECT
+            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,
+            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+            nssc.ID AS GROUP_ID
+        FROM notify_message_setting nms
+        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
+        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID IS NULL
+    </select>
+    <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
+        SELECT
+            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,
+            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+            nss.NAME
+            nssc.ID AS GROUP_ID
+            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        FROM notify_message_setting nms
+        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
+        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
+        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId}
+    </select>
+    <select id="listMessageSettingByProjectIdAndEnvId"
+            resultMap="customMessageSettingMap">
+        SELECT
+            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,
+            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+            nssc.ID AS GROUP_ID
+            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        FROM notify_message_setting nms
+        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
+        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
+        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId}
+    </select>
+    <resultMap id="customMessageSettingMap" type="io.choerodon.notify.api.vo.CustomMessageSettingVO">
+        <id property="id" column="ID"/>
+        <result property="projectId" column="PROJECT_ID"/>
+        <result property="envId" column="ENV_ID"/>
+        <result property="notifyType" column="NOTIFY_TYPE"/>
+        <result property="code" column="CODE"/>
+        <result property="smsEnable" column="SMS_ENABLE"/>
+        <result property="pmEnable" column="PM_ENABLE"/>
+        <result property="emailEnable" column="EMAIL_ENABLE"/>
+        <result property="objectVersionNumber" column="OBJECT_VERSION_NUMBER"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="name" column="NAME"/>
+        <collection property="userList" ofType="io.choerodon.notify.api.vo.TargetUserVO">
+            <id column="NMSTU_ID" property="id"/>
+            <result column="USER_ID" property="userId"/>
+            <result column="TYPE" property="type"/>
+            <result column="MESSAGE_SETTING_ID" property="messageSettingId"/>
+        </collection>
+    </resultMap>
 </mapper>
