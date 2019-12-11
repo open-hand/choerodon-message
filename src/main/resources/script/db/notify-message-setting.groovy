@@ -17,7 +17,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
             column(name: 'ENV_ID', type: 'BIGINT UNSIGNED',  remarks: '环境id')
             column(name: 'PM_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否发送站内信。1发送，0不发送')
             column(name: 'EMAIL_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '是否发送邮件。1发送，0不发送')
-            column(name: 'SMS_ENABLE', type: 'TINYINT UNSIGNED',  remarks: '是否发送短信', afterColumn: 'EMAIL_ENABLE')
+            column(name: 'SMS_ENABLE', type: 'TINYINT UNSIGNED',  remarks: '是否发送短信')
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")
             column(name: "CREATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "CREATION_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
