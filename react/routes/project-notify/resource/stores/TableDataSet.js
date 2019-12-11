@@ -1,3 +1,5 @@
+const objectTypes = ['sendHandler', 'sendOwner', 'sendSpecifier'];
+
 function formatData(data) {
   const newData = [];
   data.forEach((item) => {
@@ -25,14 +27,31 @@ function handleLoad({ dataSet }) {
       parentItemIsChecked({ dataSet, record, name: 'sendPm' });
       parentItemIsChecked({ dataSet, record, name: 'sendEmail' });
       parentItemIsChecked({ dataSet, record, name: 'sendSms' });
+    } else {
+      const notifyObject = [];
+      objectTypes.forEach((item) => {
+        if (record.get(item)) {
+          notifyObject.push(item);
+        }
+      });
+      record.init('notifyObject', notifyObject);
     }
   });
 }
 
-export default ({ formatMessage, intlPrefix, projectId }) => ({
+function handleUpdate({ record, value, name }) {
+  if (name === 'notifyObject' && value) {
+    objectTypes.forEach((item) => {
+      record.set(item, value.includes(item));
+    });
+  }
+}
+
+export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   autoQuery: true,
   selection: false,
   paging: false,
+  autoQueryAfterSubmit: false,
   parentField: 'envId',
   idField: 'key',
   primaryKey: 'key',
@@ -64,6 +83,11 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
             envId: Number(item.envId),
             projectId,
           };
+          if (item.sendSpecifier) {
+            obj.userList = item.userList.map((list) => ({ ...list, userId: list.id }));
+          } else {
+            obj.userList = [];
+          }
           newData.push(obj);
         }
       });
@@ -79,10 +103,12 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
     { name: 'sendEmail', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
     { name: 'sendPm', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
     { name: 'sendSms', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.smsEnable` }) },
-    { name: 'userList', type: 'object', textField: 'realName', valueField: 'id' },
+    { name: 'userList', type: 'object', textField: 'realName', valueField: 'id', options: userDs, multiple: true, label: '请选择' },
+    { name: 'notifyObject', type: 'object', multiple: true },
   ],
   queryFields: [],
   events: {
     load: handleLoad,
+    update: handleUpdate,
   },
 });
