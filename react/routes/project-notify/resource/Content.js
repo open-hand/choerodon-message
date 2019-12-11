@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
-import { TabPage, Content, Breadcrumb } from '@choerodon/boot';
-import { Table, CheckBox, Icon } from 'choerodon-ui/pro';
-import { useAgileContentStore } from './stores';
+import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
+import { Table, CheckBox, Icon, Dropdown, Button } from 'choerodon-ui/pro';
+import { FormattedMessage } from 'react-intl';
+import { useResourceContentStore } from './stores';
+import NotifyObject from './NotifyObject';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 
 import './index.less';
@@ -15,7 +17,19 @@ export default props => {
     intl: { formatMessage },
     tableDs,
     notifyObject,
-  } = useAgileContentStore();
+  } = useResourceContentStore();
+
+  async function refresh() {
+    tableDs.query();
+  }
+
+  async function saveSettings() {
+    try {
+      await tableDs.submit();
+    } catch (e) {
+      Choerodon.handleResponseError(e);
+    }
+  }
 
   function handleHeaderChange(value, type) {
     tableDs.forEach((record) => record.set(type, value));
@@ -74,23 +88,38 @@ export default props => {
     }
 
     const data = [];
-    const sendSpecifier = record.get('sendSpecifier');
     const userList = record.get('userList');
+    const recordObject = record.get('notifyObject');
     Object.keys(notifyObject).forEach((key) => {
-      if (record.get(key)) {
+      if (recordObject.includes(key)) {
         data.push(notifyObject[key]);
       }
     });
-    if (sendSpecifier && userList && userList.length) {
+    if (recordObject.includes('sendSpecifier') && userList && userList.length) {
       userList.forEach(({ realName }) => data.push(realName));
     }
 
+    // return (
+    //   <div>
+    //     <MouserOverWrapper width={0.2} text={data.join()}>
+    //       {data.join()}
+    //     </MouserOverWrapper>
+    //   </div>
+    // );
+
     return (
-      <div>
-        <MouserOverWrapper width={0.2} text={data.join()}>
-          {data.join()}
-        </MouserOverWrapper>
-      </div>
+      <Dropdown
+        overlay={<NotifyObject record={record} />}
+        trigger={['click']}
+        placement="bottomLeft"
+      >
+        <div className={`${prefixCls}-object-select`}>
+          <MouserOverWrapper width={0.15} text={data.join()}>
+            {data.join() || '-'}
+          </MouserOverWrapper>
+          <Icon type="arrow_drop_down" className={`${prefixCls}-object-select-icon`} />
+        </div>
+      </Dropdown>
     );
   }
 
@@ -127,6 +156,21 @@ export default props => {
           />
         </Table>
       </Content>
+      <div style={{ marginTop: 25, marginLeft: 24 }}>
+        <Button
+          funcType="raised"
+          color="primary"
+          onClick={saveSettings}
+        >
+          <FormattedMessage id="save" />
+        </Button>
+        <Button
+          funcType="raised"
+          onClick={refresh}
+          style={{ marginLeft: 16, color: '#3F51B5' }}
+        ><FormattedMessage id="cancel" />
+        </Button>
+      </div>
     </Fragment>
   );
 };
