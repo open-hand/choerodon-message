@@ -32,13 +32,33 @@ public class MessageSettingDTO extends BaseDTO {
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
     @ApiModelProperty(value = "消息设置的分组")
-    private transient String category;
+    private String category;
     @ApiModelProperty(value = "消息接收对象")
-    private transient List<TargetUserDTO> targetUserDTOS;
+    private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
-    private transient String name;
+    private String name;
     @ApiModelProperty(value = "分组的id")
-    private transient Long categoryId;
+    private Long categoryId;
+    @ApiModelProperty(value = "环境的id")
+    private Long envId;
+    @ApiModelProperty(value = "是否发送短信")
+    private Boolean smsEnable;
+
+    public Long getEnvId() {
+        return envId;
+    }
+
+    public void setEnvId(Long envId) {
+        this.envId = envId;
+    }
+
+    public Boolean getSmsEnable() {
+        return smsEnable;
+    }
+
+    public void setSmsEnable(Boolean smsEnable) {
+        this.smsEnable = smsEnable;
+    }
 
     public Long getCategoryId() {
         return categoryId;
