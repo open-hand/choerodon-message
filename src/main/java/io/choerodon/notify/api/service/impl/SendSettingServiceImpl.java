@@ -35,16 +35,16 @@ public class SendSettingServiceImpl implements SendSettingService {
     private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
     private MessageSettingMapper messageSettingMapper;
-    private TargetUserMapper targetUserMapper;
+    private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
     private final ModelMapper modelMapper = new ModelMapper();
 
     public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper,
-                                  MessageSettingMapper messageSettingMapper, TargetUserMapper targetUserMapper) {
+                                  MessageSettingMapper messageSettingMapper, MessageSettingTargetUserMapper messageSettingTargetUserMapper) {
         this.sendSettingMapper = sendSettingMapper;
         this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
         this.messageSettingMapper = messageSettingMapper;
-        this.targetUserMapper = targetUserMapper;
+        this.messageSettingTargetUserMapper = messageSettingTargetUserMapper;
     }
 
     @Override
@@ -388,7 +388,7 @@ public class SendSettingServiceImpl implements SendSettingService {
                     TargetUserDTO targetUserDTO = new TargetUserDTO();
                     targetUserDTO.setMessageSettingId(messageSettingDTO.getId());
                     targetUserDTO.setType(targetUserType);
-                    targetUserMapper.insertSelective(targetUserDTO);
+                    messageSettingTargetUserMapper.insertSelective(targetUserDTO);
                 }
             }
         } else {
@@ -409,7 +409,7 @@ public class SendSettingServiceImpl implements SendSettingService {
      * @param mgsSettingId
      */
     private void updateTargetUser(NotifyBusinessTypeScanData typeScanData, Long mgsSettingId) {
-        List<String> oldTypeList = targetUserMapper.listByMsgSettingId(mgsSettingId).stream().map(TargetUserDTO::getType).collect(Collectors.toList());
+        List<String> oldTypeList = messageSettingTargetUserMapper.listByMsgSettingId(mgsSettingId).stream().map(TargetUserDTO::getType).collect(Collectors.toList());
         List<String> newTypeList = Arrays.asList(typeScanData.getTargetUserType());
         List<String> typeList = new ArrayList<>(newTypeList);
         if (oldTypeList != null) {
@@ -426,7 +426,7 @@ public class SendSettingServiceImpl implements SendSettingService {
                 TargetUserDTO targetUserDTO = new TargetUserDTO();
                 targetUserDTO.setMessageSettingId(mgsSettingId);
                 targetUserDTO.setType(oldType);
-                targetUserMapper.delete(targetUserDTO);
+                messageSettingTargetUserMapper.delete(targetUserDTO);
             });
         }
 
@@ -434,7 +434,7 @@ public class SendSettingServiceImpl implements SendSettingService {
             TargetUserDTO targetUserDTO = new TargetUserDTO();
             targetUserDTO.setMessageSettingId(mgsSettingId);
             targetUserDTO.setType(newType);
-            targetUserMapper.insertSelective(targetUserDTO);
+            messageSettingTargetUserMapper.insertSelective(targetUserDTO);
         });
     }
 }

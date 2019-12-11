@@ -1,30 +1,15 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.exception.ext.InsertException;
-import io.choerodon.core.exception.ext.NotExistedException;
-import io.choerodon.core.exception.ext.UpdateException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.notify.api.dto.NoticeSendDTO;
-import io.choerodon.notify.api.service.SendSettingService;
-import io.choerodon.notify.api.service.TemplateService;
-import io.choerodon.notify.api.service.WebHookMessageSettingService;
-import io.choerodon.notify.api.service.WebHookService;
-import io.choerodon.notify.api.vo.WebHookVO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
-import io.choerodon.notify.infra.dto.Template;
-import io.choerodon.notify.infra.dto.WebHookDTO;
-import io.choerodon.notify.infra.dto.WebHookMessageSettingDTO;
-import io.choerodon.notify.infra.dto.WebhookRecordDTO;
-import io.choerodon.notify.infra.enums.RecordStatus;
-import io.choerodon.notify.infra.enums.SendingTypeEnum;
-import io.choerodon.notify.infra.enums.WebHookTypeEnum;
-import io.choerodon.notify.infra.mapper.MessegeSettingMapper;
-import io.choerodon.notify.infra.mapper.WebHookMapper;
-import io.choerodon.notify.infra.mapper.WebhookRecordMapper;
-import io.choerodon.web.util.PageableHelper;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +23,24 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.exception.ext.InsertException;
+import io.choerodon.core.exception.ext.NotExistedException;
+import io.choerodon.core.exception.ext.UpdateException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.notify.api.dto.NoticeSendDTO;
+import io.choerodon.notify.api.service.SendSettingService;
+import io.choerodon.notify.api.service.TemplateService;
+import io.choerodon.notify.api.service.WebHookMessageSettingService;
+import io.choerodon.notify.api.service.WebHookService;
+import io.choerodon.notify.api.vo.WebHookVO;
+import io.choerodon.notify.infra.dto.*;
+import io.choerodon.notify.infra.enums.RecordStatus;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
+import io.choerodon.notify.infra.enums.WebHookTypeEnum;
+import io.choerodon.notify.infra.mapper.WebHookMapper;
+import io.choerodon.notify.infra.mapper.WebhookRecordMapper;
+import io.choerodon.web.util.PageableHelper;
 
 @Service
 public class WebHookServiceImpl implements WebHookService {
@@ -59,16 +50,14 @@ public class WebHookServiceImpl implements WebHookService {
     private TemplateService templateService;
     private SendSettingService sendSettingService;
     private TemplateRender templateRender;
-    private MessegeSettingMapper messegeSettingMapper;
     private WebhookRecordMapper webhookRecordMapper;
 
-    public WebHookServiceImpl(WebHookMapper webHookMapper, WebHookMessageSettingService webHookMessageSettingService, TemplateService templateService, SendSettingService sendSettingService, TemplateRender templateRender, MessegeSettingMapper messegeSettingMapper, WebhookRecordMapper webhookRecordMapper) {
+    public WebHookServiceImpl(WebHookMapper webHookMapper, WebHookMessageSettingService webHookMessageSettingService, TemplateService templateService, SendSettingService sendSettingService, TemplateRender templateRender, WebhookRecordMapper webhookRecordMapper) {
         this.webHookMapper = webHookMapper;
         this.webHookMessageSettingService = webHookMessageSettingService;
         this.templateService = templateService;
         this.sendSettingService = sendSettingService;
         this.templateRender = templateRender;
-        this.messegeSettingMapper = messegeSettingMapper;
         this.webhookRecordMapper = webhookRecordMapper;
     }
 

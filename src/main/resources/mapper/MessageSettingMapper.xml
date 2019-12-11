@@ -81,7 +81,7 @@
         ntu.ID AS U_ID,
         nss.name,
         ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
-        FROM notify_message_setting nms , notify_target_user ntu
+        FROM notify_message_setting nms , notify_message_setting_target_user ntu
         , notify_send_setting nss
         , notify_send_setting_category nssc
         WHERE nms.ID=ntu.MESSAGE_SETTING_ID
@@ -119,7 +119,7 @@
         ntu.ID AS U_ID,
         nss.name,
         ntu.OBJECT_VERSION_NUMBER AS U_OBJECT_VERSION_NUMBER
-        FROM notify_message_setting nms , notify_target_user ntu
+        FROM notify_message_setting nms , notify_message_setting_target_user ntu
         , notify_send_setting  nss
         , notify_send_setting_category nssc
         WHERE nms.ID=ntu.MESSAGE_SETTING_ID

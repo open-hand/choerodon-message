@@ -66,4 +66,9 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             }
         }
     }
+
+    //todo scp
+    void syncAgileNotify() {
+
+    }
 }
