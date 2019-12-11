@@ -9,9 +9,8 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import io.choerodon.notify.infra.mapper.TargetUserMapper;
+import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private MessageSettingMapper messageSettingMapper;
 
     @Autowired
-    private TargetUserMapper targetUserMapper;
+    private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
 
     @Autowired
     private SendSettingMapper sendSettingMapper;
@@ -90,14 +89,14 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 targetUserDTOS.stream().forEach(v -> {
                     v.setId(null);
                     v.setMessageSettingId(messageSettingDTO1.getId());
-                    targetUserMapper.insert(v);
+                    messageSettingTargetUserMapper.insert(v);
                 });
             } else {
                 //否则修改原来的数据
                 //先删除targetUser
                 TargetUserDTO targetUserDTO1 = new TargetUserDTO();
                 targetUserDTO1.setMessageSettingId(e.getId());
-                targetUserMapper.delete(targetUserDTO1);
+                messageSettingTargetUserMapper.delete(targetUserDTO1);
                 //再删除MessageSetting
                 MessageSettingDTO messageSettingDTO1 = new MessageSettingDTO();
                 messageSettingDTO1.setId(e.getId());
@@ -115,7 +114,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 targetUserDTOS.stream().forEach(v -> {
                     v.setId(null);
                     v.setMessageSettingId(messageSettingDTO2.getId());
-                    targetUserMapper.insert(v);
+                    messageSettingTargetUserMapper.insert(v);
                 });
             }
         });
@@ -136,7 +135,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         //2.发送设置存在返回该设置下的接收对象
         TargetUserDTO targetUserDTO = new TargetUserDTO();
         targetUserDTO.setMessageSettingId(messageSettingDTO1.getId());
-        List<TargetUserDTO> targetUserDTOS = targetUserMapper.select(targetUserDTO);
+        List<TargetUserDTO> targetUserDTOS = messageSettingTargetUserMapper.select(targetUserDTO);
         if (targetUserDTOS == null || targetUserDTOS.size() == 0) {
             LOGGER.warn(">>>CANCEL_SENDING>>> The message target user does not exist.[INFO:message_target_user_code:'{}']",
                     code);

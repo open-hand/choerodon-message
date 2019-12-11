@@ -1,11 +1,11 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'script/db/notify-target-user.groovy') {
+databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting-target-user.groovy') {
     changeSet(author: 'xiangwang04@gmail.com', id: '2019-12-03-add-notify-target-user') {
         if(helper.dbType().isSupportSequence()){
             createSequence(sequenceName: 'NOTIFY_TARGET_USER_S', startValue:"1")
         }
-        createTable(tableName: "NOTIFY_TARGET_USER") {
+        createTable(tableName: "NOTIFY_MESSAGE_SETTING_TARGET_USER") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }

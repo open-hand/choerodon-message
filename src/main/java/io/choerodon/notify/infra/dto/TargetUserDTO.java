@@ -12,7 +12,7 @@ import javax.persistence.Table;
  * User: Mr.Wang
  * Date: 2019/12/3
  */
-@Table(name = "notify_target_user")
+@Table(name = "notify_message_setting_target_user")
 public class TargetUserDTO extends BaseDTO {
     @Id
     @GeneratedValue
