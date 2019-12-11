@@ -99,14 +99,6 @@ export default props => {
       userList.forEach(({ realName }) => data.push(realName));
     }
 
-    // return (
-    //   <div>
-    //     <MouserOverWrapper width={0.2} text={data.join()}>
-    //       {data.join()}
-    //     </MouserOverWrapper>
-    //   </div>
-    // );
-
     return (
       <Dropdown
         overlay={<NotifyObject record={record} />}

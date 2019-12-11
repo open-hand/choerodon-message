@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Content, Breadcrumb, Choerodon } from '@choerodon/boot';
+import { Content, Breadcrumb, Choerodon, TabPage } from '@choerodon/boot';
 import { Table, CheckBox, Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
 import { useProjectNotifyStore } from './stores';
@@ -133,10 +133,10 @@ export default props => {
   }
 
   return (
-    <Fragment>
+    <TabPage>
       <Breadcrumb />
       <Content className={`${prefixCls}-content`}>
-        <Table dataSet={tableDs} mode="tree" className={`${prefixCls}-content-table`}>
+        <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column
             header={(dataSet) => renderCheckBoxHeader(dataSet, 'pm')}
@@ -151,7 +151,7 @@ export default props => {
             editor={(record) => renderEditor(record, 'email')}
           />
         </Table>
-        <div style={{ marginTop: 25 }}>
+        <div className={`${prefixCls}-buttons`}>
           <Button
             funcType="raised"
             color="primary"
@@ -167,6 +167,6 @@ export default props => {
           </Button>
         </div>
       </Content>
-    </Fragment>
+    </TabPage>
   );
 };
