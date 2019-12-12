@@ -3,6 +3,7 @@ package io.choerodon.notify.api.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.core.exception.CommonException;
@@ -22,6 +23,7 @@ import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.NotifyScheduleRecordMapper;
 import io.choerodon.notify.infra.mapper.ReceiveSettingMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -132,10 +134,6 @@ public class NoticesSendServiceImpl implements NoticesSendService {
     @Override
     public void sendNotice(NoticeSendDTO noticeSendDTO) {
         LOGGER.info(">>>START_SENDING_MESSAGE>>>");
-        // 0 发送短信
-        if (!ObjectUtils.isEmpty(noticeSendDTO) && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS()) {
-            smsService.send(noticeSendDTO);
-        }
         // 0.1 校验SendSetting是否存在 : 不存在 则 取消发送
         SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(new SendSettingDTO().setCode(noticeSendDTO.getCode()));
         if (ObjectUtils.isEmpty(sendSettingDTO)) {
@@ -179,10 +177,15 @@ public class NoticesSendServiceImpl implements NoticesSendService {
             trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.3.发送WebHook
-        if (((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || !customizedSendingTypesFlag) && sendSettingDTO.getWebhookEnabledFlag()) {
+        if ((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || (!customizedSendingTypesFlag && sendSettingDTO.getWebhookEnabledFlag())) {
             trySendWebHook(noticeSendDTO, sendSettingDTO, users);
         }
-
+        // 3.4 发送短信
+        if ((customizedSendingTypesFlag && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS() && sendSettingDTO.getSmsEnabledFlag())
+                || (!customizedSendingTypesFlag && sendSettingDTO.getSmsEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getSmsEnable())
+                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getSmsEnabledFlag())) {
+            smsService.send(noticeSendDTO);
+        }
     }
 
     @Override
