@@ -3,7 +3,7 @@ import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
 import { Table, CheckBox, Icon, Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
 import { useAgileContentStore } from './stores';
-import MouserOverWrapper from '../../../components/mouseOverWrapper';
+import FooterButtons from '../components/footer-buttons';
 
 import './index.less';
 
@@ -49,15 +49,15 @@ export default props => {
 
   function handleCheckBoxChange({ record, value, name }) {
     record.set(name, value);
-    if (!record.get('categoryId')) {
+    if (!record.get('groupId')) {
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('categoryId') === record.get('key')) {
+        if (tableRecord.get('groupId') === record.get('key')) {
           tableRecord.set(name, value);
         }
       });
     } else {
-      const parentRecord = tableDs.find((tableRecord) => record.get('categoryId') === tableRecord.get('key'));
-      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('categoryId') && !tableRecord.get(name));
+      const parentRecord = tableDs.find((tableRecord) => record.get('groupId') === tableRecord.get('key'));
+      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
       parentRecord.set(name, parentIsChecked);
     }
   }
@@ -65,9 +65,9 @@ export default props => {
   function renderCheckBox({ record, name }) {
     let isChecked = true;
     let isIndeterminate = false;
-    if (!record.get('categoryId')) {
-      isChecked = !tableDs.find((tableRecord) => tableRecord.get('categoryId') === record.get('key') && !tableRecord.get(name));
-      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('categoryId') === record.get('key') && tableRecord.get(name));
+    if (!record.get('groupId')) {
+      isChecked = !tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && !tableRecord.get(name));
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && tableRecord.get(name));
     }
     return (
       <CheckBox
@@ -81,7 +81,7 @@ export default props => {
   }
 
   function renderNotifyObject({ record }) {
-    if (!record.get('categoryId')) {
+    if (!record.get('groupId')) {
       return '-';
     }
   }
@@ -112,21 +112,7 @@ export default props => {
           />
         </Table>
       </Content>
-      <div style={{ marginTop: 25, marginLeft: 24 }}>
-        <Button
-          funcType="raised"
-          color="primary"
-          onClick={saveSettings}
-        >
-          <FormattedMessage id="save" />
-        </Button>
-        <Button
-          funcType="raised"
-          onClick={refresh}
-          style={{ marginLeft: 16, color: '#3F51B5' }}
-        ><FormattedMessage id="cancel" />
-        </Button>
-      </div>
+      <FooterButtons onOk={saveSettings} onCancel={refresh} />
     </Fragment>
   );
 };

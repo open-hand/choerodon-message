@@ -3,8 +3,9 @@ import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
 import { Table, CheckBox, Icon, Dropdown, Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
 import { useResourceContentStore } from './stores';
-import NotifyObject from './NotifyObject';
+import NotifyObject from '../components/notify-object/NotifyObject';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
+import FooterButtons from '../components/footer-buttons';
 
 import './index.less';
 
@@ -148,21 +149,7 @@ export default props => {
           />
         </Table>
       </Content>
-      <div style={{ marginTop: 25, marginLeft: 24 }}>
-        <Button
-          funcType="raised"
-          color="primary"
-          onClick={saveSettings}
-        >
-          <FormattedMessage id="save" />
-        </Button>
-        <Button
-          funcType="raised"
-          onClick={refresh}
-          style={{ marginLeft: 16, color: '#3F51B5' }}
-        ><FormattedMessage id="cancel" />
-        </Button>
-      </div>
+      <FooterButtons onOk={saveSettings} onCancel={refresh} />
     </Fragment>
   );
 };

@@ -682,6 +682,11 @@ const projectNotify = {
   'project.notify.object.handler': '操作者',
   'project.notify.object.owner': '项目所有者',
   'project.notify.object.specifier': '指定用户',
+  'project.notify.object.reporter': '报告人',
+  'project.notify.object.assignee': '经办人',
+  'project.notify.object.projectOwner': '项目所有者',
+  'project.notify.object.selectedUser': '指定用户',
+  'project.notify.choose': '请选择',
 };
 
 const receiveSetting = {
