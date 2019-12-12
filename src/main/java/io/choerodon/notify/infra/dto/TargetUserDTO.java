@@ -2,6 +2,7 @@ package io.choerodon.notify.infra.dto;
 
 
 import io.choerodon.mybatis.entity.BaseDTO;
+
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.GeneratedValue;
@@ -23,18 +24,6 @@ public class TargetUserDTO extends BaseDTO {
     private Long userId;
     @ApiModelProperty("平台设置表的id")
     private Long messageSettingId;
-    @ApiModelProperty(value = "版本号")
-    private Long objectVersionNumber;
-
-    @Override
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    @Override
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
 
     public Long getId() {
         return id;
@@ -75,7 +64,7 @@ public class TargetUserDTO extends BaseDTO {
                 ", type='" + type + '\'' +
                 ", userId='" + userId + '\'' +
                 ", messageSettingId=" + messageSettingId +
-                ", objectVersionNumber=" + objectVersionNumber +
+                ", objectVersionNumber=" + super.getObjectVersionNumber() +
                 '}';
     }
 }
