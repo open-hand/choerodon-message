@@ -1,33 +1,11 @@
 package io.choerodon.notify.api.service.impl;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.util.UtilityElf;
-import io.choerodon.core.notify.ServiceNotifyType;
-import io.choerodon.core.notify.TargetUserType;
-import io.choerodon.notify.api.dto.DevopsNotificationUserRelVO;
-import io.choerodon.notify.api.dto.DevopsNotificationVO;
-import io.choerodon.notify.infra.dto.MessageSettingDTO;
-import io.choerodon.notify.infra.dto.TargetUserDTO;
-import io.choerodon.notify.infra.enums.DeleteResourceType;
-import io.choerodon.notify.infra.feign.DevopsFeignClient;
-import io.choerodon.notify.infra.mapper.MessageSettingMapper;
-import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
-import org.checkerframework.checker.units.qual.A;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.notify.TargetUserType;
 import io.choerodon.notify.api.dto.CheckLog;
+import io.choerodon.notify.api.dto.DevopsNotificationUserRelVO;
 import io.choerodon.notify.api.dto.DevopsNotificationVO;
 import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
@@ -36,11 +14,23 @@ import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
 import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.AgileFeignClient;
-import io.choerodon.notify.infra.feign.DevopsFeignClient;
+import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import io.choerodon.notify.infra.mapper.NotifyCheckLogMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -76,7 +66,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
     @Autowired
     private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
     @Autowired
-    private DevopsFeignClient devopsFeignClient;
+    private DevopsFeginClient devopsFeignClient;
 
     @Override
     public void checkLog(String version, String type) {

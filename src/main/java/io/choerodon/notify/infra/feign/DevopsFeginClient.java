@@ -1,5 +1,6 @@
 package io.choerodon.notify.infra.feign;
 
+import io.choerodon.notify.api.dto.DevopsNotificationVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.infra.feign.fallback.AsgardFeignClientFallback;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,4 +24,6 @@ public interface DevopsFeginClient {
     ResponseEntity<List<NotifyEventGroupVO>> listByActive(
             @PathVariable(value = "project_id") Long projectId,
             @RequestParam(value = "active") Boolean active);
+    @GetMapping("v1/projects/{project_id}/notification/transfer/data")
+    ResponseEntity<List<DevopsNotificationVO>> transferData(@PathVariable("project_id") Long projectId);
 }

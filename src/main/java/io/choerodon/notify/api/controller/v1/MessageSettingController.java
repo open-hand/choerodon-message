@@ -7,6 +7,7 @@ import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.service.MessageSettingService;
+import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.MessageSettingWarpVO;
 import io.choerodon.notify.api.vo.TargetUserVO;
 import io.swagger.annotations.Api;
@@ -42,15 +43,15 @@ public class MessageSettingController {
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.query"));
     }
-
-    @PutMapping
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
-    @ApiOperation(value = "修改消息设置,支持批量修改")
-    public void updateMessageSetting(
-            @PathVariable(value = "project_id") Long projectId,
-            @RequestBody List<MessageSettingVO> messageSettingVOS) {
-        messageSettingService.updateMessageSetting(projectId, messageSettingVOS);
-    }
+//
+//    @PutMapping
+//    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
+//    @ApiOperation(value = "修改消息设置,支持批量修改")
+//    public void updateMessageSetting(
+//            @PathVariable(value = "project_id") Long projectId,
+//            @RequestBody List<MessageSettingVO> messageSettingVOS) {
+//        messageSettingService.updateMessageSetting(projectId, messageSettingVOS);
+//    }
 
     @GetMapping("/target/user/list")
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
@@ -80,5 +81,15 @@ public class MessageSettingController {
             @PathVariable(value = "notify_type") String notifyType) {
         return ResponseEntity.ok(messageSettingService.listMessageSettingByType(projectId, notifyType));
 
+    }
+    @PutMapping("/{notify_type}/batch")
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
+    @ApiOperation(value = "批量修改消息设置")
+    public ResponseEntity<Void> batchUpdateByType(
+            @PathVariable(value = "project_id") Long projectId,
+            @PathVariable(value = "notify_type") String notifyType,
+            @RequestBody List<CustomMessageSettingVO> messageSettingVOS) {
+        messageSettingService.batchUpdateByType(projectId, notifyType, messageSettingVOS);
+        return ResponseEntity.noContent().build();
     }
 }

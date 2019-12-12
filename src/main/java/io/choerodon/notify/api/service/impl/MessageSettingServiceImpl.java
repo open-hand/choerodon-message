@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.ServiceNotifyType;
 import io.choerodon.core.notify.TargetUserType;
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
@@ -17,8 +18,8 @@ import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
+import io.choerodon.notify.infra.mapper.SendSettingMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ import java.util.stream.Collectors;
 public class MessageSettingServiceImpl implements MessageSettingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSettingServiceImpl.class);
     private static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
+    private static final String ERROR_SAVE_MESSAGE_SETTING = "error.save.message.setting";
+    private static final String ERROR_UPDATE_MESSAGE_SETTING = "error.update.message.setting";
     @Autowired
     private MessageSettingMapper messageSettingMapper;
 
@@ -215,6 +218,51 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         addUserInfo(customMessageSettingList);
         calculateEventName(customMessageSettingList);
         return null;
+    }
+
+    @Override
+    public void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
+        List<CustomMessageSettingVO> defaultSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
+        Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
+        calculateNotifyUsersByType(messageSettingVOS,notifyType);
+        List<CustomMessageSettingVO> defaultMessagesSettings = messageSettingVOS.stream().filter(settingVO -> defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
+        List<CustomMessageSettingVO> customMessagesSettings = messageSettingVOS.stream().filter(settingVO -> !defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
+        // 默认配置的修改
+        defaultMessagesSettings.forEach(settingVO -> {
+            MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            saveMessageSetting(settingDTO);
+
+        });
+    }
+
+    private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS, String notifyType) {
+
+            if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)) {
+                messageSettingVOS.forEach(settingVO -> {
+                    Set<String> sendRoleList = settingVO.getSendRoleList();
+                    if (!CollectionUtils.isEmpty(sendRoleList)) {
+                        sendRoleList.forEach(role -> {
+                            TargetUserVO targetUserVO = new TargetUserVO();
+                            targetUserVO.setType(role);
+                        });
+
+                    }
+                });
+            }
+            if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+
+            }
+            if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
+
+            }
+
+    }
+
+    @Override
+    public void saveMessageSetting(MessageSettingDTO messageSettingDTO) {
+        if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
+            throw new CommonException(ERROR_SAVE_MESSAGE_SETTING);
+        }
     }
 
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
