@@ -1,7 +1,7 @@
 package io.choerodon.notify.infra.feign.fallback;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.notify.api.dto.DevopsNotificationVO;
+import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class DevopsFeginClientFallback implements DevopsFeginClient {
         throw new CommonException("error.query.env");
     }
     @Override
-    public ResponseEntity<List<DevopsNotificationVO>> transferData(Long projectId) {
+    public ResponseEntity<List<DevopsNotificationTransferDataVO>> transferData(Long projectId) {
         throw new CommonException("error.transfer.data");
     }
 }
