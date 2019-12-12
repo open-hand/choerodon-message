@@ -50,6 +50,9 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "资源删除验证事件名字")
     private String eventName;
 
+    @ApiModelProperty(value = "通知对象")
+    private String notifyObject;
+
     @ApiModelProperty(value = "通知的非指定用户集合")
     private Set<String> sendRoleList = new HashSet<>();
 
@@ -166,5 +169,13 @@ public class CustomMessageSettingVO {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public String getNotifyObject() {
+        return notifyObject;
+    }
+
+    public void setNotifyObject(String notifyObject) {
+        this.notifyObject = notifyObject;
     }
 }
