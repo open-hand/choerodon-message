@@ -2,6 +2,8 @@ package io.choerodon.notify.api.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -49,10 +51,10 @@ public class CustomMessageSettingVO {
     private String eventName;
 
     @ApiModelProperty(value = "通知的非指定用户集合")
-    private Set<String> sendRoleList;
+    private Set<String> sendRoleList = new HashSet<>();
 
     @ApiModelProperty(value = "指定用户集合")
-    private Set<TargetUserVO> userList;
+    private List<TargetUserVO> userList;
 
     public Long getId() {
         return id;
@@ -134,11 +136,11 @@ public class CustomMessageSettingVO {
         this.objectVersionNumber = objectVersionNumber;
     }
 
-    public Set<TargetUserVO> getUserList() {
+    public List<TargetUserVO> getUserList() {
         return userList;
     }
 
-    public void setUserList(Set<TargetUserVO> userList) {
+    public void setUserList(List<TargetUserVO> userList) {
         this.userList = userList;
     }
 

@@ -65,16 +65,4 @@ public class TargetUserVO {
         this.loginName = loginName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TargetUserVO that = (TargetUserVO) o;
-        return userId.equals(that.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId);
-    }
 }

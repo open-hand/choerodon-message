@@ -14,6 +14,7 @@ import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.api.vo.TargetUserVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
+import io.choerodon.notify.infra.enums.DeleteResourceType;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.feign.UserFeignClient;
@@ -217,7 +218,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         // 添加用户信息
         addUserInfo(customMessageSettingList);
         calculateEventName(customMessageSettingList);
-        return null;
+        return messageSettingWarpVO;
     }
 
     @Override
@@ -267,15 +268,13 @@ public class MessageSettingServiceImpl implements MessageSettingService {
 
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
         customMessageSettingList.stream()
-                .filter(settingVO -> RESOURCE_DELETE_CONFIRMATION.equals(settingVO.getName()))
-                .forEach(settingVO -> {
-
-        });
+                .filter(settingVO -> RESOURCE_DELETE_CONFIRMATION.equals(settingVO.getCode()))
+                .forEach(settingVO -> settingVO.setName(DeleteResourceType.nameMapping.get(settingVO.getEventName())));
     }
 
     private void addUserInfo(List<CustomMessageSettingVO> customMessageSettingList) {
         customMessageSettingList.forEach(settingVO -> {
-            Set<TargetUserVO> userList = settingVO.getUserList();
+            List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
                 List<Long> uids = userList.stream().map(TargetUserVO::getId).collect(Collectors.toList());
                 List<UserDTO> iamUserList = baseFeignClient.listUsersByIds(uids.toArray(new Long[20]), false).getBody();
@@ -291,7 +290,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
 
     private void calculateSendRole(List<CustomMessageSettingVO> customMessageSettingList) {
         customMessageSettingList.forEach(settingVO -> {
-            Set<TargetUserVO> userList = settingVO.getUserList();
+            List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
                 Set<String> roleList = settingVO.getUserList().stream()
                         .map(user -> user.getType())
@@ -299,7 +298,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 // 设置通知角色
                 settingVO.setSendRoleList(roleList);
                 // 设置要通知的非指定用户
-                settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toSet())); ;
+                settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toList())); ;
             }
         });
     }
@@ -331,10 +330,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             }
         });
         return customMessageSettingList;
-    }
-
-    private void listCustomSetting(Long projectId, String notifyType) {
-        List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectId(projectId, notifyType);
     }
 
     private List<NotifyEventGroupVO> listEventGroupList(Long projectId, String notifyType) {
