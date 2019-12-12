@@ -27,10 +27,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
     }
     changeSet(id: '2019-12-12-notify-message-setting-add-column', author: 'xiangwang04@gmail.com') {
         addColumn(tableName: 'NOTIFY_MESSAGE_SETTING') {
-            column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  remarks: '资源删除事件名字', afterColumn: 'PROJECT_ID'){
-                constraints(nullable: false)
-            }
-
+            column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  remarks: '资源删除事件名字', afterColumn: 'PROJECT_ID')
         }
     }
 

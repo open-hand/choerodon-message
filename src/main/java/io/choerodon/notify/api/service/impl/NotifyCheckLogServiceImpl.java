@@ -1,17 +1,29 @@
 package io.choerodon.notify.api.service.impl;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.util.UtilityElf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.TargetUserType;
 import io.choerodon.notify.api.dto.CheckLog;
-import io.choerodon.notify.api.dto.DevopsNotificationUserRelVO;
 import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
 import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.AgileFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
@@ -19,18 +31,6 @@ import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import io.choerodon.notify.infra.mapper.NotifyCheckLogMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Service
@@ -42,7 +42,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             new LinkedBlockingQueue<>(), new UtilityElf.DefaultThreadFactory("notify-upgrade", false));
 
     private static final Map<String, String> codeMap = new HashMap<>(3);
-    private static final Map<String, String> targetUserType = new HashMap<>(4);
+    private static final Map<String, String> targetUserType = new HashMap<>(5);
 
     static {
         codeMap.put("issue_assigneed", "issueAssignee");
@@ -202,40 +202,40 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 CheckLog checkLog = new CheckLog();
                 checkLog.setContent("begin to sync agile notify projectId:" + map.getKey());
                 try {
-                    map.getValue().forEach(v -> {
+                    for (MessageDetailDTO v : map.getValue()) {
                         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
                         messageSettingDTO.setProjectId(map.getKey());
                         messageSettingDTO.setNotifyType(AGILE);
-                        SendSettingDTO sendSettingDTO = selectSendSettingByCode(codeMap.get(v.getEvent()));
-                        if (sendSettingDTO.getPmEnabledFlag()) {
-                            messageSettingDTO.setPmEnable(true);
-                        } else {
-                            messageSettingDTO.setPmEnable(false);
-                        }
                         messageSettingDTO.setCode(codeMap.get(v.getEvent()));
-                        if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
-                            throw new CommonException("error.insert.message.send.setting");
-                        }
-
-                        if (v.getNoticeType().equals("users")) {
-                            String[] userIds = v.getUser().split(",");
-                            for (String userId : userIds) {
-                                TargetUserDTO targetUserDTO = new TargetUserDTO();
-                                targetUserDTO.setMessageSettingId(messageSettingDTO.getId());
-                                targetUserDTO.setType(targetUserType.get(v.getNoticeType()));
-                                targetUserDTO.setUserId(Long.valueOf(userId));
-                                messageSettingTargetUserMapper.insertSelective(targetUserDTO);
+                        // 1. messageSetting
+                        MessageSettingDTO queryDTO = messageSettingMapper.selectOne(messageSettingDTO);
+                        if (queryDTO == null) {
+                            messageSettingDTO.setPmEnable(true);
+                            if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
+                                throw new CommonException("error.insert.message.send.setting");
                             }
                         } else {
-                            TargetUserDTO targetUserDTO = new TargetUserDTO();
-                            targetUserDTO.setMessageSettingId(messageSettingDTO.getId());
-                            targetUserDTO.setType(targetUserType.get(v.getNoticeType()));
-                            messageSettingTargetUserMapper.insertSelective(targetUserDTO);
+                            messageSettingDTO.setId(queryDTO.getId());
                         }
-                    });
-                    checkLog.setResult("Succeed to sync agile notify!");
+                        //2. messageSettingTargetUser
+                        if (v.getNoticeType().equals("users")) {
+                            if (v.getUser() == null || v.getUser().equals("")) {
+                                continue;
+                            }
+                            String[] userIds = v.getUser().split(",");
+                            for (String userId : userIds) {
+                                if (!userId.equals("") && isInteger(userId)) {
+                                    createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), Long.valueOf(userId));
+                                }
+                            }
+                        } else {
+                            createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), null);
+                        }
+                        checkLog.setResult("Succeed to sync agile notify!");
+                    }
                 } catch (Exception e) {
                     checkLog.setResult("Failed to sync agile notify!");
+                    throw e;
                 }
                 logs.add(checkLog);
             }
@@ -243,14 +243,20 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
 
     }
 
-    private SendSettingDTO selectSendSettingByCode(String code) {
-        SendSettingDTO sendSettingDTO = new SendSettingDTO();
-        sendSettingDTO.setCode(code);
-        sendSettingDTO = sendSettingMapper.selectOne(sendSettingDTO);
-        if (sendSettingDTO == null) {
-            throw new CommonException(SendSettingServiceImpl.SEND_SETTING_DOES_NOT_EXIST);
+    private void createMessageSettingTargetUser(Long messageSettingId, String noticeType, Long userId) {
+        TargetUserDTO targetUserDTO = new TargetUserDTO();
+        targetUserDTO.setMessageSettingId(messageSettingId);
+        targetUserDTO.setType(noticeType);
+        targetUserDTO.setUserId(userId);
+        if (messageSettingTargetUserMapper.selectOne(targetUserDTO) == null) {
+            if (messageSettingTargetUserMapper.insertSelective(targetUserDTO) != 1) {
+                throw new CommonException("error.insert.message.setting.target.user");
+            }
         }
-        return sendSettingDTO;
     }
 
+    public boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
 }
