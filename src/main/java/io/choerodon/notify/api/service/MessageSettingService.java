@@ -2,7 +2,8 @@ package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
-import io.choerodon.notify.api.dto.TargetUserVO;
+import io.choerodon.notify.api.vo.MessageSettingWarpVO;
+import io.choerodon.notify.api.vo.TargetUserVO;
 
 import java.util.List;
 
@@ -18,4 +19,7 @@ public interface MessageSettingService {
     List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code);
 
     MessageSettingVO getMessageSetting(Long projectId, String code);
+
+    MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType);
+
 }

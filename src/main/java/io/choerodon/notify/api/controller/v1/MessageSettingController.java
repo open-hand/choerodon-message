@@ -6,8 +6,9 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
-import io.choerodon.notify.api.dto.TargetUserVO;
 import io.choerodon.notify.api.service.MessageSettingService;
+import io.choerodon.notify.api.vo.MessageSettingWarpVO;
+import io.choerodon.notify.api.vo.TargetUserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +26,7 @@ import java.util.Optional;
  * Date: 2019/12/3
  */
 @RestController
-@RequestMapping("v1/notices/{project_id}/message/setting")
+@RequestMapping("v1/projects/{project_id}/message_settings")
 @Api("发送消息设置接口")
 public class MessageSettingController {
     @Autowired
@@ -61,14 +62,23 @@ public class MessageSettingController {
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
     }
-    @GetMapping("/{code}")
+//    @GetMapping("/{code}")
+//    @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
+//    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
+//    public ResponseEntity<MessageSettingVO> getMessageSetting(
+//            @PathVariable(value = "project_id") Long projectId,
+//            @PathVariable String code) {
+//        return Optional.ofNullable(messageSettingService.getMessageSetting(projectId, code))
+//                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+//                .orElseThrow(() -> new CommonException("error.messageSetting.query"));
+//    }
+    @GetMapping("/{notify_type}")
     @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
-    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
-    public ResponseEntity<MessageSettingVO> getMessageSetting(
+    @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
+    public ResponseEntity<MessageSettingWarpVO> listByType(
             @PathVariable(value = "project_id") Long projectId,
-            @PathVariable String code) {
-        return Optional.ofNullable(messageSettingService.getMessageSetting(projectId, code))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.messageSetting.query"));
+            @PathVariable(value = "notify_type") String notifyType) {
+        return ResponseEntity.ok(messageSettingService.listMessageSettingByType(projectId, notifyType));
+
     }
 }
