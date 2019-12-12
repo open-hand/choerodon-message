@@ -111,8 +111,8 @@ export default props => {
             renderer={renderNotifyObject}
           />
         </Table>
+        <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>
-      <FooterButtons onOk={saveSettings} onCancel={refresh} />
     </Fragment>
   );
 };
