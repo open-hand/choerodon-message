@@ -1,31 +1,32 @@
 function formatData(data) {
   const res = [];
-  data.forEach(({ messageSettingDTO, id, name }) => {
+  const notifyEventGroupList = [...data.notifyEventGroupList];
+  const customMessageSettingList = [...data.customMessageSettingList];
+  notifyEventGroupList.forEach((item) => {
     res.push({
-      id,
-      key: String(id),
-      name,
+      ...item,
+      key: String(item.id),
     });
-    if (messageSettingDTO) {
-      messageSettingDTO.forEach((item) => {
-        const obj = { ...item };
-        obj.key = `${item.categoryId}-${item.id}`;
-        obj.categoryId = String(item.categoryId);
-        res.push(obj);
-      });
-    }
+  });
+  customMessageSettingList.forEach((item) => {
+    const obj = {
+      ...item,
+      key: `${item.groupId}-${item.id}`,
+      groupId: String(item.groupId),
+    };
+    res.push(obj);
   });
   return res;
 }
 
 function parentItemIsChecked({ dataSet, record, name }) {
-  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('categoryId') && !tableRecord.get(name));
+  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
   record.init(name, parentIsChecked);
 }
 
 function handleLoad({ dataSet }) {
   dataSet.forEach((record) => {
-    if (!record.get('categoryId')) {
+    if (!record.get('groupId')) {
       parentItemIsChecked({ dataSet, record, name: 'pmEnable' });
       parentItemIsChecked({ dataSet, record, name: 'emailEnable' });
     }
@@ -37,14 +38,13 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
   selection: false,
   paging: false,
   autoQueryAfterSubmit: false,
-  parentField: 'categoryId',
+  parentField: 'groupId',
   idField: 'key',
   primaryKey: 'key',
   transport: {
     read: {
-      url: `/notify/v1/notices/${projectId}/message/setting/list`,
-      method: 'post',
-      data: { notifyType: 'devops' },
+      url: `/notify/v1/projects/${projectId}/message_settings/devops`,
+      method: 'get',
       transformResponse(response) {
         try {
           const data = JSON.parse(response);
@@ -61,15 +61,14 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
     submit: ({ data }) => {
       const res = [];
       data.forEach((item) => {
-        const { categoryId } = item;
-        if (categoryId) {
-          item.projectId = projectId;
-          item.categoryId = Number(categoryId);
+        const { groupId } = item;
+        if (groupId) {
+          item.groupId = Number(groupId);
           res.push(item);
         }
       });
       return ({
-        url: `/notify/v1/notices/${projectId}/message/setting`,
+        url: `/notify/v1/projects/${projectId}/message_settings/devops/batch`,
         method: 'put',
         data: res,
       });
