@@ -129,7 +129,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                     userList.stream().forEach(u -> {
                         if ("specifier".equals(u.getUserType())) {
                             targetUserDTO.setUserId(u.getUserId());
-                            targetUserDTO.setType(TargetUserType.SELECTED_USERS.getTypeName());
+                            targetUserDTO.setType(TargetUserType.SPECIFIER.getTypeName());
                             messageSettingTargetUserMapper.insert(targetUserDTO);
                         } else if ("owner".equals(u.getUserType())) {
                             targetUserDTO.setUserId(u.getUserId());
