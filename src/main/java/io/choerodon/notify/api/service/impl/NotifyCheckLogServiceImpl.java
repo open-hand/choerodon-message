@@ -6,7 +6,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.notify.TargetUserType;
 import io.choerodon.notify.api.dto.CheckLog;
 import io.choerodon.notify.api.dto.DevopsNotificationUserRelVO;
-import io.choerodon.notify.api.dto.DevopsNotificationVO;
+import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
 import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
@@ -82,56 +82,77 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             this.version = version;
             this.type = type;
         }
-        private  void transferDevopsData(){
-            List<DevopsNotificationVO> devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
+
+        private void transferDevopsData() {
+            List<DevopsNotificationTransferDataVO> devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
             if (devopsNotificationVOS == null || devopsNotificationVOS.size() == 0) {
                 LOGGER.info("No data to migrate");
             }
             MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
             devopsNotificationVOS.stream().forEach(e -> {
+
                 messageSettingDTO.setCode("resourceDeleteConfirmation");
                 messageSettingDTO.setProjectId(Objects.isNull(e.getProjectId()) ? null : e.getProjectId());
                 messageSettingDTO.setNotifyType("resourceDelete");
-                messageSettingDTO.setEmailEnable(Objects.isNull(e.getSendEmail()) ? false : e.getSendEmail());
-                messageSettingDTO.setSmsEnable(Objects.isNull(e.getSendSms()) ? false : e.getSendSms());
-                messageSettingDTO.setPmEnable(Objects.isNull(e.getSendPm()) ? false : e.getSendPm());
-                messageSettingDTO.setEnvId(Objects.isNull(e.getEnvId()) ? null : e.getEnvId());
-                List<String> stringList = new ArrayList<>();
+                messageSettingDTO.setEnvId(e.getEnvId());
+                List<String> recouseNameList = new ArrayList<>();
                 if (e.getNotifyTriggerEvent().contains(",")) {
-                    stringList = Stream.of(e.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
+                    recouseNameList = Stream.of(e.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
                 } else {
-                    stringList.add(e.getNotifyTriggerEvent());
+                    recouseNameList.add(e.getNotifyTriggerEvent());
                 }
-                stringList.stream().forEach(v -> {
-                    messageSettingDTO.setEventName(v);
+                List<String> notifyType = new ArrayList<>();
+                if (e.getNotifyType().contains(",")) {
+                    notifyType = Stream.of(e.getNotifyType().split(",")).collect(Collectors.toList());
+                } else {
+                    notifyType.add(e.getNotifyType());
+                }
+                for (String name : recouseNameList) {
+                    messageSettingDTO.setEventName(name);
+                    for (String type : notifyType) {
+                        messageSettingDTO.setEmailEnable(false);
+                        messageSettingDTO.setSmsEnable(false);
+                        messageSettingDTO.setPmEnable(false);
+                        if ("sms".equals(type)) {
+                            messageSettingDTO.setSmsEnable(true);
+                        }
+                        if ("email".equals(type)) {
+                            messageSettingDTO.setEmailEnable(true);
+                        }
+                        if ("pm".equals(type)) {
+                            messageSettingDTO.setPmEnable(true);
+                        }
+                    }
+                    messageSettingDTO.setId(null);
                     messageSettingMapper.insert(messageSettingDTO);
-                });
-                //插入通知对象
-                MessageSettingDTO condition = new MessageSettingDTO();
-                stringList.stream().forEach(k -> {
-                    condition.setEventName(k);
+                    //插入接收对象
+                    MessageSettingDTO condition = new MessageSettingDTO();
+                    condition.setEventName(name);
                     condition.setEnvId(messageSettingDTO.getEnvId());
                     MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(condition);
-                    TargetUserDTO targetUserDTO = new TargetUserDTO();
 
+                    TargetUserDTO targetUserDTO = new TargetUserDTO();
                     targetUserDTO.setMessageSettingId(messageSettingDTO1.getId());
-                    List<DevopsNotificationUserRelVO> userList = e.getUserList();
-                    userList.stream().forEach(u -> {
-                        if ("specifier".equals(u.getUserType())) {
+                    if ("specifier".equals(e.getNotifyObject())) {
+                        targetUserDTO.setType(TargetUserType.SPECIFIER.getTypeName());
+                        e.getUserRelDTOS().stream().forEach(u -> {
                             targetUserDTO.setUserId(u.getUserId());
-                            targetUserDTO.setType(TargetUserType.SPECIFIER.getTypeName());
+                            targetUserDTO.setId(null);
+                            targetUserDTO.setType("specifier");
                             messageSettingTargetUserMapper.insert(targetUserDTO);
-                        } else if ("owner".equals(u.getUserType())) {
-                            targetUserDTO.setUserId(u.getUserId());
-                            targetUserDTO.setType(TargetUserType.PROJECT_OWNER.getTypeName());
-                            messageSettingTargetUserMapper.insert(targetUserDTO);
-                        } else if ("handler".equals(u.getUserType())) {
-                            targetUserDTO.setUserId(u.getUserId());
-                            targetUserDTO.setType(TargetUserType.CREATOR.getTypeName());
-                            messageSettingTargetUserMapper.insert(targetUserDTO);
-                        }
-                    });
-                });
+                        });
+                    } else if ("owner".equals(e.getNotifyObject())) {
+                        targetUserDTO.setId(null);
+                        targetUserDTO.setType(TargetUserType.PROJECT_OWNER.getTypeName());
+                        messageSettingTargetUserMapper.insert(targetUserDTO);
+                    } else if ("handler".equals(e.getNotifyObject())) {
+                        targetUserDTO.setId(null);
+                        targetUserDTO.setType(TargetUserType.HANDLER.getTypeName());
+                        messageSettingTargetUserMapper.insert(targetUserDTO);
+                    }
+                }
+                recouseNameList.clear();
+                notifyType.clear();
             });
 
         }

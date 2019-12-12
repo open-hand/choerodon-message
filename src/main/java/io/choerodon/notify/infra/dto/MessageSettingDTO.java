@@ -21,7 +21,7 @@ public class MessageSettingDTO extends BaseDTO {
     @Id
     @GeneratedValue
     private Long id;
-    @ApiModelProperty("通知类型（必填），用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")
+    @ApiModelProperty("通知类型（必填），用作tab分页，敏捷消息类型agile，devops消息类型devops")
     private String notifyType;
     @ApiModelProperty("消息code")
     private String code;
