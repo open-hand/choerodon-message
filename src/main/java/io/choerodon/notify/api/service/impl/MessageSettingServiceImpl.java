@@ -7,6 +7,7 @@ import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.MessageSettingService;
+import io.choerodon.notify.api.service.MessageSettingTargetUserService;
 import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.MessageSettingWarpVO;
@@ -17,7 +18,6 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.enums.DeleteResourceType;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
-import io.choerodon.notify.infra.feign.UserFeignClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
@@ -54,7 +54,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private SendSettingMapper sendSettingMapper;
 
     @Autowired
-    private UserFeignClient userFeignClient;
+    private MessageSettingTargetUserService messageSettingTargetUserService;
 
     @Autowired
     private DevopsFeginClient devopsFeginClient;
@@ -190,7 +190,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
         // 平台层没有启用任何发送设置
-        List<CustomMessageSettingVO>  defaultMessageSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         if (CollectionUtils.isEmpty(defaultMessageSettingList)) {
             return messageSettingWarpVO;
         }
@@ -209,7 +209,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             customMessageSettingList = handleDevopsOrAgileSettings(defaultMessageSettingList, projectId, notifyType);
         }
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
-            customMessageSettingList = handleResorceDeleteSettings(notifyEventGroupList,defaultMessageSettingList, projectId, notifyType);
+            customMessageSettingList = handleResorceDeleteSettings(notifyEventGroupList, defaultMessageSettingList, projectId, notifyType);
         }
         messageSettingWarpVO.setCustomMessageSettingList(customMessageSettingList);
 
@@ -225,37 +225,34 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     public void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
         List<CustomMessageSettingVO> defaultSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
-        calculateNotifyUsersByType(messageSettingVOS,notifyType);
+        // 将非指定用户添加到userList
+        calculateNotifyUsersByType(messageSettingVOS);
         List<CustomMessageSettingVO> defaultMessagesSettings = messageSettingVOS.stream().filter(settingVO -> defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
         List<CustomMessageSettingVO> customMessagesSettings = messageSettingVOS.stream().filter(settingVO -> !defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
         // 默认配置的修改
         defaultMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
             saveMessageSetting(settingDTO);
-
+            settingVO.getUserList().forEach(user -> {
+                user.setMessageSettingId(settingDTO.getId());
+                messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+            });
         });
+        // 自定配置修改
     }
 
-    private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS, String notifyType) {
-
-            if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)) {
-                messageSettingVOS.forEach(settingVO -> {
-                    Set<String> sendRoleList = settingVO.getSendRoleList();
-                    if (!CollectionUtils.isEmpty(sendRoleList)) {
-                        sendRoleList.forEach(role -> {
-                            TargetUserVO targetUserVO = new TargetUserVO();
-                            targetUserVO.setType(role);
-                        });
-
-                    }
+    private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
+        messageSettingVOS.forEach(settingVO -> {
+            Set<String> sendRoleList = settingVO.getSendRoleList();
+            if (!CollectionUtils.isEmpty(sendRoleList)) {
+                sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
+                    TargetUserVO targetUserVO = new TargetUserVO();
+                    targetUserVO.setType(role);
+                    settingVO.getUserList().add(targetUserVO);
                 });
-            }
-            if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
 
             }
-            if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
-
-            }
+        });
 
     }
 
@@ -297,8 +294,11 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                         .collect(Collectors.toSet());
                 // 设置通知角色
                 settingVO.setSendRoleList(roleList);
+                if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
+                    settingVO.setNotifyObject(settingVO.getUserList().get(0).getType());
+                }
                 // 设置要通知的非指定用户
-                settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toList())); ;
+                settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toList()));
             }
         });
     }
@@ -307,16 +307,19 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
             List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
-            Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getCode(), v -> v));
+            Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getEventName(), v -> v));
             defaultMessageSettingList.forEach(setting -> {
-                if (custommessageSettingVOMap.get(setting.getCode()) == null) {
-                    setting.setProjectId(projectId);
-                    setting.setEnvId(envId);
-                    customMessageSettingList.add(setting);
+                if (custommessageSettingVOMap.get(setting.getEventName()) == null) {
+                    CustomMessageSettingVO messageSettingVO = new CustomMessageSettingVO();
+                    modelMapper.map(setting, messageSettingVO);
+                    messageSettingVO.setProjectId(projectId);
+                    messageSettingVO.setEnvId(envId);
+                    customMessageSettingList.add(messageSettingVO);
                 }
             });
             resorceDeleteSettingList.addAll(customMessageSettingList);
         });
+        resorceDeleteSettingList.forEach(settingVO -> settingVO.setGroupId(settingVO.getEnvId()));
         return resorceDeleteSettingList;
     }
 
@@ -335,7 +338,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private List<NotifyEventGroupVO> listEventGroupList(Long projectId, String notifyType) {
         if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)
                 || ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
-             return messageSettingMapper.listCategoriesBySettingType(notifyType);
+            return messageSettingMapper.listCategoriesBySettingType(notifyType);
         }
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
             return devopsFeginClient.listByActive(projectId, true).getBody();
