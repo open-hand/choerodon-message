@@ -45,6 +45,9 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "版本号")
     private Long objectVersionNumber;
 
+    @ApiModelProperty(value = "资源删除验证事件名字")
+    private String eventName;
+
     @ApiModelProperty(value = "通知的非指定用户集合")
     private Set<String> sendRoleList;
 
@@ -153,5 +156,13 @@ public class CustomMessageSettingVO {
 
     public void setSendRoleList(Set<String> sendRoleList) {
         this.sendRoleList = sendRoleList;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 }

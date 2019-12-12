@@ -164,8 +164,8 @@
         SELECT
             nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nss.NAME
-            nssc.ID AS GROUP_ID
+            nss.NAME, nss.EVENT_NAME,
+            nssc.ID AS GROUP_ID,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
@@ -178,7 +178,8 @@
         SELECT
             nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nssc.ID AS GROUP_ID
+            nss.NAME, nss.EVENT_NAME,
+            nssc.ID AS GROUP_ID,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
@@ -198,6 +199,7 @@
         <result property="objectVersionNumber" column="OBJECT_VERSION_NUMBER"/>
         <result property="groupId" column="GROUP_ID"/>
         <result property="name" column="NAME"/>
+        <result property="eventName" column="EVENT_NAME"/>
         <collection property="userList" ofType="io.choerodon.notify.api.vo.TargetUserVO">
             <id column="NMSTU_ID" property="id"/>
             <result column="USER_ID" property="userId"/>
