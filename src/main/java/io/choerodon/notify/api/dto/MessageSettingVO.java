@@ -37,6 +37,16 @@ public class MessageSettingVO {
     private Long envId;
     @ApiModelProperty(value = "是否发送短信")
     private Boolean smsEnable;
+    @ApiModelProperty(value = "资源删除验证事件名字")
+    private String eventName;
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
     public Long getEnvId() {
         return envId;
