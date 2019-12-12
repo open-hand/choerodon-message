@@ -30,8 +30,10 @@ public class NotifyCheckController {
     @GetMapping
     public ResponseEntity<String> checkLog(
             @ApiParam(value = "version")
-            @RequestParam(value = "version") String version) {
-        notifyCheckLogService.checkLog(version);
+            @RequestParam(value = "version") String version,
+            @ApiParam(value = "type")
+            @RequestParam(value = "type") String type) {
+        notifyCheckLogService.checkLog(version, type);
         return new ResponseEntity<>(System.currentTimeMillis() + "", HttpStatus.OK);
     }
 

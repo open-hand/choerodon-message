@@ -9,5 +9,5 @@ public interface NotifyCheckLogService {
      *
      * @param version 版本
      */
-    void checkLog(String version);
+    void checkLog(String version, String type);
 }
