@@ -10,6 +10,17 @@ import java.util.stream.Stream;
 
 import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.util.UtilityElf;
+import io.choerodon.core.notify.ServiceNotifyType;
+import io.choerodon.core.notify.TargetUserType;
+import io.choerodon.notify.api.dto.DevopsNotificationUserRelVO;
+import io.choerodon.notify.api.dto.DevopsNotificationVO;
+import io.choerodon.notify.infra.dto.MessageSettingDTO;
+import io.choerodon.notify.infra.dto.TargetUserDTO;
+import io.choerodon.notify.infra.enums.DeleteResourceType;
+import io.choerodon.notify.infra.feign.DevopsFeignClient;
+import io.choerodon.notify.infra.mapper.MessageSettingMapper;
+import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +92,59 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             this.version = version;
             this.type = type;
         }
+        private  void transferDevopsData(){
+            List<DevopsNotificationVO> devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
+            if (devopsNotificationVOS == null || devopsNotificationVOS.size() == 0) {
+                LOGGER.info("No data to migrate");
+            }
+            MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+            devopsNotificationVOS.stream().forEach(e -> {
+                messageSettingDTO.setCode("resourceDeleteConfirmation");
+                messageSettingDTO.setProjectId(Objects.isNull(e.getProjectId()) ? null : e.getProjectId());
+                messageSettingDTO.setNotifyType("resourceDelete");
+                messageSettingDTO.setEmailEnable(Objects.isNull(e.getSendEmail()) ? false : e.getSendEmail());
+                messageSettingDTO.setSmsEnable(Objects.isNull(e.getSendSms()) ? false : e.getSendSms());
+                messageSettingDTO.setPmEnable(Objects.isNull(e.getSendPm()) ? false : e.getSendPm());
+                messageSettingDTO.setEnvId(Objects.isNull(e.getEnvId()) ? null : e.getEnvId());
+                List<String> stringList = new ArrayList<>();
+                if (e.getNotifyTriggerEvent().contains(",")) {
+                    stringList = Stream.of(e.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
+                } else {
+                    stringList.add(e.getNotifyTriggerEvent());
+                }
+                stringList.stream().forEach(v -> {
+                    messageSettingDTO.setEventName(v);
+                    messageSettingMapper.insert(messageSettingDTO);
+                });
+                //插入通知对象
+                MessageSettingDTO condition = new MessageSettingDTO();
+                stringList.stream().forEach(k -> {
+                    condition.setEventName(k);
+                    condition.setEnvId(messageSettingDTO.getEnvId());
+                    MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(condition);
+                    TargetUserDTO targetUserDTO = new TargetUserDTO();
+
+                    targetUserDTO.setMessageSettingId(messageSettingDTO1.getId());
+                    List<DevopsNotificationUserRelVO> userList = e.getUserList();
+                    userList.stream().forEach(u -> {
+                        if ("specifier".equals(u.getUserType())) {
+                            targetUserDTO.setUserId(u.getUserId());
+                            targetUserDTO.setType(TargetUserType.SELECTED_USERS.getTypeName());
+                            messageSettingTargetUserMapper.insert(targetUserDTO);
+                        } else if ("owner".equals(u.getUserType())) {
+                            targetUserDTO.setUserId(u.getUserId());
+                            targetUserDTO.setType(TargetUserType.PROJECT_OWNER.getTypeName());
+                            messageSettingTargetUserMapper.insert(targetUserDTO);
+                        } else if ("handler".equals(u.getUserType())) {
+                            targetUserDTO.setUserId(u.getUserId());
+                            targetUserDTO.setType(TargetUserType.CREATOR.getTypeName());
+                            messageSettingTargetUserMapper.insert(targetUserDTO);
+                        }
+                    });
+                });
+            });
+
+        }
 
         @Override
         public void run() {
@@ -91,29 +155,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 if ("0.20.0".equals(version) && type.equals("devops")) {
                     // todo
                     LOGGER.info("Migration data start");
-                    List<DevopsNotificationVO> devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
-                    if (devopsNotificationVOS == null || devopsNotificationVOS.size() == 0) {
-                        LOGGER.info("No data to migrate");
-                    }
-                    MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-                    devopsNotificationVOS.stream().forEach(e -> {
-                        messageSettingDTO.setCode("resourceDeleteConfirmation");
-                        messageSettingDTO.setProjectId(Objects.isNull(e.getProjectId()) ? null : e.getProjectId());
-
-                        messageSettingDTO.setCategory("环境的名字");
-                        messageSettingDTO.setNotifyType("DeleteResource");
-
-                        messageSettingDTO.setEmailEnable(Objects.isNull(e.getSendEmail()) ? false : e.getSendEmail());
-                        messageSettingDTO.setSmsEnable(Objects.isNull(e.getSendSms()) ? false : e.getSendSms());
-                        messageSettingDTO.setPmEnable(Objects.isNull(e.getSendPm()) ? false : e.getSendPm());
-                        messageSettingDTO.setEnvId(Objects.isNull(e.getEnvId()) ? null : e.getEnvId());
-                        List<String> stringList = new ArrayList<>();
-                        if (e.getNotifyTriggerEvent().contains(",")) {
-                            stringList = Stream.of(e.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
-                        } else {
-                            stringList.add(e.getNotifyTriggerEvent());
-                        }
-                    });
+                    transferDevopsData();
                 }
                 if ("0.20.0".equals(version) && type.equals("agile")) {
                     syncAgileNotify(logs);
