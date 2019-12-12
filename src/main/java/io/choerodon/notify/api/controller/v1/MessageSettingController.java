@@ -27,7 +27,7 @@ import java.util.Optional;
  * Date: 2019/12/3
  */
 @RestController
-@RequestMapping("v1/projects/{project_id}/message_settings")
+@RequestMapping("/v1/projects/{project_id}/message_settings")
 @Api("发送消息设置接口")
 public class MessageSettingController {
     @Autowired
