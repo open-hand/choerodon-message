@@ -29,4 +29,6 @@ public interface MessageSettingService {
     void saveMessageSetting(MessageSettingDTO messageSettingDTO);
 
     MessageSettingVO getSettingByCode(Long projectId, String notifyType, String code, Long envId, String eventName);
+
+    void deleteByTypeAndEnvId(String type, Long envId);
 }

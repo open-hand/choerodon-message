@@ -269,4 +269,15 @@
             <result column="MESSAGE_SETTING_ID" property="messageSettingId"/>
         </collection>
     </resultMap>
+
+    <delete id="deleteByTypeAndEnvId">
+        DELETE nms,
+            nmstu
+        FROM
+            notify_message_setting nms
+            JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.id
+        WHERE
+            nms.NOTIFY_TYPE = #{type}
+            AND nms.ENV_ID = #{envId}
+    </delete>
 </mapper>
