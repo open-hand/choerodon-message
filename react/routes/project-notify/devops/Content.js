@@ -37,7 +37,7 @@ export default props => {
     const hasCheckedRecord = tableDs.find((record) => record.get(name));
     return (
       <CheckBox
-        checked={isChecked}
+        checked={!!isChecked}
         indeterminate={!isChecked && !!hasCheckedRecord}
         onChange={(value) => handleHeaderChange(value, name)}
       >
@@ -89,7 +89,7 @@ export default props => {
   return (
     <TabPage service={permissions}>
       <Breadcrumb />
-      <Content className={`${prefixCls}-resource-content`}>
+      <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column

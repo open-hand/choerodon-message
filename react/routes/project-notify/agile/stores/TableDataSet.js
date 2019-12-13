@@ -23,12 +23,15 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
       const res = [];
       data.forEach((item) => {
         if (!item.sendRoleList.includes('specifier')) {
+          item.specifierIds = [];
           item.userList = [];
+        } else {
+          item.specifierIds = item.userList.map(({ id }) => id);
         }
         res.push(item);
       });
       return ({
-        url: `/notify/v1/projects/${projectId}/message_settings/devops/batch`,
+        url: `/notify/v1/projects/${projectId}/message_settings/agile/batch`,
         method: 'put',
         data: res,
       });
@@ -37,7 +40,7 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   fields: [
     { name: 'name', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
     { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
-    { name: 'userList', type: 'object', textField: 'realName', valueField: 'id', options: userDs, multiple: true, label: formatMessage({ id: `${intlPrefix}.choose` }) },
+    { name: 'userList', type: 'object', textField: 'realName', valueField: 'userId', options: userDs, multiple: true, label: formatMessage({ id: `${intlPrefix}.choose` }) },
     { name: 'sendRoleList', multiple: true },
   ],
   queryFields: [],

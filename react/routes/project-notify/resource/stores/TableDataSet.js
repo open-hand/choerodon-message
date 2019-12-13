@@ -63,10 +63,12 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
           const obj = {
             ...item,
             groupId: Number(item.groupId),
-            projectId,
           };
           if (!item.sendRoleList.includes('specifier')) {
-            item.userList = [];
+            obj.userList = [];
+            obj.specifierIds = [];
+          } else {
+            obj.specifierIds = item.userList.map(({ id }) => id);
           }
           newData.push(obj);
         }
