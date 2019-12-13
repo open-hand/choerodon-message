@@ -295,7 +295,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 // 设置通知角色
                 settingVO.setSendRoleList(roleList);
                 if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
-                    settingVO.setNotifyObject(settingVO.getUserList().get(0).getType());
+                    settingVO.setNotifyObject(TargetUserType.nameMapping.get(settingVO.getUserList().get(0).getType()));
                 }
                 // 设置要通知的非指定用户
                 settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toList()));
