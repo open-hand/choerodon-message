@@ -40,7 +40,7 @@ export default props => {
     const hasCheckedRecord = tableDs.find((record) => record.get(name));
     return (
       <CheckBox
-        checked={isChecked}
+        checked={!!isChecked}
         indeterminate={!isChecked && !!hasCheckedRecord}
         onChange={(value) => handleHeaderChange(value, name)}
       >

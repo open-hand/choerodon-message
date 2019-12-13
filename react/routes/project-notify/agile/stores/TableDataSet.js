@@ -23,12 +23,15 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
       const res = [];
       data.forEach((item) => {
         if (!item.sendRoleList.includes('specifier')) {
+          item.specifierIds = [];
           item.userList = [];
+        } else {
+          item.specifierIds = item.userList.map(({ id }) => id);
         }
         res.push(item);
       });
       return ({
-        url: `/notify/v1/projects/${projectId}/message_settings/devops/batch`,
+        url: `/notify/v1/projects/${projectId}/message_settings/agile/batch`,
         method: 'put',
         data: res,
       });
