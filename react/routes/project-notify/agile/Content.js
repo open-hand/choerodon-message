@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
-import { Table, CheckBox, Dropdown, Icon, Button } from 'choerodon-ui/pro';
+import { Table, CheckBox, Dropdown, Icon } from 'choerodon-ui/pro';
 import { useAgileContentStore } from './stores';
-import NotifyObject from '../components/notify-object/NotifyObject';
+import NotifyObject from '../components/notify-object';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 
@@ -15,6 +15,7 @@ export default props => {
     intl: { formatMessage },
     tableDs,
     allSendRoleList,
+    permissions,
   } = useAgileContentStore();
 
   async function refresh() {
@@ -38,7 +39,7 @@ export default props => {
     const pmRecords = tableDs.find((record) => record.get('pmEnable'));
     return (
       <CheckBox
-        checked={isChecked}
+        checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
         onChange={handlePmHeaderChange}
       >
@@ -88,7 +89,7 @@ export default props => {
   }
 
   return (
-    <Fragment>
+    <TabPage service={permissions}>
       <Breadcrumb />
       <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs}>
@@ -98,6 +99,6 @@ export default props => {
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>
-    </Fragment>
+    </TabPage>
   );
 };

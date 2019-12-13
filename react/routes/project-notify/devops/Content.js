@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
 import { Table, CheckBox, Icon, Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
-import { useAgileContentStore } from './stores';
+import { useDevopsContentStore } from './stores';
 import FooterButtons from '../components/footer-buttons';
 
 const { Column } = Table;
@@ -13,7 +13,8 @@ export default props => {
     prefixCls,
     intl: { formatMessage },
     tableDs,
-  } = useAgileContentStore();
+    permissions,
+  } = useDevopsContentStore();
 
   async function refresh() {
     tableDs.query();
@@ -86,7 +87,7 @@ export default props => {
   }
 
   return (
-    <Fragment>
+    <TabPage service={permissions}>
       <Breadcrumb />
       <Content className={`${prefixCls}-resource-content`}>
         <Table dataSet={tableDs} mode="tree">
@@ -109,6 +110,6 @@ export default props => {
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>
-    </Fragment>
+    </TabPage>
   );
 };

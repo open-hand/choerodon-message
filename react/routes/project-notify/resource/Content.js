@@ -1,9 +1,9 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
-import { Table, CheckBox, Icon, Dropdown, Button } from 'choerodon-ui/pro';
+import { Table, CheckBox, Icon, Dropdown } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
 import { useResourceContentStore } from './stores';
-import NotifyObject from '../components/notify-object/NotifyObject';
+import NotifyObject from '../components/notify-object';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 
@@ -16,6 +16,7 @@ export default props => {
     intl: { formatMessage },
     tableDs,
     allSendRoleList,
+    permissions,
   } = useResourceContentStore();
 
   async function refresh() {
@@ -50,15 +51,15 @@ export default props => {
 
   function handleCheckBoxChange({ record, value, name }) {
     record.set(name, value);
-    if (!record.get('envId')) {
+    if (!record.get('groupId')) {
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('envId') === record.get('key')) {
+        if (tableRecord.get('groupId') === record.get('key')) {
           tableRecord.set(name, value);
         }
       });
     } else {
-      const parentRecord = tableDs.find((tableRecord) => record.get('envId') === tableRecord.get('key'));
-      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('envId') && !tableRecord.get(name));
+      const parentRecord = tableDs.find((tableRecord) => record.get('groupId') === tableRecord.get('key'));
+      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
       parentRecord.set(name, parentIsChecked);
     }
   }
@@ -66,9 +67,9 @@ export default props => {
   function renderCheckBox({ record, name }) {
     let isChecked = true;
     let isIndeterminate = false;
-    if (!record.get('envId')) {
-      isChecked = !tableDs.find((tableRecord) => tableRecord.get('envId') === record.get('key') && !tableRecord.get(name));
-      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('envId') === record.get('key') && tableRecord.get(name));
+    if (!record.get('groupId')) {
+      isChecked = !tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && !tableRecord.get(name));
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && tableRecord.get(name));
     }
     return (
       <CheckBox
@@ -82,7 +83,7 @@ export default props => {
   }
   
   function renderNotifyObject({ record }) {
-    if (!record.get('envId')) {
+    if (!record.get('groupId')) {
       return '-';
     }
 
@@ -115,7 +116,7 @@ export default props => {
   }
 
   return (
-    <Fragment>
+    <TabPage service={permissions}>
       <Breadcrumb />
       <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs} mode="tree">
@@ -148,6 +149,6 @@ export default props => {
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>
-    </Fragment>
+    </TabPage>
   );
 };

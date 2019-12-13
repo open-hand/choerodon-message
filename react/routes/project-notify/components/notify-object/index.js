@@ -19,7 +19,7 @@ export default ({ record, allSendRoleList }) => {
       <Form record={record}>
         <SelectBox name="sendRoleList" vertical>
           {allSendRoleList.map((item) => (
-            <Option value={item}>
+            <Option value={item} key={item}>
               <span className={`${prefixCls}-object-content-checkbox`}>
                 {formatMessage({ id: `${intlPrefix}.object.${item}` })}
               </span>

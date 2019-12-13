@@ -7,7 +7,7 @@ import TableDataSet from './TableDataSet';
 
 const Store = createContext();
 
-export function useAgileContentStore() {
+export function useDevopsContentStore() {
   return useContext(Store);
 }
 
@@ -24,7 +24,10 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
     ...props,
     intlPrefix,
     prefixCls: 'project-notify',
-    permissions: [],
+    permissions: [
+      'notify-service.message-setting.listByType',
+      'notify-service.message-setting.batchUpdateByType',
+    ],
     tableDs,
   };
 
