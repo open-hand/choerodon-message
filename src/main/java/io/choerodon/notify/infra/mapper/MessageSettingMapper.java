@@ -7,6 +7,7 @@ import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 根据通知设置类型，查询通知设置分组信息
+     *
      * @param notifyType
      * @return
      */
@@ -28,6 +30,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 查询启用的默认通知配置
+     *
      * @param notifyType
      * @return
      */
@@ -35,6 +38,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 根据通知类型查询项目下的通知配置
+     *
      * @param projectId
      * @param notifyType
      * @return
@@ -43,6 +47,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 查询资源删除验证通知设置
+     *
      * @param projectId
      * @param envId
      * @param notifyType
@@ -51,7 +56,9 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
     List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("projectId") Long projectId, @Param("envId") Long envId, @Param("notifyType") String notifyType);
 
     /**
+     * <<<<<<< 50102f2b1c5f25b2364051febd423125cdf48249
      * 根据类型和code，查询项目下的通知配置
+     *
      * @param notifyType
      * @param projectId
      * @param code
@@ -63,6 +70,7 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 查询资源删除通知设置
+     *
      * @param notifyType
      * @param projectId
      * @param code
@@ -78,17 +86,19 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
 
     /**
      * 查询默认的资源删除通知设置
+     *
      * @param notifyType
      * @param code
      * @param eventName
      * @return
      */
-    MessageSettingVO getDefaultResourceDeleteSetting(@Param("notifyType")String notifyType,
+    MessageSettingVO getDefaultResourceDeleteSetting(@Param("notifyType") String notifyType,
                                                      @Param("code") String code,
                                                      @Param("eventName") String eventName);
 
     /**
      * 查询默认通知配置
+     *
      * @param notifyType
      * @param code
      * @return
@@ -96,4 +106,11 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
     MessageSettingVO getDefaultSettingByCode(@Param("notifyType") String notifyType,
                                              @Param("code") String code);
 
+    /**
+     * 根据type和envId删除通知设置
+     *
+     * @param type
+     * @param envId
+     */
+    void deleteByTypeAndEnvId(@Param("type") String type, @Param("envId") Long envId);
 }

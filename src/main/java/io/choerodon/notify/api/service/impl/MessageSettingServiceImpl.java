@@ -21,6 +21,7 @@ import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import io.choerodon.notify.infra.mapper.SendSettingMapper;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -279,6 +280,11 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             }
         }
         return messageSettingVO;
+    }
+    
+    @Override
+    public void deleteByTypeAndEnvId(String type, Long envId) {
+        messageSettingMapper.deleteByTypeAndEnvId(type, envId);
     }
 
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
