@@ -6,8 +6,6 @@ import NotifyObject from '../components/notify-object/NotifyObject';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 
-import './index.less';
-
 const { Column } = Table;
 
 export default props => {
@@ -65,7 +63,7 @@ export default props => {
     const userList = record.get('userList');
     const sendRoleList = record.get('sendRoleList');
     sendRoleList.forEach((key) => {
-      if (key !== 'selectedUser') {
+      if (key !== 'specifier') {
         data.push(formatMessage({ id: `${intlPrefix}.object.${key}` }));
       } else if (userList && userList.length) {
         const names = userList.map(({ realName }) => realName);
@@ -92,7 +90,7 @@ export default props => {
   return (
     <Fragment>
       <Breadcrumb />
-      <Content className={`${prefixCls}-agile-content`}>
+      <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
           <Column header={renderPmHeader} renderer={renderPm} align="left" />

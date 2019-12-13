@@ -1,13 +1,11 @@
-const objectTypes = ['sendHandler', 'sendOwner', 'sendSpecifier'];
-
 function formatData(data) {
   const newData = [];
   data.forEach((item) => {
     const res = { ...item };
-    const { envId, id } = res;
-    if (envId) {
-      res.key = `${envId}-${id}`;
-      res.envId = String(envId);
+    const { groupId, id } = item;
+    if (groupId) {
+      res.key = `${groupId}-${id}`;
+      res.groupId = String(groupId);
     } else {
       res.key = String(id);
     }
@@ -17,34 +15,18 @@ function formatData(data) {
 }
 
 function parentItemIsChecked({ dataSet, record, name }) {
-  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('envId') && !tableRecord.get(name));
+  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
   record.init(name, parentIsChecked);
 }
 
 function handleLoad({ dataSet }) {
   dataSet.forEach((record) => {
-    if (!record.get('envId')) {
-      parentItemIsChecked({ dataSet, record, name: 'sendPm' });
-      parentItemIsChecked({ dataSet, record, name: 'sendEmail' });
-      parentItemIsChecked({ dataSet, record, name: 'sendSms' });
-    } else {
-      const notifyObject = [];
-      objectTypes.forEach((item) => {
-        if (record.get(item)) {
-          notifyObject.push(item);
-        }
-      });
-      record.init('notifyObject', notifyObject);
+    if (!record.get('groupId')) {
+      parentItemIsChecked({ dataSet, record, name: 'pmEnable' });
+      parentItemIsChecked({ dataSet, record, name: 'emailEnable' });
+      parentItemIsChecked({ dataSet, record, name: 'smsEnable' });
     }
   });
-}
-
-function handleUpdate({ record, value, name }) {
-  if (name === 'notifyObject' && value) {
-    objectTypes.forEach((item) => {
-      record.set(item, value.includes(item));
-    });
-  }
 }
 
 export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
@@ -52,12 +34,12 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   selection: false,
   paging: false,
   autoQueryAfterSubmit: false,
-  parentField: 'envId',
+  parentField: 'groupId',
   idField: 'key',
   primaryKey: 'key',
   transport: {
     read: {
-      url: `/devops/v1/projects/${projectId}/notification/group_by_env`,
+      url: `/notify/v1/projects/${projectId}/message_settings/resourceDelete`,
       method: 'get',
       transformResponse(response) {
         try {
@@ -65,8 +47,8 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
           if (data && data.failed) {
             return data;
           } else {
-            const { devopsEnvironmentList, devopsNotificationList } = data;
-            const res = devopsEnvironmentList.concat(devopsNotificationList);
+            const { notifyEventGroupList, customMessageSettingList } = data;
+            const res = notifyEventGroupList.concat(customMessageSettingList);
             return formatData(res);
           }
         } catch (e) {
@@ -77,22 +59,20 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
     submit: ({ data }) => {
       const newData = [];
       data.forEach((item) => {
-        if (item.envId) {
+        if (item.groupId) {
           const obj = {
             ...item,
-            envId: Number(item.envId),
+            groupId: Number(item.groupId),
             projectId,
           };
-          if (item.sendSpecifier) {
-            obj.userList = item.userList.map((list) => ({ ...list, userId: list.id }));
-          } else {
-            obj.userList = [];
+          if (!item.sendRoleList.includes('specifier')) {
+            item.userList = [];
           }
           newData.push(obj);
         }
       });
       return ({
-        url: `/devops/v1/projects/${projectId}/notification/batch`,
+        url: `/notify/v1/projects/${projectId}/message_settings/resourceDelete/batch`,
         method: 'put',
         data: newData,
       });
@@ -100,15 +80,14 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   },
   fields: [
     { name: 'name', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
-    { name: 'sendEmail', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
-    { name: 'sendPm', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
-    { name: 'sendSms', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.smsEnable` }) },
+    { name: 'emailEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
+    { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
+    { name: 'smsEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.smsEnable` }) },
     { name: 'userList', type: 'object', textField: 'realName', valueField: 'id', options: userDs, multiple: true, label: '请选择' },
-    { name: 'notifyObject', type: 'object', multiple: true },
+    { name: 'sendRoleList', type: 'object', multiple: true },
   ],
   queryFields: [],
   events: {
     load: handleLoad,
-    update: handleUpdate,
   },
 });

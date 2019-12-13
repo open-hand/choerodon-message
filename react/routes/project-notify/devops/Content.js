@@ -5,8 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import { useAgileContentStore } from './stores';
 import FooterButtons from '../components/footer-buttons';
 
-import './index.less';
-
 const { Column } = Table;
 
 export default props => {
@@ -80,10 +78,11 @@ export default props => {
     );
   }
 
-  function renderNotifyObject({ record }) {
+  function renderNotifyObject({ record, value }) {
     if (!record.get('groupId')) {
       return '-';
     }
+    return value;
   }
 
   return (
@@ -106,10 +105,7 @@ export default props => {
             width={150}
             align="left"
           />
-          <Column
-            header={formatMessage({ id: `${intlPrefix}.noticeObject` })}
-            renderer={renderNotifyObject}
-          />
+          <Column name="notifyObject" renderer={renderNotifyObject} />
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>

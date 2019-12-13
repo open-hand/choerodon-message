@@ -30,7 +30,7 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
     intlPrefix,
     prefixCls: 'project-notify',
     permissions: [],
-    allSendRoleList: ['reporter', 'assignee', 'projectOwner', 'selectedUser'],
+    allSendRoleList: ['reporter', 'assignee', 'projectOwner', 'specifier'],
     tableDs,
   };
 

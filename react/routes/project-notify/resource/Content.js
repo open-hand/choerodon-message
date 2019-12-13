@@ -7,8 +7,6 @@ import NotifyObject from '../components/notify-object/NotifyObject';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 
-import './index.less';
-
 const { Column } = Table;
 
 export default props => {
@@ -17,7 +15,7 @@ export default props => {
     prefixCls,
     intl: { formatMessage },
     tableDs,
-    notifyObject,
+    allSendRoleList,
   } = useResourceContentStore();
 
   async function refresh() {
@@ -90,19 +88,19 @@ export default props => {
 
     const data = [];
     const userList = record.get('userList');
-    const recordObject = record.get('notifyObject');
-    Object.keys(notifyObject).forEach((key) => {
-      if (recordObject.includes(key)) {
-        data.push(notifyObject[key]);
+    const sendRoleList = record.get('sendRoleList');
+    sendRoleList.forEach((key) => {
+      if (key !== 'specifier') {
+        data.push(formatMessage({ id: `${intlPrefix}.object.${key}` }));
+      } else if (userList && userList.length) {
+        const names = userList.map(({ realName }) => realName);
+        data.push(...names);
       }
     });
-    if (recordObject.includes('sendSpecifier') && userList && userList.length) {
-      userList.forEach(({ realName }) => data.push(realName));
-    }
 
     return (
       <Dropdown
-        overlay={<NotifyObject record={record} />}
+        overlay={<NotifyObject record={record} allSendRoleList={allSendRoleList} />}
         trigger={['click']}
         placement="bottomLeft"
       >
@@ -119,26 +117,26 @@ export default props => {
   return (
     <Fragment>
       <Breadcrumb />
-      <Content className={`${prefixCls}-resource-content`}>
+      <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column
-            header={() => renderCheckBoxHeader('sendPm')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'sendPm' })}
+            header={() => renderCheckBoxHeader('pmEnable')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable' })}
             editor
             width={150}
             align="left"
           />
           <Column
-            header={() => renderCheckBoxHeader('sendEmail')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'sendEmail' })}
+            header={() => renderCheckBoxHeader('emailEnable')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable' })}
             editor
             width={150}
             align="left"
           />
           <Column
-            header={() => renderCheckBoxHeader('sendSms')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'sendSms' })}
+            header={() => renderCheckBoxHeader('smsEnable')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'smsEnable' })}
             editor
             width={150}
             align="left"

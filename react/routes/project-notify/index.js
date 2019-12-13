@@ -1,11 +1,12 @@
 import React from 'react';
 import { PageTab, PageWrap } from '@choerodon/boot';
 import { StoreProvider } from './stores';
-import Content from './Content';
 import WebhookContent from '../WebhooksSetting';
 import AgileContent from './agile';
 import DevopsContent from './devops';
 import ResourceContent from './resource';
+
+import './index.less';
 
 export default props => (
   <StoreProvider {...props}>
