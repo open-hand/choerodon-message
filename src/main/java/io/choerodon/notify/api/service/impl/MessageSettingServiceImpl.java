@@ -263,6 +263,17 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         }
     }
 
+    @Override
+    public MessageSettingVO getSettingByCode(Long projectId, String notifyType, String code, Long envId, String eventName) {
+        MessageSettingVO messageSettingVO = new MessageSettingVO();
+        if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
+
+        } else {
+            messageSettingVO = messageSettingMapper.getSettingByTypeAndCode(notifyType, projectId, code);
+        }
+        return messageSettingVO;
+    }
+
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
         customMessageSettingList.stream()
                 .filter(settingVO -> RESOURCE_DELETE_CONFIRMATION.equals(settingVO.getCode()))

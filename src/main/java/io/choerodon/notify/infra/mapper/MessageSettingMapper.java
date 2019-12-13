@@ -3,6 +3,7 @@ package io.choerodon.notify.infra.mapper;
 import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 
+import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
@@ -48,4 +49,6 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
      * @return
      */
     List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("projectId") Long projectId, @Param("envId") Long envId, @Param("notifyType") String notifyType);
+
+    MessageSettingVO getSettingByTypeAndCode(String notifyType, Long projectId, String code);
 }
