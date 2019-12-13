@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class MessageSettingTargetUserServiceImpl implements MessageSettingTargetUserService {
 
     private static final String ERROR_SAVE_TARGET_USER = "error.save.target.user";
+    private static final String ERROR_DELETE_TARGET_USER = "error.delete.target.user";
 
     private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
 
@@ -28,6 +29,15 @@ public class MessageSettingTargetUserServiceImpl implements MessageSettingTarget
     public void save(TargetUserDTO targetUserDTO) {
         if (messageSettingTargetUserMapper.insertSelective(targetUserDTO) != 1) {
             throw new CommonException(ERROR_SAVE_TARGET_USER);
+        }
+    }
+
+    @Override
+    public void deleteBySettingId(Long id) {
+        TargetUserDTO targetUserDTO = new TargetUserDTO();
+        targetUserDTO.setMessageSettingId(id);
+        if (messageSettingTargetUserMapper.delete(targetUserDTO) < 1) {
+            throw new CommonException(ERROR_DELETE_TARGET_USER);
         }
     }
 }

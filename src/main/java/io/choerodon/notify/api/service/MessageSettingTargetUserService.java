@@ -12,4 +12,6 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 public interface MessageSettingTargetUserService {
 
     void save(TargetUserDTO targetUserDTO);
+
+    void deleteBySettingId(Long id);
 }

@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -45,6 +46,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private static final String ERROR_SAVE_MESSAGE_SETTING = "error.save.message.setting";
     private static final String ERROR_UPDATE_MESSAGE_SETTING = "error.update.message.setting";
+    private static final String ERROR_PARAM_INVALID = "error.update.message.setting";
     @Autowired
     private MessageSettingMapper messageSettingMapper;
 
@@ -87,63 +89,67 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         }
     }
 
-    @Override
-    @Transactional
-    public void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS) {
-        if (messageSettingVOS == null || messageSettingVOS.size() == 0 || projectId == null) {
-            return;
-        }
-        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-        messageSettingDTO.setNotifyType(messageSettingVOS.get(0).getNotifyType());
-        //判断这个是否首次修改
-        TargetUserDTO targetUserDTO = new TargetUserDTO();
-        messageSettingVOS.stream().forEach(e -> {
-            messageSettingDTO.setProjectId(projectId);
-            messageSettingDTO.setCode(e.getCode());
-            List<MessageSettingDTO> settingDTOS = messageSettingMapper.select(messageSettingDTO);
-            //如果是首次修改则插入带ProjectId的数据
-            if (Objects.isNull(settingDTOS) || settingDTOS.size() == 0) {
-                e.setProjectId(projectId);
-                e.setId(null);
-                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
-                MessageSettingDTO condition = new MessageSettingDTO();
-                condition.setProjectId(projectId);
-                condition.setCode(e.getCode());
-                MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(condition);
-                List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
-                targetUserDTOS.stream().forEach(v -> {
-                    v.setId(null);
-                    v.setMessageSettingId(messageSettingDTO1.getId());
-                    messageSettingTargetUserMapper.insert(v);
-                });
-            } else {
-                //否则修改原来的数据
-                //先删除targetUser
-                TargetUserDTO targetUserDTO1 = new TargetUserDTO();
-                targetUserDTO1.setMessageSettingId(e.getId());
-                messageSettingTargetUserMapper.delete(targetUserDTO1);
-                //再删除MessageSetting
-                MessageSettingDTO messageSettingDTO1 = new MessageSettingDTO();
-                messageSettingDTO1.setId(e.getId());
-                messageSettingMapper.delete(messageSettingDTO1);
-
-                //然后插入更新后的数据
-                e.setProjectId(projectId);
-                e.setId(null);
-                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
-                List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
-                MessageSettingDTO condition = new MessageSettingDTO();
-                condition.setProjectId(projectId);
-                condition.setCode(e.getCode());
-                MessageSettingDTO messageSettingDTO2 = messageSettingMapper.selectOne(condition);
-                targetUserDTOS.stream().forEach(v -> {
-                    v.setId(null);
-                    v.setMessageSettingId(messageSettingDTO2.getId());
-                    messageSettingTargetUserMapper.insert(v);
-                });
-            }
-        });
-    }
+//    @Override
+//    public void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS) {
+//
+//    }
+    //    @Override
+//    @Transactional
+//    public void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS) {
+//        if (messageSettingVOS == null || messageSettingVOS.size() == 0 || projectId == null) {
+//            return;
+//        }
+//        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+//        messageSettingDTO.setNotifyType(messageSettingVOS.get(0).getNotifyType());
+//        //判断这个是否首次修改
+//        TargetUserDTO targetUserDTO = new TargetUserDTO();
+//        messageSettingVOS.stream().forEach(e -> {
+//            messageSettingDTO.setProjectId(projectId);
+//            messageSettingDTO.setCode(e.getCode());
+//            List<MessageSettingDTO> settingDTOS = messageSettingMapper.select(messageSettingDTO);
+//            //如果是首次修改则插入带ProjectId的数据
+//            if (Objects.isNull(settingDTOS) || settingDTOS.size() == 0) {
+//                e.setProjectId(projectId);
+//                e.setId(null);
+//                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
+//                MessageSettingDTO condition = new MessageSettingDTO();
+//                condition.setProjectId(projectId);
+//                condition.setCode(e.getCode());
+//                MessageSettingDTO messageSettingDTO1 = messageSettingMapper.selectOne(condition);
+//                List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
+//                targetUserDTOS.stream().forEach(v -> {
+//                    v.setId(null);
+//                    v.setMessageSettingId(messageSettingDTO1.getId());
+//                    messageSettingTargetUserMapper.insert(v);
+//                });
+//            } else {
+//                //否则修改原来的数据
+//                //先删除targetUser
+//                TargetUserDTO targetUserDTO1 = new TargetUserDTO();
+//                targetUserDTO1.setMessageSettingId(e.getId());
+//                messageSettingTargetUserMapper.delete(targetUserDTO1);
+//                //再删除MessageSetting
+//                MessageSettingDTO messageSettingDTO1 = new MessageSettingDTO();
+//                messageSettingDTO1.setId(e.getId());
+//                messageSettingMapper.delete(messageSettingDTO1);
+//
+//                //然后插入更新后的数据
+//                e.setProjectId(projectId);
+//                e.setId(null);
+//                messageSettingMapper.insert(modelMapper.map(e, MessageSettingDTO.class));
+//                List<TargetUserDTO> targetUserDTOS = e.getTargetUserDTOS();
+//                MessageSettingDTO condition = new MessageSettingDTO();
+//                condition.setProjectId(projectId);
+//                condition.setCode(e.getCode());
+//                MessageSettingDTO messageSettingDTO2 = messageSettingMapper.selectOne(condition);
+//                targetUserDTOS.stream().forEach(v -> {
+//                    v.setId(null);
+//                    v.setMessageSettingId(messageSettingDTO2.getId());
+//                    messageSettingTargetUserMapper.insert(v);
+//                });
+//            }
+//        });
+//    }
 
     @Override
     public List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code) {
@@ -223,6 +229,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
         List<CustomMessageSettingVO> defaultSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
@@ -233,29 +240,37 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         // 默认配置的修改
         defaultMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setId(null);
             saveMessageSetting(settingDTO);
-            settingVO.getUserList().forEach(user -> {
-                user.setMessageSettingId(settingDTO.getId());
-                messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
-            });
+            List<TargetUserVO> userList = settingVO.getUserList();
+            if (!CollectionUtils.isEmpty(userList)) {
+                settingVO.getUserList().forEach(user -> {
+                    user.setMessageSettingId(settingDTO.getId());
+                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+                });
+            }
         });
         // 自定配置修改
-    }
+        customMessagesSettings.forEach(settingVO -> {
+            MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            updateMessageSetting(settingDTO);
 
-    private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
-        messageSettingVOS.forEach(settingVO -> {
-            Set<String> sendRoleList = settingVO.getSendRoleList();
-            if (!CollectionUtils.isEmpty(sendRoleList)) {
-                sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
-                    TargetUserVO targetUserVO = new TargetUserVO();
-                    targetUserVO.setType(role);
-                    settingVO.getUserList().add(targetUserVO);
+            // 删除旧数据
+            messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
+            // 添加新数据
+            List<TargetUserVO> userList = settingVO.getUserList();
+            if (!CollectionUtils.isEmpty(userList)) {
+                userList.forEach(user -> {
+                    user.setMessageSettingId(settingDTO.getId());
+                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
                 });
 
             }
-        });
 
+        });
     }
+
+
 
     @Override
     public void saveMessageSetting(MessageSettingDTO messageSettingDTO) {
@@ -269,6 +284,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         MessageSettingVO messageSettingVO;
 
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
+            if (envId == null || ObjectUtils.isEmpty(eventName)) {
+                throw new CommonException(ERROR_PARAM_INVALID);
+            }
             messageSettingVO = messageSettingMapper.getResourceDeleteSettingByOption(notifyType, projectId, code, envId, eventName);
             if (messageSettingVO == null) {
                 messageSettingVO = messageSettingMapper.getDefaultResourceDeleteSetting(notifyType, code, eventName);
@@ -287,6 +305,28 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         messageSettingMapper.deleteByTypeAndEnvId(type, envId);
     }
 
+    @Override
+    public void updateMessageSetting(MessageSettingDTO messageSettingDTO) {
+        if (messageSettingMapper.updateByPrimaryKeySelective(messageSettingDTO) != 1) {
+            throw new CommonException(ERROR_UPDATE_MESSAGE_SETTING);
+        }
+    }
+
+    private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
+        messageSettingVOS.forEach(settingVO -> {
+            Set<String> sendRoleList = settingVO.getSendRoleList();
+            if (!CollectionUtils.isEmpty(sendRoleList)) {
+                sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
+                    TargetUserVO targetUserVO = new TargetUserVO();
+                    targetUserVO.setType(role);
+                    settingVO.getUserList().add(targetUserVO);
+                });
+
+            }
+        });
+
+    }
+
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
         customMessageSettingList.stream()
                 .filter(settingVO -> RESOURCE_DELETE_CONFIRMATION.equals(settingVO.getCode()))
@@ -297,11 +337,11 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         customMessageSettingList.forEach(settingVO -> {
             List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
-                List<Long> uids = userList.stream().map(TargetUserVO::getId).collect(Collectors.toList());
+                List<Long> uids = userList.stream().map(TargetUserVO::getUserId).collect(Collectors.toList());
                 List<UserDTO> iamUserList = baseFeignClient.listUsersByIds(uids.toArray(new Long[20]), false).getBody();
                 Map<Long, UserDTO> iamUserMap = iamUserList.stream().collect(Collectors.toMap(v -> v.getId(), v -> v));
                 userList.forEach(user -> {
-                    UserDTO userDTO = iamUserMap.get(user.getId());
+                    UserDTO userDTO = iamUserMap.get(user.getUserId());
                     user.setRealName(userDTO.getRealName());
                     user.setLoginName(userDTO.getLoginName());
                 });
