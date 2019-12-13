@@ -16,7 +16,7 @@ import java.util.List;
 public interface MessageSettingService {
     List<MessageSettingCategoryDTO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO);
 
-    void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
+//    void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
 
     List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code);
 
@@ -31,4 +31,6 @@ public interface MessageSettingService {
     MessageSettingVO getSettingByCode(Long projectId, String notifyType, String code, Long envId, String eventName);
 
     void deleteByTypeAndEnvId(String type, Long envId);
+
+    void updateMessageSetting(MessageSettingDTO messageSettingDTO);
 }
