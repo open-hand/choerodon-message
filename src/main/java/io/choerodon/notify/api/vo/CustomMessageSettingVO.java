@@ -59,6 +59,9 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "指定用户集合")
     private List<TargetUserVO> userList;
 
+    @ApiModelProperty(value = "指定用户id集合")
+    private Set<Long> specifierIds;
+
     public Long getId() {
         return id;
     }
@@ -177,5 +180,13 @@ public class CustomMessageSettingVO {
 
     public void setNotifyObject(String notifyObject) {
         this.notifyObject = notifyObject;
+    }
+
+    public Set<Long> getSpecifierIds() {
+        return specifierIds;
+    }
+
+    public void setSpecifierIds(Set<Long> specifierIds) {
+        this.specifierIds = specifierIds;
     }
 }
