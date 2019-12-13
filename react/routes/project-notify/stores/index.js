@@ -18,7 +18,7 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
     AppState: { currentMenuType: { projectId } },
   } = props;
 
-  const ProjectNotifyStore = useMemo(() => useStore({ defaultKey: 'agile' }), []);
+  const ProjectNotifyStore = useStore();
   const userDs = useMemo(() => new DataSet(UserOptionsDataSet(projectId)), [projectId]);
 
   const value = {

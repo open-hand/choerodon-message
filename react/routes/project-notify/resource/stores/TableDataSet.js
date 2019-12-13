@@ -84,7 +84,7 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
     { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
     { name: 'smsEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.smsEnable` }) },
     { name: 'userList', type: 'object', textField: 'realName', valueField: 'id', options: userDs, multiple: true, label: '请选择' },
-    { name: 'sendRoleList', type: 'object', multiple: true },
+    { name: 'sendRoleList', multiple: true },
   ],
   queryFields: [],
   events: {

@@ -38,7 +38,7 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
     { name: 'name', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
     { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
     { name: 'userList', type: 'object', textField: 'realName', valueField: 'id', options: userDs, multiple: true, label: formatMessage({ id: `${intlPrefix}.choose` }) },
-    { name: 'sendRoleList', type: 'object', multiple: true },
+    { name: 'sendRoleList', multiple: true },
   ],
   queryFields: [],
 });
