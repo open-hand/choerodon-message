@@ -11,6 +11,7 @@ import java.util.List;
  * Date: 2019/12/3
  */
 public class MessageSettingVO {
+
     private Long id;
     @NotEmpty(message = "error.messageSetting.notifyType.empty")
     @ApiModelProperty("通知类型（必填），用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")

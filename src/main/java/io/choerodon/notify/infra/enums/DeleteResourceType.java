@@ -36,6 +36,6 @@ public enum DeleteResourceType {
         nameMapping.put(SERVICE.getTypeName(), "删除网络");
         nameMapping.put(CONFIGMAP.getTypeName(), "删除配置映射");
         nameMapping.put(CERTIFICATE.getTypeName(), "删除证书");
-        nameMapping.put(SERVICE.getTypeName(), "删除密文");
+        nameMapping.put(SECRET.getTypeName(), "删除密文");
     }
 }

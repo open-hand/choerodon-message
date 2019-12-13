@@ -3,6 +3,7 @@ package io.choerodon.notify.infra.mapper;
 import io.choerodon.mybatis.common.Mapper;
 import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 
+import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
@@ -48,4 +49,51 @@ public interface MessageSettingMapper extends Mapper<MessageSettingDTO> {
      * @return
      */
     List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("projectId") Long projectId, @Param("envId") Long envId, @Param("notifyType") String notifyType);
+
+    /**
+     * 根据类型和code，查询项目下的通知配置
+     * @param notifyType
+     * @param projectId
+     * @param code
+     * @return
+     */
+    MessageSettingVO getSettingByTypeAndCode(@Param("notifyType") String notifyType,
+                                             @Param("projectId") Long projectId,
+                                             @Param("code") String code);
+
+    /**
+     * 查询资源删除通知设置
+     * @param notifyType
+     * @param projectId
+     * @param code
+     * @param envId
+     * @param eventName
+     * @return
+     */
+    MessageSettingVO getResourceDeleteSettingByOption(@Param("notifyType") String notifyType,
+                                                      @Param("projectId") Long projectId,
+                                                      @Param("code") String code,
+                                                      @Param("envId") Long envId,
+                                                      @Param("eventName") String eventName);
+
+    /**
+     * 查询默认的资源删除通知设置
+     * @param notifyType
+     * @param code
+     * @param eventName
+     * @return
+     */
+    MessageSettingVO getDefaultResourceDeleteSetting(@Param("notifyType")String notifyType,
+                                                     @Param("code") String code,
+                                                     @Param("eventName") String eventName);
+
+    /**
+     * 查询默认通知配置
+     * @param notifyType
+     * @param code
+     * @return
+     */
+    MessageSettingVO getDefaultSettingByCode(@Param("notifyType") String notifyType,
+                                             @Param("code") String code);
+
 }

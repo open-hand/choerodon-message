@@ -27,4 +27,6 @@ public interface MessageSettingService {
     void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS);
 
     void saveMessageSetting(MessageSettingDTO messageSettingDTO);
+
+    MessageSettingVO getSettingByCode(Long projectId, String notifyType, String code, Long envId, String eventName);
 }

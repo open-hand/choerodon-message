@@ -63,16 +63,18 @@ public class MessageSettingController {
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
     }
-//    @GetMapping("/{code}")
-//    @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
-//    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
-//    public ResponseEntity<MessageSettingVO> getMessageSetting(
-//            @PathVariable(value = "project_id") Long projectId,
-//            @PathVariable String code) {
-//        return Optional.ofNullable(messageSettingService.getMessageSetting(projectId, code))
-//                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-//                .orElseThrow(() -> new CommonException("error.messageSetting.query"));
-//    }
+    @GetMapping("/type/{notify_type}/code/{code}")
+    @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
+    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
+    public ResponseEntity<MessageSettingVO> getSettingByCode(
+            @PathVariable(value = "project_id") Long projectId,
+            @PathVariable(value = "notify_type") String notifyType,
+            @PathVariable(value = "code") String code,
+            @RequestParam(value = "env_id", required = false) Long envId,
+            @RequestParam(value = "event_name", required = false) String eventName
+            ) {
+        return ResponseEntity.ok(messageSettingService.getSettingByCode(projectId, notifyType, code, envId, eventName));
+    }
     @GetMapping("/{notify_type}")
     @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
     @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
