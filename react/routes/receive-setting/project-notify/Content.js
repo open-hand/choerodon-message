@@ -2,13 +2,16 @@ import React, { Fragment } from 'react';
 import { Content, Breadcrumb, Choerodon, TabPage } from '@choerodon/boot';
 import { Table, CheckBox, Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
+import { Prompt } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import { useProjectNotifyStore } from './stores';
+import { useReceiveSettingStore } from '../stores';
 
 import './index.less';
 
 const { Column } = Table;
 
-export default props => {
+export default observer(props => {
   const {
     intlPrefix,
     prefixCls,
@@ -17,6 +20,9 @@ export default props => {
     receiveStore,
     AppState: { getUserInfo: { id } },
   } = useProjectNotifyStore();
+  const {
+    promptMsg,
+  } = useReceiveSettingStore();
 
   async function refresh() {
     await receiveStore.loadReceiveData(id);
@@ -45,7 +51,7 @@ export default props => {
     const pmRecords = tableDs.find((record) => record.get(name) && (record.get(`${name}TemplateId`) || record.get('treeType') !== 'item'));
     return (
       <CheckBox
-        checked={isChecked}
+        checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
         onChange={(value) => handleCheckBoxHeaderChange(value, name)}
       >
@@ -135,6 +141,7 @@ export default props => {
   return (
     <TabPage>
       <Breadcrumb />
+      <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={tableDs.dirty} />
       <Content className={`${prefixCls}-content`}>
         <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
@@ -169,4 +176,4 @@ export default props => {
       </Content>
     </TabPage>
   );
-};
+});

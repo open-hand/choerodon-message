@@ -1,13 +1,15 @@
 import React from 'react';
 import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
-import { Table, CheckBox, Icon, Button } from 'choerodon-ui/pro';
-import { FormattedMessage } from 'react-intl';
+import { Table, CheckBox } from 'choerodon-ui/pro';
+import { observer } from 'mobx-react-lite';
+import { Prompt } from 'react-router-dom';
 import { useDevopsContentStore } from './stores';
 import FooterButtons from '../components/footer-buttons';
+import { useProjectNotifyStore } from '../stores';
 
 const { Column } = Table;
 
-export default props => {
+export default observer(props => {
   const {
     intlPrefix,
     prefixCls,
@@ -15,6 +17,9 @@ export default props => {
     tableDs,
     permissions,
   } = useDevopsContentStore();
+  const {
+    promptMsg,
+  } = useProjectNotifyStore();
 
   async function refresh() {
     tableDs.query();
@@ -89,6 +94,7 @@ export default props => {
   return (
     <TabPage service={permissions}>
       <Breadcrumb />
+      <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={tableDs.dirty} />
       <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
@@ -112,4 +118,4 @@ export default props => {
       </Content>
     </TabPage>
   );
-};
+});
