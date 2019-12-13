@@ -10,11 +10,11 @@ import './index.less';
 
 export default props => (
   <StoreProvider {...props}>
-    <PageWrap noHeader={['agile', 'devops', 'resource']} cache>
-      <PageTab title="敏捷消息" tabKey="agile" component={AgileContent} alwaysShow />
-      <PageTab title="Devops消息" tabKey="devops" component={DevopsContent} alwaysShow />
-      <PageTab title="资源删除验证" tabKey="resource" component={ResourceContent} alwaysShow />
-      <PageTab title="Webhook配置" tabKey="webhook" component={WebhookContent} alwaysShow />
+    <PageWrap noHeader={['choerodon.code.project.setting-notify-agile', 'choerodon.code.project.setting-notify-devops', 'choerodon.code.project.setting-notify-resource']}>
+      <PageTab title="敏捷消息" tabKey="choerodon.code.project.setting-notify-agile" component={AgileContent} />
+      <PageTab title="Devops消息" tabKey="choerodon.code.project.setting-notify-devops" component={DevopsContent} />
+      <PageTab title="资源删除验证" tabKey="choerodon.code.project.setting-notify-resource" component={ResourceContent} />
+      <PageTab title="Webhook配置" tabKey="choerodon.code.project.setting-notify-webhook" component={WebhookContent} />
     </PageWrap>
   </StoreProvider>
 );
