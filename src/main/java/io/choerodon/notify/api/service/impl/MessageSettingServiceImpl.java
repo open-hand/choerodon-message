@@ -271,7 +271,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
 
-
     @Override
     public void saveMessageSetting(MessageSettingDTO messageSettingDTO) {
         if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
@@ -299,7 +298,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         }
         return messageSettingVO;
     }
-    
+
     @Override
     public void deleteByTypeAndEnvId(String type, Long envId) {
         messageSettingMapper.deleteByTypeAndEnvId(type, envId);
@@ -313,18 +312,27 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     }
 
     private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
+
+        // 添加指定用户
         messageSettingVOS.forEach(settingVO -> {
+            List<TargetUserVO> userList = new ArrayList<>();
+            settingVO.getSpecifierIds().forEach(uid -> {
+                TargetUserVO targetUserVO = new TargetUserVO();
+                targetUserVO.setType(TargetUserType.SPECIFIER.getTypeName());
+                targetUserVO.setUserId(uid);
+                userList.add(targetUserVO);
+            });
+            // 添加非指定用户
             Set<String> sendRoleList = settingVO.getSendRoleList();
             if (!CollectionUtils.isEmpty(sendRoleList)) {
                 sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
                     TargetUserVO targetUserVO = new TargetUserVO();
                     targetUserVO.setType(role);
-                    settingVO.getUserList().add(targetUserVO);
+                    userList.add(targetUserVO);
                 });
-
             }
+            settingVO.setUserList(userList);
         });
-
     }
 
     private void calculateEventName(List<CustomMessageSettingVO> customMessageSettingList) {
