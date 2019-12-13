@@ -231,6 +231,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
+
         List<CustomMessageSettingVO> defaultSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
         // 将非指定用户添加到userList
@@ -242,34 +243,37 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
             settingDTO.setId(null);
             saveMessageSetting(settingDTO);
-            List<TargetUserVO> userList = settingVO.getUserList();
-            if (!CollectionUtils.isEmpty(userList)) {
-                settingVO.getUserList().forEach(user -> {
-                    user.setMessageSettingId(settingDTO.getId());
-                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
-                });
+            if (!ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
+                List<TargetUserVO> userList = settingVO.getUserList();
+                if (!CollectionUtils.isEmpty(userList)) {
+                    settingVO.getUserList().forEach(user -> {
+                        user.setMessageSettingId(settingDTO.getId());
+                        messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+                    });
+                }
             }
+
         });
         // 自定配置修改
         customMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
             updateMessageSetting(settingDTO);
+            // devops消息不更新通知对象
+            if (!ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
+                // 删除旧数据
+                messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
+                // 添加新数据
+                List<TargetUserVO> userList = settingVO.getUserList();
+                if (!CollectionUtils.isEmpty(userList)) {
+                    userList.forEach(user -> {
+                        user.setMessageSettingId(settingDTO.getId());
+                        messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+                    });
 
-            // 删除旧数据
-            messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
-            // 添加新数据
-            List<TargetUserVO> userList = settingVO.getUserList();
-            if (!CollectionUtils.isEmpty(userList)) {
-                userList.forEach(user -> {
-                    user.setMessageSettingId(settingDTO.getId());
-                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
-                });
-
+                }
             }
-
         });
     }
-
 
     @Override
     public void saveMessageSetting(MessageSettingDTO messageSettingDTO) {
@@ -361,7 +365,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         customMessageSettingList.forEach(settingVO -> {
             List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
-                Set<String> roleList = settingVO.getUserList().stream()
+                // 处理id和userId
+                userList.forEach(user -> user.setId(user.getUserId()));
+                Set<String> roleList = userList.stream()
                         .map(user -> user.getType())
                         .collect(Collectors.toSet());
                 // 设置通知角色
@@ -371,6 +377,8 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 }
                 // 设置要通知的非指定用户
                 settingVO.setUserList(userList.stream().filter(user -> TargetUserType.SPECIFIER.getTypeName().equals(user.getType())).collect(Collectors.toList()));
+                settingVO.setSpecifierIds(settingVO.getUserList().stream().map(TargetUserVO::getUserId).collect(Collectors.toSet()));
+
             }
         });
     }
