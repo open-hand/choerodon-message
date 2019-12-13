@@ -33,36 +33,6 @@ public class MessageSettingController {
     @Autowired
     private MessageSettingService messageSettingService;
 
-    @PostMapping("/list")
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
-    @ApiOperation(value = "根据消息类型模糊查询消息发送设置,消息类型为空查询所有,消息类型不为空")
-    public ResponseEntity<List<MessageSettingCategoryDTO>> listMessageSetting(
-            @PathVariable(value = "project_id") Long projectId,
-            @Valid @RequestBody MessageSettingVO messageSettingVO) {
-        return Optional.ofNullable(messageSettingService.listMessageSetting(projectId, messageSettingVO))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.messageSetting.query"));
-    }
-//
-//    @PutMapping
-//    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
-//    @ApiOperation(value = "修改消息设置,支持批量修改")
-//    public void updateMessageSetting(
-//            @PathVariable(value = "project_id") Long projectId,
-//            @RequestBody List<MessageSettingVO> messageSettingVOS) {
-//        messageSettingService.updateMessageSetting(projectId, messageSettingVOS);
-//    }
-
-    @GetMapping("/target/user/list")
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
-    @ApiOperation(value = "项目层敏捷消息和devops消息发送前校验接收对象")
-    public ResponseEntity<List<TargetUserVO>> getProjectLevelTargetUser(
-            @PathVariable(value = "project_id") Long projectId,
-            @RequestParam String code) {
-        return Optional.ofNullable(messageSettingService.getProjectLevelTargetUser(projectId, code))
-                .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-                .orElseThrow(() -> new CommonException("error.messageSetting.check.TargetUser"));
-    }
     @GetMapping("/type/{notify_type}/code/{code}")
     @Permission(type = ResourceType.PROJECT, roles = InitRoleCode.PROJECT_OWNER)
     @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")

@@ -14,13 +14,7 @@ import java.util.List;
  * Date: 2019/12/3
  */
 public interface MessageSettingService {
-    List<MessageSettingCategoryDTO> listMessageSetting(Long projectId, MessageSettingVO messageSettingVO);
 
-//    void updateMessageSetting(Long projectId, List<MessageSettingVO> messageSettingVOS);
-
-    List<TargetUserVO> getProjectLevelTargetUser(Long projectId, String code);
-
-    MessageSettingVO getMessageSetting(Long projectId, String code);
 
     MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType);
 
