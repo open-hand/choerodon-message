@@ -1,22 +1,17 @@
 function formatData(data) {
-  const res = [];
-  const notifyEventGroupList = [...data.notifyEventGroupList];
-  const customMessageSettingList = [...data.customMessageSettingList];
-  notifyEventGroupList.forEach((item) => {
-    res.push({
-      ...item,
-      key: String(item.id),
-    });
+  const newData = [];
+  data.forEach((item) => {
+    const res = { ...item };
+    const { groupId, id } = item;
+    if (groupId) {
+      res.key = `${groupId}-${id}`;
+      res.groupId = String(groupId);
+    } else {
+      res.key = String(id);
+    }
+    newData.push(res);
   });
-  customMessageSettingList.forEach((item) => {
-    const obj = {
-      ...item,
-      key: `${item.groupId}-${item.id}`,
-      groupId: String(item.groupId),
-    };
-    res.push(obj);
-  });
-  return res;
+  return newData;
 }
 
 function parentItemIsChecked({ dataSet, record, name }) {
@@ -51,7 +46,9 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
           if (data && data.failed) {
             return data;
           } else {
-            return formatData(data);
+            const { notifyEventGroupList, customMessageSettingList } = data;
+            const res = notifyEventGroupList.concat(customMessageSettingList);
+            return formatData(res);
           }
         } catch (e) {
           return response;
@@ -78,7 +75,7 @@ export default ({ formatMessage, intlPrefix, projectId }) => ({
     { name: 'name', type: 'string', label: formatMessage({ id: `${intlPrefix}.type` }) },
     { name: 'pmEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.pmEnable` }) },
     { name: 'emailEnable', type: 'boolean', label: formatMessage({ id: `${intlPrefix}.emailEnable` }) },
-    { name: 'targetUserDTOS', type: 'object', label: formatMessage({ id: `${intlPrefix}.noticeObject` }) },
+    { name: 'notifyObject', type: 'string', label: formatMessage({ id: `${intlPrefix}.noticeObject` }) },
   ],
   queryFields: [],
   events: {

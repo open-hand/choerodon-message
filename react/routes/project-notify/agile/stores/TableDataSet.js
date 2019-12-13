@@ -22,7 +22,7 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
     submit: ({ data }) => {
       const res = [];
       data.forEach((item) => {
-        if (!item.sendRoleList.includes('selectedUser')) {
+        if (!item.sendRoleList.includes('specifier')) {
           item.userList = [];
         }
         res.push(item);

@@ -31,10 +31,7 @@ export const StoreProvider = injectIntl(inject('AppState')(observer((props) => {
     prefixCls: 'project-notify',
     permissions: [],
     tableDs,
-    notifyObject: {
-      sendHandler: formatMessage({ id: `${intlPrefix}.object.handler` }),
-      sendOwner: formatMessage({ id: `${intlPrefix}.object.owner` }),
-    },
+    allSendRoleList: ['reporter', 'assignee', 'projectOwner', 'specifier'],
   };
 
   return (

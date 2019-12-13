@@ -26,7 +26,7 @@ export default ({ record, allSendRoleList }) => {
             </Option>
           ))}
         </SelectBox>
-        {record.get('sendRoleList').includes('selectedUser') && (
+        {record.get('sendRoleList').includes('specifier') && (
           <Select name="userList" maxTagCount={2} searchable />
         )}
       </Form>
