@@ -143,7 +143,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             // devops消息不更新通知对象
             if (!ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
                 // 删除旧数据
-                messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
+                if (!CollectionUtils.isEmpty(messageSettingTargetUserService.getBySettingId(settingVO.getId()))) {
+                    messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
+                }
                 // 添加新数据
                 List<TargetUserVO> userList = settingVO.getUserList();
                 if (!CollectionUtils.isEmpty(userList)) {
