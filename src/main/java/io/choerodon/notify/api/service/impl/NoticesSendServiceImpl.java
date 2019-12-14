@@ -159,20 +159,7 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
         //项目层的设置
-        Long envId;
-        if (noticeSendDTO.getParams().get("envId") != null) {
-            envId = Long.parseLong(noticeSendDTO.getParams().get("envId").toString());
-        } else {
-            envId = null;
-        }
-        String eventName;
-        if (noticeSendDTO.getParams().get("eventName") == null) {
-            eventName = noticeSendDTO.getParams().get("eventName").toString();
-        } else {
-            eventName = null;
-        }
-
-        MessageSettingVO messageSettingVO = messageSettingService.getSettingByCode(noticeSendDTO.getSourceId(),noticeSendDTO.getParams().get("notifyType").toString(), noticeSendDTO.getCode(), envId,eventName);
+        MessageSettingVO messageSettingVO = messageSettingService.getSettingByCode(noticeSendDTO.getSourceId(),noticeSendDTO.getNotifyType(), noticeSendDTO.getCode(), noticeSendDTO.getEnvId(),noticeSendDTO.getEventName());
         // 3.1.发送邮件
         //自定义发送类型如果发送邮件，平台层设置开启则发送，没有自定义类型，平台层设置开启，则发送
         //如果自定义发送，项目层没有设置的，并且平台层设置发送则发送
