@@ -215,6 +215,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
                     TargetUserVO targetUserVO = new TargetUserVO();
                     targetUserVO.setType(role);
+                    targetUserVO.setUserId(0L);
                     userList.add(targetUserVO);
                 });
             }
