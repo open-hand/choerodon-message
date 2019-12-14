@@ -109,18 +109,8 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                             messageSettingDTO.setNotifyType("resourceDelete");
                             messageSettingDTO.setEnvId(devopsNotificationTransferDataVO.getEnvId());
                             List<String> recouseNameList = new ArrayList<>();
-                            if (devopsNotificationTransferDataVO.getNotifyTriggerEvent().contains(",")) {
-                                recouseNameList = Stream.of(devopsNotificationTransferDataVO.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
-                            } else {
-                                recouseNameList.add(devopsNotificationTransferDataVO.getNotifyTriggerEvent());
-                            }
                             List<String> notifyType = new ArrayList<>();
-                            if (devopsNotificationTransferDataVO.getNotifyType().contains(",")) {
-                                notifyType = Stream.of(devopsNotificationTransferDataVO.getNotifyType().split(",")).collect(Collectors.toList());
-                            } else {
-                                notifyType.add(devopsNotificationTransferDataVO.getNotifyType());
-                            }
-
+                            fillTypeAndName(recouseNameList, notifyType, devopsNotificationTransferDataVO);
                             for (String name : recouseNameList) {
                                 messageSettingDTO.setEventName(name);
                                 MessageSettingDTO queryDTO = messageSettingMapper.selectOne(messageSettingDTO);
@@ -296,6 +286,19 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             if (messageSettingTargetUserMapper.insertSelective(targetUserDTO) != 1) {
                 throw new CommonException("error.insert.message.setting.target.user");
             }
+        }
+    }
+
+    private void fillTypeAndName(List<String> recouseNameList, List<String> notifyType, DevopsNotificationTransferDataVO devopsNotificationTransferDataVO) {
+        if (devopsNotificationTransferDataVO.getNotifyTriggerEvent().contains(",")) {
+            recouseNameList = Stream.of(devopsNotificationTransferDataVO.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
+        } else {
+            recouseNameList.add(devopsNotificationTransferDataVO.getNotifyTriggerEvent());
+        }
+        if (devopsNotificationTransferDataVO.getNotifyType().contains(",")) {
+            notifyType = Stream.of(devopsNotificationTransferDataVO.getNotifyType().split(",")).collect(Collectors.toList());
+        } else {
+            notifyType.add(devopsNotificationTransferDataVO.getNotifyType());
         }
     }
 }
