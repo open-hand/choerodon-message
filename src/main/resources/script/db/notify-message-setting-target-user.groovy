@@ -20,4 +20,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting-target-user
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
     }
+    changeSet(id: '2019-12-13-notify-message-setting-target-user-add-index', author: 'wanghao') {
+        addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING_TARGET_USER', columnNames: 'TYPE, USER_ID, MESSAGE_SETTING_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_TARGET_USER_U1')
+    }
 }

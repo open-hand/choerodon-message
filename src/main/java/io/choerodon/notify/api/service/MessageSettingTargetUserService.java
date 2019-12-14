@@ -2,6 +2,8 @@ package io.choerodon.notify.api.service;
 
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 
+import java.util.List;
+
 /**
  * 〈功能简述〉
  * 〈消息通知用户Service〉
@@ -14,4 +16,6 @@ public interface MessageSettingTargetUserService {
     void save(TargetUserDTO targetUserDTO);
 
     void deleteBySettingId(Long id);
+
+    List<TargetUserDTO> getBySettingId(Long id);
 }

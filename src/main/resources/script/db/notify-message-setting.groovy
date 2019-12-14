@@ -30,8 +30,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
             column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  remarks: '资源删除事件名字', afterColumn: 'PROJECT_ID')
         }
     }
-
-
-
-
+    changeSet(id: '2019-12-13-notify-message-setting-add-index', author: 'wanghao') {
+        addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING', columnNames: 'NOTIFY_TYPE, CODE, PROJECT_ID, EVENT_NAME, ENV_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_U1')
+    }
 }

@@ -6,6 +6,8 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 〈功能简述〉
  * 〈〉
@@ -39,5 +41,12 @@ public class MessageSettingTargetUserServiceImpl implements MessageSettingTarget
         if (messageSettingTargetUserMapper.delete(targetUserDTO) < 1) {
             throw new CommonException(ERROR_DELETE_TARGET_USER);
         }
+    }
+
+    @Override
+    public List<TargetUserDTO> getBySettingId(Long id) {
+        TargetUserDTO targetUserDTO = new TargetUserDTO();
+        targetUserDTO.setMessageSettingId(id);
+        return messageSettingTargetUserMapper.select(targetUserDTO);
     }
 }
