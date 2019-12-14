@@ -46,29 +46,23 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     private static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private static final String ERROR_SAVE_MESSAGE_SETTING = "error.save.message.setting";
     private static final String ERROR_UPDATE_MESSAGE_SETTING = "error.update.message.setting";
-    private static final String ERROR_PARAM_INVALID = "error.update.message.setting";
-    @Autowired
+    private static final String ERROR_PARAM_INVALID = "error.param.invalid";
+    private ModelMapper modelMapper = new ModelMapper();
+
     private MessageSettingMapper messageSettingMapper;
 
-    @Autowired
-    private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
-
-    @Autowired
-    private SendSettingMapper sendSettingMapper;
-
-    @Autowired
     private MessageSettingTargetUserService messageSettingTargetUserService;
 
-    @Autowired
     private DevopsFeginClient devopsFeginClient;
 
-    @Autowired
-    private SendSettingService sendSettingService;
-
-    @Autowired
     private BaseFeignClient baseFeignClient;
 
-    private ModelMapper modelMapper = new ModelMapper();
+    public MessageSettingServiceImpl(MessageSettingMapper messageSettingMapper, MessageSettingTargetUserService messageSettingTargetUserService, DevopsFeginClient devopsFeginClient, BaseFeignClient baseFeignClient) {
+        this.messageSettingMapper = messageSettingMapper;
+        this.messageSettingTargetUserService = messageSettingTargetUserService;
+        this.devopsFeginClient = devopsFeginClient;
+        this.baseFeignClient = baseFeignClient;
+    }
 
     @PostConstruct
     public void init() {
@@ -113,7 +107,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
-
+        if (messageSettingVOS.stream().anyMatch(settingVO -> !notifyType.equals(settingVO.getNotifyType()))) {
+            throw new CommonException(ERROR_PARAM_INVALID);
+        }
         List<CustomMessageSettingVO> defaultSettingList = messageSettingMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
         // 将非指定用户添加到userList
