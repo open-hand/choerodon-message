@@ -139,7 +139,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                                 recouseNameList.clear();
                                 notifyType.clear();
                             }
-
+                            checkLog.setResult("Succeed to sync devops notify!");
                         }
                     } catch (Exception e) {
                         checkLog.setResult("Failed to sync agile notify!");
