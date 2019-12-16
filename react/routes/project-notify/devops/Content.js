@@ -27,7 +27,9 @@ export default observer(props => {
 
   async function saveSettings() {
     try {
-      await tableDs.submit();
+      if (await tableDs.submit() !== false) {
+        refresh();
+      }
     } catch (e) {
       Choerodon.handleResponseError(e);
     }
