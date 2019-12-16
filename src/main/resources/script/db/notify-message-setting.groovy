@@ -9,12 +9,21 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }
-            column(name: 'NOTIFY_TYPE', type: 'VARCHAR(64)', remarks: '通知类型。比如敏捷消息，DevOps消息等。')
+            column(name: 'NOTIFY_TYPE', type: 'VARCHAR(64)', remarks: '通知类型。比如敏捷消息，DevOps消息等。') {
+                constraints(nullable: false)
+            }
             column(name: 'CODE', type: 'VARCHAR(32)', remarks: '消息code，指向notify-send-setting表') {
                 constraints(nullable: false)
             }
-            column(name: 'PROJECT_ID', type: 'BIGINT UNSIGNED', remarks: '项目ID。')
-            column(name: 'ENV_ID', type: 'BIGINT UNSIGNED',  remarks: '环境id')
+            column(name: 'PROJECT_ID', type: 'BIGINT UNSIGNED', defaultValue: "0", remarks: '项目ID。') {
+                constraints(nullable: false)
+            }
+            column(name: 'ENV_ID', type: 'BIGINT UNSIGNED', defaultValue: "0", remarks: '环境id') {
+                constraints(nullable: false)
+            }
+            column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  defaultValue: "", remarks: '资源删除事件名字') {
+                constraints(nullable: false)
+            }
             column(name: 'PM_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否发送站内信。1发送，0不发送')
             column(name: 'EMAIL_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '是否发送邮件。1发送，0不发送')
             column(name: 'SMS_ENABLE', type: 'TINYINT UNSIGNED',  remarks: '是否发送短信')
@@ -24,13 +33,6 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting.groovy') {
             column(name: "LAST_UPDATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
-    }
-    changeSet(id: '2019-12-12-notify-message-setting-add-column', author: 'xiangwang04@gmail.com') {
-        addColumn(tableName: 'NOTIFY_MESSAGE_SETTING') {
-            column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  remarks: '资源删除事件名字', afterColumn: 'PROJECT_ID')
-        }
-    }
-    changeSet(id: '2019-12-13-notify-message-setting-add-index', author: 'wanghao') {
         addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING', columnNames: 'NOTIFY_TYPE, CODE, PROJECT_ID, EVENT_NAME, ENV_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_U1')
     }
 }
