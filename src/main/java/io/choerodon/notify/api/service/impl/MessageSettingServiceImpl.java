@@ -291,9 +291,13 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectId(projectId, notifyType);
         Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getCode(), v -> v));
         defaultMessageSettingList.forEach(defaultMessageSetting -> {
-            if (custommessageSettingVOMap.get(defaultMessageSetting.getCode()) == null) {
+            CustomMessageSettingVO customMessageSettingVO = custommessageSettingVOMap.get(defaultMessageSetting.getCode());
+            if (customMessageSettingVO == null) {
                 defaultMessageSetting.setProjectId(projectId);
                 customMessageSettingList.add(defaultMessageSetting);
+            } else {
+                // 为自定义配置添加默认通知对象
+                customMessageSettingVO.setUserList(defaultMessageSetting.getUserList());
             }
         });
         return customMessageSettingList;
