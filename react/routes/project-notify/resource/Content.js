@@ -8,6 +8,7 @@ import NotifyObject from '../components/notify-object';
 import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 import { useProjectNotifyStore } from '../stores';
+import Tips from '../../../components/tips';
 
 const { Column } = Table;
 
@@ -151,7 +152,7 @@ export default observer(props => {
             align="left"
           />
           <Column
-            header={formatMessage({ id: `${intlPrefix}.noticeObject` })}
+            header={<Tips title={formatMessage({ id: `${intlPrefix}.noticeObject` })} helpText={formatMessage({ id: `${intlPrefix}.noticeObject.resource.tips` })} />}
             renderer={renderNotifyObject}
           />
         </Table>

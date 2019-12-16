@@ -6,6 +6,7 @@ import { Prompt } from 'react-router-dom';
 import { useDevopsContentStore } from './stores';
 import FooterButtons from '../components/footer-buttons';
 import { useProjectNotifyStore } from '../stores';
+import Tips from '../../../components/tips';
 
 const { Column } = Table;
 
@@ -114,7 +115,11 @@ export default observer(props => {
             width={150}
             align="left"
           />
-          <Column name="notifyObject" renderer={renderNotifyObject} />
+          <Column
+            name="notifyObject"
+            header={<Tips title={formatMessage({ id: `${intlPrefix}.noticeObject` })} helpText={formatMessage({ id: `${intlPrefix}.noticeObject.devops.tips` })} />}
+            renderer={renderNotifyObject}
+          />
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
       </Content>
