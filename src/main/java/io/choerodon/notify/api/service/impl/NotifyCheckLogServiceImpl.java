@@ -110,10 +110,15 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                             messageSettingDTO.setEnvId(devopsNotificationTransferDataVO.getEnvId());
                             List<String> recouseNameList = new ArrayList<>();
                             List<String> notifyType = new ArrayList<>();
-                            fillTypeAndName(recouseNameList, notifyType, devopsNotificationTransferDataVO);
+                            recouseNameList = fillName(recouseNameList, devopsNotificationTransferDataVO);
+                            notifyType = fillType(notifyType, devopsNotificationTransferDataVO);
                             for (String name : recouseNameList) {
                                 messageSettingDTO.setEventName(name);
-                                MessageSettingDTO queryDTO = messageSettingMapper.selectOne(messageSettingDTO);
+                                MessageSettingDTO condition=new MessageSettingDTO();
+                                condition.setEventName(name);
+                                condition.setEnvId(devopsNotificationTransferDataVO.getEnvId());
+                                condition.setProjectId(devopsNotificationTransferDataVO.getProjectId());
+                                MessageSettingDTO queryDTO = messageSettingMapper.selectOne(condition);
                                 if (queryDTO == null) {
                                     fillMessageSettings(messageSettingDTO, notifyType);
                                     messageSettingDTO.setId(null);
@@ -121,14 +126,16 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                                     if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
                                         throw new CommonException("error.insert.message.send.setting");
                                     }
+                                    //插入接收对象
+                                    saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
                                 } else {
                                     messageSettingDTO.setId(queryDTO.getId());
                                     //插入接收对象
                                     saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
                                 }
-                                recouseNameList.clear();
-                                notifyType.clear();
                             }
+                            recouseNameList.clear();
+                            notifyType.clear();
                             checkLog.setResult("Succeed to sync devops notify!");
                         }
                     } catch (Exception e) {
@@ -289,16 +296,21 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
     }
 
-    private void fillTypeAndName(List<String> recouseNameList, List<String> notifyType, DevopsNotificationTransferDataVO devopsNotificationTransferDataVO) {
+    private List<String> fillName(List<String> recouseNameList, DevopsNotificationTransferDataVO devopsNotificationTransferDataVO) {
         if (devopsNotificationTransferDataVO.getNotifyTriggerEvent().contains(",")) {
             recouseNameList = Stream.of(devopsNotificationTransferDataVO.getNotifyTriggerEvent().split(",")).collect(Collectors.toList());
         } else {
             recouseNameList.add(devopsNotificationTransferDataVO.getNotifyTriggerEvent());
         }
+        return recouseNameList;
+    }
+
+    private List<String> fillType(List<String> notifyType, DevopsNotificationTransferDataVO devopsNotificationTransferDataVO) {
         if (devopsNotificationTransferDataVO.getNotifyType().contains(",")) {
             notifyType = Stream.of(devopsNotificationTransferDataVO.getNotifyType().split(",")).collect(Collectors.toList());
         } else {
             notifyType.add(devopsNotificationTransferDataVO.getNotifyType());
         }
+        return notifyType;
     }
 }
