@@ -33,7 +33,6 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   autoQuery: true,
   selection: false,
   paging: false,
-  autoQueryAfterSubmit: false,
   parentField: 'groupId',
   idField: 'key',
   primaryKey: 'key',
