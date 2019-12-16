@@ -159,31 +159,65 @@ public class NoticesSendServiceImpl implements NoticesSendService {
         boolean customizedSendingTypesFlag = !CollectionUtils.isEmpty(noticeSendDTO.getCustomizedSendingTypes());
         LOGGER.info(">>>WHETHER_TO_CUSTOMIZE_THE_CONFIGURATION>>>{}>>>email:{}>>>pm:{}>>>sms:{}>>>wb:{}", customizedSendingTypesFlag, noticeSendDTO.isSendingEmail(), noticeSendDTO.isSendingSiteMessage(), noticeSendDTO.isSendingSMS(), noticeSendDTO.isSendingWebHook());
         //项目层的设置
-        MessageSettingVO messageSettingVO = messageSettingService.getSettingByCode(noticeSendDTO.getSourceId(),noticeSendDTO.getNotifyType(), noticeSendDTO.getCode(), noticeSendDTO.getEnvId(),noticeSendDTO.getEventName());
+        MessageSettingVO messageSettingVO = messageSettingService.getSettingByCode(noticeSendDTO.getSourceId(), noticeSendDTO.getNotifyType(), noticeSendDTO.getCode(), noticeSendDTO.getEnvId(), noticeSendDTO.getEventName());
         // 3.1.发送邮件
-        //自定义发送类型如果发送邮件，平台层设置开启则发送，没有自定义类型，平台层设置开启，则发送
-        //如果自定义发送，项目层没有设置的，并且平台层设置发送则发送
-        //如果是非自定义，平台层发送 项目层发送则发送
-        //如果是非自定义的并且在项目层不存在的 平台层发送就发送
+        //平台层检验是否通过
+        boolean siteLevelEmailVerification = false;
+        //是否需要项目层校验
+        boolean isRequiredProjectLevelEmailPmVerification = false;
         if ((customizedSendingTypesFlag && noticeSendDTO.isSendingEmail() && sendSettingDTO.getEmailEnabledFlag())
-                || (!customizedSendingTypesFlag && sendSettingDTO.getEmailEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getEmailEnable())
-                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getEmailEnabledFlag())) {
+                || (!customizedSendingTypesFlag && sendSettingDTO.getEmailEnabledFlag())) {
+            siteLevelEmailVerification = true;
+        }
+        if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel()) && !Objects.isNull(messageSettingVO)) {
+            isRequiredProjectLevelEmailPmVerification = true;
+        }
+        if (siteLevelEmailVerification && !isRequiredProjectLevelEmailPmVerification) {
             trySendEmail(noticeSendDTO, sendSettingDTO, users);
         }
+        if (siteLevelEmailVerification && isRequiredProjectLevelEmailPmVerification && messageSettingVO.getEmailEnable()) {
+            trySendEmail(noticeSendDTO, sendSettingDTO, users);
+        }
+
         // 3.2.发送站内信
+        //平台层校验是否体通过
+        boolean siteLevelPmVerification = false;
+        //是否需要项目层校验
+        boolean isRequiredProjectLevelPmVerification = false;
         if ((customizedSendingTypesFlag && noticeSendDTO.isSendingSiteMessage() && sendSettingDTO.getPmEnabledFlag())
-                || (!customizedSendingTypesFlag && sendSettingDTO.getPmEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getPmEnable())
-                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getPmEnabledFlag())) {
+                || (!customizedSendingTypesFlag && sendSettingDTO.getPmEnabledFlag())) {
+            siteLevelPmVerification = true;
+        }
+        if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel()) && !Objects.isNull(messageSettingVO)) {
+            isRequiredProjectLevelPmVerification = true;
+        }
+        if (siteLevelPmVerification && !isRequiredProjectLevelPmVerification) {
             trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
         }
+        if (siteLevelPmVerification && isRequiredProjectLevelPmVerification && messageSettingVO.getPmEnable()) {
+            trySendSiteMessage(noticeSendDTO, sendSettingDTO, users);
+        }
+
         // 3.3.发送WebHook
         if ((customizedSendingTypesFlag && noticeSendDTO.isSendingWebHook()) || (!customizedSendingTypesFlag && sendSettingDTO.getWebhookEnabledFlag())) {
             trySendWebHook(noticeSendDTO, sendSettingDTO, users);
         }
         // 3.4 发送短信
+        //平台层校验是否体通过
+        boolean siteLevelSmsVerification = false;
+        //是否需要项目层校验
+        boolean isRequiredProjectLevelSmsVerification = false;
         if ((customizedSendingTypesFlag && !ObjectUtils.isEmpty(noticeSendDTO.isSendingSMS()) && noticeSendDTO.isSendingSMS() && sendSettingDTO.getSmsEnabledFlag())
-                || (!customizedSendingTypesFlag && sendSettingDTO.getSmsEnabledFlag() && !Objects.isNull(messageSettingVO) && messageSettingVO.getSmsEnable())
-                || (!customizedSendingTypesFlag && Objects.isNull(messageSettingVO) && sendSettingDTO.getSmsEnabledFlag())) {
+                || (!customizedSendingTypesFlag && sendSettingDTO.getSmsEnabledFlag())) {
+            siteLevelSmsVerification = true;
+        }
+        if (SenderType.PROJECT.value().equals(sendSettingDTO.getLevel()) && !Objects.isNull(messageSettingVO)) {
+            isRequiredProjectLevelSmsVerification = true;
+        }
+        if (siteLevelSmsVerification && !isRequiredProjectLevelSmsVerification) {
+            smsService.send(noticeSendDTO);
+        }
+        if (siteLevelSmsVerification && isRequiredProjectLevelSmsVerification && messageSettingVO.getSmsEnable()) {
             smsService.send(noticeSendDTO);
         }
     }
