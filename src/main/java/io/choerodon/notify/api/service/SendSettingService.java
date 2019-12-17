@@ -88,4 +88,11 @@ public interface SendSettingService {
      * @return
      */
     SendSettingDTO queryByCode(String code);
+
+    /**
+     * 校验资源删除验证通知是否启用
+     * @return
+     */
+    Boolean checkResourceDeleteEnabled();
+
 }

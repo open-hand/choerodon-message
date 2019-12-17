@@ -31,6 +31,7 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
     public static final String SEND_SETTING_UPDATE_EXCEPTION = "error.send.setting.update";
+    public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private SendSettingMapper sendSettingMapper;
     private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
@@ -368,6 +369,14 @@ public class SendSettingServiceImpl implements SendSettingService {
         SendSettingDTO sendSettingDTO = new SendSettingDTO();
         sendSettingDTO.setCode(code);
         return sendSettingMapper.selectOne(sendSettingDTO);
+    }
+
+    @Override
+    public Boolean checkResourceDeleteEnabled() {
+        SendSettingDTO record = new SendSettingDTO();
+        record.setCode(RESOURCE_DELETE_CONFIRMATION);
+        SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(record);
+        return sendSettingDTO.getEnabled();
     }
 
     /**
