@@ -1,6 +1,4 @@
-import { DataSet } from 'choerodon-ui/pro/lib';
-
-export default function ({ setCurrentPageType }) {
+export default function ({ setCurrentPageType, store }) {
   return {
     autoQuery: true,
     selection: false,
@@ -28,7 +26,14 @@ export default function ({ setCurrentPageType }) {
     },
     events: {
       load: ({ dataSet }) => {
-        dataSet.get(0).set('expand', true);
+        const expandsKeys = store.getExpandedKeys;
+        if (expandsKeys && expandsKeys.length) {
+          dataSet.forEach(record => {
+            record.set('expand', expandsKeys.includes(String(record.get('id'))));
+          });
+        } else {
+          dataSet.get(0).set('expand', true);
+        }
       },
     },
   };

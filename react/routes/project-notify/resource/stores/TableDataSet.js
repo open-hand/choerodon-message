@@ -30,7 +30,7 @@ function handleLoad({ dataSet }) {
 }
 
 export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
-  autoQuery: true,
+  autoQuery: false,
   selection: false,
   paging: false,
   parentField: 'groupId',

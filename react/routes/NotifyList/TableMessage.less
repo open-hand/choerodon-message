@@ -47,6 +47,17 @@
   &-icon {
     .icon(0.08rem);
   }
+
+  &-text {
+    display: flex;
+
+    &-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 80%;
+    }
+  }
 }
 
 .circleIcon(@width: 0.1rem, @height: 0.1rem) {

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { TabPage, Content, Breadcrumb, Choerodon } from '@choerodon/boot';
-import { Table, CheckBox, Icon, Dropdown } from 'choerodon-ui/pro';
+import { Table, CheckBox, Icon, Dropdown, Spin } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
 import { Prompt } from 'react-router-dom';
 import { useResourceContentStore } from './stores';
@@ -9,6 +9,7 @@ import MouserOverWrapper from '../../../components/mouseOverWrapper';
 import FooterButtons from '../components/footer-buttons';
 import { useProjectNotifyStore } from '../stores';
 import Tips from '../../../components/tips';
+import EmptyPage from '../../../components/empty-page';
 
 const { Column } = Table;
 
@@ -20,6 +21,7 @@ export default observer(props => {
     tableDs,
     allSendRoleList,
     permissions,
+    resourceStore: { getLoading, getEnabled },
   } = useResourceContentStore();
   const {
     promptMsg,
@@ -123,40 +125,60 @@ export default observer(props => {
     );
   }
 
+  function getContent() {
+    if (getLoading) {
+      return <Spin spinning style={{ textAlign: 'center' }} />;
+    }
+    if (getEnabled) {
+      return (
+        <Fragment>
+          <Table dataSet={tableDs} mode="tree">
+            <Column name="name" />
+            <Column
+              header={() => renderCheckBoxHeader('pmEnable')}
+              renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable' })}
+              editor
+              width={150}
+              align="left"
+            />
+            <Column
+              header={() => renderCheckBoxHeader('emailEnable')}
+              renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable' })}
+              editor
+              width={150}
+              align="left"
+            />
+            <Column
+              header={() => renderCheckBoxHeader('smsEnable')}
+              renderer={({ record }) => renderCheckBox({ record, name: 'smsEnable' })}
+              editor
+              width={150}
+              align="left"
+            />
+            <Column
+              header={<Tips title={formatMessage({ id: `${intlPrefix}.noticeObject` })} helpText={formatMessage({ id: `${intlPrefix}.noticeObject.resource.tips` })} />}
+              renderer={renderNotifyObject}
+            />
+          </Table>
+          <FooterButtons onOk={saveSettings} onCancel={refresh} />
+        </Fragment>
+      );
+    } else {
+      return (
+        <EmptyPage
+          title={formatMessage({ id: `${intlPrefix}.empty.title` })}
+          describe={formatMessage({ id: `${intlPrefix}.empty.des` })}
+        />
+      );
+    }
+  }
+
   return (
     <TabPage service={permissions}>
       <Breadcrumb />
       <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={tableDs.dirty} />
       <Content className={`${prefixCls}-page-content`}>
-        <Table dataSet={tableDs} mode="tree">
-          <Column name="name" />
-          <Column
-            header={() => renderCheckBoxHeader('pmEnable')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable' })}
-            editor
-            width={150}
-            align="left"
-          />
-          <Column
-            header={() => renderCheckBoxHeader('emailEnable')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable' })}
-            editor
-            width={150}
-            align="left"
-          />
-          <Column
-            header={() => renderCheckBoxHeader('smsEnable')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'smsEnable' })}
-            editor
-            width={150}
-            align="left"
-          />
-          <Column
-            header={<Tips title={formatMessage({ id: `${intlPrefix}.noticeObject` })} helpText={formatMessage({ id: `${intlPrefix}.noticeObject.resource.tips` })} />}
-            renderer={renderNotifyObject}
-          />
-        </Table>
-        <FooterButtons onOk={saveSettings} onCancel={refresh} />
+        {getContent()}
       </Content>
     </TabPage>
   );

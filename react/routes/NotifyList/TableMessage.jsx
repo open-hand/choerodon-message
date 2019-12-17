@@ -16,9 +16,19 @@ const cssPrefix = 'c7n-notify-contentList';
 // 设置邮件，设置短信，设置站内信
 export default observer(() => {
   const context = useContext(Store);
-  const { queryTreeDataSet, messageTypeTableDataSet, messageTypeDetailDataSet, history, currentPageType, setCurrentPageType, intl: { formatMessage } } = context;
+  const {
+    queryTreeDataSet,
+    messageTypeTableDataSet,
+    messageTypeDetailDataSet,
+    history,
+    currentPageType,
+    setCurrentPageType,
+    intl: { formatMessage },
+    messageStore,
+  } = context;
   const [inputValue, setInputValue] = useState('');
   let disableModal;
+
   function getTitle(record) {
     const name = record.get('name').toLowerCase();
     const searchValue = inputValue.toLowerCase();
@@ -26,12 +36,12 @@ export default observer(() => {
     const beforeStr = name.substr(0, index).toLowerCase();
     const afterStr = name.substr(index + searchValue.length).toLowerCase();
     const title = index > -1 ? (
-      <span>
+      <span className={`${cssPrefix}-text-title`}>
         {beforeStr}
         <span style={{ color: '#f50' }}>{inputValue.toLowerCase()}</span>
         {afterStr}
       </span>
-    ) : (<span>{name}</span>);
+    ) : (<span className={`${cssPrefix}-text-title`}>{name}</span>);
     return title;
   }
 
@@ -42,7 +52,6 @@ export default observer(() => {
       // 停用
       disableModal.close();
       await axios.put(`/notify/v1/notices/send_settings/disabled?code=${code}`);
-
     } else {
       // 启用
       await axios.put(`/notify/v1/notices/send_settings/enabled?code=${code}`);
@@ -50,7 +59,6 @@ export default observer(() => {
     await queryTreeDataSet.query();
     await messageTypeDetailDataSet.query();
   }
-
 
   function openStopModal(record) {
     disableModal = Modal.open({
@@ -129,7 +137,7 @@ export default observer(() => {
     };
 
     return (
-      <div onClick={toggleContentRenderer}>
+      <div onClick={toggleContentRenderer} className={`${cssPrefix}-text`}>
         <span className={`${cssPrefix}-icon`}>{treeIcon()}</span>
         {getTitle(record)}
         {getAction(record)}
@@ -177,16 +185,24 @@ export default observer(() => {
     runInAction(() => {
       queryTreeDataSet.forEach((record) => {
         record.set('expand', false);
+        messageStore.setExpandedKeys([]);
       });
+      const expandedKeys = [];
       queryTreeDataSet.forEach((record) => {
         if (record.get('name').toLowerCase().includes(inputValue.toLowerCase())) {
           while (record.parent) {
             record.parent.set('expand', true);
             record = record.parent;
+            expandedKeys.push(String(record.get('id')));
           }
         }
       });
+      messageStore.setExpandedKeys(expandedKeys);
     });
+  }
+
+  function handleExpanded(keys) {
+    messageStore.setExpandedKeys(keys);
   }
 
   return (
@@ -208,6 +224,7 @@ export default observer(() => {
           <Tree
             dataSet={queryTreeDataSet}
             renderer={treeNodeRenderer}
+            onExpand={handleExpanded}
           />
         </div>
         <div className={`${cssPrefix}-rightContent`}>
