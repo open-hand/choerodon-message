@@ -53,6 +53,8 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "通知对象")
     private String notifyObject;
 
+    private int order;
+
     @ApiModelProperty(value = "通知的非指定用户集合")
     private Set<String> sendRoleList = new HashSet<>();
 
@@ -188,5 +190,13 @@ public class CustomMessageSettingVO {
 
     public void setSpecifierIds(Set<Long> specifierIds) {
         this.specifierIds = specifierIds;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 }
