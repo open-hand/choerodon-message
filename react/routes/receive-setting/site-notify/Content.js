@@ -38,7 +38,7 @@ export default observer(props => {
 
   function handleCheckBoxHeaderChange(value, name) {
     tableDs.forEach((record) => {
-      const hasTemplateId = record.get(`${name}TemplateId`);
+      const hasTemplateId = record.get(`${name}TemplateId`) || !record.get('parentId');
       if (hasTemplateId) {
         record.set(name, value);
       }
@@ -46,8 +46,20 @@ export default observer(props => {
   }
   
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && (record.get(`${name}TemplateId`)));
-    const pmRecords = tableDs.find((record) => record.get(name) && (record.get(`${name}TemplateId`)));
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => {
+      if (record.get('parentId')) {
+        return !record.get(name) && (record.get(`${name}TemplateId`));
+      } else {
+        return !record.get(name);
+      }
+    });
+    const pmRecords = tableDs.find((record) => {
+      if (record.get('parentId')) {
+        return record.get(name) && (record.get(`${name}TemplateId`));
+      } else {
+        return record.get(name);
+      }
+    });
     return (
       <CheckBox
         checked={!!isChecked}
@@ -59,15 +71,50 @@ export default observer(props => {
     );
   }
 
+  function parentItemIsChecked({ record, name }) {
+    const parentIsChecked = !tableDs.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
+    record.set(name, parentIsChecked);
+  }
+
+  function handleChecked(name) {
+    tableDs.forEach((record) => {
+      if (!record.get('parentId')) {
+        parentItemIsChecked({ record, name });
+      }
+    });
+  }
+
+  function handleCheckBoxChange(record, value, name) {
+    if (!record.get('parentId')) {
+      tableDs.forEach((tableRecord) => {
+        if (tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`)) {
+          tableRecord.set(name, value);
+        }
+      });
+    } else {
+      record.set(name, value);
+      handleChecked(name);
+    }
+  }
+
   function renderCheckBox({ record, name }) {
-    const isDisabled = !record.get(`${name}TemplateId`);
+    let isDisabled = !record.get(`${name}TemplateId`);
+    let isChecked = true;
+    let isIndeterminate = false;
+    if (!record.get('parentId')) {
+      isChecked = !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
+      isDisabled = !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
+    }
+
     return (
       <CheckBox
         record={record}
         name={name}
         checked={record.get(name)}
         disabled={!!isDisabled}
-        onChange={(value) => record.set(name, value)}
+        indeterminate={!isChecked && isIndeterminate}
+        onChange={(value) => handleCheckBoxChange(record, value, name)}
       />
     );
   }
@@ -81,7 +128,7 @@ export default observer(props => {
       <Breadcrumb />
       <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={tableDs.dirty} />
       <Content className={`${prefixCls}-content`}>
-        <Table dataSet={tableDs}>
+        <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column
             header={(dataSet) => renderCheckBoxHeader(dataSet, 'pm')}

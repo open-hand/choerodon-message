@@ -80,12 +80,13 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
           }
         },
       },
-      submit: ({ data }) => {
+      submit: ({ dataSet }) => {
         const res = [];
-        data.forEach(({ pm, email, id, treeType, sourceId }) => {
+        const data = dataSet.toData();
+        data.forEach(({ pm, email, id, treeType, sourceId, pmTemplateId, emailTemplateId }) => {
           if (treeType === 'item') {
             const projectId = sourceId.split('-')[0];
-            if (!pm) {
+            if (!pm && pmTemplateId) {
               res.push({
                 sendingType: 'pm',
                 disable: true,
@@ -95,7 +96,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
                 userId,
               });
             }
-            if (!email) {
+            if (!email && emailTemplateId) {
               res.push({
                 sendingType: 'email',
                 disable: true,

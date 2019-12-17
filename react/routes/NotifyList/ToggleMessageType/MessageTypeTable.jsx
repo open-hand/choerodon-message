@@ -46,15 +46,19 @@ const MessageTypeTable = () => {
 
   const ActionRenderer = ({ value, record }) => {
     const enabled = record.get('enabled');
+    const edit = record.get('edit');
     const actionArr = [{
       service: [],
       text: enabled ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' }),
       action: () => (enabled ? openDisableModal() : changeMake()),
-    }, {
-      service: [],
-      text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
-      action: () => changeReceive(),
     }];
+    if (edit) {
+      actionArr.push({
+        service: [],
+        text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
+        action: () => changeReceive(),
+      });
+    }
     return <Action className="action-icon" data={actionArr} />;
   };
 
