@@ -25,7 +25,7 @@
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
         LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0 AND nss.IS_ENABLED = TRUE
     </select>
     <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
         SELECT
@@ -38,7 +38,7 @@
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
         LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId}
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nss.IS_ENABLED = TRUE
     </select>
     <select id="listMessageSettingByProjectIdAndEnvId"
             resultMap="customMessageSettingMap">
@@ -52,7 +52,7 @@
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
         LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId}
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId} AND nss.IS_ENABLED = TRUE
     </select>
     <select id="getSettingByTypeAndCode" resultMap="messageSettingMap">
         SELECT
