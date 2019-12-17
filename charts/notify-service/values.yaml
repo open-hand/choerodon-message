@@ -178,3 +178,8 @@ metrics:
 logs:
   # 日志收集格式
   parser: spring-boot
+## Ingress 相关配置
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+##
+ingress:
+  enabled: false
