@@ -48,6 +48,7 @@
         fd_level AS LEVEL,
         is_enabled as enabled,
         is_allow_config AS allowConfig,
+        is_edit AS edit,
         object_version_number
         FROM
         notify_send_setting

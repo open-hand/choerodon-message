@@ -34,6 +34,9 @@ public class MessageServiceVO {
     @ApiModelProperty(value = "是否允许配置接收")
     private Boolean allowConfig;
 
+    @ApiModelProperty(value = "是否允许更改，允许配置接收")
+    private Boolean edit;
+
     @ApiModelProperty(value = "乐观所版本号")
     private Long objectVersionNumber;
 
@@ -107,5 +110,13 @@ public class MessageServiceVO {
     public MessageServiceVO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
         return this;
+    }
+
+    public Boolean getEdit() {
+        return edit;
+    }
+
+    public void setEdit(Boolean edit) {
+        this.edit = edit;
     }
 }

@@ -71,8 +71,10 @@ public class SendSettingServiceImpl implements SendSettingService {
             BeanUtils.copyProperties(t, sendSettingDTO);
             SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(sendSettingDTO.getCode()));
             if (query == null) {
+                sendSettingDTO.setEdit(sendSettingDTO.getAllowConfig());
                 sendSettingMapper.insertSelective(sendSettingDTO);
             } else {
+                query.setEdit(sendSettingDTO.getAllowConfig());
                 query.setName(sendSettingDTO.getName());
                 query.setDescription(sendSettingDTO.getDescription());
                 query.setLevel(sendSettingDTO.getLevel());

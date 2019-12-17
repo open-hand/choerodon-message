@@ -90,10 +90,8 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 List<CheckLog> logs = new ArrayList<>();
                 notifyCheckLogDTO.setBeginCheckDate(new Date());
                 if ("0.20.0".equals(version) && type.equals("devops")) {
-                    // todo
                     transferDevopsData(logs);
-                }
-                if ("0.20.0".equals(version) && type.equals("agile")) {
+                } else if ("0.20.0".equals(version) && type.equals("agile")) {
                     syncAgileNotify(logs);
                 } else {
                     LOGGER.info("version not matched");

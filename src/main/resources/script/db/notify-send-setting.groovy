@@ -110,4 +110,10 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-send-setting.groovy') {
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_TEMPLATE_ID')
         dropColumn(tableName: 'NOTIFY_SEND_SETTING', columnName: 'WH_ENABLED_FLAG')*/
     }
+
+    changeSet(author: 'scp', id: '2019-12-17-add-column_edit') {
+        addColumn(tableName: "NOTIFY_SEND_SETTING") {
+            column(name: 'IS_EDIT', type: 'TINYINT UNSIGNED', remarks: '能够编辑isAllowConfig', defaultValue: 1)
+        }
+    }
 }

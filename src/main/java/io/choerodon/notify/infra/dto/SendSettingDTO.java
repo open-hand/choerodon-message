@@ -28,6 +28,9 @@ public class SendSettingDTO extends BaseDTO {
     @Column(name = "is_allow_config")
     private Boolean isAllowConfig;
 
+    @Column(name = "is_edit")
+    private Boolean isEdit;
+
     @Column(name = "is_enabled")
     private Boolean enabled;
 
@@ -93,6 +96,7 @@ public class SendSettingDTO extends BaseDTO {
                 ", isSendInstantly=" + isSendInstantly +
                 ", isManualRetry=" + isManualRetry +
                 ", backlogFlag=" + backlogFlag +
+                ", isEdit" + isEdit +
                 ", webhookEnabledFlag=" + webhookEnabledFlag +
                 '}';
     }
@@ -228,5 +232,29 @@ public class SendSettingDTO extends BaseDTO {
 
     public void setBacklogFlag(Boolean backlogFlag) {
         this.backlogFlag = backlogFlag;
+    }
+
+    public Boolean getEdit() {
+        return isEdit;
+    }
+
+    public void setEdit(Boolean edit) {
+        isEdit = edit;
+    }
+
+    public Boolean getSendInstantly() {
+        return isSendInstantly;
+    }
+
+    public void setSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+    }
+
+    public Boolean getManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
     }
 }
