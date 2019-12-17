@@ -15,7 +15,9 @@ import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.api.vo.TargetUserVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
+import io.choerodon.notify.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.DeleteResourceType;
+import io.choerodon.notify.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
@@ -94,14 +96,30 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
             customMessageSettingList = handleResorceDeleteSettings(notifyEventGroupList, defaultMessageSettingList, projectId, notifyType);
         }
-        messageSettingWarpVO.setCustomMessageSettingList(customMessageSettingList);
 
         // 计算通知对象
         calculateSendRole(customMessageSettingList);
         // 添加用户信息
         addUserInfo(customMessageSettingList);
         calculateEventName(customMessageSettingList);
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         return messageSettingWarpVO;
+    }
+
+    private List<CustomMessageSettingVO> sortEvent(String notifyType, List<CustomMessageSettingVO> customMessageSettingList) {
+        // 设置排序大小
+        if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(AgileNotifyTypeEnum.orderMapping.get(settingVO.getCode())));
+        }
+        if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(DevopsNotifyTypeEnum.orderMapping.get(settingVO.getCode())));
+        }
+        if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(DeleteResourceType.orderMapping.get(settingVO.getEventName())));
+        }
+        // 排序
+        return customMessageSettingList.stream().sorted(Comparator.comparing(CustomMessageSettingVO::getOrder)).collect(Collectors.toList());
+
     }
 
     @Override
