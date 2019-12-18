@@ -48,7 +48,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
 
     @Override
     @Transactional
-    public void update(final Long userId, final List<io.choerodon.notify.api.dto.ReceiveSettingDTO> settingDTOList) {
+    public void update(final Long userId, final List<io.choerodon.notify.api.dto.ReceiveSettingDTO> settingDTOList, String sourceType) {
         if (userId == null) return;
         //没有校验接收通知设置中，层级是否一致，
         // 即sendSettingId中对应的level和接收通知设置中level不一定一致
@@ -57,6 +57,7 @@ public class ReceiveSettingServiceImpl implements ReceiveSettingService {
                 .peek(receiveSettingDTO -> receiveSettingDTO.setUserId(userId)).collect(Collectors.toList());
         ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
         receiveSettingDTO.setUserId(userId);
+        receiveSettingDTO.setSourceType(sourceType);
         List<ReceiveSettingDTO> dbSettings = receiveSettingMapper.select(receiveSettingDTO);
         //备份updateSettings，移除updateSettings和数据库dbSettings中不同的元素
         List<ReceiveSettingDTO> insertSetting = new ArrayList<>(updateSettings);

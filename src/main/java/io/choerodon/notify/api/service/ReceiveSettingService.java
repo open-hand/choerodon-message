@@ -24,7 +24,7 @@ public interface ReceiveSettingService {
      *
      * @param settingDTOList settingDTOList是所有当前用户禁用的接收配置
      */
-    void update(Long userId, List<ReceiveSettingDTO> settingDTOList);
+    void update(Long userId, List<ReceiveSettingDTO> settingDTOList, String sourceType);
 
     /**
      * 删除（disable为false）或插入(disable为true)当前用户sourceId对应组织/项目/平台的通知配置(pm/email)
