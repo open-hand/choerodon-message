@@ -18,6 +18,7 @@ import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.DeleteResourceType;
 import io.choerodon.notify.infra.enums.DevopsNotifyTypeEnum;
+import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
@@ -79,7 +80,8 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         if (CollectionUtils.isEmpty(defaultMessageSettingList)) {
             return messageSettingWarpVO;
         }
-
+        // 计算平台层是否启用发送短信，站内信，邮件
+        calculateStieSendSetting(defaultMessageSettingList);
         List<NotifyEventGroupVO> notifyEventGroupList = listEventGroupList(projectId, notifyType);
         // 资源删除验证，项目下没有启用的环境
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)
@@ -104,6 +106,27 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         calculateEventName(customMessageSettingList);
         messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         return messageSettingWarpVO;
+    }
+
+    private void calculateStieSendSetting(List<CustomMessageSettingVO> defaultMessageSettingList) {
+        defaultMessageSettingList.forEach(settingVO -> {
+            if (Boolean.TRUE.equals(settingVO.getSendSetting().getPmEnabledFlag())
+                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
+                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.PM.getValue().equals(template.getSendingType()))) {
+                settingVO.setPmEnabledFlag(true);
+            }
+            if (Boolean.TRUE.equals(settingVO.getSendSetting().getEmailEnabledFlag())
+                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
+                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.EMAIL.getValue().equals(template.getSendingType()))) {
+                settingVO.setEmailEnabledFlag(true);
+            }
+            if (Boolean.TRUE.equals(settingVO.getSendSetting().getSmsEnabledFlag())
+                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
+                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.SMS.getValue().equals(template.getSendingType()))) {
+                settingVO.setSmsEnabledFlag(true);
+            }
+        });
+
     }
 
     private List<CustomMessageSettingVO> sortEvent(String notifyType, List<CustomMessageSettingVO> customMessageSettingList) {
@@ -318,6 +341,9 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 if(ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
                     customMessageSettingVO.setUserList(defaultMessageSetting.getUserList());
                 }
+                customMessageSettingVO.setSmsEnabledFlag(defaultMessageSetting.getSmsEnabledFlag());
+                customMessageSettingVO.setEmailEnabledFlag(defaultMessageSetting.getEmailEnabledFlag());
+                customMessageSettingVO.setPmEnabledFlag(defaultMessageSetting.getPmEnabledFlag());
             }
         });
         return customMessageSettingList;
