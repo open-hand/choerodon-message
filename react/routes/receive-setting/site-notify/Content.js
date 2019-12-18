@@ -30,7 +30,9 @@ export default observer(props => {
 
   async function saveSettings() {
     try {
-      await tableDs.submit();
+      if (await tableDs.submit() !== false) {
+        refresh();
+      }
     } catch (e) {
       Choerodon.handleResponseError(e);
     }
@@ -38,8 +40,11 @@ export default observer(props => {
 
   function handleCheckBoxHeaderChange(value, name) {
     tableDs.forEach((record) => {
-      const hasTemplateId = record.get(`${name}TemplateId`) || !record.get('parentId');
-      if (hasTemplateId) {
+      if (record.get('parentId')) {
+        if (record.get(`${name}TemplateId`)) {
+          record.set(name, value);
+        }
+      } else if (tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`))) {
         record.set(name, value);
       }
     });
@@ -49,9 +54,8 @@ export default observer(props => {
     const isChecked = tableDs.totalCount && !tableDs.find((record) => {
       if (record.get('parentId')) {
         return !record.get(name) && (record.get(`${name}TemplateId`));
-      } else {
-        return !record.get(name);
       }
+      return !(record.get('name') || !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`)));
     });
     const pmRecords = tableDs.find((record) => {
       if (record.get('parentId')) {
@@ -73,7 +77,8 @@ export default observer(props => {
 
   function parentItemIsChecked({ record, name }) {
     const parentIsChecked = !tableDs.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-    record.set(name, parentIsChecked);
+    const realValue = parentIsChecked && !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
+    record.set(name, realValue);
   }
 
   function handleChecked(name) {

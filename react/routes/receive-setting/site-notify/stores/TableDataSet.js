@@ -1,7 +1,7 @@
 export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
   function parentItemIsChecked({ dataSet, record, name }) {
     const parentIsChecked = !dataSet.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-    const realValue = parentIsChecked && !dataSet.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(`${name}TemplateId`));
+    const realValue = parentIsChecked && !!dataSet.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
     record.init(name, realValue);
   }
 
@@ -66,7 +66,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
         });
 
         return ({
-          url: '/notify/v1/notices/receive_setting/all',
+          url: '/notify/v1/notices/receive_setting/all?source_type=site',
           method: 'put',
           data: res,
         });

@@ -110,7 +110,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
         });
 
         return ({
-          url: '/notify/v1/notices/receive_setting/all',
+          url: '/notify/v1/notices/receive_setting/all?source_type=project',
           method: 'put',
           data: res,
         });
