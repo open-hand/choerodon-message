@@ -1,7 +1,10 @@
 export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
-  function parentItemIsChecked({ dataSet, record, name, judgeTemplate = false }) {
-    const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && !tableRecord.get(name) && (judgeTemplate || tableRecord.get(`${name}TemplateId`)));
-    record.init(name, parentIsChecked);
+  function parentItemIsChecked({ dataSet, record, name }) {
+    const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && !tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    const disabled = !dataSet.find((tableRecord) => tableRecord.get('sourceId') === record.get('key') && !tableRecord.get(`${name}Disabled`));
+    const realValue = parentIsChecked && !disabled;
+    record.init(name, realValue);
+    record.init(`${name}Disabled`, disabled);
   }
 
   function handleLoad({ dataSet }) {
@@ -13,17 +16,18 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
     });
     dataSet.forEach((record) => {
       if (record.get('treeType') === 'project') {
-        parentItemIsChecked({ dataSet, record, name: 'pm', judgeTemplate: true });
-        parentItemIsChecked({ dataSet, record, name: 'email', judgeTemplate: true });
+        parentItemIsChecked({ dataSet, record, name: 'pm' });
+        parentItemIsChecked({ dataSet, record, name: 'email' });
       }
     });
   }
 
-  function initChecked(item, type, templateIdName) {
-    const hasTemplateId = item[templateIdName];
+  function initChecked(item, type, templateIdName, enabledName) {
+    const hasTemplateId = item[templateIdName] && item[enabledName];
     const isCheck = hasTemplateId && !receiveStore.getReceiveData.some(({ sendSettingId, sourceId, sendingType }) => (
       sendSettingId === item.id && Number(item.sourceId.split('-')[0]) === sourceId && sendingType === type
     ));
+    item[`${type}Disabled`] = !hasTemplateId;
     return isCheck;
   }
 
@@ -41,8 +45,8 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
           children.key = `${projectId}-${parentId}-${id}`;
           children.sourceId = `${projectId}-${parentId}`;
           children.treeType = 'item';
-          children.pm = initChecked(children, 'pm', 'pmTemplateId');
-          children.email = initChecked(children, 'email', 'emailTemplateId');
+          children.pm = initChecked(children, 'pm', 'pmTemplateId', 'pmEnabledFlag');
+          children.email = initChecked(children, 'email', 'emailTemplateId', 'emailEnabledFlag');
         } else {
           children.key = `${projectId}-${sequenceId}`;
           children.sourceId = `${projectId}`;
@@ -83,10 +87,10 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
       submit: ({ dataSet }) => {
         const res = [];
         const data = dataSet.toData();
-        data.forEach(({ pm, email, id, treeType, sourceId, pmTemplateId, emailTemplateId }) => {
+        data.forEach(({ pm, email, id, treeType, sourceId, pmDisabled, emailDisabled }) => {
           if (treeType === 'item') {
             const projectId = sourceId.split('-')[0];
-            if (!pm && pmTemplateId) {
+            if (!pm && !pmDisabled) {
               res.push({
                 sendingType: 'pm',
                 disable: true,
@@ -96,7 +100,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
                 userId,
               });
             }
-            if (!email && emailTemplateId) {
+            if (!email && !emailDisabled) {
               res.push({
                 sendingType: 'email',
                 disable: true,

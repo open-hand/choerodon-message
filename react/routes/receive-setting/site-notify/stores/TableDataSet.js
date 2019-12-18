@@ -1,23 +1,26 @@
 export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
   function parentItemIsChecked({ dataSet, record, name }) {
-    const parentIsChecked = !dataSet.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-    const realValue = parentIsChecked && !!dataSet.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
+    const parentIsChecked = !dataSet.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    const disabled = !dataSet.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(`${name}Disabled`));
+    const realValue = parentIsChecked && !disabled;
     record.init(name, realValue);
+    record.init(`${name}Disabled`, disabled);
   }
 
-  function isChecked(record, type, templateIdName) {
-    const hasTemplateId = record.get(templateIdName);
+  function isChecked(record, type, templateIdName, enabledName) {
+    const hasTemplateId = record.get(templateIdName) && record.get(enabledName);
     const isCheck = hasTemplateId && !receiveStore.getReceiveData.some(({ sendSettingId, sendingType }) => (
       sendSettingId === record.get('id') && sendingType === type
     ));
     record.init(type, isCheck);
+    record.init(`${type}Disabled`, !hasTemplateId);
   }
 
   function handleLoad({ dataSet }) {
     dataSet.forEach((record) => {
       if (record.get('parentId')) {
-        isChecked(record, 'pm', 'pmTemplateId');
-        isChecked(record, 'email', 'emailTemplateId');
+        isChecked(record, 'pm', 'pmTemplateId', 'pmEnabledFlag');
+        isChecked(record, 'email', 'emailTemplateId', 'emailEnabledFlag');
       }
     });
     dataSet.forEach((record) => {
@@ -43,9 +46,9 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
       submit: ({ dataSet }) => {
         const res = [];
         const data = dataSet.toData();
-        data.forEach(({ pm, email, id, parentId, pmTemplateId, emailTemplateId }) => {
+        data.forEach(({ pm, email, id, parentId, pmDisabled, emailDisabled }) => {
           if (!parentId) return;
-          if (!pm && pmTemplateId) {
+          if (!pm && !pmDisabled) {
             res.push({
               sendingType: 'pm',
               disable: true,
@@ -54,7 +57,7 @@ export default ({ formatMessage, intlPrefix, receiveStore, userId }) => {
               userId,
             });
           }
-          if (!email && emailTemplateId) {
+          if (!email && !emailDisabled) {
             res.push({
               sendingType: 'email',
               disable: true,

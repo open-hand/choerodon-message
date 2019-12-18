@@ -41,16 +41,15 @@ export default observer(props => {
 
   function handleCheckBoxHeaderChange(value, name) {
     tableDs.forEach((record) => {
-      const canCheck = record.get(`${name}TemplateId`) || record.get('treeType') !== 'item';
-      if (canCheck) {
+      if (!record.get(`${name}Disabled`)) {
         record.set(name, value);
       }
     });
   }
 
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && (record.get(`${name}TemplateId`) || record.get('treeType') !== 'item'));
-    const pmRecords = tableDs.find((record) => record.get(name) && (record.get(`${name}TemplateId`) || record.get('treeType') !== 'item'));
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && !record.get(`${name}Disabled`));
+    const pmRecords = tableDs.find((record) => record.get(name) && !record.get(`${name}Disabled`));
     return (
       <CheckBox
         checked={!!isChecked}
@@ -72,9 +71,10 @@ export default observer(props => {
     return childrenId;
   }
 
-  function parentItemIsChecked({ record, name, judgeTemplate = false }) {
-    const parentIsChecked = !tableDs.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && !tableRecord.get(name) && (judgeTemplate || tableRecord.get(`${name}TemplateId`)));
-    record.set(name, parentIsChecked);
+  function parentItemIsChecked({ record, name }) {
+    const parentIsChecked = !tableDs.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && !tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    const realValue = parentIsChecked && !record.get(`${name}Disabled`);
+    record.set(name, realValue);
   }
 
   function handleChecked(name) {
@@ -85,7 +85,7 @@ export default observer(props => {
     });
     tableDs.forEach((record) => {
       if (record.get('treeType') === 'project') {
-        parentItemIsChecked({ record, name, judgeTemplate: true });
+        parentItemIsChecked({ record, name });
       }
     });
   }
@@ -93,18 +93,18 @@ export default observer(props => {
   function handleCheckBoxChange(record, value, name) {
     if (record.get('treeType') === 'group') {
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('sourceId') === record.get('key') && tableRecord.get(`${name}TemplateId`)) {
+        if (tableRecord.get('sourceId') === record.get('key') && !tableRecord.get(`${name}Disabled`)) {
           tableRecord.set(name, value);
         } else if (record.get('sourceId') === tableRecord.get('key')) {
-          parentItemIsChecked({ record: tableRecord, name, judgeTemplate: true });
+          parentItemIsChecked({ record: tableRecord, name });
         }
       });
     } else if (record.get('treeType') === 'project') {
       const childrenId = getChildrenId(record.get('key'));
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('sourceId') === record.get('key')) {
+        if (tableRecord.get('sourceId') === record.get('key') && !tableRecord.get(`${name}Disabled`)) {
           tableRecord.set(name, value);
-        } else if (childrenId.includes(tableRecord.get('sourceId')) && tableRecord.get(`${name}TemplateId`)) {
+        } else if (childrenId.includes(tableRecord.get('sourceId')) && !tableRecord.get(`${name}Disabled`)) {
           tableRecord.set(name, value);
         }
       });
@@ -114,30 +114,30 @@ export default observer(props => {
   }
 
   function renderCheckBox({ record, name }) {
-    const isDisabled = !record.get(`${name}TemplateId`) && record.get('treeType') === 'item';
-    const isParentItem = record.get('treeType') !== 'item';
+    const isDisabled = record.get(`${name}Disabled`);
+    const isChecked = record.get(name);
     let checkedRecords;
     if (record.get('treeType') === 'group') {
-      checkedRecords = tableDs.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
+      checkedRecords = tableDs.find((tableRecord) => record.get('key') === tableRecord.get('sourceId') && tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
     } else if (record.get('treeType') === 'project') {
       const childrenId = getChildrenId(record.get('key'));
-      checkedRecords = tableDs.find((tableRecord) => childrenId.includes(tableRecord.get('sourceId')) && tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
+      checkedRecords = tableDs.find((tableRecord) => childrenId.includes(tableRecord.get('sourceId')) && tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
     }
 
     return (
       <CheckBox
         record={record}
         name={name}
-        checked={record.get(name)}
-        disabled={!!isDisabled}
-        indeterminate={isParentItem && !record.get(name) && !!checkedRecords}
+        checked={isChecked}
+        disabled={isDisabled}
+        indeterminate={!isChecked && !!checkedRecords}
         onChange={(checkBoxValue) => handleCheckBoxChange(record, checkBoxValue, name)}
       />
     );
   }
 
   function renderEditor(record, name) {
-    return !!(record.get(`${name}TemplateId`) || record.get('treeType') === 'project' || record.get('treeType') === 'group');
+    return !record.get(`${name}Disabled`);
   }
 
   return (

@@ -40,30 +40,15 @@ export default observer(props => {
 
   function handleCheckBoxHeaderChange(value, name) {
     tableDs.forEach((record) => {
-      if (record.get('parentId')) {
-        if (record.get(`${name}TemplateId`)) {
-          record.set(name, value);
-        }
-      } else if (tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`))) {
+      if (!record.get(`${name}Disabled`)) {
         record.set(name, value);
       }
     });
   }
   
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => {
-      if (record.get('parentId')) {
-        return !record.get(name) && (record.get(`${name}TemplateId`));
-      }
-      return !(record.get('name') || !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`)));
-    });
-    const pmRecords = tableDs.find((record) => {
-      if (record.get('parentId')) {
-        return record.get(name) && (record.get(`${name}TemplateId`));
-      } else {
-        return record.get(name);
-      }
-    });
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && !record.get(`${name}Disabled`));
+    const pmRecords = tableDs.find((record) => record.get(name) && !record.get(`${name}Disabled`));
     return (
       <CheckBox
         checked={!!isChecked}
@@ -76,8 +61,8 @@ export default observer(props => {
   }
 
   function parentItemIsChecked({ record, name }) {
-    const parentIsChecked = !tableDs.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-    const realValue = parentIsChecked && !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
+    const parentIsChecked = !tableDs.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    const realValue = parentIsChecked && !record.get(`${name}Disabled`);
     record.set(name, realValue);
   }
 
@@ -92,7 +77,7 @@ export default observer(props => {
   function handleCheckBoxChange(record, value, name) {
     if (!record.get('parentId')) {
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`)) {
+        if (tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(`${name}Disabled`)) {
           tableRecord.set(name, value);
         }
       });
@@ -103,13 +88,10 @@ export default observer(props => {
   }
 
   function renderCheckBox({ record, name }) {
-    let isDisabled = !record.get(`${name}TemplateId`);
-    let isChecked = true;
+    const isDisabled = record.get(`${name}Disabled`);
     let isIndeterminate = false;
     if (!record.get('parentId')) {
-      isChecked = !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(name) && tableRecord.get(`${name}TemplateId`));
-      isDisabled = !tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(`${name}TemplateId`));
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
     }
 
     return (
@@ -117,15 +99,15 @@ export default observer(props => {
         record={record}
         name={name}
         checked={record.get(name)}
-        disabled={!!isDisabled}
-        indeterminate={!isChecked && isIndeterminate}
+        disabled={isDisabled}
+        indeterminate={!record.get(name) && isIndeterminate}
         onChange={(value) => handleCheckBoxChange(record, value, name)}
       />
     );
   }
 
   function renderEditor(record, name) {
-    return !!(record.get(`${name}TemplateId`));
+    return !record.get(`${name}Disabled`);
   }
 
   return (
