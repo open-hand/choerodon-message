@@ -24,6 +24,7 @@ import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.AgileFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
@@ -93,6 +94,8 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                     transferDevopsData(logs);
                 } else if ("0.20.0".equals(version) && type.equals("agile")) {
                     syncAgileNotify(logs);
+                } else if ("0.20.0".equals(version) && type.equals("notify")) {
+                    syncNotifySendSetting(logs);
                 } else {
                     LOGGER.info("version not matched");
                 }
@@ -106,7 +109,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
     }
 
-    void syncAgileNotify(List<CheckLog> logs) {
+    private void syncAgileNotify(List<CheckLog> logs) {
         LOGGER.info("begin to sync agile notify!");
         List<MessageDetailDTO> messageDetailDTOList;
         try {
@@ -165,6 +168,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
 
     }
+
     private void transferDevopsData(List<CheckLog> logs) {
         List<DevopsNotificationTransferDataVO> devopsNotificationVOS;
         try {
@@ -196,7 +200,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                         notifyType = fillType(notifyType, devopsNotificationTransferDataVO);
                         for (String name : recouseNameList) {
                             messageSettingDTO.setEventName(name);
-                            MessageSettingDTO condition=new MessageSettingDTO();
+                            MessageSettingDTO condition = new MessageSettingDTO();
                             condition.setEventName(name);
                             condition.setEnvId(devopsNotificationTransferDataVO.getEnvId());
                             condition.setProjectId(devopsNotificationTransferDataVO.getProjectId());
@@ -227,6 +231,25 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 logs.add(checkLog);
             }
         }
+    }
+
+    private void syncNotifySendSetting(List<CheckLog> logs) {
+        List<String> deleteNotifyList = new ArrayList<>();
+        deleteNotifyList.add("registerOrganization");
+        deleteNotifyList.add("jobStatusProject");
+        deleteNotifyList.add("buzz-reply-message");
+        deleteNotifyList.add("buzz-message");
+
+        CheckLog checkLog = new CheckLog();
+        checkLog.setContent("begin to sync notify!");
+
+        deleteNotifyList.forEach(code -> {
+            SendSettingDTO sendSettingDTO = new SendSettingDTO();
+            sendSettingDTO.setCode(code);
+            sendSettingMapper.delete(sendSettingDTO);
+        });
+        checkLog.setResult("success");
+        logs.add(checkLog);
     }
 
     private void createMessageSettingTargetUser(Long messageSettingId, String noticeType, Long userId) {
