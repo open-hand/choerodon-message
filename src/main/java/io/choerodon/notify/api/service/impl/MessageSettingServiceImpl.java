@@ -314,8 +314,10 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 defaultMessageSetting.setProjectId(projectId);
                 customMessageSettingList.add(defaultMessageSetting);
             } else {
-                // 为自定义配置添加默认通知对象
-                customMessageSettingVO.setUserList(defaultMessageSetting.getUserList());
+                // 为devops自定义配置添加默认通知对象
+                if(ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+                    customMessageSettingVO.setUserList(defaultMessageSetting.getUserList());
+                }
             }
         });
         return customMessageSettingList;
