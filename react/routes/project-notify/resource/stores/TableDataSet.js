@@ -14,17 +14,19 @@ function formatData(data) {
   return newData;
 }
 
-function parentItemIsChecked({ dataSet, record, name }) {
-  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
-  record.init(name, parentIsChecked);
+function parentItemIsChecked({ dataSet, record, name, flagName }) {
+  const parentIsChecked = !dataSet.find((tableRecord) => record.get('key') === tableRecord.get('groupId') && !tableRecord.get(name) && tableRecord.get(flagName));
+  const canCheck = !!dataSet.find((tableRecord) => record.get('key') === tableRecord.get('groupId') && tableRecord.get(flagName));
+  record.init(name, parentIsChecked && canCheck);
+  record.init(flagName, canCheck);
 }
 
 function handleLoad({ dataSet }) {
   dataSet.forEach((record) => {
     if (!record.get('groupId')) {
-      parentItemIsChecked({ dataSet, record, name: 'pmEnable' });
-      parentItemIsChecked({ dataSet, record, name: 'emailEnable' });
-      parentItemIsChecked({ dataSet, record, name: 'smsEnable' });
+      parentItemIsChecked({ dataSet, record, name: 'pmEnable', flagName: 'pmEnabledFlag' });
+      parentItemIsChecked({ dataSet, record, name: 'emailEnable', flagName: 'emailEnabledFlag' });
+      parentItemIsChecked({ dataSet, record, name: 'smsEnable', flagName: 'smsEnabledFlag' });
     }
   });
 }

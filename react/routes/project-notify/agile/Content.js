@@ -39,12 +39,12 @@ export default observer(props => {
   }
 
   function handlePmHeaderChange(value) {
-    tableDs.forEach((record) => record.set('pmEnable', value));
+    tableDs.forEach((record) => record.get('pmEnabledFlag') && record.set('pmEnable', value));
   }
   
   function renderPmHeader(dataSet) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable'));
-    const pmRecords = tableDs.find((record) => record.get('pmEnable'));
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable') && record.get('pmEnabledFlag'));
+    const pmRecords = tableDs.find((record) => record.get('pmEnable') && record.get('pmEnabledFlag'));
     return (
       <CheckBox
         checked={!!isChecked}
@@ -62,6 +62,7 @@ export default observer(props => {
         record={record}
         name="pmEnable"
         checked={record.get('pmEnable')}
+        disabled={!record.get('pmEnabledFlag')}
         onChange={(value) => record.set('pmEnable', value)}
       />
     );

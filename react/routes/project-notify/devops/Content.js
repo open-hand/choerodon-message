@@ -36,53 +36,51 @@ export default observer(props => {
     }
   }
 
-  function handleHeaderChange(value, type) {
-    tableDs.forEach((record) => record.set(type, value));
+  function handleHeaderChange(value, type, flagName) {
+    tableDs.forEach((record) => record.get(flagName) && record.set(type, value));
   }
 
-  function renderCheckBoxHeader(name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name));
-    const hasCheckedRecord = tableDs.find((record) => record.get(name));
+  function renderCheckBoxHeader(name, flagName) {
+    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && record.get(flagName));
+    const hasCheckedRecord = tableDs.find((record) => record.get(name) && record.get(flagName));
     return (
       <CheckBox
         checked={!!isChecked}
         indeterminate={!isChecked && !!hasCheckedRecord}
-        onChange={(value) => handleHeaderChange(value, name)}
+        onChange={(value) => handleHeaderChange(value, name, flagName)}
       >
         {formatMessage({ id: `${intlPrefix}.${name}` })}
       </CheckBox>
     );
   }
 
-  function handleCheckBoxChange({ record, value, name }) {
+  function handleCheckBoxChange({ record, value, name, flagName }) {
     record.set(name, value);
     if (!record.get('groupId')) {
       tableDs.forEach((tableRecord) => {
-        if (tableRecord.get('groupId') === record.get('key')) {
+        if (tableRecord.get('groupId') === record.get('key') && tableRecord.get(flagName)) {
           tableRecord.set(name, value);
         }
       });
     } else {
       const parentRecord = tableDs.find((tableRecord) => record.get('groupId') === tableRecord.get('key'));
-      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('groupId') && !tableRecord.get(name));
-      parentRecord.set(name, parentIsChecked);
+      const parentIsChecked = !tableDs.find((tableRecord) => parentRecord.get('key') === tableRecord.get('groupId') && !tableRecord.get(name) && tableRecord.get(flagName));
+      parentRecord.set(name, parentIsChecked && parentRecord.get(flagName));
     }
   }
 
-  function renderCheckBox({ record, name }) {
-    let isChecked = true;
-    let isIndeterminate = false;
-    if (!record.get('groupId')) {
-      isChecked = !tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && !tableRecord.get(name));
-      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && tableRecord.get(name));
-    }
+  function renderCheckBox({ record, name, flagName }) {
+    const disabled = !record.get(flagName);
+    const checked = record.get(name);
+    const isIndeterminate = !record.get('groupId') && !!tableDs.find((tableRecord) => tableRecord.get('groupId') === record.get('key') && tableRecord.get(name) && tableRecord.get(flagName));
     return (
       <CheckBox
         record={record}
         name={name}
-        checked={record.get(name)}
-        indeterminate={!isChecked && isIndeterminate}
-        onChange={(value) => handleCheckBoxChange({ record, value, name })}
+        checked={checked}
+        indeterminate={!checked && isIndeterminate}
+        disabled={disabled}
+        onChange={(value) => handleCheckBoxChange({ record, value, name, flagName })}
       />
     );
   }
@@ -102,15 +100,15 @@ export default observer(props => {
         <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column
-            header={() => renderCheckBoxHeader('pmEnable')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable' })}
+            header={() => renderCheckBoxHeader('pmEnable', 'pmEnabledFlag')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable', flagName: 'pmEnabledFlag' })}
             editor
             width={150}
             align="left"
           />
           <Column
-            header={() => renderCheckBoxHeader('emailEnable')}
-            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable' })}
+            header={() => renderCheckBoxHeader('emailEnable', 'emailEnabledFlag')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable', flagName: 'emailEnabledFlag' })}
             editor
             width={150}
             align="left"

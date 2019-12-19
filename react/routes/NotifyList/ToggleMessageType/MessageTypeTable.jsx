@@ -64,7 +64,7 @@ const MessageTypeTable = () => {
 
   const getEnabled = ({ record }) => (
     <StatusTag
-      name={record.get('enabled') ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' })}
+      name={record.get('enabled') ? formatMessage({ id: 'enable' }) : formatMessage({ id: 'disable' })}
       color={record.get('enabled') ? '#00bfa5' : '#00000033'}
     />
   );
