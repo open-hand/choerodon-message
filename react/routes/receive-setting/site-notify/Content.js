@@ -47,12 +47,14 @@ export default observer(props => {
   }
   
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && !record.get(`${name}Disabled`));
+    const disabled = !tableDs.find((record) => !record.get(`${name}Disabled`));
+    const isChecked = !disabled && tableDs.totalCount && !tableDs.find((record) => !record.get(name) && !record.get(`${name}Disabled`));
     const pmRecords = tableDs.find((record) => record.get(name) && !record.get(`${name}Disabled`));
     return (
       <CheckBox
         checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
+        disabled={disabled}
         onChange={(value) => handleCheckBoxHeaderChange(value, name)}
       >
         {formatMessage({ id: `receive.type.${name}` })}
