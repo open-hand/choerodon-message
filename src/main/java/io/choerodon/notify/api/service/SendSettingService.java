@@ -8,7 +8,6 @@ import io.choerodon.swagger.notify.NotifyBusinessTypeScanData;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public interface SendSettingService {
@@ -53,10 +52,10 @@ public interface SendSettingService {
     /**
      * 修改发送设置
      *
+     * @param id
      * @param sendSettingDTO 更新信息
-     * @return
      */
-    SendSettingDTO updateSendSetting(SendSettingDTO sendSettingDTO);
+    SendSettingDTO updateSendSetting(Long id, SendSettingDTO sendSettingDTO);
 
     /**
      * 查询项目层下的所有可选的SendSetting

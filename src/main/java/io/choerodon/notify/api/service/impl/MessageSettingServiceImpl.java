@@ -1,14 +1,13 @@
 package io.choerodon.notify.api.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.notify.NotifyType;
 import io.choerodon.core.notify.ServiceNotifyType;
 import io.choerodon.core.notify.TargetUserType;
-import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.dto.UserDTO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.api.service.MessageSettingTargetUserService;
-import io.choerodon.notify.api.service.SendSettingService;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.MessageSettingWarpVO;
 import io.choerodon.notify.api.vo.NotifyEventGroupVO;
@@ -22,18 +21,15 @@ import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.MessageSettingMapper;
-import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
-
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -236,6 +232,26 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         }
     }
 
+    @Override
+    public void disableNotifyTypeByCodeAndType(String code, String notiyfType) {
+        if (ObjectUtils.isEmpty(code)) {
+            throw new CommonException(ERROR_PARAM_INVALID);
+        }
+        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+        if (NotifyType.PM.getValue().equals(notiyfType)) {
+            messageSettingDTO.setPmEnable(false);
+        }
+        if (NotifyType.EMAIL.getValue().equals(notiyfType)) {
+            messageSettingDTO.setEmailEnable(false);
+        }
+        if (NotifyType.SMS.getValue().equals(notiyfType)) {
+            messageSettingDTO.setSmsEnable(false);
+        }
+        Example example = new Example(MessageSettingDTO.class);
+        example.createCriteria().andEqualTo("code", code).andNotEqualTo("projectId", 0);
+        messageSettingMapper.updateByExampleSelective(messageSettingDTO, example);
+    }
+
     private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
 
         // 添加指定用户
@@ -314,12 +330,17 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
             Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getEventName(), v -> v));
             defaultMessageSettingList.forEach(setting -> {
-                if (custommessageSettingVOMap.get(setting.getEventName()) == null) {
+                CustomMessageSettingVO customMessageSettingVO = custommessageSettingVOMap.get(setting.getEventName());
+                if (customMessageSettingVO == null) {
                     CustomMessageSettingVO messageSettingVO = new CustomMessageSettingVO();
                     modelMapper.map(setting, messageSettingVO);
                     messageSettingVO.setProjectId(projectId);
                     messageSettingVO.setEnvId(envId);
                     customMessageSettingList.add(messageSettingVO);
+                } else {
+                    customMessageSettingVO.setSmsEnabledFlag(setting.getSmsEnabledFlag());
+                    customMessageSettingVO.setEmailEnabledFlag(setting.getEmailEnabledFlag());
+                    customMessageSettingVO.setPmEnabledFlag(setting.getPmEnabledFlag());
                 }
             });
             resorceDeleteSettingList.addAll(customMessageSettingList);

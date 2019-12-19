@@ -1,10 +1,8 @@
 package io.choerodon.notify.api.service;
 
-import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.MessageSettingWarpVO;
-import io.choerodon.notify.api.vo.TargetUserVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 
 import java.util.List;
@@ -27,4 +25,6 @@ public interface MessageSettingService {
     void deleteByTypeAndEnvId(String type, Long envId);
 
     void updateMessageSetting(MessageSettingDTO messageSettingDTO);
+
+    void disableNotifyTypeByCodeAndType(String code, String notiyfType);
 }

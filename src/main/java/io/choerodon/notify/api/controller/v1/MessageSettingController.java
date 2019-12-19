@@ -2,25 +2,19 @@ package io.choerodon.notify.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.notify.api.dto.MessageSettingCategoryDTO;
 import io.choerodon.notify.api.dto.MessageSettingVO;
 import io.choerodon.notify.api.service.MessageSettingService;
 import io.choerodon.notify.api.vo.CustomMessageSettingVO;
 import io.choerodon.notify.api.vo.MessageSettingWarpVO;
-import io.choerodon.notify.api.vo.TargetUserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * User: Mr.Wang

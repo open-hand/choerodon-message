@@ -48,6 +48,8 @@ public class SendSettingVO {
 
     private Boolean backlogFlag;
 
+    private Long objectVersionNumber;
+
     private List<Template> templates;
 
     public Long getId() {
@@ -184,5 +186,29 @@ public class SendSettingVO {
 
     public void setEdit(Boolean edit) {
         this.edit = edit;
+    }
+
+    public Boolean getSendInstantly() {
+        return isSendInstantly;
+    }
+
+    public void setSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+    }
+
+    public Boolean getManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
     }
 }
