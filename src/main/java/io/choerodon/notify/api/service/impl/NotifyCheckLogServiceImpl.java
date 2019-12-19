@@ -123,7 +123,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
 
         if (messageDetailDTOList != null && messageDetailDTOList.size() > 0) {
-            Map<Long, List<MessageDetailDTO>> messageDetailMap = messageDetailDTOList.stream().collect(Collectors.groupingBy(MessageDetailDTO::getProjectId));
+            Map<Long, List<MessageDetailDTO>> messageDetailMap = messageDetailDTOList.stream().filter(MessageDetailDTO::getEnable).collect(Collectors.groupingBy(MessageDetailDTO::getProjectId));
             for (Map.Entry<Long, List<MessageDetailDTO>> map : messageDetailMap.entrySet()) {
                 CheckLog checkLog = new CheckLog();
                 checkLog.setContent("begin to sync agile notify projectId:" + map.getKey());
@@ -239,6 +239,13 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         deleteNotifyList.add("jobStatusProject");
         deleteNotifyList.add("buzz-reply-message");
         deleteNotifyList.add("buzz-message");
+        deleteNotifyList.add("captcha-registrantOrganization");
+        deleteNotifyList.add(" registrant-exception");
+        deleteNotifyList.add("registerOrganization-expireSoon");
+        deleteNotifyList.add("registerOrganization-expired");
+        deleteNotifyList.add("registrant-exception");
+        deleteNotifyList.add("marketApplicationNotice-base");
+        deleteNotifyList.add("devopsDeleteInstance4Sms");
 
         CheckLog checkLog = new CheckLog();
         checkLog.setContent("begin to sync notify!");
