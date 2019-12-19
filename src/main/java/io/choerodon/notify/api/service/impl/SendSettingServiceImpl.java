@@ -81,6 +81,7 @@ public class SendSettingServiceImpl implements SendSettingService {
                 sendSettingMapper.insertSelective(sendSettingDTO);
             } else {
                 query.setEdit(sendSettingDTO.getAllowConfig());
+                query.setAllowConfig(sendSettingDTO.getAllowConfig());
                 query.setName(sendSettingDTO.getName());
                 query.setDescription(sendSettingDTO.getDescription());
                 query.setLevel(sendSettingDTO.getLevel());
