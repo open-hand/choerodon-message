@@ -123,7 +123,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
 
         if (messageDetailDTOList != null && messageDetailDTOList.size() > 0) {
-            Map<Long, List<MessageDetailDTO>> messageDetailMap = messageDetailDTOList.stream().filter(MessageDetailDTO::getEnable).collect(Collectors.groupingBy(MessageDetailDTO::getProjectId));
+            Map<Long, List<MessageDetailDTO>> messageDetailMap = messageDetailDTOList.stream().collect(Collectors.groupingBy(MessageDetailDTO::getProjectId));
             for (Map.Entry<Long, List<MessageDetailDTO>> map : messageDetailMap.entrySet()) {
                 CheckLog checkLog = new CheckLog();
                 checkLog.setContent("begin to sync agile notify projectId:" + map.getKey());
@@ -144,18 +144,20 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                             messageSettingDTO.setId(queryDTO.getId());
                         }
                         //2. messageSettingTargetUser
-                        if (v.getNoticeType().equals("users")) {
-                            if (v.getUser() == null || v.getUser().equals("")) {
-                                continue;
-                            }
-                            String[] userIds = v.getUser().split(",");
-                            for (String userId : userIds) {
-                                if (!userId.equals("") && isInteger(userId)) {
-                                    createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), Long.valueOf(userId));
+                        if (v.getEnable()) {
+                            if (v.getNoticeType().equals("users")) {
+                                if (v.getUser() == null || v.getUser().equals("")) {
+                                    continue;
                                 }
+                                String[] userIds = v.getUser().split(",");
+                                for (String userId : userIds) {
+                                    if (!userId.equals("") && isInteger(userId)) {
+                                        createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), Long.valueOf(userId));
+                                    }
+                                }
+                            } else {
+                                createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), null);
                             }
-                        } else {
-                            createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), null);
                         }
                         checkLog.setResult("Succeed to sync agile notify!");
                     }
