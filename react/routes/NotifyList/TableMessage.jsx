@@ -155,6 +155,7 @@ export default observer(() => {
   }
 
   function editTemplate(type, title) {
+    messageTypeDetailDataSet.children.templates.reset();
     Modal.open({
       title,
       drawer: true,

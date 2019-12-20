@@ -717,6 +717,7 @@ const zh_CN = {
   loading: '加载中',
   queue: '队列中',
   wait_to_be_pulled: '等待被拉取',
+  noContent: '暂无内容',
 
   day: '天',
   hour: '小时',
