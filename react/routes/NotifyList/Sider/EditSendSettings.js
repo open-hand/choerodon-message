@@ -6,7 +6,9 @@ export default function ({ context, modal }) {
   const { messageTypeDetailDataSet } = context;
   modal.handleOk(async () => {
     try {
-      if (!await messageTypeDetailDataSet.submit()) {
+      if (await messageTypeDetailDataSet.submit() !== false) {
+        messageTypeDetailDataSet.query();
+      } else {
         return false;
       }
     } catch (err) {
