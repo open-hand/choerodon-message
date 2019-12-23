@@ -30,17 +30,21 @@ public class ReceiveSettingController {
     @GetMapping
     @Permission(permissionLogin = true, type = ResourceType.SITE)
     @ApiOperation(value = "查询当前用户所有接收通知配置")
-    public List<ReceiveSettingDTO> queryByUserId(@RequestParam("source_type") String sourceType) {
+    public List<ReceiveSettingDTO> queryByUserId(
+            @ApiParam(name = "消息类型", required = true)
+            @RequestParam("source_type") String sourceType) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
-        return receiveSettingService.queryByUserId(userId,sourceType);
+        return receiveSettingService.queryByUserId(userId, sourceType);
     }
 
     @PutMapping("/all")
     @Permission(permissionLogin = true, type = ResourceType.SITE)
     @ApiOperation(value = "更新当前用户所有接收通知配置（前端传输当前用户所有禁用的接收通知配置）")
-    public void update(@RequestBody List<ReceiveSettingDTO> settingDTOList) {
+    public void update(@RequestBody List<ReceiveSettingDTO> settingDTOList,
+                       @ApiParam(name = "消息类型", required = true)
+                       @RequestParam("source_type") String sourceType) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
-        receiveSettingService.update(userId, settingDTOList);
+        receiveSettingService.update(userId, settingDTOList, sourceType);
     }
 
     @PutMapping

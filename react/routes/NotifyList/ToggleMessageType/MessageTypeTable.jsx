@@ -46,21 +46,25 @@ const MessageTypeTable = () => {
 
   const ActionRenderer = ({ value, record }) => {
     const enabled = record.get('enabled');
+    const edit = record.get('edit');
     const actionArr = [{
       service: [],
       text: enabled ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' }),
       action: () => (enabled ? openDisableModal() : changeMake()),
-    }, {
-      service: [],
-      text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
-      action: () => changeReceive(),
     }];
+    if (edit) {
+      actionArr.push({
+        service: [],
+        text: record.get('allowConfig') ? '不允许配置接收' : '允许配置接收',
+        action: () => changeReceive(),
+      });
+    }
     return <Action className="action-icon" data={actionArr} />;
   };
 
   const getEnabled = ({ record }) => (
     <StatusTag
-      name={record.get('enabled') ? formatMessage({ id: 'disable' }) : formatMessage({ id: 'enable' })}
+      name={record.get('enabled') ? formatMessage({ id: 'enable' }) : formatMessage({ id: 'disable' })}
       color={record.get('enabled') ? '#00bfa5' : '#00000033'}
     />
   );
@@ -86,7 +90,7 @@ const MessageTypeTable = () => {
             },
           })}
         />
-        <Column renderer={ActionRenderer} width={40} />
+        <Column renderer={ActionRenderer} width={50} />
         <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} name="introduce" />
         <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} width={80} name="enabled" renderer={getEnabled} align="left" />
         <Column style={{ color: 'rgba(0, 0, 0, 0.65)' }} width={147} name="allowConfig" renderer={getAllowConfig} />

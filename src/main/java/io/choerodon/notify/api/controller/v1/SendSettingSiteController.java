@@ -98,10 +98,7 @@ public class SendSettingSiteController {
     @Permission(type = ResourceType.SITE)
     @ApiOperation(value = "修改发送设置")
     public ResponseEntity<SendSettingDTO> updateSendSetting(@PathVariable("id") Long id, @RequestBody SendSettingDTO updateDTO) {
-        if (!id.equals(updateDTO.getId())) {
-            throw new CommonException("error.update.primary.key.not.equal.to.the.path.id");
-        }
-        return new ResponseEntity<>(sendSettingService.updateSendSetting(updateDTO), HttpStatus.OK);
+        return ResponseEntity.ok(sendSettingService.updateSendSetting(id, updateDTO));
     }
 
     @PutMapping("/{id}/allow_configuration")
@@ -122,5 +119,11 @@ public class SendSettingSiteController {
     @ApiOperation(value = "根据code查询发送设置")
     public ResponseEntity<SendSettingDTO> queryByCode(@PathVariable("code") String code) {
         return new ResponseEntity<>(sendSettingService.queryByCode(code), HttpStatus.OK);
+    }
+    @GetMapping("/codes/resourceDeleteConfirmation/check_enabled")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "检查资源删除验证通知是否启用")
+    public ResponseEntity<Boolean> checkResourceDeleteEnabled() {
+        return ResponseEntity.ok(sendSettingService.checkResourceDeleteEnabled());
     }
 }

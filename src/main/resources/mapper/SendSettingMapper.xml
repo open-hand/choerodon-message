@@ -19,6 +19,10 @@
         nts.is_send_instantly,
         nts.is_manual_retry,
         nts.is_allow_config,
+        nts.email_enabled_flag,
+        nts.pm_enabled_flag,
+        nts.webhook_enabled_flag,
+        nts.sms_enabled_flag,
         nts.is_enabled,
         nts.object_version_number,
         nts.category_code,
@@ -48,6 +52,7 @@
         fd_level AS LEVEL,
         is_enabled as enabled,
         is_allow_config AS allowConfig,
+        is_edit AS edit,
         object_version_number
         FROM
         notify_send_setting

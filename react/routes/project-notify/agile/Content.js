@@ -39,16 +39,18 @@ export default observer(props => {
   }
 
   function handlePmHeaderChange(value) {
-    tableDs.forEach((record) => record.set('pmEnable', value));
+    tableDs.forEach((record) => record.get('pmEnabledFlag') && record.set('pmEnable', value));
   }
-  
+
   function renderPmHeader(dataSet) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable'));
-    const pmRecords = tableDs.find((record) => record.get('pmEnable'));
+    const disabled = !tableDs.find((record) => record.get('pmEnabledFlag'));
+    const isChecked = !disabled && tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable') && record.get('pmEnabledFlag'));
+    const pmRecords = tableDs.find((record) => record.get('pmEnable') && record.get('pmEnabledFlag'));
     return (
       <CheckBox
         checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
+        disabled={disabled}
         onChange={handlePmHeaderChange}
       >
         {formatMessage({ id: `${intlPrefix}.pmEnable` })}
@@ -62,6 +64,7 @@ export default observer(props => {
         record={record}
         name="pmEnable"
         checked={record.get('pmEnable')}
+        disabled={!record.get('pmEnabledFlag')}
         onChange={(value) => record.set('pmEnable', value)}
       />
     );
@@ -83,7 +86,7 @@ export default observer(props => {
     return (
       <Dropdown
         overlay={<NotifyObject record={record} allSendRoleList={allSendRoleList} />}
-        trigger={['click']}
+        trigger={['click', 'focus']}
         placement="bottomLeft"
       >
         <div className={`${prefixCls}-object-select`}>

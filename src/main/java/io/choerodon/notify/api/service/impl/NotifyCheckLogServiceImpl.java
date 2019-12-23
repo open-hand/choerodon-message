@@ -24,6 +24,7 @@ import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.AgileFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
@@ -83,70 +84,6 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             this.type = type;
         }
 
-        private void transferDevopsData(List<CheckLog> logs) {
-            List<DevopsNotificationTransferDataVO> devopsNotificationVOS;
-            try {
-                devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
-            } catch (Exception e) {
-                CheckLog checkLog = new CheckLog();
-                checkLog.setContent("Get message of devops!");
-                checkLog.setResult("error.get.devops.message.data");
-                logs.add(checkLog);
-                throw new CommonException("error.get.devops.message.data", e);
-            }
-            if (devopsNotificationVOS != null || devopsNotificationVOS.size() > 0) {
-                Map<Long, List<DevopsNotificationTransferDataVO>> longListMap = devopsNotificationVOS
-                        .stream()
-                        .collect(Collectors.groupingBy(DevopsNotificationTransferDataVO::getProjectId));
-                for (Map.Entry<Long, List<DevopsNotificationTransferDataVO>> longListEntry : longListMap.entrySet()) {
-                    CheckLog checkLog = new CheckLog();
-                    checkLog.setContent("begin to sync devops notify projectId:" + longListEntry.getKey());
-                    try {
-                        for (DevopsNotificationTransferDataVO devopsNotificationTransferDataVO : longListEntry.getValue()) {
-                            MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-                            messageSettingDTO.setCode("resourceDeleteConfirmation");
-                            messageSettingDTO.setProjectId(Objects.isNull(devopsNotificationTransferDataVO.getProjectId()) ? null : devopsNotificationTransferDataVO.getProjectId());
-                            messageSettingDTO.setNotifyType("resourceDelete");
-                            messageSettingDTO.setEnvId(devopsNotificationTransferDataVO.getEnvId());
-                            List<String> recouseNameList = new ArrayList<>();
-                            List<String> notifyType = new ArrayList<>();
-                            recouseNameList = fillName(recouseNameList, devopsNotificationTransferDataVO);
-                            notifyType = fillType(notifyType, devopsNotificationTransferDataVO);
-                            for (String name : recouseNameList) {
-                                messageSettingDTO.setEventName(name);
-                                MessageSettingDTO condition=new MessageSettingDTO();
-                                condition.setEventName(name);
-                                condition.setEnvId(devopsNotificationTransferDataVO.getEnvId());
-                                condition.setProjectId(devopsNotificationTransferDataVO.getProjectId());
-                                MessageSettingDTO queryDTO = messageSettingMapper.selectOne(condition);
-                                if (queryDTO == null) {
-                                    fillMessageSettings(messageSettingDTO, notifyType);
-                                    messageSettingDTO.setId(null);
-                                    //插入messageSetting
-                                    if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
-                                        throw new CommonException("error.insert.message.send.setting");
-                                    }
-                                    //插入接收对象
-                                    saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
-                                } else {
-                                    messageSettingDTO.setId(queryDTO.getId());
-                                    //插入接收对象
-                                    saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
-                                }
-                            }
-                            recouseNameList.clear();
-                            notifyType.clear();
-                            checkLog.setResult("Succeed to sync devops notify!");
-                        }
-                    } catch (Exception e) {
-                        checkLog.setResult("Failed to sync agile notify!");
-                        throw e;
-                    }
-                    logs.add(checkLog);
-                }
-            }
-        }
-
         @Override
         public void run() {
             try {
@@ -154,11 +91,11 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 List<CheckLog> logs = new ArrayList<>();
                 notifyCheckLogDTO.setBeginCheckDate(new Date());
                 if ("0.20.0".equals(version) && type.equals("devops")) {
-                    // todo
                     transferDevopsData(logs);
-                }
-                if ("0.20.0".equals(version) && type.equals("agile")) {
+                } else if ("0.20.0".equals(version) && type.equals("agile")) {
                     syncAgileNotify(logs);
+                } else if ("0.20.0".equals(version) && type.equals("notify")) {
+                    syncNotifySendSetting(logs);
                 } else {
                     LOGGER.info("version not matched");
                 }
@@ -172,7 +109,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
         }
     }
 
-    void syncAgileNotify(List<CheckLog> logs) {
+    private void syncAgileNotify(List<CheckLog> logs) {
         LOGGER.info("begin to sync agile notify!");
         List<MessageDetailDTO> messageDetailDTOList;
         try {
@@ -207,18 +144,20 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                             messageSettingDTO.setId(queryDTO.getId());
                         }
                         //2. messageSettingTargetUser
-                        if (v.getNoticeType().equals("users")) {
-                            if (v.getUser() == null || v.getUser().equals("")) {
-                                continue;
-                            }
-                            String[] userIds = v.getUser().split(",");
-                            for (String userId : userIds) {
-                                if (!userId.equals("") && isInteger(userId)) {
-                                    createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), Long.valueOf(userId));
+                        if (v.getEnable()) {
+                            if (v.getNoticeType().equals("users")) {
+                                if (v.getUser() == null || v.getUser().equals("")) {
+                                    continue;
                                 }
+                                String[] userIds = v.getUser().split(",");
+                                for (String userId : userIds) {
+                                    if (!userId.equals("") && isInteger(userId)) {
+                                        createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), Long.valueOf(userId));
+                                    }
+                                }
+                            } else {
+                                createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), null);
                             }
-                        } else {
-                            createMessageSettingTargetUser(messageSettingDTO.getId(), targetUserType.get(v.getNoticeType()), null);
                         }
                         checkLog.setResult("Succeed to sync agile notify!");
                     }
@@ -230,6 +169,96 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             }
         }
 
+    }
+
+    private void transferDevopsData(List<CheckLog> logs) {
+        List<DevopsNotificationTransferDataVO> devopsNotificationVOS;
+        try {
+            devopsNotificationVOS = devopsFeignClient.transferData(1L).getBody();
+        } catch (Exception e) {
+            CheckLog checkLog = new CheckLog();
+            checkLog.setContent("Get message of devops!");
+            checkLog.setResult("error.get.devops.message.data");
+            logs.add(checkLog);
+            throw new CommonException("error.get.devops.message.data", e);
+        }
+        if (devopsNotificationVOS != null || devopsNotificationVOS.size() > 0) {
+            Map<Long, List<DevopsNotificationTransferDataVO>> longListMap = devopsNotificationVOS
+                    .stream()
+                    .collect(Collectors.groupingBy(DevopsNotificationTransferDataVO::getProjectId));
+            for (Map.Entry<Long, List<DevopsNotificationTransferDataVO>> longListEntry : longListMap.entrySet()) {
+                CheckLog checkLog = new CheckLog();
+                checkLog.setContent("begin to sync devops notify projectId:" + longListEntry.getKey());
+                try {
+                    for (DevopsNotificationTransferDataVO devopsNotificationTransferDataVO : longListEntry.getValue()) {
+                        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+                        messageSettingDTO.setCode("resourceDeleteConfirmation");
+                        messageSettingDTO.setProjectId(Objects.isNull(devopsNotificationTransferDataVO.getProjectId()) ? null : devopsNotificationTransferDataVO.getProjectId());
+                        messageSettingDTO.setNotifyType("resourceDelete");
+                        messageSettingDTO.setEnvId(devopsNotificationTransferDataVO.getEnvId());
+                        List<String> recouseNameList = new ArrayList<>();
+                        List<String> notifyType = new ArrayList<>();
+                        recouseNameList = fillName(recouseNameList, devopsNotificationTransferDataVO);
+                        notifyType = fillType(notifyType, devopsNotificationTransferDataVO);
+                        for (String name : recouseNameList) {
+                            messageSettingDTO.setEventName(name);
+                            MessageSettingDTO condition = new MessageSettingDTO();
+                            condition.setEventName(name);
+                            condition.setEnvId(devopsNotificationTransferDataVO.getEnvId());
+                            condition.setProjectId(devopsNotificationTransferDataVO.getProjectId());
+                            MessageSettingDTO queryDTO = messageSettingMapper.selectOne(condition);
+                            if (queryDTO == null) {
+                                fillMessageSettings(messageSettingDTO, notifyType);
+                                messageSettingDTO.setId(null);
+                                //插入messageSetting
+                                if (messageSettingMapper.insertSelective(messageSettingDTO) != 1) {
+                                    throw new CommonException("error.insert.message.send.setting");
+                                }
+                                //插入接收对象
+                                saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
+                            } else {
+                                messageSettingDTO.setId(queryDTO.getId());
+                                //插入接收对象
+                                saveMessageSettingTargetUser(devopsNotificationTransferDataVO, messageSettingDTO);
+                            }
+                        }
+                        recouseNameList.clear();
+                        notifyType.clear();
+                        checkLog.setResult("Succeed to sync devops notify!");
+                    }
+                } catch (Exception e) {
+                    checkLog.setResult("Failed to sync devops notify!");
+                    throw e;
+                }
+                logs.add(checkLog);
+            }
+        }
+    }
+
+    private void syncNotifySendSetting(List<CheckLog> logs) {
+        List<String> deleteNotifyList = new ArrayList<>();
+        deleteNotifyList.add("registerOrganization");
+        deleteNotifyList.add("jobStatusProject");
+        deleteNotifyList.add("buzz-reply-message");
+        deleteNotifyList.add("buzz-message");
+        deleteNotifyList.add("captcha-registrantOrganization");
+        deleteNotifyList.add(" registrant-exception");
+        deleteNotifyList.add("registerOrganization-expireSoon");
+        deleteNotifyList.add("registerOrganization-expired");
+        deleteNotifyList.add("registrant-exception");
+        deleteNotifyList.add("marketApplicationNotice-base");
+        deleteNotifyList.add("devopsDeleteInstance4Sms");
+
+        CheckLog checkLog = new CheckLog();
+        checkLog.setContent("begin to sync notify!");
+
+        deleteNotifyList.forEach(code -> {
+            SendSettingDTO sendSettingDTO = new SendSettingDTO();
+            sendSettingDTO.setCode(code);
+            sendSettingMapper.delete(sendSettingDTO);
+        });
+        checkLog.setResult("success");
+        logs.add(checkLog);
     }
 
     private void createMessageSettingTargetUser(Long messageSettingId, String noticeType, Long userId) {

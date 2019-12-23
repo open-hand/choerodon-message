@@ -1,5 +1,8 @@
 package io.choerodon.notify.api.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.choerodon.notify.api.dto.SendSettingVO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.HashSet;
@@ -38,11 +41,20 @@ public class CustomMessageSettingVO {
     @ApiModelProperty("是否发送站内信")
     private Boolean pmEnable;
 
+    @ApiModelProperty("平台层配置是否允许发送站内信")
+    private Boolean pmEnabledFlag = false;
+
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
 
-    @ApiModelProperty("是否发送邮件")
+    @ApiModelProperty("平台层配置是否允许发送邮件")
+    private Boolean emailEnabledFlag = false;
+
+    @ApiModelProperty("是否发送短信")
     private Boolean smsEnable;
+
+    @ApiModelProperty("平台层配置是否允许发送短信")
+    private Boolean smsEnabledFlag = false;
 
     @ApiModelProperty(value = "版本号")
     private Long objectVersionNumber;
@@ -53,6 +65,8 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "通知对象")
     private String notifyObject;
 
+    private int order;
+
     @ApiModelProperty(value = "通知的非指定用户集合")
     private Set<String> sendRoleList = new HashSet<>();
 
@@ -61,6 +75,10 @@ public class CustomMessageSettingVO {
 
     @ApiModelProperty(value = "指定用户id集合")
     private Set<Long> specifierIds;
+
+    @JsonIgnore
+    private SendSettingVO sendSetting;
+
 
     public Long getId() {
         return id;
@@ -188,5 +206,45 @@ public class CustomMessageSettingVO {
 
     public void setSpecifierIds(Set<Long> specifierIds) {
         this.specifierIds = specifierIds;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public SendSettingVO getSendSetting() {
+        return sendSetting;
+    }
+
+    public void setSendSetting(SendSettingVO sendSetting) {
+        this.sendSetting = sendSetting;
+    }
+
+    public Boolean getPmEnabledFlag() {
+        return pmEnabledFlag;
+    }
+
+    public void setPmEnabledFlag(Boolean pmEnabledFlag) {
+        this.pmEnabledFlag = pmEnabledFlag;
+    }
+
+    public Boolean getEmailEnabledFlag() {
+        return emailEnabledFlag;
+    }
+
+    public void setEmailEnabledFlag(Boolean emailEnabledFlag) {
+        this.emailEnabledFlag = emailEnabledFlag;
+    }
+
+    public Boolean getSmsEnabledFlag() {
+        return smsEnabledFlag;
+    }
+
+    public void setSmsEnabledFlag(Boolean smsEnabledFlag) {
+        this.smsEnabledFlag = smsEnabledFlag;
     }
 }

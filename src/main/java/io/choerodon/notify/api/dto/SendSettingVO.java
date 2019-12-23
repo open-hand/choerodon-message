@@ -5,6 +5,8 @@ import io.choerodon.notify.infra.dto.Template;
 import javax.persistence.Column;
 import java.util.List;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author jiameng.cao
  * @date 2019/10/30
@@ -22,6 +24,9 @@ public class SendSettingVO {
 
     @Column(name = "is_allow_config")
     private Boolean isAllowConfig;
+
+    @ApiModelProperty(value = "是否允许更改，允许配置接收")
+    private Boolean edit;
 
     private Boolean enabled;
 
@@ -42,6 +47,8 @@ public class SendSettingVO {
     private Boolean webhookEnabledFlag;
 
     private Boolean backlogFlag;
+
+    private Long objectVersionNumber;
 
     private List<Template> templates;
 
@@ -171,5 +178,37 @@ public class SendSettingVO {
 
     public void setTemplates(List<Template> templates) {
         this.templates = templates;
+    }
+
+    public Boolean getEdit() {
+        return edit;
+    }
+
+    public void setEdit(Boolean edit) {
+        this.edit = edit;
+    }
+
+    public Boolean getSendInstantly() {
+        return isSendInstantly;
+    }
+
+    public void setSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+    }
+
+    public Boolean getManualRetry() {
+        return isManualRetry;
+    }
+
+    public void setManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
     }
 }

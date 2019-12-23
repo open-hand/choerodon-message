@@ -684,6 +684,8 @@ const projectNotify = {
   'project.notify.object.assignee': '经办人',
   'project.notify.object.projectOwner': '项目所有者',
   'project.notify.choose': '请选择',
+  'project.notify.empty.title': '验证通知已停用',
+  'project.notify.empty.des': '该类型的消息通知已在平台管理中被停用，若想启用，请联系平台管理员操作',
 };
 
 const receiveSetting = {
@@ -715,6 +717,7 @@ const zh_CN = {
   loading: '加载中',
   queue: '队列中',
   wait_to_be_pulled: '等待被拉取',
+  noContent: '暂无内容',
 
   day: '天',
   hour: '小时',

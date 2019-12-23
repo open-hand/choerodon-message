@@ -5,12 +5,15 @@ import java.util.stream.Collectors;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.notify.NotifyType;
+import io.choerodon.notify.api.service.MessageSettingService;
+import io.choerodon.notify.api.service.ReceiveSettingService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.CommonException;
@@ -31,20 +34,24 @@ public class SendSettingServiceImpl implements SendSettingService {
 
     public static final String SEND_SETTING_DOES_NOT_EXIST = "error.send.setting.not.exist";
     public static final String SEND_SETTING_UPDATE_EXCEPTION = "error.send.setting.update";
+    public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private SendSettingMapper sendSettingMapper;
     private SendSettingCategoryMapper sendSettingCategoryMapper;
     private TemplateMapper templateMapper;
     private MessageSettingMapper messageSettingMapper;
     private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
+    private MessageSettingService messageSettingService;
+    private ReceiveSettingService receiveSettingService;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper,
-                                  MessageSettingMapper messageSettingMapper, MessageSettingTargetUserMapper messageSettingTargetUserMapper) {
+    public SendSettingServiceImpl(SendSettingMapper sendSettingMapper, SendSettingCategoryMapper sendSettingCategoryMapper, TemplateMapper templateMapper, MessageSettingMapper messageSettingMapper, MessageSettingTargetUserMapper messageSettingTargetUserMapper, MessageSettingService messageSettingService, ReceiveSettingService receiveSettingService) {
         this.sendSettingMapper = sendSettingMapper;
         this.sendSettingCategoryMapper = sendSettingCategoryMapper;
         this.templateMapper = templateMapper;
         this.messageSettingMapper = messageSettingMapper;
         this.messageSettingTargetUserMapper = messageSettingTargetUserMapper;
+        this.messageSettingService = messageSettingService;
+        this.receiveSettingService = receiveSettingService;
     }
 
     @Override
@@ -70,8 +77,11 @@ public class SendSettingServiceImpl implements SendSettingService {
             BeanUtils.copyProperties(t, sendSettingDTO);
             SendSettingDTO query = sendSettingMapper.selectOne(new SendSettingDTO(sendSettingDTO.getCode()));
             if (query == null) {
+                sendSettingDTO.setEdit(sendSettingDTO.getAllowConfig());
                 sendSettingMapper.insertSelective(sendSettingDTO);
             } else {
+                query.setEdit(sendSettingDTO.getAllowConfig());
+                query.setAllowConfig(sendSettingDTO.getAllowConfig());
                 query.setName(sendSettingDTO.getName());
                 query.setDescription(sendSettingDTO.getDescription());
                 query.setLevel(sendSettingDTO.getLevel());
@@ -261,17 +271,32 @@ public class SendSettingServiceImpl implements SendSettingService {
     }
 
     @Override
-    public SendSettingDTO updateSendSetting(SendSettingDTO updateDTO) {
-        SendSettingDTO sendSettingDTO = sendSettingMapper.selectByPrimaryKey(updateDTO);
-        if (StringUtils.isEmpty(sendSettingDTO)) {
-            throw new CommonException(SEND_SETTING_DOES_NOT_EXIST);
-        }
-
-        updateDTO.setObjectVersionNumber(sendSettingDTO.getObjectVersionNumber());
+    @Transactional(rollbackFor = Exception.class)
+    public SendSettingDTO updateSendSetting(Long id, SendSettingDTO updateDTO) {
+        SendSettingDTO oldSetting = sendSettingMapper.selectByPrimaryKey(id);
+        updateDTO.setId(id);
         if (sendSettingMapper.updateByPrimaryKeySelective(updateDTO) != 1) {
             throw new CommonException(SEND_SETTING_UPDATE_EXCEPTION);
         }
-        return updateDTO;
+        compareAndUpdateProjectSetting(oldSetting,updateDTO);
+        return sendSettingMapper.selectByPrimaryKey(id);
+    }
+
+    /**
+     * 比较更新内容，（取消勾选发送方式时，把项目的设置也取消掉）
+     * @param oldSetting
+     * @param updateDTO
+     */
+    private void compareAndUpdateProjectSetting(SendSettingDTO oldSetting, SendSettingDTO updateDTO) {
+        if (Boolean.TRUE.equals(oldSetting.getPmEnabledFlag()) && Boolean.FALSE.equals(updateDTO.getPmEnabledFlag())) {
+            messageSettingService.disableNotifyTypeByCodeAndType(updateDTO.getCode(), NotifyType.PM.getValue());
+        }
+        if (Boolean.TRUE.equals(oldSetting.getEmailEnabledFlag()) && Boolean.FALSE.equals(updateDTO.getEmailEnabledFlag())) {
+            messageSettingService.disableNotifyTypeByCodeAndType(updateDTO.getCode(), NotifyType.EMAIL.getValue());
+        }
+        if (Boolean.TRUE.equals(oldSetting.getSmsEnabledFlag()) && Boolean.FALSE.equals(updateDTO.getSmsEnabledFlag())) {
+            messageSettingService.disableNotifyTypeByCodeAndType(updateDTO.getCode(), NotifyType.SMS.getValue());
+        }
     }
 
     private void getSecondMsgServiceTreeVOS(Map<String, Set<String>> categoryMap, List<MsgServiceTreeVO> msgServiceTreeVOS, List<SendSettingDTO> sendSettingDTOS) {
@@ -368,6 +393,14 @@ public class SendSettingServiceImpl implements SendSettingService {
         SendSettingDTO sendSettingDTO = new SendSettingDTO();
         sendSettingDTO.setCode(code);
         return sendSettingMapper.selectOne(sendSettingDTO);
+    }
+
+    @Override
+    public Boolean checkResourceDeleteEnabled() {
+        SendSettingDTO record = new SendSettingDTO();
+        record.setCode(RESOURCE_DELETE_CONFIRMATION);
+        SendSettingDTO sendSettingDTO = sendSettingMapper.selectOne(record);
+        return sendSettingDTO.getEnabled();
     }
 
     /**

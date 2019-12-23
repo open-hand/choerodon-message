@@ -25,7 +25,8 @@ export default (type, id) => ({
       method: 'get',
       transformResponse(JSONData) {
         const { sendSettingCategorySelection, sendSettingSelection } = JSON.parse(JSONData);
-        return [...sendSettingCategorySelection.map(item => ({ ...item, description: null })), ...sendSettingSelection];
+        const list = (sendSettingCategorySelection || []).map(item => ({ ...item, description: null }));
+        return [...list, ...(sendSettingSelection || [])];
       },
       params: {
         ...params,

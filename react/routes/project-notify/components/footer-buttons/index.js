@@ -1,5 +1,4 @@
-import React, { Fragment } from 'react';
-import { TabPage, Content, Breadcrumb } from '@choerodon/boot';
+import React from 'react';
 import { Button } from 'choerodon-ui/pro';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';

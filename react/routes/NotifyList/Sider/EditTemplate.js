@@ -15,10 +15,10 @@ export default observer(({ context, modal, type }) => {
   }
   modal.handleOk(async () => {
     try {
-      if (!await dataSet.submit()) {
-        return false;
-      } else {
+      if (await dataSet.submit() !== false) {
         messageTypeDetailDataSet.query();
+      } else {
+        return false;
       }
     } catch (err) {
       messageTypeDetailDataSet.query();

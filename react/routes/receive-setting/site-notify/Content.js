@@ -30,7 +30,9 @@ export default observer(props => {
 
   async function saveSettings() {
     try {
-      await tableDs.submit();
+      if (await tableDs.submit() !== false) {
+        refresh();
+      }
     } catch (e) {
       Choerodon.handleResponseError(e);
     }
@@ -38,20 +40,21 @@ export default observer(props => {
 
   function handleCheckBoxHeaderChange(value, name) {
     tableDs.forEach((record) => {
-      const hasTemplateId = record.get(`${name}TemplateId`);
-      if (hasTemplateId) {
+      if (!record.get(`${name}Disabled`)) {
         record.set(name, value);
       }
     });
   }
   
   function renderCheckBoxHeader(dataSet, name) {
-    const isChecked = tableDs.totalCount && !tableDs.find((record) => !record.get(name) && (record.get(`${name}TemplateId`)));
-    const pmRecords = tableDs.find((record) => record.get(name) && (record.get(`${name}TemplateId`)));
+    const disabled = !tableDs.find((record) => !record.get(`${name}Disabled`));
+    const isChecked = !disabled && tableDs.totalCount && !tableDs.find((record) => !record.get(name) && !record.get(`${name}Disabled`));
+    const pmRecords = tableDs.find((record) => record.get(name) && !record.get(`${name}Disabled`));
     return (
       <CheckBox
         checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
+        disabled={disabled}
         onChange={(value) => handleCheckBoxHeaderChange(value, name)}
       >
         {formatMessage({ id: `receive.type.${name}` })}
@@ -59,21 +62,54 @@ export default observer(props => {
     );
   }
 
+  function parentItemIsChecked({ record, name }) {
+    const parentIsChecked = !tableDs.find((tableRecord) => record.get('sequenceId') === tableRecord.get('parentId') && !tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    const realValue = parentIsChecked && !record.get(`${name}Disabled`);
+    record.set(name, realValue);
+  }
+
+  function handleChecked(name) {
+    tableDs.forEach((record) => {
+      if (!record.get('parentId')) {
+        parentItemIsChecked({ record, name });
+      }
+    });
+  }
+
+  function handleCheckBoxChange(record, value, name) {
+    if (!record.get('parentId')) {
+      tableDs.forEach((tableRecord) => {
+        if (tableRecord.get('parentId') === record.get('sequenceId') && !tableRecord.get(`${name}Disabled`)) {
+          tableRecord.set(name, value);
+        }
+      });
+    } else {
+      record.set(name, value);
+      handleChecked(name);
+    }
+  }
+
   function renderCheckBox({ record, name }) {
-    const isDisabled = !record.get(`${name}TemplateId`);
+    const isDisabled = record.get(`${name}Disabled`);
+    let isIndeterminate = false;
+    if (!record.get('parentId')) {
+      isIndeterminate = !!tableDs.find((tableRecord) => tableRecord.get('parentId') === record.get('sequenceId') && tableRecord.get(name) && !tableRecord.get(`${name}Disabled`));
+    }
+
     return (
       <CheckBox
         record={record}
         name={name}
         checked={record.get(name)}
-        disabled={!!isDisabled}
-        onChange={(value) => record.set(name, value)}
+        disabled={isDisabled}
+        indeterminate={!record.get(name) && isIndeterminate}
+        onChange={(value) => handleCheckBoxChange(record, value, name)}
       />
     );
   }
 
   function renderEditor(record, name) {
-    return !!(record.get(`${name}TemplateId`));
+    return !record.get(`${name}Disabled`);
   }
 
   return (
@@ -81,7 +117,7 @@ export default observer(props => {
       <Breadcrumb />
       <Prompt message={promptMsg} wrapper="c7n-iam-confirm-modal" when={tableDs.dirty} />
       <Content className={`${prefixCls}-content`}>
-        <Table dataSet={tableDs}>
+        <Table dataSet={tableDs} mode="tree">
           <Column name="name" />
           <Column
             header={(dataSet) => renderCheckBoxHeader(dataSet, 'pm')}
