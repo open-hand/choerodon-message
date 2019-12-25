@@ -112,7 +112,7 @@ export default observer(props => {
     return (
       <Dropdown
         overlay={<NotifyObject record={record} allSendRoleList={allSendRoleList} />}
-        trigger={['click']}
+        trigger={['click', 'focus']}
         placement="bottomLeft"
       >
         <div className={`${prefixCls}-object-select`}>
