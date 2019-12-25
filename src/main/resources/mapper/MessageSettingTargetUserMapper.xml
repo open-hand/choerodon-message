@@ -4,7 +4,7 @@
     <select id="listByMsgSettingId" resultType="io.choerodon.notify.infra.dto.TargetUserDTO">
         SELECT *
         FROM
-            NOTIFY_MESSAGE_SETTING_TARGET_USER ntu
+            notify_message_setting_target ntu
         WHERE ntu.message_setting_id = #{msgSettingId}
     </select>
 </mapper>
