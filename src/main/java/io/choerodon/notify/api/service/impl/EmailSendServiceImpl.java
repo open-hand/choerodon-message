@@ -29,6 +29,7 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -112,7 +113,7 @@ public class EmailSendServiceImpl implements EmailSendService {
             }
             //2.3.发送邮件
             mailingRecordDTO.setSendData(new RecordSendData(template, newParams, createEmailSender(), sendSettingDTO.getRetryCount()));
-            if (sendSettingDTO.getIsSendInstantly()) {
+            if (!ObjectUtils.isEmpty(sendSettingDTO.getIsSendInstantly()) && sendSettingDTO.getIsSendInstantly()) {
                 sendRecord(mailingRecordDTO, false);
             } else {
                 emailQueueObservable.emit(mailingRecordDTO);

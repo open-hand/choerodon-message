@@ -26,7 +26,7 @@
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
         LEFT JOIN notify_template nt ON nss.CODE = nt.SEND_SETTING_CODE
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0 AND nss.IS_ENABLED = TRUE
     </select>
     <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
@@ -39,7 +39,7 @@
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nss.IS_ENABLED = TRUE
     </select>
     <select id="listMessageSettingByProjectIdAndEnvId"
@@ -53,7 +53,7 @@
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId} AND nss.IS_ENABLED = TRUE
     </select>
     <select id="getSettingByTypeAndCode" resultMap="messageSettingMap">
@@ -62,7 +62,7 @@
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.CODE = #{code}
     </select>
     <select id="getResourceDeleteSettingByOption" resultMap="messageSettingMap">
@@ -71,7 +71,7 @@
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
             nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId}
             AND nms.CODE = #{code} AND nms.ENV_ID = #{envId} AND nms.EVENT_NAME = #{eventName}
@@ -82,7 +82,7 @@
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
             nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
             AND nms.CODE = #{code} AND nms.ENV_ID = 0 AND nms.EVENT_NAME = #{eventName}
@@ -93,7 +93,7 @@
             nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
             nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
-        LEFT JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
             nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
             AND nms.CODE = #{code} AND nms.ENV_ID = 0
@@ -151,7 +151,7 @@
             nmstu
         FROM
             notify_message_setting nms
-            JOIN notify_message_setting_target_user nmstu ON nmstu.MESSAGE_SETTING_ID = nms.id
+            JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.id
         WHERE
             nms.NOTIFY_TYPE = #{type}
             AND nms.ENV_ID = #{envId}

@@ -1,11 +1,11 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting-target-user.groovy') {
-    changeSet(author: 'xiangwang04@gmail.com', id: '2019-12-03-add-notify-target-user') {
+databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting-target.groovy') {
+    changeSet(author: 'xiangwang04@gmail.com', id: '2019-12-03-add-notify-target') {
         if(helper.dbType().isSupportSequence()){
             createSequence(sequenceName: 'NOTIFY_TARGET_USER_S', startValue:"1")
         }
-        createTable(tableName: "NOTIFY_MESSAGE_SETTING_TARGET_USER") {
+        createTable(tableName: "NOTIFY_MESSAGE_SETTING_TARGET") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }
@@ -24,6 +24,6 @@ databaseChangeLog(logicalFilePath: 'script/db/notify-message-setting-target-user
             column(name: "LAST_UPDATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
-        addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING_TARGET_USER', columnNames: 'TYPE, USER_ID, MESSAGE_SETTING_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_TARGET_USER_U1')
+        addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING_TARGET', columnNames: 'TYPE, USER_ID, MESSAGE_SETTING_ID', constraintName: 'UK_notify-message-setting-target_U1')
     }
 }

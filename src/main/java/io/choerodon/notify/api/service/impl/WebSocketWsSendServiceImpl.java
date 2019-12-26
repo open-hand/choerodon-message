@@ -98,7 +98,7 @@ public class WebSocketWsSendServiceImpl implements WebSocketSendService {
             LOGGER.info(">>>SENDING_SITE_MSG>>>Insert {} pieces of site msg records in batches", num);
         }
         //2.4.发送站内信
-        if (ObjectUtils.isEmpty(sendSettingDTO.getIsSendInstantly()) && sendSettingDTO.getIsSendInstantly()) {
+        if (!ObjectUtils.isEmpty(sendSettingDTO.getIsSendInstantly()) && sendSettingDTO.getIsSendInstantly()) {
             targetUsers.forEach(user -> {
                 String key = "choerodon:msg:site-msg:" + user.getId();
                 webSocketHelper.sendMessageByKey(key, new SendMessagePayload<>(MSG_TYPE_PM, key, siteMsgRecordMapper.selectCountOfUnRead(user.getId())));
