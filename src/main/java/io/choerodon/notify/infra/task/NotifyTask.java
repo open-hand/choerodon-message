@@ -32,5 +32,15 @@ public class NotifyTask {
         logger.info("begin to upgrade 0.19.0 to 0.20.0 notify send setting.");
         notifyCheckLogService.checkLog("0.20.0","notify");
     }
+    /**
+     * 升级0.20.0-0.21.0，初始化数据
+     */
+    @JobTask(maxRetryCount = 3, code = "upgradeVersionTo21Notify", params = {}, description = "升级notify-service,0.20.0-0.21.0，初始化数据")
+    @TimedTask(name = "upgradeVersionTo21Notify", description = "升级notify-service,0.20.0-0.21.0，升级数据", oneExecution = true,
+            repeatCount = 0, repeatInterval = 1, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS, params = {})
+    public void syncNotifyInitData(Map<String, Object> map) {
+        logger.info("begin to upgrade 0.20.0 to 0.21.0 notify send setting.");
+        notifyCheckLogService.checkLog("0.21.0","notify");
+    }
 
 }
