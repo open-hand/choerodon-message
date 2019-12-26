@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.util.UtilityElf;
+import io.choerodon.core.notify.ServiceNotifyType;
+import io.choerodon.notify.infra.enums.DeleteResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +101,10 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 } else {
                     LOGGER.info("version not matched");
                 }
+                if("0.21.0".equals(version) && type.equals("notify")) {
+                    initTargetUser();
+                }
+
 
                 notifyCheckLogDTO.setLog(JSON.toJSONString(logs));
                 notifyCheckLogDTO.setEndCheckDate(new Date());
@@ -108,7 +114,25 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             }
         }
     }
+    private void initTargetUser() {
+        // 初始化资源删除验证通知对象
 
+        // 1.获取资源删除默认事件
+        MessageSettingDTO record = new MessageSettingDTO();
+        record.setNotifyType(ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName());
+        record.setProjectId(0L);
+        record.setCode("resourceDeleteConfirmation");
+        List<MessageSettingDTO> messageSettingDTOList = messageSettingMapper.select(record);
+        messageSettingDTOList.forEach(setting -> {
+            // 2.初始化通知对象
+            TargetUserDTO targetUserDTO = new TargetUserDTO();
+            targetUserDTO.setMessageSettingId(setting.getId());
+            targetUserDTO.setType(DeleteResourceType.notifyTargetMapping.get(setting.getEventName()));
+            targetUserDTO.setUserId(0L);
+            messageSettingTargetUserMapper.insertSelective(targetUserDTO);
+        });
+
+    }
     private void syncAgileNotify(List<CheckLog> logs) {
         LOGGER.info("begin to sync agile notify!");
         List<MessageDetailDTO> messageDetailDTOList;

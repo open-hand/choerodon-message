@@ -1,5 +1,7 @@
 package io.choerodon.notify.infra.enums;
 
+import io.choerodon.core.notify.TargetUserType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +49,16 @@ public enum DeleteResourceType {
         orderMapping.put(CONFIGMAP.getTypeName(), 4);
         orderMapping.put(CERTIFICATE.getTypeName(), 5);
         orderMapping.put(SECRET.getTypeName(), 6);
+    }
+
+    public static Map<String, String> notifyTargetMapping = new HashMap(6);
+
+    static {
+        notifyTargetMapping.put(INSTANCE.getTypeName(), TargetUserType.PROJECT_OWNER.getTypeName());
+        notifyTargetMapping.put(INGRESS.getTypeName(), TargetUserType.HANDLER.getTypeName());
+        notifyTargetMapping.put(SERVICE.getTypeName(), TargetUserType.HANDLER.getTypeName());
+        notifyTargetMapping.put(CONFIGMAP.getTypeName(), TargetUserType.HANDLER.getTypeName());
+        notifyTargetMapping.put(CERTIFICATE.getTypeName(), TargetUserType.PROJECT_OWNER.getTypeName());
+        notifyTargetMapping.put(SECRET.getTypeName(), TargetUserType.HANDLER.getTypeName());
     }
 }
