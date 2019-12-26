@@ -57,7 +57,12 @@ export default observer(() => {
       await axios.put(`/notify/v1/notices/send_settings/enabled?code=${code}`);
     }
     await queryTreeDataSet.query();
-    await messageTypeDetailDataSet.query();
+    const { currentCode, currentSelectedType } = currentPageType;
+    if (currentSelectedType === 'table') {
+      await messageTypeTableDataSet.query();
+    } else if (code === currentCode) {
+      await messageTypeDetailDataSet.query();
+    }
   }
 
   function openStopModal(record) {
@@ -80,7 +85,7 @@ export default observer(() => {
       },
     ];
     if (!children) {
-      return <Action style={{ position: 'absolute', top: '0.04rem', right: '0.05rem' }} data={actionDatas} />;
+      return <Action style={{ position: 'absolute', top: '0.04rem', right: '0.05rem' }} data={actionDatas} onClick={(e) => e.stopPropagation()} />;
     }
     return null;
   }
@@ -123,6 +128,7 @@ export default observer(() => {
         messageTypeDetailDataSet.query();
         setCurrentPageType({
           currentSelectedType: 'form',
+          currentCode: record.get('code'),
         });
       } else {
         messageTypeTableDataSet.setQueryParameter('firstCode', record.parent.get('code'));
