@@ -22,6 +22,7 @@ function parentItemIsChecked({ dataSet, record, name, flagName }) {
 }
 
 function handleLoad({ dataSet }) {
+  dataSet.get(0).init('expand', true);
   dataSet.forEach((record) => {
     if (!record.get('groupId')) {
       parentItemIsChecked({ dataSet, record, name: 'pmEnable', flagName: 'pmEnabledFlag' });
@@ -38,6 +39,7 @@ export default ({ formatMessage, intlPrefix, projectId, userDs }) => ({
   parentField: 'groupId',
   idField: 'key',
   primaryKey: 'key',
+  expandField: 'expand',
   transport: {
     read: {
       url: `/notify/v1/projects/${projectId}/message_settings/resourceDelete`,
