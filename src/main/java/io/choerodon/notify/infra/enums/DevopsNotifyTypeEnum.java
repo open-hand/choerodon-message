@@ -22,7 +22,8 @@ public enum DevopsNotifyTypeEnum {
     SERVICE_FAILURE("serviceFailure"),
     PIPELINE_FAILED("pipelinefailed"),
     ENABLE_APP_SERVICE("enableAppService"),
-    MERGE_REQUEST_PASSED("mergeRequestPassed");
+    MERGE_REQUEST_PASSED("mergeRequestPassed"),
+    AUDIT_MERGE_REQUEST("auditMergeRequest");
 
     private final String value;
 
@@ -34,7 +35,7 @@ public enum DevopsNotifyTypeEnum {
         return this.value;
     }
 
-    public static Map<String, Integer> orderMapping = new HashMap(3);
+    public static Map<String, Integer> orderMapping = new HashMap(13);
 
     static {
         orderMapping.put(APP_SERVICE_CREATION_FAILURE.value(), 1);
@@ -49,5 +50,6 @@ public enum DevopsNotifyTypeEnum {
         orderMapping.put(CERTIFICATION_FAILURE.value(), 10);
         orderMapping.put(PIPELINE_SUCCESS.value(), 11);
         orderMapping.put(PIPELINE_FAILED.value(), 12);
+        orderMapping.put(AUDIT_MERGE_REQUEST.value(), 13);
     }
 }
