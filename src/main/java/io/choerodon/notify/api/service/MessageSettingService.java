@@ -14,7 +14,7 @@ import java.util.List;
 public interface MessageSettingService {
 
 
-    MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType);
+    MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName);
 
     void batchUpdateByType(Long projectId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS);
 

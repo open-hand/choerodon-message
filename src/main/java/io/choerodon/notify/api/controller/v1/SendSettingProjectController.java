@@ -32,4 +32,11 @@ public class SendSettingProjectController {
     public ResponseEntity<WebHookVO.SendSetting> getSendSettings(@PathVariable("project_id") Long projectId) {
         return new ResponseEntity<>(sendSettingService.getUnderProject(), HttpStatus.OK);
     }
+
+    @GetMapping("/codes/resourceDeleteConfirmation/check_enabled")
+    @Permission(type = ResourceType.SITE)
+    @ApiOperation(value = "检查资源删除验证通知是否启用")
+    public ResponseEntity<Boolean> checkResourceDeleteEnabled() {
+        return ResponseEntity.ok(sendSettingService.checkResourceDeleteEnabled());
+    }
 }
