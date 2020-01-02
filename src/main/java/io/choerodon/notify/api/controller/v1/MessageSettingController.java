@@ -10,6 +10,7 @@ import io.choerodon.notify.api.vo.MessageSettingWarpVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,9 +45,10 @@ public class MessageSettingController {
     @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
     public ResponseEntity<MessageSettingWarpVO> listByType(
             @PathVariable(value = "project_id") Long projectId,
-            @PathVariable(value = "notify_type") String notifyType) {
-        return ResponseEntity.ok(messageSettingService.listMessageSettingByType(projectId, notifyType));
-
+            @PathVariable(value = "notify_type") String notifyType,
+            @ApiParam(value = "事件名称（过滤条件）")
+            @RequestParam(value = "name", required = false) String eventName) {
+        return ResponseEntity.ok(messageSettingService.listMessageSettingByType(projectId, notifyType, eventName));
     }
     @PutMapping("/{notify_type}/batch")
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
