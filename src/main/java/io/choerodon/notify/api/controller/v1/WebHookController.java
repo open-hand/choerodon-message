@@ -35,7 +35,7 @@ public class WebHookController {
 
     @GetMapping
     @Permission(type = ResourceType.PROJECT)
-    @ApiOperation(value = "分页查询WebHook信息")
+    @ApiOperation(value = "查询WebHook信息（分页接口）")
     @CustomPageRequest
     public ResponseEntity<PageInfo<WebHookDTO>> pagingByMessage(@ApiIgnore
                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,

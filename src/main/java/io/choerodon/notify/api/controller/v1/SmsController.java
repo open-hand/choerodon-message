@@ -25,7 +25,7 @@ public class SmsController {
     }
 
     @GetMapping("/config")
-    @ApiOperation(value = "根据id查询短信配置")
+    @ApiOperation(value = "查询短信配置（根据id查询）")
     @Permission(type = ResourceType.SITE)
     public ResponseEntity<SmsConfigDTO> queryConfig(@RequestParam(name = "organization_id") Long organizationId) {
         return new ResponseEntity<>(smsService.queryConfig(organizationId), HttpStatus.OK);
