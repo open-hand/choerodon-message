@@ -14,9 +14,7 @@ import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.api.vo.TargetUserVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
-import io.choerodon.notify.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.DeleteResourceType;
-import io.choerodon.notify.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
@@ -32,7 +30,10 @@ import org.springframework.util.ObjectUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -106,7 +107,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             notifyEventGroupList = filterEventGroupBySettingList(customMessageSettingList, notifyEventGroupList);
         }
         // 装配VO
-        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
+        messageSettingWarpVO.setCustomMessageSettingList(customMessageSettingList);
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
 
         return messageSettingWarpVO;
@@ -258,22 +259,6 @@ public class MessageSettingServiceImpl implements MessageSettingService {
 
     }
 
-    private List<CustomMessageSettingVO> sortEvent(String notifyType, List<CustomMessageSettingVO> customMessageSettingList) {
-        // 设置排序大小
-        if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)) {
-            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(AgileNotifyTypeEnum.orderMapping.get(settingVO.getCode())));
-        }
-        if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
-            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(DevopsNotifyTypeEnum.orderMapping.get(settingVO.getCode())));
-        }
-        if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
-            customMessageSettingList.forEach(settingVO -> settingVO.setOrder(DeleteResourceType.orderMapping.get(settingVO.getEventName())));
-        }
-        // 排序
-        return customMessageSettingList.stream().sorted(Comparator.comparing(CustomMessageSettingVO::getOrder)).collect(Collectors.toList());
-
-    }
-
     private void calculateNotifyUsersByType(List<CustomMessageSettingVO> messageSettingVOS) {
 
         // 添加指定用户
@@ -314,7 +299,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             if (!CollectionUtils.isEmpty(userList)) {
                 List<Long> uids = userList.stream().map(TargetUserVO::getUserId).collect(Collectors.toList());
                 List<UserDTO> iamUserList = baseFeignClient.listUsersByIds(uids.toArray(new Long[20]), false).getBody();
-                Map<Long, UserDTO> iamUserMap = iamUserList.stream().collect(Collectors.toMap(v -> v.getId(), v -> v));
+                Map<Long, UserDTO> iamUserMap = iamUserList.stream().collect(Collectors.toMap(UserDTO::getId, v -> v));
                 userList.forEach(user -> {
                     UserDTO userDTO = iamUserMap.get(user.getUserId());
                     user.setRealName(userDTO.getRealName());
@@ -331,7 +316,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
                 // 处理id和userId
                 userList.forEach(user -> user.setId(user.getUserId()));
                 Set<String> roleList = userList.stream()
-                        .map(user -> user.getType())
+                        .map(TargetUserVO::getType)
                         .collect(Collectors.toSet());
                 // 设置通知角色
                 settingVO.setSendRoleList(roleList);
@@ -350,7 +335,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
             List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
-            Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getEventName(), v -> v));
+            Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getEventName, v -> v));
             defaultMessageSettingList.forEach(setting -> {
                 CustomMessageSettingVO customMessageSettingVO = custommessageSettingVOMap.get(setting.getEventName());
                 if (customMessageSettingVO == null) {
@@ -373,7 +358,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
 
     private List<CustomMessageSettingVO> handleDevopsOrAgileSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
         List<CustomMessageSettingVO> customMessageSettingList = messageSettingMapper.listMessageSettingByProjectId(projectId, notifyType);
-        Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(v -> v.getCode(), v -> v));
+        Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getCode, v -> v));
         defaultMessageSettingList.forEach(defaultMessageSetting -> {
             CustomMessageSettingVO customMessageSettingVO = custommessageSettingVOMap.get(defaultMessageSetting.getCode());
             if (customMessageSettingVO == null) {
@@ -400,7 +385,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
             return devopsFeginClient.listByActive(projectId, true).getBody();
         }
-        return null;
+        return new ArrayList<>();
     }
 
 }
