@@ -34,7 +34,7 @@ public class SendSettingProjectController {
     }
 
     @GetMapping("/codes/resourceDeleteConfirmation/check_enabled")
-    @Permission(type = ResourceType.SITE)
+    @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiOperation(value = "检查资源删除验证通知是否启用")
     public ResponseEntity<Boolean> checkResourceDeleteEnabled() {
         return ResponseEntity.ok(sendSettingService.checkResourceDeleteEnabled());
