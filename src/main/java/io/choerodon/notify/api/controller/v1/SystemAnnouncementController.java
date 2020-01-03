@@ -55,7 +55,7 @@ public class SystemAnnouncementController {
     }
 
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
-    @ApiOperation(value = "分页查询系统公告")
+    @ApiOperation(value = "查询系统公告（分页接口）")
     @GetMapping("/all")
     @CustomPageRequest
     public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQuery(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -66,7 +66,7 @@ public class SystemAnnouncementController {
     }
 
     @Permission(type = ResourceType.SITE, permissionLogin = true)
-    @ApiOperation(value = "分页查询已发送的系统公告")
+    @ApiOperation(value = "查询已发送的系统公告（分页接口）")
     @GetMapping("/completed")
     @CustomPageRequest
     public ResponseEntity<PageInfo<SystemAnnouncementDTO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable) {

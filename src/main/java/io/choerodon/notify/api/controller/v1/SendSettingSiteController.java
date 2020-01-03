@@ -3,7 +3,6 @@ package io.choerodon.notify.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.notify.api.dto.MessageServiceVO;
 import io.choerodon.notify.api.dto.MsgServiceTreeVO;
@@ -37,7 +36,7 @@ public class SendSettingSiteController {
 
     @GetMapping
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层分页查询消息服务列表")
+    @ApiOperation(value = "查询消息服务列表(分页接口)")
     @CustomPageRequest
     public ResponseEntity<PageInfo<MessageServiceVO>> pageSite(@ApiIgnore
                                                                @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -60,7 +59,7 @@ public class SendSettingSiteController {
 
     @GetMapping("/detail")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层查看发送设置详情")
+    @ApiOperation(value = "查看发送设置详情")
     public ResponseEntity<SendSettingVO> query(@RequestParam String code) {
         return new ResponseEntity<>(sendSettingService.query(code), HttpStatus.OK);
     }
@@ -74,7 +73,7 @@ public class SendSettingSiteController {
 
     @DeleteMapping("/{id}")
     @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
-    @ApiOperation(value = "根据Id删除发送设置")
+    @ApiOperation(value = "删除发送设置（根据Id）")
     public ResponseEntity delSendSetting(@PathVariable Long id) {
         sendSettingService.delete(id);
         return new ResponseEntity(HttpStatus.OK);
@@ -82,14 +81,14 @@ public class SendSettingSiteController {
 
     @PutMapping("/enabled")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "根据code启用消息服务")
+    @ApiOperation(value = "启用消息服务（根据code）")
     public ResponseEntity<MessageServiceVO> enabled(@RequestParam("code") String code) {
         return new ResponseEntity<>(sendSettingService.enabled(code), HttpStatus.OK);
     }
 
     @PutMapping("/disabled")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "根据code停用消息服务")
+    @ApiOperation(value = "停用消息服务(根据code)")
     public ResponseEntity<MessageServiceVO> disabled(@RequestParam("code") String code) {
         return new ResponseEntity<>(sendSettingService.disabled(code), HttpStatus.OK);
     }
@@ -116,7 +115,7 @@ public class SendSettingSiteController {
     }
     @GetMapping("/codes/{code}")
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "根据code查询发送设置")
+    @ApiOperation(value = "查询发送设置(根据code)")
     public ResponseEntity<SendSettingDTO> queryByCode(@PathVariable("code") String code) {
         return new ResponseEntity<>(sendSettingService.queryByCode(code), HttpStatus.OK);
     }

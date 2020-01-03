@@ -34,7 +34,7 @@ public class WebhookRecordController {
 
     @GetMapping
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "分页查询WebHook发送记录信息")
+    @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
     public ResponseEntity<PageInfo<WebhookRecordVO>> pagingByMessage(@ApiIgnore
                                                                      @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,

@@ -24,7 +24,7 @@ public class TemplateSiteController {
 
     @PostMapping
     @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "全局层创建和更新模版")
+    @ApiOperation(value = "创建和更新模版")
     public ResponseEntity<Template> createAndUpdateTemplate(@RequestBody @Validated Template template) {
         if (template.getId() == null) {
             return new ResponseEntity<>(templateService.createTemplate(template), HttpStatus.OK);

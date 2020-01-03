@@ -29,7 +29,7 @@ public class MessageRecordSiteController {
 
     @Permission(type = ResourceType.SITE)
     @GetMapping("/emails")
-    @ApiOperation(value = "全局层分页查询邮件消息记录")
+    @ApiOperation(value = "查询邮件消息记录（分页接口）")
     @CustomPageRequest
     public ResponseEntity<PageInfo<RecordListDTO>> pageEmail(@ApiIgnore
                                                              @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -43,7 +43,7 @@ public class MessageRecordSiteController {
 
     @Permission(type = ResourceType.SITE)
     @PostMapping("/emails/{id}/retry")
-    @ApiOperation(value = "全局层重试发送邮件")
+    @ApiOperation(value = "重试发送邮件")
     public Record manualRetrySendEmail(@PathVariable long id) {
         return messageRecordService.manualRetrySendEmail(id);
     }

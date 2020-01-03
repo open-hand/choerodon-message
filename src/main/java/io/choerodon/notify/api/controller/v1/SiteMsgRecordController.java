@@ -37,7 +37,7 @@ public class SiteMsgRecordController {
 
     @GetMapping
     @Permission(type = ResourceType.SITE, permissionLogin = true)
-    @ApiOperation(value = "全局层查询用户站内信消息接口")
+    @ApiOperation(value = "查询用户站内信消息接口（分页接口）")
     @CustomPageRequest
     public ResponseEntity<PageInfo<SiteMsgRecordDTO>> pagingQuery(@ApiIgnore
                                                                   @SortDefault(value = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -51,7 +51,7 @@ public class SiteMsgRecordController {
 
     @PutMapping("/batch_read")
     @Permission(type = ResourceType.SITE, permissionLogin = true)
-    @ApiOperation(value = "全局层批量已读站内信消息接口")
+    @ApiOperation(value = "批量已读站内信消息接口")
     public ResponseEntity<List<SiteMsgRecordDTO>> batchRead(@RequestParam("user_id") Long userId,
                                                             @RequestBody Long[] ids) {
         SiteMsgRecordValidator.validateCurrentUser(userId);
@@ -61,7 +61,7 @@ public class SiteMsgRecordController {
 
     @PutMapping("/batch_delete")
     @Permission(type = ResourceType.SITE, permissionLogin = true)
-    @ApiOperation(value = "全局层批量删除站内信消息接口")
+    @ApiOperation(value = "批量删除站内信消息接口")
     public ResponseEntity<List<SiteMsgRecordDTO>> batchDeleted(@RequestParam("user_id") Long userId,
                                                                @RequestBody Long[] ids) {
         SiteMsgRecordValidator.validateCurrentUser(userId);
