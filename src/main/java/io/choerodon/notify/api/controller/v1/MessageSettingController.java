@@ -47,7 +47,7 @@ public class MessageSettingController {
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @ApiParam(value = "事件名称（过滤条件）")
-            @RequestParam(value = "name", required = false) String eventName) {
+            @RequestParam(value = "params", required = false) String eventName) {
         return ResponseEntity.ok(messageSettingService.listMessageSettingByType(projectId, notifyType, eventName));
     }
     @PutMapping("/{notify_type}/batch")
