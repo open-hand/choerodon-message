@@ -1,8 +1,5 @@
 package io.choerodon.notify.infra.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 〈功能简述〉
  * 〈devops消息枚举〉
@@ -22,13 +19,5 @@ public enum AgileNotifyTypeEnum {
 
     public String value() {
         return this.value;
-    }
-
-    public static Map<String, Integer> orderMapping = new HashMap(3);
-
-    static {
-        orderMapping.put(ISSUE_CREATE.value(), 1);
-        orderMapping.put(ISSUE_ASSIGNEE.value(), 2);
-        orderMapping.put(ISSUE_SOLVE.value(), 3);
     }
 }

@@ -119,10 +119,5 @@ public class SendSettingSiteController {
     public ResponseEntity<SendSettingDTO> queryByCode(@PathVariable("code") String code) {
         return new ResponseEntity<>(sendSettingService.queryByCode(code), HttpStatus.OK);
     }
-    @GetMapping("/codes/resourceDeleteConfirmation/check_enabled")
-    @Permission(type = ResourceType.SITE)
-    @ApiOperation(value = "检查资源删除验证通知是否启用")
-    public ResponseEntity<Boolean> checkResourceDeleteEnabled() {
-        return ResponseEntity.ok(sendSettingService.checkResourceDeleteEnabled());
-    }
+
 }
