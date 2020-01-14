@@ -51,4 +51,15 @@ public enum DeleteResourceType {
         notifyTargetMapping.put(CERTIFICATE.getTypeName(), TargetUserType.PROJECT_OWNER.getTypeName());
         notifyTargetMapping.put(SECRET.getTypeName(), TargetUserType.HANDLER.getTypeName());
     }
+
+    public static Map<String, Integer> orderMapping = new HashMap(6);
+
+    static {
+        orderMapping.put(INSTANCE.getTypeName(), 10);
+        orderMapping.put(INGRESS.getTypeName(), 20);
+        orderMapping.put(SERVICE.getTypeName(), 30);
+        orderMapping.put(CONFIGMAP.getTypeName(), 40);
+        orderMapping.put(CERTIFICATE.getTypeName(), 50);
+        orderMapping.put(SECRET.getTypeName(), 60);
+    }
 }
