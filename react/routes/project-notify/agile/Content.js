@@ -38,34 +38,34 @@ export default observer(props => {
     }
   }
 
-  function handlePmHeaderChange(value) {
-    tableDs.forEach((record) => record.get('pmEnabledFlag') && record.set('pmEnable', value));
+  function handlePmHeaderChange(value, name, nameFlag) {
+    tableDs.forEach((record) => record.get(nameFlag) && record.set(name, value));
   }
 
-  function renderPmHeader(dataSet) {
-    const disabled = !tableDs.find((record) => record.get('pmEnabledFlag'));
-    const isChecked = !disabled && tableDs.totalCount && !tableDs.find((record) => !record.get('pmEnable') && record.get('pmEnabledFlag'));
-    const pmRecords = tableDs.find((record) => record.get('pmEnable') && record.get('pmEnabledFlag'));
+  function renderCheckBoxHeader(name, nameFlag) {
+    const disabled = !tableDs.find((record) => record.get(nameFlag));
+    const isChecked = !disabled && tableDs.totalCount && !tableDs.find((record) => !record.get(name) && record.get(nameFlag));
+    const pmRecords = tableDs.find((record) => record.get(name) && record.get(nameFlag));
     return (
       <CheckBox
         checked={!!isChecked}
         indeterminate={!isChecked && !!pmRecords}
         disabled={disabled}
-        onChange={handlePmHeaderChange}
+        onChange={(value) => handlePmHeaderChange(value, name, nameFlag)}
       >
-        {formatMessage({ id: `${intlPrefix}.pmEnable` })}
+        {formatMessage({ id: `${intlPrefix}.${name}` })}
       </CheckBox>
     );
   }
 
-  function renderPm({ record }) {
+  function renderCheckBox({ record, name, nameFlag }) {
     return (
       <CheckBox
         record={record}
-        name="pmEnable"
-        checked={record.get('pmEnable')}
-        disabled={!record.get('pmEnabledFlag')}
-        onChange={(value) => record.set('pmEnable', value)}
+        name={name}
+        checked={record.get(name)}
+        disabled={!record.get(nameFlag)}
+        onChange={(value) => record.set(name, value)}
       />
     );
   }
@@ -106,7 +106,16 @@ export default observer(props => {
       <Content className={`${prefixCls}-page-content`}>
         <Table dataSet={tableDs}>
           <Column name="name" />
-          <Column header={renderPmHeader} renderer={renderPm} align="left" />
+          <Column
+            header={() => renderCheckBoxHeader('pmEnable', 'pmEnabledFlag')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'pmEnable', nameFlag: 'pmEnabledFlag' })}
+            align="left"
+          />
+          <Column
+            header={() => renderCheckBoxHeader('emailEnable', 'emailEnabledFlag')}
+            renderer={({ record }) => renderCheckBox({ record, name: 'emailEnable', nameFlag: 'emailEnabledFlag' })}
+            align="left"
+          />
           <Column renderer={renderNotifyObject} header={formatMessage({ id: `${intlPrefix}.noticeObject` })} />
         </Table>
         <FooterButtons onOk={saveSettings} onCancel={refresh} />
