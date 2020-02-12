@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/notify",
   "routeName": "notify",
-  "version": "0.21.0",
+  "version": "0.20.2",
   "description": "",
   "main": "./lib/index.js",
   "dependencies": {
