@@ -1,5 +1,6 @@
 package io.choerodon.notify.api.controller.v1;
 
+import com.alibaba.fastjson.JSON;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.exception.FeignException;
@@ -43,6 +44,7 @@ public class NoticesSendController {
     @ApiOperation(value = "发送消息")
     @Permission(type = ResourceType.SITE)
     public void postNotice(@RequestBody NoticeSendDTO dto) {
+        LOGGER.info(JSON.toJSONString(dto));
         if (StringUtils.isEmpty(dto.getCode())) {
             throw new FeignException("error.postNotify.codeEmpty");
         }
