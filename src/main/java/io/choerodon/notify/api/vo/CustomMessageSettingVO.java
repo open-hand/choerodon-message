@@ -76,6 +76,8 @@ public class CustomMessageSettingVO {
     @JsonIgnore
     private SendSettingVO sendSetting;
 
+    private int order;
+
 
     public Long getId() {
         return id;
@@ -235,5 +237,13 @@ public class CustomMessageSettingVO {
 
     public void setSmsEnabledFlag(Boolean smsEnabledFlag) {
         this.smsEnabledFlag = smsEnabledFlag;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 }

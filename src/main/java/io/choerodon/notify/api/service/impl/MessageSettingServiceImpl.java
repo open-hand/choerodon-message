@@ -14,7 +14,9 @@ import io.choerodon.notify.api.vo.NotifyEventGroupVO;
 import io.choerodon.notify.api.vo.TargetUserVO;
 import io.choerodon.notify.infra.dto.MessageSettingDTO;
 import io.choerodon.notify.infra.dto.TargetUserDTO;
+import io.choerodon.notify.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.DeleteResourceType;
+import io.choerodon.notify.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.notify.infra.enums.SendingTypeEnum;
 import io.choerodon.notify.infra.feign.BaseFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
@@ -30,10 +32,7 @@ import org.springframework.util.ObjectUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -107,7 +106,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             notifyEventGroupList = filterEventGroupBySettingList(customMessageSettingList, notifyEventGroupList);
         }
         // 装配VO
-        messageSettingWarpVO.setCustomMessageSettingList(customMessageSettingList);
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
 
         return messageSettingWarpVO;
@@ -224,6 +223,31 @@ public class MessageSettingServiceImpl implements MessageSettingService {
         Example example = new Example(MessageSettingDTO.class);
         example.createCriteria().andEqualTo("code", code).andNotEqualTo("projectId", 0);
         messageSettingMapper.updateByExampleSelective(messageSettingDTO, example);
+    }
+
+    private List<CustomMessageSettingVO> sortEvent(String notifyType, List<CustomMessageSettingVO> customMessageSettingList) {
+        // 设置排序大小
+        if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> {
+                Integer order = AgileNotifyTypeEnum.orderMapping.get(settingVO.getCode());
+                settingVO.setOrder(order == null ? 0 : order);
+            });
+        }
+        if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> {
+                Integer order = DevopsNotifyTypeEnum.orderMapping.get(settingVO.getCode());
+                settingVO.setOrder(order == null ? 0 : order);
+            });
+        }
+        if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
+            customMessageSettingList.forEach(settingVO -> {
+                Integer order = DeleteResourceType.orderMapping.get(settingVO.getEventName());
+                settingVO.setOrder(order == null ? 0 : order);
+            });
+        }
+        // 排序
+        return customMessageSettingList.stream().sorted(Comparator.comparing(CustomMessageSettingVO::getOrder)).collect(Collectors.toList());
+
     }
 
     private List<NotifyEventGroupVO> filterEventGroupBySettingList(List<CustomMessageSettingVO> customMessageSettingList, List<NotifyEventGroupVO> notifyEventGroupList) {

@@ -38,4 +38,15 @@ public enum DeleteResourceType {
         nameMapping.put(CERTIFICATE.getTypeName(), "删除证书");
         nameMapping.put(SECRET.getTypeName(), "删除密文");
     }
+
+    public static Map<String, Integer> orderMapping = new HashMap(6);
+
+    static {
+        orderMapping.put(INSTANCE.getTypeName(), 10);
+        orderMapping.put(INGRESS.getTypeName(), 20);
+        orderMapping.put(SERVICE.getTypeName(), 30);
+        orderMapping.put(CONFIGMAP.getTypeName(), 40);
+        orderMapping.put(CERTIFICATE.getTypeName(), 50);
+        orderMapping.put(SECRET.getTypeName(), 60);
+    }
 }
