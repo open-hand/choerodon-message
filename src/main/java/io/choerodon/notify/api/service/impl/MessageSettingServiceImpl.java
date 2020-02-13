@@ -106,7 +106,7 @@ public class MessageSettingServiceImpl implements MessageSettingService {
             notifyEventGroupList = filterEventGroupBySettingList(customMessageSettingList, notifyEventGroupList);
         }
         // 装配VO
-        messageSettingWarpVO.setCustomMessageSettingList(customMessageSettingList);
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
 
         return messageSettingWarpVO;
