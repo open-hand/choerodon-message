@@ -22,4 +22,7 @@ public interface MailingRecordMapper extends Mapper<MailingRecordDTO> {
                                             @Param("reason") String reason,
                                             @Param("increase") boolean increase,
                                             @Param("date") Date date);
+
+    List<MailingRecordDTO> selectByDate(@Param("startTime") java.sql.Date startTime,
+                                        @Param("endTime") java.sql.Date endTime);
 }

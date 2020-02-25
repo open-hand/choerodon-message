@@ -39,6 +39,18 @@
         </if>
         order by rc.id desc
     </select>
+    <select id="selectByDate" resultType="io.choerodon.notify.infra.dto.MailingRecordDTO">
+        SELECT *
+        FROM notify_mailing_record nmr
+        <where>
+            <if test="startTime">
+                nmr.CREATION_DATE >= CONCAT('','${startTime}',' 00:00:00')
+            </if>
+            <if test="endTime">
+                AND nmr.CREATION_DATE <![CDATA[<=]]> CONCAT('','${endTime}',' 23:59:59')
+            </if>
+        </where>
+    </select>
 
     <update id="updateRecordStatusAndIncreaseCount">
         UPDATE notify_mailing_record
