@@ -53,15 +53,15 @@ public class OnlineCountStorageUtils {
     }
 
     /**
-     * 每天凌晨2点清空在线人数
+     * 每天凌晨0点清空在线人数
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void clearOnlineCountSchedule() {
         redisTemplate.delete(Optional.ofNullable(redisTemplate.keys(ONLINE_COUNT + "*")).orElse(Collections.emptySet()));
         LOGGER.info("Clear the number of onliners");
     }
 
-    public Map<String, Object> makeVisitorsInfo(){
+    public Map<String, Object> makeVisitorsInfo() {
         Map<String, Object> visitorsInfo = new HashMap<>();
         visitorsInfo.put("CurrentOnliners", getOnlineCount());
         visitorsInfo.put("numberOfVisitorsToday", getNumberOfVisitorsToday());
@@ -114,5 +114,35 @@ public class OnlineCountStorageUtils {
 
     public void clearNumberOfVisitorsToday() {
         redisTemplate.delete(NUMBER_OF_VISITORS_TODAY);
+    }
+
+    public Map getCurrentCount() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put(ONLINE_COUNT, getOnlineCount());
+        map.put(NUMBER_OF_VISITORS_TODAY, getNumberOfVisitorsToday());
+        return map;
+    }
+
+    public Map getCurrentCountPerHour() {
+        Map<String, Integer> map = new HashMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+        SimpleDateFormat outDateFormat = new SimpleDateFormat("HH:mm");
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(new Date());
+        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        startCalendar.set(Calendar.MINUTE, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+
+        for (int i = 0; i <= calendar.get(calendar.HOUR_OF_DAY); i++) {
+            String time = dateFormat.format(startCalendar.getTime());
+            String onlinersOnThatTime = redisTemplate.opsForValue().get(time);
+            Integer onlineCount = onlinersOnThatTime == null ? 0 : Integer.parseInt(onlinersOnThatTime);
+            map.put(outDateFormat.format(startCalendar.getTime()), onlineCount);
+            startCalendar.add(Calendar.HOUR, +1);
+        }
+        return map;
     }
 }
