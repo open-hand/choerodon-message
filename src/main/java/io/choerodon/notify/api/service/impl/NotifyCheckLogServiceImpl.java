@@ -102,7 +102,6 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 }
                 if("0.21.0".equals(version) && type.equals("notify")) {
                     initTargetUser();
-                    updateMailTemplate();
                 }
 
 
@@ -112,30 +111,6 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             } catch (Throwable ex) {
                 LOGGER.warn("Exception occurred when applying data migration. The ex is: {}", ex);
             }
-        }
-    }
-
-    /**
-     * 更新忘记密码邮件模板
-     */
-    private void updateMailTemplate() {
-        String type = "email";
-        String code = "forgetPassword";
-        String content = "";
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("static/foget-password-mail-template.html");
-        InputStreamReader reader = new InputStreamReader(inputStream);
-        try {
-            content = FileCopyUtils.copyToString(reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Template record = new Template();
-        record.setSendingType(type);
-        record.setSendSettingCode(code);
-        Template template = templateMapper.selectOne(record);
-        template.setContent(content);
-        if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
-            LOGGER.error("Update forget-password mail template failed, please modify manually！");
         }
     }
 
