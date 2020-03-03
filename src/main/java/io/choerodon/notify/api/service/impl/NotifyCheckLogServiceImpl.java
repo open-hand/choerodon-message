@@ -1,5 +1,28 @@
 package io.choerodon.notify.api.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.zaxxer.hikari.util.UtilityElf;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.notify.ServiceNotifyType;
+import io.choerodon.core.notify.TargetUserType;
+import io.choerodon.notify.api.dto.CheckLog;
+import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
+import io.choerodon.notify.api.dto.MessageDetailDTO;
+import io.choerodon.notify.api.service.NotifyCheckLogService;
+import io.choerodon.notify.infra.dto.*;
+import io.choerodon.notify.infra.enums.DeleteResourceType;
+import io.choerodon.notify.infra.feign.AgileFeignClient;
+import io.choerodon.notify.infra.feign.DevopsFeginClient;
+import io.choerodon.notify.infra.mapper.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -8,32 +31,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.alibaba.fastjson.JSON;
-import com.zaxxer.hikari.util.UtilityElf;
-import io.choerodon.core.notify.ServiceNotifyType;
-import io.choerodon.notify.infra.enums.DeleteResourceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.notify.TargetUserType;
-import io.choerodon.notify.api.dto.CheckLog;
-import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
-import io.choerodon.notify.api.dto.MessageDetailDTO;
-import io.choerodon.notify.api.service.NotifyCheckLogService;
-import io.choerodon.notify.infra.dto.MessageSettingDTO;
-import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
-import io.choerodon.notify.infra.dto.SendSettingDTO;
-import io.choerodon.notify.infra.dto.TargetUserDTO;
-import io.choerodon.notify.infra.feign.AgileFeignClient;
-import io.choerodon.notify.infra.feign.DevopsFeginClient;
-import io.choerodon.notify.infra.mapper.MessageSettingMapper;
-import io.choerodon.notify.infra.mapper.MessageSettingTargetUserMapper;
-import io.choerodon.notify.infra.mapper.NotifyCheckLogMapper;
-import io.choerodon.notify.infra.mapper.SendSettingMapper;
 
 
 @Service
@@ -70,6 +67,8 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
     private MessageSettingTargetUserMapper messageSettingTargetUserMapper;
     @Autowired
     private DevopsFeginClient devopsFeignClient;
+    @Autowired
+    private TemplateMapper templateMapper;
 
     @Override
     public void checkLog(String version, String type) {
@@ -103,6 +102,7 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 }
                 if("0.21.0".equals(version) && type.equals("notify")) {
                     initTargetUser();
+                    updateMailTemplate();
                 }
 
 
@@ -114,6 +114,31 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
             }
         }
     }
+
+    /**
+     * 更新忘记密码邮件模板
+     */
+    private void updateMailTemplate() {
+        String type = "email";
+        String code = "forgetPassword";
+        String content = "";
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("static/foget-password-mail-template.html");
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        try {
+            content = FileCopyUtils.copyToString(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Template record = new Template();
+        record.setSendingType(type);
+        record.setSendSettingCode(code);
+        Template template = templateMapper.selectOne(record);
+        template.setContent(content);
+        if (templateMapper.updateByPrimaryKeySelective(template) != 1) {
+            LOGGER.error("Update forget-password mail template failed, please modify manually！");
+        }
+    }
+
     private void initTargetUser() {
         // 初始化资源删除验证通知对象
 
