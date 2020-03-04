@@ -3,14 +3,15 @@ package io.choerodon.notify.api.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.util.UtilityElf;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.notify.ServiceNotifyType;
 import io.choerodon.core.notify.TargetUserType;
 import io.choerodon.notify.api.dto.CheckLog;
 import io.choerodon.notify.api.dto.DevopsNotificationTransferDataVO;
 import io.choerodon.notify.api.dto.MessageDetailDTO;
 import io.choerodon.notify.api.service.NotifyCheckLogService;
-import io.choerodon.notify.infra.dto.*;
-import io.choerodon.notify.infra.enums.DeleteResourceType;
+import io.choerodon.notify.infra.dto.MessageSettingDTO;
+import io.choerodon.notify.infra.dto.NotifyCheckLogDTO;
+import io.choerodon.notify.infra.dto.SendSettingDTO;
+import io.choerodon.notify.infra.dto.TargetUserDTO;
 import io.choerodon.notify.infra.feign.AgileFeignClient;
 import io.choerodon.notify.infra.feign.DevopsFeginClient;
 import io.choerodon.notify.infra.mapper.*;
@@ -18,11 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -100,10 +97,6 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 } else {
                     LOGGER.info("version not matched");
                 }
-                if("0.21.0".equals(version) && type.equals("notify")) {
-                    initTargetUser();
-                }
-
 
                 notifyCheckLogDTO.setLog(JSON.toJSONString(logs));
                 notifyCheckLogDTO.setEndCheckDate(new Date());
@@ -112,26 +105,6 @@ public class NotifyCheckLogServiceImpl implements NotifyCheckLogService {
                 LOGGER.warn("Exception occurred when applying data migration. The ex is: {}", ex);
             }
         }
-    }
-
-    private void initTargetUser() {
-        // 初始化资源删除验证通知对象
-
-        // 1.获取资源删除默认事件
-        MessageSettingDTO record = new MessageSettingDTO();
-        record.setNotifyType(ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName());
-        record.setProjectId(0L);
-        record.setCode("resourceDeleteConfirmation");
-        List<MessageSettingDTO> messageSettingDTOList = messageSettingMapper.select(record);
-        messageSettingDTOList.forEach(setting -> {
-            // 2.初始化通知对象
-            TargetUserDTO targetUserDTO = new TargetUserDTO();
-            targetUserDTO.setMessageSettingId(setting.getId());
-            targetUserDTO.setType(DeleteResourceType.notifyTargetMapping.get(setting.getEventName()));
-            targetUserDTO.setUserId(0L);
-            messageSettingTargetUserMapper.insertSelective(targetUserDTO);
-        });
-
     }
     private void syncAgileNotify(List<CheckLog> logs) {
         LOGGER.info("begin to sync agile notify!");
