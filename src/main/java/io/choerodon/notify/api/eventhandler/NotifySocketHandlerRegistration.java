@@ -17,6 +17,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.CloseStatus;
@@ -47,7 +48,8 @@ public class NotifySocketHandlerRegistration implements SocketHandlerRegistratio
         try {
             MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUri(serverHttpRequest.getURI()).build().getQueryParams();
             String accessToken = parameters.getFirst("token");
-            if (accessToken != null) {
+            LOGGER.info("<<<<<<<<<<<<<<<<<<<<<<< token:{}  >>>>>>>>>>>>>>>>>>>", accessToken);
+            if (!StringUtils.isEmpty(accessToken)) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, "bearer " + accessToken);
                 HttpEntity<String> entity = new HttpEntity<>(headers);
