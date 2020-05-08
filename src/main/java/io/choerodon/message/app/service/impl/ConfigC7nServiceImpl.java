@@ -14,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import javax.mail.MessagingException;
+
+
 import java.util.ArrayList;
 import java.util.List;
 

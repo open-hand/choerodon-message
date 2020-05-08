@@ -5,13 +5,16 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
 import io.choerodon.message.infra.dto.SendSettingCategoryDTO;
 import io.choerodon.message.infra.dto.SendSettingDetailDTO;
 import io.choerodon.message.infra.dto.SendSettingDetailTreeDTO;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
+import io.choerodon.message.infra.mapper.MessageTemplateRelMapper;
 import io.choerodon.message.infra.mapper.SendSettingCategoryMapper;
 import io.choerodon.message.infra.mapper.SendSettingMapper;
 import io.choerodon.message.infra.validator.CommonValidator;
+
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
@@ -38,6 +41,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
+    private MessageTemplateRelMapper messageTemplateRelMapper;
+    @Autowired
     private MessageTemplateService messageTemplateService;
     @Autowired
     private MessageClientProperties messageClientProperties;
@@ -58,6 +63,10 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             );
             sendSettingVO.setMessageTemplates(messageTemplates);
         }
+        List<MessageTemplateRelDTO> templateRelDTOS = messageTemplateRelMapper.select(new MessageTemplateRelDTO(sendSettingVO.getMessageCode()));
+        if (!CollectionUtils.isEmpty(templateRelDTOS)) {
+            templateRelDTOS.forEach(t -> setSendTypeEnable(t, sendSettingVO));
+        }
         return sendSettingVO;
     }
 
@@ -70,16 +79,25 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private void setSendTypeEnable(TemplateServerLine templateServerLine, SendSettingVO sendSettingVO) {
         switch (SendingTypeEnum.valueOf(templateServerLine.getTypeCode())) {
             case EMAIL:
-//                sendSettingVO.setEmailEnabledFlag(templateServerLine.get);
+                sendSettingVO.setEmailEnabledFlag(templateServerLine.getEnabledFlag());
                 break;
             case SMS:
-                sendSettingVO.setSmsEnabledFlag(true);
+                sendSettingVO.setSmsEnabledFlag(templateServerLine.getEnabledFlag());
                 break;
             case WH:
-                sendSettingVO.setWebhookEnabledFlag(true);
+                sendSettingVO.setWebhookEnabledFlag(templateServerLine.getEnabledFlag());
+                break;
+            default:
+        }
+    }
+
+    private void setSendTypeEnable(MessageTemplateRelDTO messageTemplateRelDTO, SendSettingVO sendSettingVO) {
+        switch (SendingTypeEnum.valueOf(messageTemplateRelDTO.getSendType())) {
+            case WH:
+                sendSettingVO.setWebhookEnabledFlag(messageTemplateRelDTO.getEnabledFlag());
                 break;
             case WHJSON:
-                sendSettingVO.setWebhookJsonEnabledFlag(true);
+                sendSettingVO.setWebhookJsonEnabledFlag(messageTemplateRelDTO.getEnabledFlag());
                 break;
             default:
         }
