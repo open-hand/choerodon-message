@@ -16,55 +16,55 @@ public class SendSettingVO extends TemplateServer {
     // todo 等待hzero添加
 //    private Integer retryCount;
 
-    private Boolean emailEnabledFlag;
+    private Integer emailEnabledFlag;
 
-    private Boolean pmEnabledFlag;
+    private Integer pmEnabledFlag;
 
-    private Boolean smsEnabledFlag;
+    private Integer smsEnabledFlag;
 
-    private Boolean webhookEnabledFlag;
+    private Integer webhookEnabledFlag;
 
-    private Boolean webhookJsonEnabledFlag;
+    private Integer webhookJsonEnabledFlag;
 
     private List<MessageTemplate> messageTemplates;
 
-    public Boolean getEmailEnabledFlag() {
+    public Integer getEmailEnabledFlag() {
         return emailEnabledFlag;
     }
 
-    public void setEmailEnabledFlag(Boolean emailEnabledFlag) {
+    public void setEmailEnabledFlag(Integer emailEnabledFlag) {
         this.emailEnabledFlag = emailEnabledFlag;
     }
 
-    public Boolean getPmEnabledFlag() {
+    public Integer getPmEnabledFlag() {
         return pmEnabledFlag;
     }
 
-    public void setPmEnabledFlag(Boolean pmEnabledFlag) {
+    public void setPmEnabledFlag(Integer pmEnabledFlag) {
         this.pmEnabledFlag = pmEnabledFlag;
     }
 
-    public Boolean getSmsEnabledFlag() {
+    public Integer getSmsEnabledFlag() {
         return smsEnabledFlag;
     }
 
-    public void setSmsEnabledFlag(Boolean smsEnabledFlag) {
+    public void setSmsEnabledFlag(Integer smsEnabledFlag) {
         this.smsEnabledFlag = smsEnabledFlag;
     }
 
-    public Boolean getWebhookEnabledFlag() {
+    public Integer getWebhookEnabledFlag() {
         return webhookEnabledFlag;
     }
 
-    public void setWebhookEnabledFlag(Boolean webhookEnabledFlag) {
+    public void setWebhookEnabledFlag(Integer webhookEnabledFlag) {
         this.webhookEnabledFlag = webhookEnabledFlag;
     }
 
-    public Boolean getWebhookJsonEnabledFlag() {
+    public Integer getWebhookJsonEnabledFlag() {
         return webhookJsonEnabledFlag;
     }
 
-    public void setWebhookJsonEnabledFlag(Boolean webhookJsonEnabledFlag) {
+    public void setWebhookJsonEnabledFlag(Integer webhookJsonEnabledFlag) {
         this.webhookJsonEnabledFlag = webhookJsonEnabledFlag;
     }
 
