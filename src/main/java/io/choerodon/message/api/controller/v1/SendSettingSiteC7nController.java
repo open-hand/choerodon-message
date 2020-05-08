@@ -1,5 +1,6 @@
 package io.choerodon.message.api.controller.v1;
 
+import io.choerodon.message.infra.dto.SendSettingDetailTreeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.swagger.annotation.Permission;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("v1/notices/send_settings")
@@ -55,12 +58,12 @@ public class SendSettingSiteC7nController {
         return new ResponseEntity<>(sendSettingC7nService.queryByTempServerId(tempServerId), HttpStatus.OK);
     }
 
-//    @GetMapping("/list/allow_config")
-//    @Permission(permissionLogin = true)
-//    @ApiOperation(value = "根据层级查询未禁用通知配置的启用状态的发送设置列表")
-//    public ResponseEntity<List<SendSettingDetailTreeDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type") String level) {
-//        return new ResponseEntity<>(sendSettingC7nService.queryByLevelAndAllowConfig(level, true), HttpStatus.OK);
-//    }
+    @GetMapping("/list/allow_config")
+    @Permission(permissionLogin = true)
+    @ApiOperation(value = "根据层级查询未禁用通知配置的启用状态的发送设置列表")
+    public ResponseEntity<List<SendSettingDetailTreeDTO>> listLevelAndAllowConfig(@RequestParam(name = "source_type") String level) {
+        return new ResponseEntity<>(sendSettingC7nService.queryByLevelAndAllowConfig(level, true), HttpStatus.OK);
+    }
 //
 //    @DeleteMapping("/{id}")
 //    @Permission(type = ResourceType.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})

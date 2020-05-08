@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.choerodon.core.iam.ResourceLevel;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,36 +43,39 @@ public class ReceiveSettingC7nServiceImpl implements ReceiveSettingC7nService {
     @Override
     @Transactional
     public void update(final Long userId, final List<ReceiveSettingVO> settingDTOList, String sourceType) {
-        if (userId == null) return;
-        //没有校验接收通知设置中，层级是否一致，
-        // 即sendSettingId中对应的level和接收通知设置中level不一定一致
-        List<ReceiveSettingDTO> updateSettings = settingDTOList.stream().
-                map(settingDTO -> modelMapper.map(settingDTO, ReceiveSettingDTO.class))
-                .peek(receiveSettingDTO -> receiveSettingDTO.setUserId(userId)).collect(Collectors.toList());
-        ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
-        receiveSettingDTO.setUserId(userId);
-        receiveSettingDTO.setSourceType(sourceType);
-        List<ReceiveSettingDTO> dbSettings = receiveSettingC7nMapper.select(receiveSettingDTO);
-        //备份updateSettings，移除updateSettings和数据库dbSettings中不同的元素
-        List<ReceiveSettingDTO> insertSetting = new ArrayList<>(updateSettings);
-        insertSetting.removeAll(dbSettings);
-        //insertSetting是应该插入的元素
-        insertSetting.forEach(t -> {
-            t.setUserId(userId);
-            if (receiveSettingC7nMapper.insert(t) != 1) {
-                throw new CommonException("error.receiveSettingDTO.createOrUpdateEmail");
-            }
-        });
-        //移除数据库dbSettings和updateSettings中不同的元素，这些是应该删除的对象
-        dbSettings.removeAll(updateSettings);
-        dbSettings.forEach(t -> {
-            t.setUserId(userId);
-            if (receiveSettingC7nMapper.delete(t) != 1) {
-                throw new CommonException("error.receiveSettingDTO.createOrUpdateEmail");
-            }
-        });
-
-        // todo 对于修改平台层 添加对hzero接收设置操作
+        if (sourceType.equals(ResourceLevel.PROJECT.value())) {
+            if (userId == null) return;
+            //没有校验接收通知设置中，层级是否一致，
+            // 即sendSettingId中对应的level和接收通知设置中level不一定一致
+            List<ReceiveSettingDTO> updateSettings = settingDTOList.stream().
+                    map(settingDTO -> modelMapper.map(settingDTO, ReceiveSettingDTO.class))
+                    .peek(receiveSettingDTO -> receiveSettingDTO.setUserId(userId)).collect(Collectors.toList());
+            ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
+            receiveSettingDTO.setUserId(userId);
+            receiveSettingDTO.setSourceType(sourceType);
+            List<ReceiveSettingDTO> dbSettings = receiveSettingC7nMapper.select(receiveSettingDTO);
+            //备份updateSettings，移除updateSettings和数据库dbSettings中不同的元素
+            List<ReceiveSettingDTO> insertSetting = new ArrayList<>(updateSettings);
+            insertSetting.removeAll(dbSettings);
+            //insertSetting是应该插入的元素
+            insertSetting.forEach(t -> {
+                t.setUserId(userId);
+                if (receiveSettingC7nMapper.insert(t) != 1) {
+                    throw new CommonException("error.receiveSettingDTO.createOrUpdateEmail");
+                }
+            });
+            //移除数据库dbSettings和updateSettings中不同的元素，这些是应该删除的对象
+            dbSettings.removeAll(updateSettings);
+            dbSettings.forEach(t -> {
+                t.setUserId(userId);
+                if (receiveSettingC7nMapper.delete(t) != 1) {
+                    throw new CommonException("error.receiveSettingDTO.createOrUpdateEmail");
+                }
+            });
+        }
+        if (sourceType.equals(ResourceLevel.SITE.value())) {
+// todo 对于修改平台层 添加对hzero接收设置操作
+        }
     }
 
 }
