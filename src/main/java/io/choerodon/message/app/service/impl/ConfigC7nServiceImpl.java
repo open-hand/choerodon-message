@@ -1,29 +1,23 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hzero.core.util.Results;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.message.api.vo.EmailConfigVO;
+import io.choerodon.message.app.service.ConfigC7nService;
+import io.choerodon.message.infra.ConfigNameEnum;
 import org.hzero.message.app.service.EmailServerService;
 import org.hzero.message.app.service.SmsServerService;
 import org.hzero.message.domain.entity.EmailProperty;
 import org.hzero.message.domain.entity.EmailServer;
 import org.hzero.message.domain.entity.SmsServer;
-import org.hzero.message.domain.repository.EmailServerRepository;
 import org.hzero.message.infra.supporter.EmailSupporter;
-import org.hzero.mybatis.helper.SecurityTokenHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.message.api.vo.EmailConfigVO;
-import io.choerodon.message.app.service.ConfigC7nService;
-import io.choerodon.message.infra.ConfigNameEnum;
+import javax.mail.MessagingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author scp

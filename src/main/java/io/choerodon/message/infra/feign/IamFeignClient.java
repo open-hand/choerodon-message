@@ -3,6 +3,7 @@ package io.choerodon.message.infra.feign;
 import java.util.List;
 import java.util.Set;
 
+import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import io.choerodon.message.api.vo.UserVO;
  * @author wanghao
  * @Date 2019/12/11 19:00
  */
-@FeignClient(value = HZeroService.Iam.NAME, fallback = BaseFeignClientFallback.class)
+@FeignClient(value = HZeroService.Iam.NAME, fallback = IamFeignClientFallback.class)
 public interface IamFeignClient {
 
     @PostMapping(value = "/v1/users/ids")

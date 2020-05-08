@@ -1,17 +1,5 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import tk.mybatis.mapper.entity.Example;
-
 import io.choerodon.core.enums.NotifyType;
 import io.choerodon.core.enums.ServiceNotifyType;
 import io.choerodon.core.enums.TargetUserType;
@@ -24,15 +12,19 @@ import io.choerodon.message.infra.dto.TargetUserDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.message.infra.enums.DeleteResourceType;
 import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
-import io.choerodon.message.infra.enums.SendingTypeEnum;
+import io.choerodon.message.infra.feign.DevopsFeginClient;
+import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
-import io.choerodon.notify.api.dto.UserDTO;
-import io.choerodon.notify.infra.enums.AgileNotifyTypeEnum;
-import io.choerodon.notify.infra.enums.DeleteResourceType;
-import io.choerodon.notify.infra.enums.DevopsNotifyTypeEnum;
-import io.choerodon.notify.infra.enums.SendingTypeEnum;
-import io.choerodon.notify.infra.feign.BaseFeignClient;
-import io.choerodon.notify.infra.feign.DevopsFeginClient;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * User: Mr.Wang
@@ -52,13 +44,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     private DevopsFeginClient devopsFeginClient;
 
-    private BaseFeignClient baseFeignClient;
+    private IamFeignClient iamFeignClient;
 
-    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper, MessageSettingTargetUserC7nService messageSettingTargetUserService, DevopsFeginClient devopsFeginClient, BaseFeignClient baseFeignClient) {
+    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper, MessageSettingTargetUserC7nService messageSettingTargetUserService, DevopsFeginClient devopsFeginClient, IamFeignClient iamFeignClient) {
         this.messageSettingC7nMapper = messageSettingC7nMapper;
         this.messageSettingTargetUserService = messageSettingTargetUserService;
         this.devopsFeginClient = devopsFeginClient;
-        this.baseFeignClient = baseFeignClient;
+        this.iamFeignClient = iamFeignClient;
     }
 
     @PostConstruct
@@ -109,7 +101,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
         return messageSettingWarpVO;
     }
-
 
 
     @Override
@@ -322,7 +313,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
                 List<Long> uids = userList.stream().map(TargetUserVO::getUserId).collect(Collectors.toList());
-                List<UserVO> iamUserList = baseFeignClient.listUsersByIds(uids.toArray(new Long[20]), false).getBody();
+                List<UserVO> iamUserList = iamFeignClient.listUsersByIds(uids.toArray(new Long[20]), false).getBody();
                 Map<Long, UserVO> iamUserMap = iamUserList.stream().collect(Collectors.toMap(UserVO::getId, v -> v));
                 userList.forEach(user -> {
                     UserVO userDTO = iamUserMap.get(user.getUserId());
@@ -390,7 +381,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 customMessageSettingList.add(defaultMessageSetting);
             } else {
                 // 为devops自定义配置添加默认通知对象
-                if(ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+                if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
                     customMessageSettingVO.setUserList(defaultMessageSetting.getUserList());
                 }
                 customMessageSettingVO.setSmsEnabledFlag(defaultMessageSetting.getSmsEnabledFlag());
