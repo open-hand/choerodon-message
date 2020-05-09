@@ -1,7 +1,7 @@
 package script.db
 
-databaseChangeLog(logicalFilePath: 'script/db/notify-receive-setting.groovy') {
-    changeSet(author: 'youquandeng1@gmail.com', id: '2018-11-07-add-notify-receive-setting') {
+databaseChangeLog(logicalFilePath: 'script/db/notify_receive_setting.groovy') {
+    changeSet(author: 'youquandeng1@gmail.com', id: '2018-11-07-add-notify_receive_setting') {
         if(helper.dbType().isSupportSequence()){
             createSequence(sequenceName: 'NOTIFY_RECEIVE_SETTING_S', startValue:"1")
         }
