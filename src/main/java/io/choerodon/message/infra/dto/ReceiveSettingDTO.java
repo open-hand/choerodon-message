@@ -18,16 +18,7 @@ public class ReceiveSettingDTO extends AuditDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    /**
-     * 弃用该字段，使用 code 字段代替
-     * 该字段的含义是sendSetting的id
-     * 直接改成sendSetting的sendSettingCode
-     */
-    @Deprecated
     private Long sendSettingId;
-
-    @ApiModelProperty(value = "sendSetting的sendSettingCode")
-    private String sendSettingCode;
     private Long sourceId;
     private String sourceType;
     private Long userId;
@@ -82,14 +73,6 @@ public class ReceiveSettingDTO extends AuditDomain {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public String getSendSettingCode() {
-        return sendSettingCode;
-    }
-
-    public void setSendSettingCode(String sendSettingCode) {
-        this.sendSettingCode = sendSettingCode;
     }
 
     @Override
