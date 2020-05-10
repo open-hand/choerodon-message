@@ -1,7 +1,5 @@
 package io.choerodon.message.api.vo;
 
-import io.choerodon.message.infra.dto.DevopsNotificationUserRelVO;
-
 import java.util.List;
 
 /**

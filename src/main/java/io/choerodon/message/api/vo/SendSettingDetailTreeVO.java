@@ -1,6 +1,6 @@
-package io.choerodon.message.infra.dto;
+package io.choerodon.message.api.vo;
 
-public class SendSettingDetailTreeDTO extends SendSettingDetailDTO {
+public class SendSettingDetailTreeVO extends SendSettingDetailVO {
     private Long parentId;
     private Long sequenceId;
 

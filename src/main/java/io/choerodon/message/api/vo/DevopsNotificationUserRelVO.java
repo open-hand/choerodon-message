@@ -1,4 +1,4 @@
-package io.choerodon.message.infra.dto;
+package io.choerodon.message.api.vo;
 
 /**
  * Creator: ChangpingShi0213@gmail.com

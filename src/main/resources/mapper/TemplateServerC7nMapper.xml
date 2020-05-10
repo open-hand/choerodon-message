@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.TemplateServerC7nMapper">
+
+    <select id="selectTemplateServer" resultType="io.choerodon.message.api.vo.MessageServiceVO">
+        SELECT
+        temp_server_id as id,
+        message_code,
+        message_name as introduce,
+        enabled_flag as enabled,
+        subcategory_code AS message_type,
+        category_code AS LEVEL,
+        receive_config_flag ,
+        object_version_number
+        FROM
+        hmsg_template_server hts
+        WHERE
+        1=1
+        <if test="level != null">
+            AND category_code = #{level}
+        </if>
+        <if test="messageCode != null">
+            AND message_code = #{categoryCode}
+        </if>
+        <if test="messageName != null">
+            AND message_name LIKE concat(concat('%',#{introduce}),'%')
+        </if>
+        <if test="messageType != null">
+            AND subcategory_code LIKE concat(concat('%',#{messageType}),'%')
+        </if>
+        <if test="enabled != null">
+            AND enabled_flag = #{enabled}
+        </if>
+        <if test="receiveConfigFlag != null">
+            AND receive_config_flag = #{allowConfig}
+        </if>
+        <if test="params != null">
+            AND message_code LIKE concat(concat('%',#{params}),'%')
+        </if>
+    </select>
+
+</mapper>

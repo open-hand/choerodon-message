@@ -1,4 +1,4 @@
-package io.choerodon.message.infra.dto;
+package io.choerodon.message.api.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,15 +13,17 @@ public class MessageServiceVO {
     private Long id;
 
     @ApiModelProperty(value = "模版编码")
-    private String code;
+    private String messageCode;
+
+    @ApiModelProperty(value = "消息名称")
+    private String messageName;
 
     // 对应notify_send_setting.name
     @ApiModelProperty(value = "消息类型")
     private String messageType;
 
-    // 对应notify_send_setting.description
-    @ApiModelProperty(value = "说明")
-    private String introduce;
+    @ApiModelProperty(value = "消息类型Value")
+    private String messageTypeValue;
 
     @ApiModelProperty(value = "层级")
     private String level;
@@ -32,7 +34,7 @@ public class MessageServiceVO {
 
     // 对应notify_send_setting.is_allow_config
     @ApiModelProperty(value = "是否允许配置接收")
-    private Boolean allowConfig;
+    private Boolean receiveConfigFlag;
 
     @ApiModelProperty(value = "是否允许更改，允许配置接收")
     private Boolean edit;
@@ -49,13 +51,28 @@ public class MessageServiceVO {
         return this;
     }
 
-    public String getCode() {
-        return code;
+    public String getMessageTypeValue() {
+        return messageTypeValue;
     }
 
-    public MessageServiceVO setCode(String code) {
-        this.code = code;
-        return this;
+    public void setMessageTypeValue(String messageTypeValue) {
+        this.messageTypeValue = messageTypeValue;
+    }
+
+    public String getMessageCode() {
+        return messageCode;
+    }
+
+    public void setMessageCode(String messageCode) {
+        this.messageCode = messageCode;
+    }
+
+    public Boolean getReceiveConfigFlag() {
+        return receiveConfigFlag;
+    }
+
+    public void setReceiveConfigFlag(Boolean receiveConfigFlag) {
+        this.receiveConfigFlag = receiveConfigFlag;
     }
 
     public String getMessageType() {
@@ -64,15 +81,6 @@ public class MessageServiceVO {
 
     public MessageServiceVO setMessageType(String messageType) {
         this.messageType = messageType;
-        return this;
-    }
-
-    public String getIntroduce() {
-        return introduce;
-    }
-
-    public MessageServiceVO setIntroduce(String introduce) {
-        this.introduce = introduce;
         return this;
     }
 
@@ -91,15 +99,6 @@ public class MessageServiceVO {
 
     public MessageServiceVO setEnabled(Boolean enabled) {
         this.enabled = enabled;
-        return this;
-    }
-
-    public Boolean getAllowConfig() {
-        return allowConfig;
-    }
-
-    public MessageServiceVO setAllowConfig(Boolean allowConfig) {
-        this.allowConfig = allowConfig;
         return this;
     }
 

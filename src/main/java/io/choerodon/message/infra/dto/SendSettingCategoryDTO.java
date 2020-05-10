@@ -11,6 +11,7 @@ import javax.persistence.Table;
  * @author jiameng.cao
  * @date 2019/10/25
  */
+// todo 删除
 @Table(name = "notify_send_setting_category")
 public class SendSettingCategoryDTO extends AuditDomain {
     @Id

@@ -13,8 +13,8 @@ import org.hzero.message.domain.entity.TemplateServer;
  */
 public class SendSettingVO extends TemplateServer {
 
-    // todo 等待hzero添加
-//    private Integer retryCount;
+    @ApiModelProperty(value = "邮件重发次数")
+    private Integer retryCount;
 
     private Integer emailEnabledFlag;
 
@@ -74,5 +74,13 @@ public class SendSettingVO extends TemplateServer {
 
     public void setMessageTemplates(List<MessageTemplate> messageTemplates) {
         this.messageTemplates = messageTemplates;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
     }
 }
