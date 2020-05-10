@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.message.infra.mapper.SendSettingMapper">
-        <resultMap id="SendSettingDetailDTO" type="io.choerodon.message.infra.dto.SendSettingDetailDTO">
+        <resultMap id="SendSettingDetailDTO" type="io.choerodon.message.api.vo.SendSettingDetailVO">
             <id column="id" property="id"></id>
             <result column="fd_level" property="level" jdbcType="VARCHAR"/>
         </resultMap>
@@ -43,7 +43,7 @@
         </select>
 
 
-        <select id="doFTR" resultType="io.choerodon.message.infra.dto.MessageServiceVO">
+        <select id="doFTR" resultType="io.choerodon.message.api.vo.MessageServiceVO">
             SELECT
             id,
             code,

@@ -1,8 +1,8 @@
 package io.choerodon.message.infra.mapper;
 
-import io.choerodon.message.infra.dto.MessageServiceVO;
+import io.choerodon.message.api.vo.MessageServiceVO;
 import io.choerodon.message.infra.dto.SendSettingDTO;
-import io.choerodon.message.infra.dto.SendSettingDetailDTO;
+import io.choerodon.message.api.vo.SendSettingDetailVO;
 import io.choerodon.mybatis.common.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,8 +29,8 @@ public interface SendSettingMapper extends BaseMapper<SendSettingDTO> {
                                  @Param("params") String params);
 
 
-    List<SendSettingDetailDTO> queryByLevelAndAllowConfig(@Param("level") String level,
-                                                          @Param("allowConfig") boolean allowConfig);
+    List<SendSettingDetailVO> queryByLevelAndAllowConfig(@Param("level") String level,
+                                                         @Param("allowConfig") boolean allowConfig);
 
     List<SendSettingDTO> pageSendSettingByCondition(@Param("sendSettingDTO") SendSettingDTO sendSettingDTO,
                                                     @Param("type") String type);

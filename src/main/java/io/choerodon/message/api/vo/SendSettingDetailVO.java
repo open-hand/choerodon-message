@@ -1,7 +1,7 @@
-package io.choerodon.message.infra.dto;
+package io.choerodon.message.api.vo;
 
 
-public class SendSettingDetailDTO {
+public class SendSettingDetailVO {
 
     private Long id;
 

@@ -7,6 +7,7 @@ import javax.persistence.*;
 /**
  * 消息业务类型
  */
+// todo 删除
 @Table(name = "notify_send_setting")
 public class SendSettingDTO extends AuditDomain {
 
