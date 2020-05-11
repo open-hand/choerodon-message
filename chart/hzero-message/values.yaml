@@ -113,8 +113,6 @@ env:
     HZERO_SMS_FAKE: false
     # 日志级别
     LOG_LEVEL: info
-    # 数据库默认用户，MSSQL需要考虑
-    HZERO_DB_OWNER:
     # JVM参数
     JAVA_OPTS: >
       -Xms1024m
