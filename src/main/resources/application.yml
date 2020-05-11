@@ -81,9 +81,6 @@ hzero:
     message-redis-database: 1
     sms:
       fake-action: ${HZERO_SMS_FAKE:false}
-  data:
-    permission:
-      db-owner: ${HZERO_DB_OWNER:}
   cache-value:
     enable: true
   resource:
