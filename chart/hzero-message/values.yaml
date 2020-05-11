@@ -5,13 +5,13 @@ preJob:
   # 工具 jar 包镜像库地址
   image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.6.7
   preInitDB:
-    # 是否初始化base_service数据库
+    # 是否初始化hzero_message数据库
     enabled: true
     datasource:
       # 初始化数据库更新数据的时候忽略的表或列
-      exclusion: iam_user.hash_password,oauth_client.web_server_redirect_uri,oauth_ldap.server_address,oauth_ldap.object_class,iam_role.is_enabled,fd_organization.name
+      exclusion: ""
       # 本服务数据库相关信息
-      url: jdbc:mysql://localhost:3306/base_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://localhost:3306/?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
       username: username
       password: password
       driver: com.mysql.jdbc.Driver
@@ -62,34 +62,71 @@ env:
     # 配置中心地址
     SPRING_CLOUD_CONFIG_URI: http://register-server:8000
 
+    # 注册服务地址
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
+
+    # 网关地址
+    CHOERODON_GATEWAY_URL: http://api.example.com
+
     # Redis 主机地址
     SPRING_REDIS_HOST: localhost
     # Redis 端口
     SPRING_REDIS_PORT: 6379
     # Redis db
     SPRING_REDIS_DATABASE: 2
+    # 资源池中最大连接数
+    # 默认8，-1表示无限制；可根据服务并发redis情况及服务端的支持上限调整
+    SPRING_REDIS_POOL_MAX_ACTIVE: 50
+    # 资源池运行最大空闲的连接数
+    # 默认8，-1表示无限制；可根据服务并发redis情况及服务端的支持上限调整，一般建议和max-active保持一致，避免资源伸缩带来的开销
+    SPRING_REDIS_POOL_MAX_IDLE: 50
+    # 当资源池连接用尽后，调用者的最大等待时间(单位为毫秒)
+    # 默认 -1 表示永不超时，设置5秒
+    SPRING_REDIS_POOL_MAX_WAIT: 5000
 
     # 数据库连接地址
-    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/base_service?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
+    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/hzero_message?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
     # 数据库用户名
     SPRING_DATASOURCE_USERNAME: choerodon
     # 数据库密码
     SPRING_DATASOURCE_PASSWORD: password
+    # 连接池最小空闲连接数
+    SPRING_DATASOURCE_MINIMUM_IDLE: 20
+    # 连接池允许的最大连接数
+    SPRING_DATASOURCE_MAXIMUM_POOL_SIZE: 200
+    # 等待连接池分配连接的最大时长（毫秒）
+    SPRING_DATASOURCE_CONNECTION_TIMEOUT: 30000
 
-    # 注册服务地址
-    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
+    # Hystrix 熔断超时时间
+    HYSTRIX_COMMAND_TIMEOUT_IN_MILLISECONDS: 40000
+    # Ribbon 读取超时时间
+    RIBBON_READ_TIMEOUT: 30000
+    # Ribbon 连接超时时间
+    RIBBON_CONNECT_TIMEOUT: 3000
+    # IO线程数, 它主要执行非阻塞的任务
+    SERVER_UNDERTOW_IO_THREADS: 4
+    # 阻塞任务线程池
+    SERVER_UNDERTOW_WORKER_THREADS: 128
+    # 每块buffer的空间大小，越小空间被利用越充分
+    SERVER_UNDERTOW_BUFFER_SIZE: 1024
+    # SMS假处理
+    HZERO_SMS_FAKE: false
+    # 日志级别
+    LOG_LEVEL: info
+    # 数据库默认用户，MSSQL需要考虑
+    HZERO_DB_OWNER:
+    # JVM参数
+    JAVA_OPTS: >
+      -Xms1024m
+      -Xmx1536m
 
-    # 忽略jwt的url
-    CHOERODON_RESOURCE_JWT_IGNORE: /favicon.ico
+    ## Skywalking 配置参数
+    # SKYWALKING_OPTS: >-
+    #   -javaagent:/agent/skywalking-agent.jar
+    #   -Dskywalking.agent.application_code=asgard-service
+    #   -Dskywalking.agent.sample_n_per_3_secs=-1
+    #   -Dskywalking.collector.backend_service=oap.skywalking:11800
 
-    # 清理permission表中的旧接口和role_permission表中角色和权限层级不匹配的脏数据
-    CHOERODON_CLEANPERMISSION: false
-
-    # 网关地址
-    CHOERODON_GATEWAY_URL: http://api.example.com
-
-    #用户默认密码
-    CHOERODON_USER_DEFAULT_PASSWORD: abcd1234
 
 ## Liveness 和 Readiness 探针相关配置
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
@@ -109,7 +146,7 @@ readinessProbe:
 ## 资源请求和限制相关配置
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: 
+resources:
   limits:
     # cpu: 100m
     memory: 2Gi
@@ -135,13 +172,13 @@ service:
   # 指定 service 的 clusterIP
   clusterIP: ~
   # 端口设置
-  ports: 
+  ports:
     # 服务端口
-    http: 
+    http:
       port: 8030
       nodePort: 30092
     # 管理端口
-    actuator: 
+    actuator:
       port: 8031
       nodePort: 30093
   ## externalIPs 设置
@@ -150,7 +187,7 @@ service:
   annotations: {}
     # prometheus.io/scrape: 'true'
     # prometheus.io/path: '/actuator/prometheus'
-    # prometheus.io/port: '8031'
+  # prometheus.io/port: '8031'
 
 ## 指标收集
 metrics:
