@@ -11,7 +11,7 @@ preJob:
       # 初始化数据库更新数据的时候忽略的表或列
       exclusion: ""
       # 本服务数据库相关信息
-      url: jdbc:mysql://localhost:3306/hzero_message?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://localhost:3306/?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
       username: username
       password: password
       driver: com.mysql.jdbc.Driver
@@ -62,6 +62,12 @@ env:
     # 配置中心地址
     SPRING_CLOUD_CONFIG_URI: http://register-server:8000
 
+    # 注册服务地址
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
+
+    # 网关地址
+    CHOERODON_GATEWAY_URL: http://api.example.com
+
     # Redis 主机地址
     SPRING_REDIS_HOST: localhost
     # Redis 端口
@@ -90,12 +96,6 @@ env:
     SPRING_DATASOURCE_MAXIMUM_POOL_SIZE: 200
     # 等待连接池分配连接的最大时长（毫秒）
     SPRING_DATASOURCE_CONNECTION_TIMEOUT: 30000
-
-    # 注册服务地址
-    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
-
-    # 网关地址
-    CHOERODON_GATEWAY_URL: http://api.example.com
 
     # Hystrix 熔断超时时间
     HYSTRIX_COMMAND_TIMEOUT_IN_MILLISECONDS: 40000
