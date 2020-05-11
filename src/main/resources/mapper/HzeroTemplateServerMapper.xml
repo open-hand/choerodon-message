@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.HzeroTemplateServerMapper">
+    <select id="queryByCategoryCodeAndReceiveConfigFlag"
+            resultType="io.choerodon.message.infra.dto.TemplateServerC7NDTO">
+        SELECT
+        hts.temp_server_id,
+        hts.tenant_id,
+        hts.message_code,
+        hts.message_name,
+        hts.category_code,
+        hts.subcategory_code,
+        hts.receive_config_flag,
+        hts.enabled_flag,
+        hts.object_version_number,
+        htslemail.enabled_flag emailEnabledFlag,
+        htslsms.enabled_flag smsEnabledFlag,
+        htslpm.enabled_flag pmEnabledFlag
+        FROM hmsg_template_server hts
+        LEFT JOIN hmsg_template_server_line htslemail on hts.temp_server_id = htslemail.temp_server_id and htslemail.type_code='email'
+        LEFT JOIN hmsg_template_server_line htslsms on hts.temp_server_id = htslsms.temp_server_id and htslsms.type_code='sms'
+        LEFT JOIN hmsg_template_server_line htslpm on hts.temp_server_id = htslpm.temp_server_id and htslsms.type_code='pm'
+        where hts.enabled_flag = 1
+        <if test="level != null">
+            AND hts.category_code = #{level}
+        </if>
+        <if test="allowConfig != null">
+            AND hts.receive_config_flag = #{allowConfig}
+        </if>
+    </select>
+</mapper>
