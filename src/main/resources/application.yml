@@ -72,13 +72,20 @@ mapper:
   not-empty: true
 
 hzero:
+  websocket:
+    # 用于连接websocket的路径
+    websocket: /websocket
+    # 与当前服务的redis数据库一致
+    redisDb: ${SPRING_REDIS_DATABASE:1}
+    secretKey: hzero
+    oauthUrl: http://example/oauth/api/user
   lov:
     sql:
       enabled: true
     value:
       enabled: true
   message:
-    message-redis-database: 1
+    message-redis-database: ${SPRING_REDIS_DATABASE:1}
     sms:
       fake-action: ${HZERO_SMS_FAKE:false}
   cache-value:
