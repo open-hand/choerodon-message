@@ -1,9 +1,6 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.hzero.boot.message.entity.Attachment;
@@ -29,8 +26,12 @@ import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 
 /**
  * @author scp
@@ -40,45 +41,20 @@ import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
 
-    private final WebSendService webSendService;
-    private final EmailSendService emailSendService;
-    private final SmsSendService smsSendService;
-    private final CallSendService callSendService;
-    private final TemplateServerService templateServerService;
-    private final TemplateServerRepository templateServerRepository;
-    private final TemplateServerLineRepository templateServerLineRepository;
-    private final MessageReceiverService messageReceiverService;
-    private final WeChatSendService weChatSendService;
-    private final DingTalkSendService dingTalkSendService;
-    private final ReceiveSettingC7nMapper receiveSettingC7nMapper;
-    private final MessageSettingC7nMapper messageSettingC7nMapper;
-
     @Autowired
-    public RelSendMessageServiceImpl(WebSendService webSendService,
-                                     EmailSendService emailSendService,
-                                     SmsSendService smsSendService,
-                                     CallSendService callSendService,
-                                     TemplateServerService templateServerService,
-                                     TemplateServerRepository templateServerRepository,
-                                     TemplateServerLineRepository templateServerLineRepository,
-                                     MessageReceiverService messageReceiverService,
-                                     WeChatSendService weChatSendService,
-                                     MessageSettingC7nMapper messageSettingC7nMapper,
-                                     ReceiveSettingC7nMapper receiveSettingC7nMapper,
-                                     DingTalkSendService dingTalkSendService) {
-        this.webSendService = webSendService;
-        this.emailSendService = emailSendService;
-        this.smsSendService = smsSendService;
-        this.callSendService = callSendService;
-        this.templateServerService = templateServerService;
-        this.templateServerRepository = templateServerRepository;
-        this.templateServerLineRepository = templateServerLineRepository;
-        this.messageReceiverService = messageReceiverService;
-        this.weChatSendService = weChatSendService;
-        this.dingTalkSendService = dingTalkSendService;
-        this.receiveSettingC7nMapper = receiveSettingC7nMapper;
-        this.messageSettingC7nMapper = messageSettingC7nMapper;
-    }
+    private TemplateServerService templateServerService;
+    @Autowired
+    private TemplateServerLineRepository templateServerLineRepository;
+    @Autowired
+    private MessageReceiverService messageReceiverService;
+    @Autowired
+    private ReceiveSettingC7nMapper receiveSettingC7nMapper;
+    @Autowired
+    private MessageSettingC7nMapper messageSettingC7nMapper;
+    @Autowired
+    private IamClientOperator iamClientOperator;
+    @Autowired
+    private WebhookProjectRelMapper webhookProjectRelMapper;
 
     @Override
     public Map<String, Integer> relSendMessage(MessageSender messageSender) {
@@ -103,25 +79,27 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<Receiver> receiverList = messageSender.getReceiverAddressList();
         Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
         Long envId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName());
-        String evnetName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
+        String eventName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
         // 每种类型的模板只能指定一个
         // 模板允许站内消息 且 (不指定发送方式且userId不为空 或 发送方式中指定了站内消息)
         if (serverLineMap.containsKey(HmsgConstant.MessageType.WEB) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.WEB)) {
-            receiveFilter(receiverList, tempServerId, projectId);
-            if (!CollectionUtils.isEmpty(receiverList) && projectFilter(messageSender, projectId, envId, evnetName, HmsgConstant.MessageType.WEB)) {
+            receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.WEB);
+            if (!CollectionUtils.isEmpty(receiverList) && projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.WEB)) {
                 sendWeb(serverLineMap, receiverList, messageSender.getTenantId(), messageSender.getLang(), messageSender.getArgs(), result, messageSender.getMessageMap());
             }
         }
         // 模板允许短信 且 (不指定发送方式且phone不为空 或 发送方式中指定了短信)
         if (serverLineMap.containsKey(HmsgConstant.MessageType.SMS) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.SMS)) {
-            if (projectFilter(messageSender, projectId, envId, evnetName, HmsgConstant.MessageType.SMS)) {
+            if (projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.SMS)) {
                 sendSms(serverLineMap, receiverList, messageSender.getTenantId(), messageSender.getLang(), messageSender.getArgs(), result, messageSender.getMessageMap());
             }
         }
         // 模板允许邮件 且 (不指定发送方式且email不为空 或 发送方式中指定了邮件)
         if (serverLineMap.containsKey(HmsgConstant.MessageType.EMAIL) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.EMAIL)) {
-            receiveFilter(receiverList, tempServerId, projectId);
-            sendEmail(serverLineMap, receiverList, messageSender.getTenantId(), messageSender.getLang(), messageSender.getArgs(), result, messageSender.getMessageMap(), messageSender.getAttachmentList(), messageSender.getCcList(), messageSender.getBccList(), messageSender.getBatchSend());
+            receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.EMAIL);
+            if (!CollectionUtils.isEmpty(receiverList) && projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.EMAIL)) {
+                sendEmail(serverLineMap, receiverList, messageSender.getTenantId(), messageSender.getLang(), messageSender.getArgs(), result, messageSender.getMessageMap(), messageSender.getAttachmentList(), messageSender.getCcList(), messageSender.getBccList(), messageSender.getBatchSend());
+            }
         }
         // 模板允许语音 且 (不指定发送方式且phone不为空 或 发送方式中指定了与语音)
         if (serverLineMap.containsKey(HmsgConstant.MessageType.CALL) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.CALL)) {
@@ -141,24 +119,54 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * @param tempServerId
      * @param projectId
      */
-    private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId) {
+    private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId, String messageType) {
         List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
-        List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, HmsgConstant.MessageType.WEB);
+        List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
         List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
         receiverAddressList.removeAll(removeUserList);
     }
 
+    /**
+     * 项目层 对应消息是否启用
+     *
+     * @param messageSender
+     * @param projectId
+     * @param envId
+     * @param eventName
+     * @param messageType
+     * @return
+     */
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
         MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
         return !ObjectUtils.isEmpty(messageSettingDTO);
 
     }
 
-    /**
-     * 判断个人接收设置是否启用
-     */
-    private void filterReceiveMessage() {
 
+    /**
+     * webhook过滤
+     * @param serverLineMap
+     * @param tenantId
+     * @param projectId
+     */
+    private void webHookFilter(Map<String, List<TemplateServerLine>> serverLineMap, Long tenantId, Long projectId) {
+        Map<String, List<TemplateServerLine>> newMap = new HashMap<>();
+        if (!ObjectUtils.isEmpty(projectId)) {
+            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            for (Map.Entry<String, List<TemplateServerLine>> entry : serverLineMap.entrySet()) {
+                List<TemplateServerLine> values = entry.getValue().stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+                newMap.put(entry.getKey(), values);
+            }
+        } else {
+            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setTenantId(tenantId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            for (Map.Entry<String, List<TemplateServerLine>> entry : serverLineMap.entrySet()) {
+                List<TemplateServerLine> values = entry.getValue().stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+                newMap.put(entry.getKey(), values);
+            }
+
+        }
+        serverLineMap.clear();
+        serverLineMap.putAll(newMap);
     }
 
 

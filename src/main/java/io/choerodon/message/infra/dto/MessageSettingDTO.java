@@ -4,6 +4,7 @@ import java.util.List;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,16 +24,6 @@ import io.choerodon.mybatis.domain.AuditDomain;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MessageSettingDTO extends AuditDomain {
 
-    public MessageSettingDTO(Long projectId, String code, Long envId, String eventName) {
-        this.projectId = projectId;
-        this.code = code;
-        this.envId = envId;
-        this.eventName = eventName;
-    }
-
-    public static final String FIELD_PROJECT_ID = "projectId";
-    public static final String FIELD_CODE = "code";
-
     @Id
     @GeneratedValue
     private Long id;
@@ -46,14 +37,23 @@ public class MessageSettingDTO extends AuditDomain {
     private Boolean pmEnable;
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
+
     @ApiModelProperty(value = "消息设置的分组")
-    private transient String category;
+    @Transient
+    private  String category;
+
     @ApiModelProperty(value = "消息接收对象")
-    private transient List<TargetUserDTO> targetUserDTOS;
+    @Transient
+    private  List<TargetUserDTO> targetUserDTOS;
+
     @ApiModelProperty(value = "消息设置的名字")
-    private transient String name;
+    @Transient
+    private  String name;
+
     @ApiModelProperty(value = "分组的id")
-    private transient Long categoryId;
+    @Transient
+    private  Long categoryId;
+
     @ApiModelProperty(value = "环境的id")
     private Long envId;
     @ApiModelProperty(value = "是否发送短信")

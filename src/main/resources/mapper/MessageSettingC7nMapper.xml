@@ -133,9 +133,7 @@
             <result property="emailEnabledFlag" column="EMAIL_ENABLED_FLAG"/>
             <result property="pmEnabledFlag" column="PM_ENABLED_FLAG"/>
             <result property="smsEnabledFlag" column="SMS_ENABLED_FLAG"/>
-            <collection property="templates" ofType="io.choerodon.notify.infra.dto.Template">
-                <result property="sendingType" column="SENDING_TYPE"/>
-            </collection>
+            <result property="sendingType" column="SENDING_TYPE"/>
         </association>
         <collection property="userList" ofType="io.choerodon.message.api.vo.TargetUserVO">
             <id column="NMSTU_ID" property="id"/>

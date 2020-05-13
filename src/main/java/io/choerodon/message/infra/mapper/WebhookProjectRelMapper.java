@@ -1,5 +1,7 @@
 package io.choerodon.message.infra.mapper;
 
+import java.util.List;
+
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.mybatis.common.BaseMapper;
 

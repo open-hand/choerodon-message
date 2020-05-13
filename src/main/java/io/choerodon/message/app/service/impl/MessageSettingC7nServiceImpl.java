@@ -1,6 +1,5 @@
 package io.choerodon.message.app.service.impl;
 
-import io.choerodon.core.enums.NotifyType;
 import io.choerodon.core.enums.ServiceNotifyType;
 import io.choerodon.core.enums.TargetUserType;
 import io.choerodon.core.exception.CommonException;
@@ -15,6 +14,8 @@ import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.message.infra.feign.DevopsFeignClient;
 import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
+
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
@@ -200,13 +201,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             throw new CommonException(ERROR_PARAM_INVALID);
         }
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-        if (NotifyType.PM.getValue().equals(notiyfType)) {
+        if (HmsgConstant.MessageType.WEB.equals(notiyfType)) {
             messageSettingDTO.setPmEnable(false);
         }
-        if (NotifyType.EMAIL.getValue().equals(notiyfType)) {
+        if (HmsgConstant.MessageType.EMAIL.equals(notiyfType)) {
             messageSettingDTO.setEmailEnable(false);
         }
-        if (NotifyType.SMS.getValue().equals(notiyfType)) {
+        if (HmsgConstant.MessageType.SMS.equals(notiyfType)) {
             messageSettingDTO.setSmsEnable(false);
         }
         messageSettingDTO.setCode(code);
