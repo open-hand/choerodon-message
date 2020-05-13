@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.WebhookRecordC7nMapper">
+
+    <resultMap id="WebHookRecordVO" type="io.choerodon.message.api.vo.WebhookRecordVO" autoMapping="true">
+        <id column="server_id" property="serverId"/>
+        <result column="webhook_address" property="webhookAddress"/>
+        <result column="server_type" property="serverType"/>
+        <result column="enabled_flag" property="enabledFlag"/>
+        <collection property="templateServers" ofType="org.hzero.message.domain.entity.TemplateServer">
+            <id property="temp_server_id" column="tempServerId"/>
+            <result property="message_code" column="messageCode"/>
+            <result property="message_name" column="messageName"/>
+        </collection>
+    </resultMap>
+
+    <select id="pagingWebHookRecord" resultType="io.choerodon.message.api.vo.WebhookRecordVO">
+        SELECT
+        hmt.transaction_id as recordId,
+        hts.message_code,
+        hts.message_name,
+        hmt.trx_status_code,
+        hm.creation_date,
+        hws.webhook_address,
+        hws.server_type
+        FROM
+        hmsg_message hm
+        JOIN hmsg_message_transaction hmt ON hmt.message_id = hm.message_id
+        JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
+        JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+        JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
+        <if test="projectId!=null">
+            INNER JOIN webhook_project_rel wpr on wpr.project_id=#{projectId} and wpr.webhook_id=hws.server_id
+        </if>
+        WHERE
+        hm.message_type_code = 'WEB_HOOK'
+        AND  hm.tenant_id=#{tenantId}
+        <if test="status!=null">
+            AND hmt.trx_status_code=#{status}
+        </if>
+        <if test="eventName!=null">
+            AND hts.message_name LIKE concat(concat('%',#{eventName}),'%')
+        </if>
+        <if test="type!=null">
+            AND hws.server_type =#{type}
+        </if>
+        <if test="webHookId!=null">
+            AND hws.server_id =#{webHookId}
+        </if>
+    </select>
+
+    <select id="selectById" resultType="io.choerodon.message.api.vo.WebhookRecordVO">
+        SELECT
+            hm.message_id,
+            hts.message_code,
+            hts.message_name,
+            hmt.trx_status_code,
+            hm.creation_date,
+            hm.content,
+            hws.webhook_address,
+            hmt.transaction_message as errorInfo,
+            hws.server_type
+        FROM
+            hmsg_message hm
+            JOIN hmsg_message_transaction hmt ON hmt.message_id = hm.message_id
+            JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
+            JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+
+            JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
+        WHERE
+            hm.message_type_code = 'WEB_HOOK'
+            AND  hmt.transaction_id=#{record_id}
+    </select>
+</mapper>
