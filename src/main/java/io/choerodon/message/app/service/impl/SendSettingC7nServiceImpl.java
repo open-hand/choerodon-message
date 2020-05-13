@@ -10,7 +10,6 @@ import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
-import io.choerodon.message.infra.dto.TemplateServerC7NDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.feign.PlatformFeignClient;
@@ -297,7 +296,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     /**
-     * 注意TemplateServerC7NDTO中CategoryCode与SubCategoryCode字段
+     * 注意SendSettingVO中CategoryCode与SubCategoryCode字段
      * CategoryCode         表示level关系
      * SubCategoryCode      表示分类关系
      *
@@ -314,7 +313,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         CommonValidator.validatorLevel(level);
 
         // 查询 处于启用状态 允许配置 的对应层级的消息发送设置
-        List<TemplateServerC7NDTO> templateServerList = hzeroTemplateServerMapper.queryByCategoryCodeAndReceiveConfigFlag(level, allowConfig);
+        List<SendSettingVO> sendSettingVOList = hzeroTemplateServerMapper.queryByCategoryCodeAndReceiveConfigFlag(level, allowConfig);
 
         // 返回给客户端的消息发送设置列表
         List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS = new ArrayList<>();
@@ -324,20 +323,20 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         levelAndCategoryCodeMap.put(ResourceLevel.valueOf(level.toUpperCase()).value(), new HashSet<>());
 
         // for循环里过滤掉不是level层级的categoryCode
-        for (TemplateServerC7NDTO templateServerC7NDTO : templateServerList) {
-            Set<String> categoryCodes = levelAndCategoryCodeMap.get(templateServerC7NDTO.getCategoryCode());
+        for (SendSettingVO sendSettingVO : sendSettingVOList) {
+            Set<String> categoryCodes = levelAndCategoryCodeMap.get(sendSettingVO.getCategoryCode());
             if (categoryCodes != null) {
-                categoryCodes.add(templateServerC7NDTO.getSubcategoryCode());
+                categoryCodes.add(sendSettingVO.getSubcategoryCode());
             }
         }
-        getSecondSendSettingDetailTreeVOS(levelAndCategoryCodeMap, sendSettingDetailTreeDTOS, templateServerList);
+        getSecondSendSettingDetailTreeVOS(levelAndCategoryCodeMap, sendSettingDetailTreeDTOS, sendSettingVOList);
 
         return sendSettingDetailTreeDTOS;
     }
 
     private void getSecondSendSettingDetailTreeVOS(Map<String, Set<String>> levelAndCategoryCodeMap,
                                                    List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS,
-                                                   List<TemplateServerC7NDTO> templateServerC7NDTOList) {
+                                                   List<SendSettingVO> sendSettingVOList) {
         int i = 1;
         // 将不同层级的categoryCode取出
         for (String level : levelAndCategoryCodeMap.keySet()) {
@@ -355,22 +354,22 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 int secondParentId = i;
                 i = i + 1;
 
-                i = getThirdSendSettingDetailTreeVOS(templateServerC7NDTOList, level, subCategoryCode, secondParentId, sendSettingDetailTreeDTOS, i);
+                i = getThirdSendSettingDetailTreeVOS(sendSettingVOList, level, subCategoryCode, secondParentId, sendSettingDetailTreeDTOS, i);
             }
         }
     }
 
-    private int getThirdSendSettingDetailTreeVOS(List<TemplateServerC7NDTO> templateServerC7NDTOList,
+    private int getThirdSendSettingDetailTreeVOS(List<SendSettingVO> sendSettingVOList,
                                                  String level,
                                                  String categoryCode,
                                                  Integer secondParentId,
                                                  List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS, Integer i) {
-        for (TemplateServerC7NDTO templateServerC7NDTO : templateServerC7NDTOList) {
+        for (SendSettingVO sendSettingVO : sendSettingVOList) {
             // 取出指定层级、指定类别的消息发送设置，比如project层级的pro-management类别的所有消息发送设置
             // 与hzero融合后，层级字段是 CategoryCode，分类字段是 SubCategoryCode
-            if (templateServerC7NDTO.getCategoryCode().equals(level) && templateServerC7NDTO.getSubcategoryCode().equals(categoryCode)) {
+            if (sendSettingVO.getCategoryCode().equals(level) && sendSettingVO.getSubcategoryCode().equals(categoryCode)) {
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                TemplateServerC7NDTOConvertToSendSettingDetailTreeVO(templateServerC7NDTO, sendSettingDetailTreeDTO, level);
+                SendSettingVOConvertToSendSettingDetailTreeVO(sendSettingVO, sendSettingDetailTreeDTO, level);
                 sendSettingDetailTreeDTO.setParentId((long) secondParentId);
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO);
@@ -391,14 +390,14 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         return meanings.getBody();
     }
 
-    private void TemplateServerC7NDTOConvertToSendSettingDetailTreeVO(TemplateServerC7NDTO templateServerC7NDTO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
-        sendSettingDetailTreeVO.setId(templateServerC7NDTO.getTempServerId());
+    private void SendSettingVOConvertToSendSettingDetailTreeVO(SendSettingVO sendSettingVO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
+        sendSettingDetailTreeVO.setId(sendSettingVO.getTempServerId());
         sendSettingDetailTreeVO.setLevel(level);
-        sendSettingDetailTreeVO.setName(templateServerC7NDTO.getMessageName());
-        sendSettingDetailTreeVO.setCategoryCode(templateServerC7NDTO.getSubcategoryCode());
-        sendSettingDetailTreeVO.setCode(templateServerC7NDTO.getMessageCode());
-        sendSettingDetailTreeVO.setEmailEnabledFlag(templateServerC7NDTO.getEmailEnabledFlag());
-        sendSettingDetailTreeVO.setPmEnabledFlag(templateServerC7NDTO.getPmEnabledFlag());
+        sendSettingDetailTreeVO.setName(sendSettingVO.getMessageName());
+        sendSettingDetailTreeVO.setCategoryCode(sendSettingVO.getSubcategoryCode());
+        sendSettingDetailTreeVO.setCode(sendSettingVO.getMessageCode());
+        sendSettingDetailTreeVO.setEmailEnabledFlag(sendSettingVO.getEmailEnabledFlag().equals(1));
+        sendSettingDetailTreeVO.setPmEnabledFlag(sendSettingVO.getPmEnabledFlag().equals(1));
     }
 
 }
