@@ -1,11 +1,11 @@
 package io.choerodon.message.infra.mapper;
 
 
-import io.choerodon.message.infra.dto.TemplateServerC7NDTO;
+import io.choerodon.message.api.vo.SendSettingVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface HzeroTemplateServerMapper {
-    List<TemplateServerC7NDTO> queryByCategoryCodeAndReceiveConfigFlag(@Param("level") String level, @Param("allowConfig") int allowConfig);
+    List<SendSettingVO> queryByCategoryCodeAndReceiveConfigFlag(@Param("level") String level, @Param("allowConfig") int allowConfig);
 }
