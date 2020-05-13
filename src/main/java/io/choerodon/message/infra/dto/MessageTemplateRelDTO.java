@@ -55,8 +55,9 @@ public class MessageTemplateRelDTO extends AuditDomain {
         return messageCode;
     }
 
-    public void setMessageCode(String messageCode) {
+    public MessageTemplateRelDTO setMessageCode(String messageCode) {
         this.messageCode = messageCode;
+        return this;
     }
 
     public Long getTemplateId() {

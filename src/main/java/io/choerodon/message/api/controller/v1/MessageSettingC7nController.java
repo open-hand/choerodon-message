@@ -22,7 +22,7 @@ import io.choerodon.swagger.annotation.Permission;
  * Date: 2019/12/3
  */
 @RestController
-@RequestMapping("/v1/projects/{project_id}/message_settings")
+@RequestMapping("/choerodon/v1/projects/{project_id}/message_settings")
 @Api("发送消息设置接口")
 public class MessageSettingC7nController {
     @Autowired

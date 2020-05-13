@@ -12,7 +12,6 @@ import io.choerodon.message.infra.dto.TargetUserDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.message.infra.enums.DeleteResourceType;
 import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
-import io.choerodon.message.infra.feign.DevopsFeignClient;
 import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import org.modelmapper.ModelMapper;
@@ -42,14 +41,14 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     private MessageSettingTargetUserC7nService messageSettingTargetUserService;
 
-    private DevopsFeignClient devopsFeignClient;
+    private DevopsFeginClient devopsFeginClient;
 
     private IamFeignClient iamFeignClient;
 
-    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper, MessageSettingTargetUserC7nService messageSettingTargetUserService, DevopsFeignClient devopsFeignClient, IamFeignClient iamFeignClient) {
+    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper, MessageSettingTargetUserC7nService messageSettingTargetUserService, DevopsFeginClient devopsFeginClient, IamFeignClient iamFeignClient) {
         this.messageSettingC7nMapper = messageSettingC7nMapper;
         this.messageSettingTargetUserService = messageSettingTargetUserService;
-        this.devopsFeignClient = devopsFeignClient;
+        this.devopsFeginClient = devopsFeginClient;
         this.iamFeignClient = iamFeignClient;
     }
 
@@ -398,7 +397,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             return messageSettingC7nMapper.listCategoriesBySettingType(notifyType);
         }
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
-            return devopsFeignClient.listByActive(projectId, true).getBody();
+            return devopsFeginClient.listByActive(projectId, true).getBody();
         }
         return new ArrayList<>();
     }

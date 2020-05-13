@@ -1,15 +1,13 @@
 package io.choerodon.message.infra.enums;
 
-public enum SendingTypeEnum {
-    EMAIL("EMAIL"),
-    SMS("SMS"),
-    WEB("WEB"),
-    WH("WEBHOOK"),
-    WHJSON("WEBHOOK-JSON");
+public enum WebHookTypeEnum {
+    DINGTALK("DingTalk"),
+    WECHAT("WeChat"),
+    JSON("Json");
 
     private String value;
 
-    SendingTypeEnum(String value) {
+    WebHookTypeEnum(String value) {
         this.value = value;
     }
 
@@ -19,7 +17,7 @@ public enum SendingTypeEnum {
 
     public static boolean isInclude(String key) {
         boolean include = false;
-        for (SendingTypeEnum e : SendingTypeEnum.values()) {
+        for (WebHookTypeEnum e : WebHookTypeEnum.values()) {
             if (e.getValue().equalsIgnoreCase(key)) {
                 include = true;
                 break;

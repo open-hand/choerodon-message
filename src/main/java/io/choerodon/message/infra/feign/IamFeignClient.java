@@ -3,7 +3,10 @@ package io.choerodon.message.infra.feign;
 import java.util.List;
 import java.util.Set;
 
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
+
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import io.choerodon.message.api.vo.OrganizationProjectVO;
 import io.choerodon.message.api.vo.ProjectVO;
-import io.choerodon.message.api.vo.TenantVO;
 import io.choerodon.message.api.vo.UserVO;
 
 /**
@@ -32,10 +34,10 @@ public interface IamFeignClient {
     ResponseEntity<Long[]> getUserIds();
 
     @PostMapping("/v1/organizations/ids")
-    ResponseEntity<List<TenantVO>> listOrganizationsByIds(@RequestBody Set<Long> ids);
+    ResponseEntity<List<TenantDTO>> listOrganizationsByIds(@RequestBody Set<Long> ids);
 
     @PostMapping("/v1/projects/ids")
-    ResponseEntity<List<ProjectVO>> listProjectsByIds(@RequestBody Set<Long> ids);
+    ResponseEntity<List<ProjectDTO>> listProjectsByIds(@RequestBody Set<Long> ids);
 
     @PostMapping("/v1/users/emails")
     ResponseEntity<List<UserVO>> listUsersByEmails(@RequestBody String[] emails);
@@ -45,4 +47,11 @@ public interface IamFeignClient {
 
     @GetMapping("/v1/projects/list/by_name")
     ResponseEntity<List<Long>> getProListByName(@RequestParam("name") String name);
+
+    @GetMapping("/v1/projects/{project_id}")
+    ResponseEntity<ProjectDTO> queryProjectById(@PathVariable("project_id") Long projectId);
+
+    @GetMapping("/v1/organizations/{organizationId}")
+    ResponseEntity<TenantDTO> queryTenantById(@PathVariable("organizationId") Long organizationId);
+
 }

@@ -12,5 +12,5 @@ import io.choerodon.mybatis.common.BaseMapper;
  */
 public interface MessageTemplateRelMapper extends BaseMapper<MessageTemplateRelDTO> {
 
-    MessageTemplateRelDTO selectByTemplateCode(@Param("templateCode") String templateCode);
+    MessageTemplateRelDTO selectByTemplateId(@Param("templateId") Long templateId);
 }

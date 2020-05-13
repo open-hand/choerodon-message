@@ -1,26 +1,9 @@
 package io.choerodon.message.app.service.impl;
 
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.MessageServiceVO;
-import io.choerodon.message.api.vo.MsgServiceTreeVO;
-import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
-import io.choerodon.message.api.vo.SendSettingVO;
-import io.choerodon.message.app.service.SendSettingC7nService;
-import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
-import io.choerodon.message.infra.dto.TemplateServerC7NDTO;
-import io.choerodon.message.infra.enums.LevelType;
-import io.choerodon.message.infra.enums.SendingTypeEnum;
-import io.choerodon.message.infra.feign.PlatformFeignClient;
-import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
-import io.choerodon.message.infra.mapper.MessageTemplateRelMapper;
-import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
-import io.choerodon.message.infra.utils.ConversionUtil;
-import io.choerodon.message.infra.validator.CommonValidator;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.core.base.BaseConstants;
@@ -31,12 +14,27 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.domain.repository.TemplateServerRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.*;
+import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
+import io.choerodon.message.infra.enums.LevelType;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
+import io.choerodon.message.infra.feign.PlatformFeignClient;
+import io.choerodon.message.infra.mapper.MessageTemplateRelMapper;
+import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.message.infra.validator.CommonValidator;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author scp
@@ -66,8 +64,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private TemplateServerRepository templateServerRepository;
     @Autowired
     private TemplateServerLineRepository templateServerLineRepository;
-    @Autowired
-    private HzeroTemplateServerMapper hzeroTemplateServerMapper;
 
 
     @Override
@@ -296,17 +292,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         }
     }
 
-    /**
-     * 注意TemplateServerC7NDTO中CategoryCode与SubCategoryCode字段
-     * CategoryCode         表示level关系
-     * SubCategoryCode      表示分类关系
-     *
-     * @param level
-     * @param allowConfig
-     * @return
-     */
     @Override
-    public List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, int allowConfig) {
+    public List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, boolean allowConfig) {
         if (level == null) {
             throw new CommonException("error.level.null");
         }
@@ -314,63 +301,64 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         CommonValidator.validatorLevel(level);
 
         // 查询 处于启用状态 允许配置 的对应层级的消息发送设置
-        List<TemplateServerC7NDTO> templateServerList = hzeroTemplateServerMapper.queryByCategoryCodeAndReceiveConfigFlag(level, allowConfig);
+        List<SendSettingDetailVO> list = sendSettingMapper.queryByLevelAndAllowConfig(level, allowConfig);
 
         // 返回给客户端的消息发送设置列表
         List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS = new ArrayList<>();
 
         // key: 资源层级     value: categoryCode集合
-        Map<String, Set<String>> levelAndCategoryCodeMap = new HashMap<>();
-        levelAndCategoryCodeMap.put(ResourceLevel.valueOf(level.toUpperCase()).value(), new HashSet<>());
+        Map<String, Set<String>> categoryMap = new HashMap<>();
+        categoryMap.put(ResourceLevel.valueOf(level.toUpperCase()).value(), new HashSet<>());
 
         // for循环里过滤掉不是level层级的categoryCode
-        for (TemplateServerC7NDTO templateServerC7NDTO : templateServerList) {
-            Set<String> categoryCodes = levelAndCategoryCodeMap.get(templateServerC7NDTO.getCategoryCode());
+        for (SendSettingDetailVO sendSettingDTO : list) {
+            Set<String> categoryCodes = categoryMap.get(sendSettingDTO.getLevel());
             if (categoryCodes != null) {
-                categoryCodes.add(templateServerC7NDTO.getSubcategoryCode());
+                categoryCodes.add(sendSettingDTO.getCategoryCode());
             }
         }
-        getSecondSendSettingDetailTreeVOS(levelAndCategoryCodeMap, sendSettingDetailTreeDTOS, templateServerList);
+        getSecondSendSettingDetailTreeDTOS(categoryMap, sendSettingDetailTreeDTOS, list);
 
-        return sendSettingDetailTreeDTOS;
+        // 过滤emailId、PmId、smsId不存在，以及parentId等于0的记录
+        return sendSettingDetailTreeDTOS.stream().filter(s -> (s.getEmailTemplateId() != null || s.getPmTemplateId() != null || s.getSmsTemplateId() != null) || s.getParentId() == 0)
+                .collect(Collectors.toList());
     }
 
-    private void getSecondSendSettingDetailTreeVOS(Map<String, Set<String>> levelAndCategoryCodeMap,
-                                                   List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS,
-                                                   List<TemplateServerC7NDTO> templateServerC7NDTOList) {
+    private void getSecondSendSettingDetailTreeDTOS(Map<String, Set<String>> categoryMap, List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS, List<SendSettingDetailVO> sendSettingDetailVOS) {
         int i = 1;
         // 将不同层级的categoryCode取出
-        for (String level : levelAndCategoryCodeMap.keySet()) {
-            Map<String, String> categoryMeanings = getMeanings();
-            for (String subCategoryCode : levelAndCategoryCodeMap.get(level)) {
+        for (String level : categoryMap.keySet()) {
+            for (String categoryCode : categoryMap.get(level)) {
 
-                // 表示第一层的SendSettingDetailTreeVO，parentId就是0
+                // 表示第一层的SendSettingDetailTreeDTO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
                 sendSettingDetailTreeDTO.setParentId(0L);
-                sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
-                sendSettingDetailTreeDTO.setSequenceId((long) i);
-                sendSettingDetailTreeDTO.setCode(subCategoryCode);
 
+                SendSettingCategoryDTO categoryDTO = new SendSettingCategoryDTO();
+                categoryDTO.setCode(categoryCode);
+                categoryDTO = sendSettingCategoryMapper.selectOne(categoryDTO);
+                sendSettingDetailTreeDTO.setName(categoryDTO.getName());
+                sendSettingDetailTreeDTO.setSequenceId((long) i);
+                sendSettingDetailTreeDTO.setCode(categoryDTO.getCode());
+
+                //防止被过滤掉
+                sendSettingDetailTreeDTO.setEmailTemplateId(0L);
                 sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO);
                 int secondParentId = i;
                 i = i + 1;
 
-                i = getThirdSendSettingDetailTreeVOS(templateServerC7NDTOList, level, subCategoryCode, secondParentId, sendSettingDetailTreeDTOS, i);
+                i = getThirdSendSettingDetailTreeDTOS(sendSettingDetailVOS, level, categoryCode, secondParentId, sendSettingDetailTreeDTOS, i);
+
             }
         }
     }
 
-    private int getThirdSendSettingDetailTreeVOS(List<TemplateServerC7NDTO> templateServerC7NDTOList,
-                                                 String level,
-                                                 String categoryCode,
-                                                 Integer secondParentId,
-                                                 List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS, Integer i) {
-        for (TemplateServerC7NDTO templateServerC7NDTO : templateServerC7NDTOList) {
+    private int getThirdSendSettingDetailTreeDTOS(List<SendSettingDetailVO> sendSettingDetailVOS, String level, String categoryCode, Integer secondParentId, List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS, Integer i) {
+        for (SendSettingDetailVO sendSettingDetailVO : sendSettingDetailVOS) {
             // 取出指定层级、指定类别的消息发送设置，比如project层级的pro-management类别的所有消息发送设置
-            // 与hzero融合后，层级字段是 CategoryCode，分类字段是 SubCategoryCode
-            if (templateServerC7NDTO.getCategoryCode().equals(level) && templateServerC7NDTO.getSubcategoryCode().equals(categoryCode)) {
+            if (sendSettingDetailVO.getLevel().equals(level) && sendSettingDetailVO.getCategoryCode().equals(categoryCode)) {
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                TemplateServerC7NDTOConvertToSendSettingDetailTreeVO(templateServerC7NDTO, sendSettingDetailTreeDTO, level);
+                BeanUtils.copyProperties(sendSettingDetailVO, sendSettingDetailTreeDTO);
                 sendSettingDetailTreeDTO.setParentId((long) secondParentId);
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTOS.add(sendSettingDetailTreeDTO);
@@ -389,16 +377,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             throw new CommonException(LOV_ERROR_INFO);
         }
         return meanings.getBody();
-    }
-
-    private void TemplateServerC7NDTOConvertToSendSettingDetailTreeVO(TemplateServerC7NDTO templateServerC7NDTO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
-        sendSettingDetailTreeVO.setId(templateServerC7NDTO.getTempServerId());
-        sendSettingDetailTreeVO.setLevel(level);
-        sendSettingDetailTreeVO.setName(templateServerC7NDTO.getMessageName());
-        sendSettingDetailTreeVO.setCategoryCode(templateServerC7NDTO.getSubcategoryCode());
-        sendSettingDetailTreeVO.setCode(templateServerC7NDTO.getMessageCode());
-        sendSettingDetailTreeVO.setEmailEnabledFlag(templateServerC7NDTO.getEmailEnabledFlag());
-        sendSettingDetailTreeVO.setPmEnabledFlag(templateServerC7NDTO.getPmEnabledFlag());
     }
 
 }

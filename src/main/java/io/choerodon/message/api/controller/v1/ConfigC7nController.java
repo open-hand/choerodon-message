@@ -23,7 +23,7 @@ import io.choerodon.swagger.annotation.Permission;
 ;
 
 @RestController
-@RequestMapping("v1/notices/configs")
+@RequestMapping("/choerodon/v1/notices/configs")
 @Api("邮箱，短信，站内信配置接口")
 public class ConfigC7nController {
     @Autowired
