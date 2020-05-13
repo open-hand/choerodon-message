@@ -156,4 +156,33 @@
             nms.NOTIFY_TYPE = #{type}
             AND nms.ENV_ID = #{envId}
     </delete>
+
+    <select id="selectByParams" resultType="io.choerodon.message.infra.dto.MessageSettingDTO">
+        SELECT
+            nms.ID,
+            nms.`CODE`,
+            nms.EVENT_NAME
+        FROM
+            notify_message_setting nms
+        WHERE
+            nms. CODE = #{messageCode}
+            AND nms.PROJECT_ID = #{projectId}
+            <if test="envId!=null">
+                AND nms.ENV_ID = #{envId}
+            </if>
+            <if test="eventName!=null">
+                AND nms.EVENT_NAME = #{eventName}
+            </if>
+        <choose>
+            <when test="type != null and type ='EMAIL'">
+                AND nms.EMAIL_ENABLE = TRUE
+            </when>
+            <when test="type != null and type ='SMS'">
+                AND nms.EMAIL_ENABLE = TRUE
+            </when>
+            <when test="type != null and type ='WEB'">
+                AND nms.PM_ENABLE = TRUE
+            </when>
+        </choose>
+    </select>
 </mapper>
