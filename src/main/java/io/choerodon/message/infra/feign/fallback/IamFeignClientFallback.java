@@ -9,6 +9,7 @@ import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.IamFeignClient;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
  * @author wanghao
  * @Date 2019/12/11 19:04
  */
+@Component
 public class IamFeignClientFallback implements IamFeignClient {
     @Override
     public ResponseEntity<List<UserVO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
@@ -66,4 +68,8 @@ public class IamFeignClientFallback implements IamFeignClient {
         throw new CommonException("error.tenant.get");
     }
 
+    @Override
+    public ResponseEntity<List<ProjectDTO>> listProjectsByTenantId(Long tenantId) {
+        throw new CommonException("error.projects.list");
+    }
 }

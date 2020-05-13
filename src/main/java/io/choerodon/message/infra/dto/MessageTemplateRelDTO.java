@@ -1,5 +1,6 @@
 package io.choerodon.message.infra.dto;
 
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -14,6 +15,7 @@ import io.choerodon.mybatis.domain.AuditDomain;
  */
 @Table(name = "message_template_rel")
 public class MessageTemplateRelDTO extends AuditDomain {
+    @Id
     private Long id;
 
     @ApiModelProperty(value = "消息code")

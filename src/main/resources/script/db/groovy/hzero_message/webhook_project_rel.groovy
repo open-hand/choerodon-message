@@ -10,6 +10,12 @@ databaseChangeLog(logicalFilePath: 'script/db/webhook_project_rel.groovy') {
             column(name: 'PROJECT_ID', type: 'BIGINT UNSIGNED', remarks: '项目id') {
                 constraints(nullable: false)
             }
+            column(name: 'TENANT_ID', type: 'BIGINT UNSIGNED', remarks: '组织id') {
+                constraints(nullable: false)
+            }
+            column(name: 'SERVER_CODE', type: 'VARCHAR(64)', remarks: '服务编码') {
+                constraints(nullable: false)
+            }
 
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")
             column(name: "CREATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")

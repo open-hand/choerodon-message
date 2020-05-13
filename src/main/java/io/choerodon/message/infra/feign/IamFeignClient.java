@@ -54,4 +54,6 @@ public interface IamFeignClient {
     @GetMapping("/v1/organizations/{organizationId}")
     ResponseEntity<TenantDTO> queryTenantById(@PathVariable("organizationId") Long organizationId);
 
+    @GetMapping("/v1/projects/{tenant_id}")
+    ResponseEntity<List<ProjectDTO>> listProjectsByTenantId(@PathVariable("tenant_id") Long tenantId);
 }

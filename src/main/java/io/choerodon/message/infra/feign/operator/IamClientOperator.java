@@ -1,5 +1,7 @@
 package io.choerodon.message.infra.feign.operator;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +39,13 @@ public class IamClientOperator {
             throw new CommonException("error.tenant.query.by.id", tenantId);
         }
         return projectDTOResponseEntity.getBody();
+    }
+
+    public List<ProjectDTO> listProjectsByTenantId(Long tenantId) {
+        ResponseEntity<List<ProjectDTO>> projects = iamFeignClient.listProjectsByTenantId(tenantId);
+        if (!projects.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.tenant.query.by.id", tenantId);
+        }
+        return projects.getBody();
     }
 }
