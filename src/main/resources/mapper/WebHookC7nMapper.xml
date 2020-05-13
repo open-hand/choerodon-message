@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.WebHookC7nMapper">
+
+    <resultMap id="WebHookVO" type="io.choerodon.message.api.vo.WebHookVO" autoMapping="true">
+        <id column="server_id" property="serverId"/>
+        <result column="webhook_address" property="webhookAddress"/>
+        <result column="server_type" property="serverType"/>
+        <result column="enabled_flag" property="enabledFlag"/>
+        <collection property="templateServers" ofType="org.hzero.message.domain.entity.TemplateServer">
+            <id property="temp_server_id" column="tempServerId"/>
+            <result property="message_code" column="messageCode"/>
+            <result property="message_name" column="messageName"/>
+        </collection>
+    </resultMap>
+
+    <select id="pagingWebHook" resultMap="WebHookVO">
+        SELECT
+        hws.server_id,
+        hws.webhook_address,
+        hws.server_type,
+        hws.enabled_flag,
+        hts.message_code,
+        hts.message_name,
+        hts.temp_server_id
+        FROM
+        hmsg_webhook_server hws
+        INNER JOIN hmsg_template_server_line htsl on htsl.server_id=hws.server_id
+        INNER JOIN hmsg_template_server hts on hts.temp_server_id=htsl.temp_server_id
+        <if test="projectId!=null">
+            INNER JOIN webhook_project_rel wpr on wpr.project_id=#{projectId} and wpr.webhook_id=hws.server_id
+        </if>
+        where
+        hws.tenant_id=#{tenantId}
+        <if test="messageName != null">
+            AND hts.message_name LIKE concat(concat('%',#{messageName}),'%')
+        </if>
+        <if test="type != null">
+            AND hws.type=#{type}
+        </if>
+        <if test="enableFlag != null">
+            AND hws.enabled_flag='enableFlag'
+        </if>
+        <if test="params != null">
+            AND (hws.webhook_address like concat(concat('%',#{params}),'%') or hts.message_name like concat(concat('%',#{params}),'%'))
+        </if>
+    </select>
+
+    <delete id="deleteWebHook">
+        DELETE hws.*, hwsl.*, htsl.*
+        FROM
+            hmsg_webhook_server hws
+            JOIN hmsg_webhook_server_tl hwsl ON hwsl.server_id = hws.server_id
+            JOIN hmsg_template_server_line htsl ON htsl.server_code = hws.server_code
+            LEFT JOIN  webhook_project_rel wpr on wpr.webhook_id=hws.server_id
+        WHERE hws.server_id=#{webhookId}
+    </delete>
+
+    <select id="queryById" resultMap="WebHookVO">
+        SELECT
+            hws.server_id,
+            hws.webhook_address,
+            hws.server_type,
+            hws.enabled_flag,
+            hts.message_code,
+            hts.message_name,
+            hts.temp_server_id
+        FROM
+            hmsg_webhook_server hws
+            INNER JOIN hmsg_template_server_line htsl on htsl.server_id=hws.server_id
+            INNER JOIN hmsg_template_server hts on hts.temp_server_id=htsl.temp_server_id
+        where
+            hws.server_id=#{webHookId}
+    </select>
+
+</mapper>

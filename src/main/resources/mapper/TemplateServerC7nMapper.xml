@@ -23,7 +23,7 @@
             AND message_code = #{categoryCode}
         </if>
         <if test="messageName != null">
-            AND message_name LIKE concat(concat('%',#{introduce}),'%')
+            AND message_name LIKE concat(concat('%',#{messageName}),'%')
         </if>
         <if test="messageType != null">
             AND subcategory_code LIKE concat(concat('%',#{messageType}),'%')
