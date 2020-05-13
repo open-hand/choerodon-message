@@ -1,10 +1,10 @@
 package io.choerodon.message.app.service;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.message.api.vo.MessageServiceVO;
 import io.choerodon.message.api.vo.MsgServiceTreeVO;
-import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
 import io.choerodon.message.api.vo.SendSettingVO;
+import io.choerodon.message.api.vo.MessageServiceVO;
+import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import java.util.List;
@@ -59,11 +59,10 @@ public interface SendSettingC7nService {
 
     /**
      * 校验资源删除验证通知是否启用
-     *
      * @return
      */
     Boolean checkResourceDeleteEnabled();
 
 
-    List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, int allowConfig);
+    List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, boolean allowConfig);
 }

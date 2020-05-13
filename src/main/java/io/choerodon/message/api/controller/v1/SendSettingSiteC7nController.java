@@ -25,7 +25,7 @@ import io.choerodon.swagger.annotation.Permission;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/notices/send_settings")
+@RequestMapping("/choerodonv1/notices/send_settings")
 @Api("全局层发送设置接口")
 public class SendSettingSiteC7nController {
 
