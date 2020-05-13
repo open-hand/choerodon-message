@@ -36,6 +36,6 @@ public class WebhookRecordC7nServiceImpl implements WebhookRecordC7nService {
 
     @Override
     public WebhookRecordVO queryById(Long sourceId, Long recordId, String sourceLevel) {
-        return webhookRecordC7nMapper.selectById(sourceId, sourceLevel, recordId);
+        return webhookRecordC7nMapper.selectById(recordId);
     }
 }
