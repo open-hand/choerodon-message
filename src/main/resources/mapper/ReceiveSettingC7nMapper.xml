@@ -13,4 +13,26 @@
         </if>
     </delete>
 
+    <select id="selectByTemplateServerId" resultType="java.lang.Long">
+        SELECT
+            nrs.USER_ID
+        FROM
+            notify_receive_setting nrs
+        WHERE
+         nrs.SEND_SETTING_ID=#{tempServerId}
+           AND nrs.USER_ID IN
+        <foreach item="user" index="index" collection="userIds" open="(" separator="," close=")">
+            #{user}
+        </foreach>
+        <choose>
+            <when test="projectId != null">
+                AND nrs.SOURCE_ID = 1  AND nrs.SOURCE_TYPE = 'project'
+            </when>
+            <otherwise>
+                AND nrs.SOURCE_TYPE = 'site'
+            </otherwise>
+        </choose>
+            AND nrs.SENDING_TYPE = #{type}
+    </select>
+
 </mapper>

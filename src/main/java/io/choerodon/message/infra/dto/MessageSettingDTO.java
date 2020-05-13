@@ -23,6 +23,13 @@ import io.choerodon.mybatis.domain.AuditDomain;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MessageSettingDTO extends AuditDomain {
 
+    public MessageSettingDTO(Long projectId, String code, Long envId, String eventName) {
+        this.projectId = projectId;
+        this.code = code;
+        this.envId = envId;
+        this.eventName = eventName;
+    }
+
     public static final String FIELD_PROJECT_ID = "projectId";
     public static final String FIELD_CODE = "code";
 
