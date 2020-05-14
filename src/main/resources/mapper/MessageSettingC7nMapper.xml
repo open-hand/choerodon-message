@@ -3,7 +3,7 @@
 <mapper namespace="io.choerodon.message.infra.mapper.MessageSettingC7nMapper">
     <select id="queryByCodeWithoutProjectId" resultType="io.choerodon.message.infra.dto.MessageSettingDTO">
         SELECT
-            nms.*
+        nms.*
         FROM notify_message_setting nms
         WHERE nms.`CODE`=#{code} and nms.PROJECT_ID = 0
     </select>
@@ -16,12 +16,12 @@
     </select>
     <select id="listDefaultAndEnabledSettingByNotifyType" resultMap="customMessageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID, nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nss.ID AS NSS_ID, nss.NAME, nss.EMAIL_ENABLED_FLAG, nss.PM_ENABLED_FLAG, nss.SMS_ENABLED_FLAG,
-            nt.ID NT_ID, nt.SENDING_TYPE,
-            nssc.ID AS GROUP_ID,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID, nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nss.ID AS NSS_ID, nss.NAME, nss.EMAIL_ENABLED_FLAG, nss.PM_ENABLED_FLAG, nss.SMS_ENABLED_FLAG,
+        nt.ID NT_ID, nt.SENDING_TYPE,
+        nssc.ID AS GROUP_ID,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
@@ -31,11 +31,11 @@
     </select>
     <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nss.NAME,
-            nssc.ID AS GROUP_ID,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nss.NAME,
+        nssc.ID AS GROUP_ID,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
@@ -45,60 +45,61 @@
     <select id="listMessageSettingByProjectIdAndEnvId"
             resultMap="customMessageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nss.NAME,
-            nssc.ID AS GROUP_ID,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nss.NAME,
+        nssc.ID AS GROUP_ID,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
         LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId} AND nss.IS_ENABLED = TRUE
+        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId} AND
+        nss.IS_ENABLED = TRUE
     </select>
     <select id="getSettingByTypeAndCode" resultMap="messageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.CODE = #{code}
     </select>
     <select id="getResourceDeleteSettingByOption" resultMap="messageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
-            nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId}
-            AND nms.CODE = #{code} AND nms.ENV_ID = #{envId} AND nms.EVENT_NAME = #{eventName}
+        nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId}
+        AND nms.CODE = #{code} AND nms.ENV_ID = #{envId} AND nms.EVENT_NAME = #{eventName}
     </select>
     <select id="getDefaultResourceDeleteSetting" resultMap="messageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
-            nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
-            AND nms.CODE = #{code} AND nms.ENV_ID = 0 AND nms.EVENT_NAME = #{eventName}
+        nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
+        AND nms.CODE = #{code} AND nms.ENV_ID = 0 AND nms.EVENT_NAME = #{eventName}
     </select>
     <select id="getDefaultSettingByCode" resultMap="messageSettingMap">
         SELECT
-            nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-            nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-            nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
+        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
-            nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
-            AND nms.CODE = #{code} AND nms.ENV_ID = 0
+        nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0
+        AND nms.CODE = #{code} AND nms.ENV_ID = 0
     </select>
-    <resultMap id="messageSettingMap" type="io.choerodon.message.api.vo.MessageSettingVO" >
+    <resultMap id="messageSettingMap" type="io.choerodon.message.api.vo.MessageSettingVO">
         <id property="id" column="ID"/>
         <result property="projectId" column="PROJECT_ID"/>
         <result property="envId" column="ENV_ID"/>
@@ -146,13 +147,13 @@
 
     <delete id="deleteByTypeAndEnvId">
         DELETE nms,
-            nmstu
+        nmstu
         FROM
-            notify_message_setting nms
-            JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.id
+        notify_message_setting nms
+        JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.id
         WHERE
-            nms.NOTIFY_TYPE = #{type}
-            AND nms.ENV_ID = #{envId}
+        nms.NOTIFY_TYPE = #{type}
+        AND nms.ENV_ID = #{envId}
     </delete>
 
     <select id="selectByParams" resultType="io.choerodon.message.infra.dto.MessageSettingDTO">

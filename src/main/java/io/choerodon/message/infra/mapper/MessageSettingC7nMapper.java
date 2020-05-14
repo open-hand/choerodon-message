@@ -13,11 +13,7 @@ import io.choerodon.mybatis.common.BaseMapper;
 
 public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
 
-    List<MessageSettingCategoryVO> listMessageSettingByCondition(@Param("projectId") Long projectId, @Param("messageSettingDTO") MessageSettingDTO messageSettingDTO);
-
     MessageSettingDTO queryByCodeWithoutProjectId(@Param("code") String code);
-
-    List<MessageSettingDTO> queryByCodeOrProjectId(@Param("messageSettingDTO") MessageSettingDTO messageSettingDTO);
 
     /**
      * 根据通知设置类型，查询通知设置分组信息
