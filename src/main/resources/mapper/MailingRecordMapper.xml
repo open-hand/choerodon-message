@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.MailingRecordMapper">
+
+    <select id="selectByDate" resultType="io.choerodon.message.infra.dto.MailingRecordDTO">
+        SELECT *
+        FROM notify_mailing_record nmr
+        <where>
+            <if test="startTime">
+                nmr.CREATION_DATE >= CONCAT('','${startTime}',' 00:00:00')
+            </if>
+            <if test="endTime">
+                AND nmr.CREATION_DATE <![CDATA[<=]]> CONCAT('','${endTime}',' 23:59:59')
+            </if>
+        </where>
+    </select>
+
+</mapper>

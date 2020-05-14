@@ -1,20 +1,17 @@
 package io.choerodon.message.infra.feign;
 
-import java.util.List;
-import java.util.Set;
-
+import io.choerodon.message.api.vo.OrganizationProjectVO;
+import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
-
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import io.choerodon.message.api.vo.OrganizationProjectVO;
-import io.choerodon.message.api.vo.ProjectVO;
-import io.choerodon.message.api.vo.UserVO;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 〈功能简述〉
@@ -26,32 +23,32 @@ import io.choerodon.message.api.vo.UserVO;
 @FeignClient(value = HZeroService.Iam.NAME, fallback = IamFeignClientFallback.class)
 public interface IamFeignClient {
 
-    @PostMapping(value = "/v1/users/ids")
+    @PostMapping(value = "/choerodon/v1/users/ids")
     ResponseEntity<List<UserVO>> listUsersByIds(@RequestBody Long[] ids, @RequestParam(value = "only_enabled") Boolean onlyEnabled);
 
 
-    @GetMapping("/v1/users/ids")
+    @GetMapping("/choerodon/v1/users/ids")
     ResponseEntity<Long[]> getUserIds();
 
-    @PostMapping("/v1/organizations/ids")
+    @PostMapping("/choerodon/v1/organizations/ids")
     ResponseEntity<List<TenantDTO>> listOrganizationsByIds(@RequestBody Set<Long> ids);
 
-    @PostMapping("/v1/projects/ids")
+    @PostMapping("/choerodon/v1/projects/ids")
     ResponseEntity<List<ProjectDTO>> listProjectsByIds(@RequestBody Set<Long> ids);
 
-    @PostMapping("/v1/users/emails")
+    @PostMapping("/choerodon/v1/users/emails")
     ResponseEntity<List<UserVO>> listUsersByEmails(@RequestBody String[] emails);
 
-    @GetMapping("/v1/users/{id}/organization_project")
+    @GetMapping("/choerodon/v1/users/{id}/organization_project")
     ResponseEntity<OrganizationProjectVO> queryByUserIdOrganizationProject(@PathVariable("id") Long id);
 
-    @GetMapping("/v1/projects/list/by_name")
+    @GetMapping("/choerodon/v1/projects/list/by_name")
     ResponseEntity<List<Long>> getProListByName(@RequestParam("name") String name);
 
-    @GetMapping("/v1/projects/{project_id}")
+    @GetMapping("/choerodon/v1/projects/{project_id}")
     ResponseEntity<ProjectDTO> queryProjectById(@PathVariable("project_id") Long projectId);
 
-    @GetMapping("/v1/organizations/{organizationId}")
+    @GetMapping("/choerodon/v1/organizations/{organizationId}")
     ResponseEntity<TenantDTO> queryTenantById(@PathVariable("organizationId") Long organizationId);
 
     @GetMapping("/v1/projects/{tenant_id}")

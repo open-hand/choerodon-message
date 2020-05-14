@@ -20,7 +20,7 @@ import java.util.List;
  */
 @FeignClient(value = "devops-service", fallback = DevopsFeignClientFallback.class)
 public interface DevopsFeignClient {
-    @GetMapping(value = "/v1/projects/{project_id}/envs/list_by_active")
+    @GetMapping(value = "/choerodon/v1/projects/{project_id}/envs/list_by_active")
     ResponseEntity<List<NotifyEventGroupVO>> listByActive(
             @PathVariable(value = "project_id") Long projectId,
             @RequestParam(value = "active") Boolean active);
