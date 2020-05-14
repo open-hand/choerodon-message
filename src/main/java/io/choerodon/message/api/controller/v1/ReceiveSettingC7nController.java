@@ -17,7 +17,7 @@ import io.choerodon.swagger.annotation.Permission;
  * @author dengyouquan
  **/
 @RestController
-@RequestMapping("/choerdonv1/notices/receive_setting")
+@RequestMapping("/choerdon/v1/notices/receive_setting")
 @Api("个人配置是否接收通知接口")
 public class ReceiveSettingC7nController {
     private ReceiveSettingC7nService receiveSettingService;
