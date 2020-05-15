@@ -69,7 +69,7 @@ env:
     CHOERODON_GATEWAY_URL: http://api.example.com
 
     # 获取用户信息的接口
-    HZERO_WEBSOCKET_OAUTHURL: http://hzero-gateway/oauth/api/user
+    HZERO_WEBSOCKET_OAUTHURL: http://hzero-oauth/oauth/api/user
 
     # Redis 主机地址
     SPRING_REDIS_HOST: localhost
