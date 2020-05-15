@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.SystemAnnouncementMapper">
+
+    <resultMap id="systemAnnouncementVO" type="io.choerodon.message.api.vo.SystemAnnouncementVO">
+        <id column="notice_id" property="id"/>
+        <result column="is_sticky" property="sticky" jdbcType="BOOLEAN"/>
+        <result column="is_send_notices" property="sendNotices" jdbcType="BOOLEAN"/>
+    </resultMap>
+
+
+    <select id="fulltextSearch" resultMap="systemAnnouncementVO">
+        SELECT
+        hnp.notice_id AS id,
+        hnp.title AS title,
+        hnp.notice_body AS content,
+        hnp.published_date AS sendDate,
+        hnp.published_status_code AS status
+        FROM hmsg_notice_published hnp
+        <where>
+            <if test="title != null">
+                AND hnp.title LIKE concat(concat('%', #{title}), '%')
+            </if>
+            <if test="status != null">
+                AND hnp.published_status_code = #{status}
+            </if>
+            <if test="params != null">
+                AND (
+                title LIKE concat(concat('%',#{params}), '%') OR
+                hnp.notice_body LIKE concat(concat('%',#{params}), '%')
+                )
+            </if>
+        </where>
+        order by hnp.published_date desc
+    </select>
+
+    <select id="selectLastestSticky" resultMap="systemAnnouncementVO">
+        SELECT
+        *
+        FROM
+        notify_system_announcement
+        WHERE
+        IS_STICKY = 1
+        AND
+        #{currentTime} BETWEEN SEND_DATE AND END_DATE
+        ORDER BY ID DESC LIMIT 1
+    </select>
+</mapper>
