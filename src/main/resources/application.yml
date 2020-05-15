@@ -78,7 +78,8 @@ hzero:
     # 与当前服务的redis数据库一致
     redisDb: ${SPRING_REDIS_DATABASE:1}
     secretKey: hzero
-    oauthUrl: http://example/oauth/api/user
+    # 获取用户信息的接口
+    oauthUrl: http://hzero-gateway/oauth/api/user
   lov:
     sql:
       enabled: true
