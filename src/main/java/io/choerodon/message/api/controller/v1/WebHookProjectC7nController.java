@@ -2,8 +2,8 @@ package io.choerodon.message.api.controller.v1;
 
 import io.swagger.annotations.ApiOperation;
 import org.hzero.message.app.service.MessageService;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
