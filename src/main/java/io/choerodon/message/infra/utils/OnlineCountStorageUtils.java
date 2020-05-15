@@ -112,14 +112,14 @@ public class OnlineCountStorageUtils {
         redisTemplate.delete(NUMBER_OF_VISITORS_TODAY);
     }
 
-    public Map getCurrentCount() {
+    public Map<String, Integer> getCurrentCount() {
         Map<String, Integer> map = new HashMap<>();
         map.put(ONLINE_COUNT, getOnlineCount());
         map.put(NUMBER_OF_VISITORS_TODAY, getNumberOfVisitorsToday());
         return map;
     }
 
-    public Map getCurrentCountPerHour() {
+    public Map<String, Integer> getCurrentCountPerHour() {
         Map<String, Integer> map = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
         SimpleDateFormat outDateFormat = new SimpleDateFormat("HH:mm");
