@@ -49,6 +49,19 @@ public class NotifyWebSocketHandler implements SocketHandler {
             // TODO 发送在线消息          有没有必要
 //            webSocketHelper.sendMessageByKey(ONLINE_INFO_KEY_PATH, new SendMessagePayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
         }
+
+        // TODO 发送未读站内信数量
+//        Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, key);
+//            String code = map.get("code");
+//            if (SITE_MSG_CODE.equals(code)) {
+//                String id = map.get("id");
+//                if (id != null) {
+//                    int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(userId));
+//                    if (unReadNum > 0) {
+//                        webSocketHelper.sendMessageBySession(session, new SendMessagePayload<>(MSG_TYPE_PM, key, unReadNum));
+//                    }
+//                }
+//            }
     }
 
     @Override
@@ -63,26 +76,15 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
+        // 这里应该是只会接收到心跳
         LOGGER.info("Notify Socket handler: received message: {}", message.getPayload());
+        // TODO 这个订阅的逻辑原先是为了配合io.choerodon.notify.api.controller.v1.NoticesSendController#postWebSocket方法的
 //        if (!StringUtils.isEmpty(key)) {
 //            webSocketHelper.subscribe(key, session);
 //            webSocketHelper.sendMessageBySession(session, new SendMessagePayload<>("contact", key, "ok"));
 //        }
-//        if (matcher.match(SIT_MSG_KEY_PATH, key)) {
-//            // TODO 这里应该是前端定时给后端发送消息以获取未读消息数的逻辑 (为什么不用后端主动推送？)
-//            Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, key);
-//            String code = map.get("code");
-//            if (SITE_MSG_CODE.equals(code)) {
-//                String id = map.get("id");
-//                if (id != null) {
-//                    int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(id));
-//                    if (unReadNum > 0) {
-//                        webSocketHelper.sendMessageBySession(session, new SendMessagePayload<>(MSG_TYPE_PM, key, unReadNum));
-//                    }
-//                }
-//            }
-//        } else if (matcher.match(ONLINE_INFO_KEY_PATH, key)) {
-            // TODO 这个逻辑前端暂时没找到用处，可以考虑删除
+//        if (matcher.match(ONLINE_INFO_KEY_PATH, key)) {
+        // TODO 这个逻辑前端暂时没找到用处，可以考虑删除
 //            webSocketHelper.sendMessageBySession(session, new SendMessagePayload<>(ONLINE_INFO_CODE, ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
 //        }
     }
