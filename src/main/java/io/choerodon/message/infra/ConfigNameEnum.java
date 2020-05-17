@@ -8,10 +8,8 @@ import java.util.HashMap;
  * @description
  */
 public enum ConfigNameEnum {
-    EMAIL_NAME("choerodon-email"),
-    SMS_NAME("choerodon-sms"),
-    WEBHOOK_JSON_NAME("choerodon-webhook-json"),
-    WEBHOOK_NAME("choerodon-webhook");
+    EMAIL_NAME("CHOERODON-EMAIL"),
+    SMS_NAME("CHOERODON-SMS");
 
 
     private String value;

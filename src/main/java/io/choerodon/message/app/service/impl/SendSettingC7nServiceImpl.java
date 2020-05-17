@@ -9,17 +9,17 @@ import io.choerodon.message.api.vo.MsgServiceTreeVO;
 import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
-import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
+import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.PlatformFeignClient;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
-import io.choerodon.message.infra.mapper.MessageTemplateRelMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.core.base.BaseConstants;
@@ -51,8 +51,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Autowired
     private TemplateServerService templateServerService;
-    @Autowired
-    private MessageTemplateRelMapper messageTemplateRelMapper;
     @Autowired
     private MessageTemplateService messageTemplateService;
     @Autowired
@@ -138,10 +136,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             );
             sendSettingVO.setMessageTemplates(messageTemplates);
         }
-        List<MessageTemplateRelDTO> templateRelDTOS = messageTemplateRelMapper.select(new MessageTemplateRelDTO(sendSettingVO.getMessageCode()));
-        if (!CollectionUtils.isEmpty(templateRelDTOS)) {
-            templateRelDTOS.forEach(t -> setSendTypeEnable(t, sendSettingVO));
-        }
         return sendSettingVO;
     }
 
@@ -175,13 +169,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (!CollectionUtils.isEmpty(lineList)) {
             lineList.forEach(t -> setEnabledFlag(t, sendSettingVO));
             templateServerLineRepository.batchUpdateByPrimaryKey(lineList);
-        }
-        List<MessageTemplateRelDTO> templateRelDTOS = messageTemplateRelMapper.select(new MessageTemplateRelDTO(templateServer.getMessageCode()));
-        if (!CollectionUtils.isEmpty(templateRelDTOS)) {
-            templateRelDTOS.forEach(t -> {
-                setEnabledFlag(t, sendSettingVO);
-                messageTemplateRelMapper.updateByPrimaryKey(t);
-            });
         }
         return sendSettingVO;
     }
@@ -251,6 +238,13 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 break;
             case WEB:
                 sendSettingVO.setPmEnabledFlag(templateServerLine.getEnabledFlag());
+            case WH:
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
+                    sendSettingVO.setWebhookJsonEnabledFlag(templateServerLine.getEnabledFlag());
+                }
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.WECHAT.getValue())) {
+                    sendSettingVO.setWebhookEnabledFlag(templateServerLine.getEnabledFlag());
+                }
                 break;
             default:
         }
@@ -267,29 +261,13 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             case WEB:
                 templateServerLine.setEnabledFlag(sendSettingVO.getPmEnabledFlag());
                 break;
-            default:
-        }
-    }
-
-    private void setSendTypeEnable(MessageTemplateRelDTO messageTemplateRelDTO, SendSettingVO sendSettingVO) {
-        switch (SendingTypeEnum.valueOf(messageTemplateRelDTO.getSendType())) {
             case WH:
-                sendSettingVO.setWebhookEnabledFlag(messageTemplateRelDTO.getEnabledFlag());
-                break;
-            case WHJSON:
-                sendSettingVO.setWebhookJsonEnabledFlag(messageTemplateRelDTO.getEnabledFlag());
-                break;
-            default:
-        }
-    }
-
-    private void setEnabledFlag(MessageTemplateRelDTO messageTemplateRelDTO, SendSettingVO sendSettingVO) {
-        switch (SendingTypeEnum.valueOf(messageTemplateRelDTO.getSendType())) {
-            case WH:
-                messageTemplateRelDTO.setEnabledFlag(sendSettingVO.getWebhookEnabledFlag());
-                break;
-            case WHJSON:
-                messageTemplateRelDTO.setEnabledFlag(sendSettingVO.getWebhookJsonEnabledFlag());
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
+                    templateServerLine.setEnabledFlag(sendSettingVO.getWebhookJsonEnabledFlag());
+                }
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.WECHAT.getValue())) {
+                    templateServerLine.setEnabledFlag(sendSettingVO.getWebhookEnabledFlag());
+                }
                 break;
             default:
         }

@@ -4,6 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.EmailConfigVO;
 import io.choerodon.message.app.service.ConfigC7nService;
 import io.choerodon.message.infra.ConfigNameEnum;
+
 import org.hzero.message.app.service.EmailServerService;
 import org.hzero.message.app.service.SmsServerService;
 import org.hzero.message.domain.entity.EmailProperty;
@@ -13,12 +14,16 @@ import org.hzero.message.infra.supporter.EmailSupporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
 import javax.mail.MessagingException;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -41,17 +46,19 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     @Override
     public EmailConfigVO createOrUpdateEmail(EmailConfigVO emailConfigVO) {
         EmailServer emailServer = emailServerService.getEmailServer(0L, ConfigNameEnum.EMAIL_NAME.value());
-        if (emailConfigVO.getSsl() && emailServer.getEmailProperties() == null) {
+        // 只处理ssl配置
+        if (emailConfigVO.getSsl()) {
             emailServer.setEmailProperties(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
+        } else {
+            emailServer.setEmailProperties(null);
         }
 
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
         newEmailServer.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
         newEmailServer.setServerName(ConfigNameEnum.configNames.get(ConfigNameEnum.EMAIL_NAME.value()));
         newEmailServer.setTenantId(0L);
-        newEmailServer.setTryTimes(0);
         if (StringUtils.isEmpty(emailServer.getServerId())) {
-            emailServerService.createEmailServer(newEmailServer);
+            throw new CommonException("error.get.server.email");
         } else {
             emailServerService.updateEmailServer(newEmailServer);
         }
@@ -81,7 +88,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         smsServer.setServerCode(ConfigNameEnum.SMS_NAME.value());
         smsServer.setServerName(ConfigNameEnum.configNames.get(ConfigNameEnum.SMS_NAME.value()));
         if (StringUtils.isEmpty(oleSmsServer.getServerId())) {
-            smsServerService.createSmsServer(smsServer);
+            throw new CommonException("error.get.server.sms");
         } else {
             smsServerService.updateSmsServer(smsServer);
         }
@@ -133,11 +140,17 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     private EmailConfigVO setEmailConfigVO(EmailConfigVO emailConfigVO, EmailServer emailServer) {
         emailConfigVO.setHost(emailServer.getHost());
         emailConfigVO.setPort(Integer.parseInt(emailServer.getPort()));
-        emailConfigVO.setProtocol(emailServer.getProtocolMeaning());
+        emailConfigVO.setProtocol(emailServer.getProtocol());
         emailConfigVO.setSendName(emailServer.getUsername());
         emailConfigVO.setAccount(emailServer.getSender());
         emailConfigVO.setPassword(emailServer.getPasswordEncrypted());
-        emailConfigVO.setObjectVersionNumber(emailConfigVO.getObjectVersionNumber());
+        emailConfigVO.setObjectVersionNumber(emailServer.getObjectVersionNumber());
+        Map<String, String> map = emailServer.getEmailProperties().stream().collect(Collectors.toMap(EmailProperty::getPropertyCode, EmailProperty::getPropertyValue));
+        if (!CollectionUtils.isEmpty(map) && map.containsKey(SSL_PROPERTY_ENABLE) && Boolean.parseBoolean(map.get(SSL_PROPERTY_ENABLE))) {
+            emailConfigVO.setSsl(true);
+        } else {
+            emailConfigVO.setSsl(false);
+        }
         return emailConfigVO;
     }
 }

@@ -5,11 +5,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hzero.message.app.service.MessageService;
+import org.hzero.message.app.service.TemplateServerWhService;
 import org.hzero.message.app.service.WebhookServerService;
-import org.hzero.message.domain.entity.MessageTemplate;
-import org.hzero.message.domain.entity.TemplateServer;
-import org.hzero.message.domain.entity.TemplateServerLine;
-import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.entity.*;
+import org.hzero.message.domain.repository.TemplateServerWhRepository;
 import org.hzero.message.domain.repository.WebhookServerRepository;
 import org.hzero.message.infra.mapper.MessageTemplateMapper;
 import org.hzero.message.infra.mapper.TemplateServerLineMapper;
@@ -23,17 +22,14 @@ import org.springframework.util.ObjectUtils;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.OrganizationProjectVO;
 import io.choerodon.message.api.vo.WebHookVO;
 import io.choerodon.message.app.service.WebHookC7nService;
-import io.choerodon.message.infra.dto.MessageTemplateRelDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
-import io.choerodon.message.infra.mapper.MessageTemplateRelMapper;
+import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
 import io.choerodon.message.infra.mapper.WebHookC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
@@ -58,8 +54,6 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Autowired
     private WebhookServerService webhookServerService;
     @Autowired
-    private MessageTemplateRelMapper messageTemplateRelMapper;
-    @Autowired
     private MessageTemplateMapper messageTemplateMapper;
     @Autowired
     private TemplateServerLineMapper templateServerLineMapper;
@@ -69,6 +63,12 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     private WebhookProjectRelMapper webhookProjectRelMapper;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private TemplateServerLineC7nMapper templateServerLineC7nMapper;
+    @Autowired
+    private TemplateServerWhService templateServerWhService;
+    @Autowired
+    private TemplateServerWhRepository templateServerWhRepository;
 
 
     @Override
@@ -122,19 +122,23 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         webhookServer.setServerCode(String.format("%s-%s", serverCode, uuid));
         String serverName = nameStr.length() > NAME_MAX_LENGTH ? nameStr.substring(NAME_MAX_LENGTH) : nameStr;
         webhookServer.setServerName(String.format("%s-%s", serverName, uuid));
-        webhookServerService.createWebHook(tenantId, webhookServer);
+        webhookServer = webhookServerService.createWebHook(tenantId, webhookServer);
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
-        sendSettingIdList.forEach(aLong -> {
-            MessageTemplateRelDTO templateRelDTO = messageTemplateRelMapper.selectByTemplateId(aLong);
-            MessageTemplate messageTemplate = messageTemplateMapper.selectByPrimaryKey(templateRelDTO.getTemplateId());
-            TemplateServerLine serverLine = new TemplateServerLine();
-            serverLine.setServerCode(serverCode);
-            serverLine.setTempServerId(aLong);
-            serverLine.setTemplateCode(messageTemplate.getTemplateCode());
-            serverLine.setTypeCode(SendingTypeEnum.WH.getValue());
-            templateServerLineMapper.insert(serverLine);
-        });
+        for (Long aLong : sendSettingIdList) {
+            TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType());
+            if (!ObjectUtils.isEmpty(serverLine)) {
+                TemplateServerWh templateServerWh = new TemplateServerWh();
+                templateServerWh.setTenantId(0L);
+                templateServerWh.setServerCode(webhookServer.getServerCode());
+                templateServerWh.setServerName(webhookServer.getServerName());
+                templateServerWh.setServerType(webhookServer.getServerType());
+                templateServerWh.setTempServerId(serverLine.getTempServerId());
+                List<TemplateServerWh> templateServerWhList = new ArrayList<>();
+                templateServerWhList.add(templateServerWh);
+                templateServerWhService.batchCreateTemplateServerWh(serverLine.getTempServerLineId(), templateServerWhList);
+            }
+        }
 
         if (Objects.equals(sourceLevel, sourceLevel)) {
             WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO(webhookServer.getServerId(), sourceId);
@@ -161,9 +165,10 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             tenantId = projectDTO.getOrganizationId();
         }
-        webhookServerService.updateWebHook(tenantId, webhookServer);
-
-        List<Long> oldSendIds = templateServerLineMapper.select(new TemplateServerLine().setServerCode(webhookServer.getServerCode())).stream().map(TemplateServerLine::getTempServerId).collect(Collectors.toList());
+        webhookServer= webhookServerService.updateWebHook(tenantId, webhookServer);
+        TemplateServerWh queryDTO=new TemplateServerWh();
+        queryDTO.setServerCode(webhookServer.getServerCode());
+        List<Long> oldSendIds = templateServerWhRepository.select(queryDTO).stream().map(TemplateServerWh::getTempServerId).collect(Collectors.toList());
         List<Long> updateSendIds = new ArrayList<>();
         Set<Long> newSendIds = webHookVO.getSendSettingIdList();
         for (Long sendId : oldSendIds) {
@@ -174,33 +179,29 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         }
         oldSendIds.removeAll(updateSendIds);
         if (!CollectionUtils.isEmpty(oldSendIds)) {
-            oldSendIds.forEach(aLong -> {
-                TemplateServer templateServer = templateServerMapper.selectByPrimaryKey(aLong);
-                MessageTemplateRelDTO messageTemplateRelDTO = new MessageTemplateRelDTO().setMessageCode(templateServer.getMessageCode());
-                messageTemplateRelDTO.setSendType(webHookVO.getServerType());
-                MessageTemplateRelDTO templateRelDTO = messageTemplateRelMapper.selectOne(messageTemplateRelDTO);
-                MessageTemplate messageTemplate = messageTemplateMapper.selectByPrimaryKey(templateRelDTO.getTemplateId());
-                TemplateServerLine serverLine = new TemplateServerLine();
-                serverLine.setServerCode(webhookServer.getServerCode());
-                serverLine.setTempServerId(aLong);
-                serverLine.setTemplateCode(messageTemplate.getTemplateCode());
-                serverLine.setTypeCode(SendingTypeEnum.WH.getValue());
-                templateServerLineMapper.delete(serverLine);
-            });
+            for (Long aLong : oldSendIds) {
+                TemplateServerWh serverWh = new TemplateServerWh();
+                serverWh.setServerCode(webhookServer.getServerCode());
+                serverWh.setTempServerId(aLong);
+                serverWh.setServerType(webhookServer.getServerType());
+                templateServerWhRepository.delete(serverWh);
+            }
         }
 
         if (!CollectionUtils.isEmpty(newSendIds)) {
-            newSendIds.forEach(aLong -> {
-                TemplateServer templateServer = templateServerMapper.selectByPrimaryKey(aLong);
-                MessageTemplateRelDTO templateRelDTO = messageTemplateRelMapper.selectOne(new MessageTemplateRelDTO().setMessageCode(templateServer.getMessageCode()));
-                MessageTemplate messageTemplate = messageTemplateMapper.selectByPrimaryKey(templateRelDTO.getTemplateId());
-                TemplateServerLine serverLine = new TemplateServerLine();
-                serverLine.setServerCode(webhookServer.getServerCode());
-                serverLine.setTempServerId(aLong);
-                serverLine.setTemplateCode(messageTemplate.getTemplateCode());
-                serverLine.setTypeCode(SendingTypeEnum.WH.getValue());
-                templateServerLineMapper.insert(serverLine);
-            });
+            for (Long aLong : newSendIds) {
+                TemplateServerWh templateServerWh = new TemplateServerWh();
+                templateServerWh.setTenantId(0L);
+                templateServerWh.setServerCode(webhookServer.getServerCode());
+                templateServerWh.setServerName(webhookServer.getServerName());
+                templateServerWh.setServerType(webhookServer.getServerType());
+                templateServerWh.setTempServerId(aLong);
+                List<TemplateServerWh> templateServerWhList = new ArrayList<>();
+                templateServerWhList.add(templateServerWh);
+
+                TemplateServerLine templateServerLine=templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
+                templateServerWhService.batchCreateTemplateServerWh(templateServerLine.getTempServerLineId(), templateServerWhList);
+            }
         }
 
         return webHookVO;
