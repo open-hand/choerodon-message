@@ -27,6 +27,8 @@
         hmsg_webhook_server hws
         INNER JOIN hmsg_template_server_line htsl on htsl.server_id=hws.server_id
         INNER JOIN hmsg_template_server hts on hts.temp_server_id=htsl.temp_server_id
+        INNER JOIN hmsg_template_server_hw htsh on htsh.temp_server_id=htsl.temp_server_id and htsh..server_code=hws.server_code
+        and htsh.temp_server_line_id=htsl.temp_server_line_id
         <if test="projectId!=null">
             INNER JOIN webhook_project_rel wpr on wpr.project_id=#{projectId} and wpr.webhook_id=hws.server_id
         </if>
@@ -47,12 +49,13 @@
     </select>
 
     <delete id="deleteWebHook">
-        DELETE hws.*, hwsl.*, htsl.*
+        DELETE hws.*, hwsl.*, htsl.*,hwsh.*
         FROM
             hmsg_webhook_server hws
             JOIN hmsg_webhook_server_tl hwsl ON hwsl.server_id = hws.server_id
             JOIN hmsg_template_server_line htsl ON htsl.server_code = hws.server_code
             LEFT JOIN  webhook_project_rel wpr on wpr.webhook_id=hws.server_id
+            JOIN hmsg_template_server_hw hwsh on hwsh.server_code=hws.server_code
         WHERE hws.server_id=#{webhookId}
     </delete>
 
