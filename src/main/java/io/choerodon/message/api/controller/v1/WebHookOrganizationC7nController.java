@@ -45,7 +45,7 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook信息（分页接口）")
     @CustomPageRequest
-    public ResponseEntity<Page<WebHookVO>> pagingByMessage(@ApiIgnore
+    public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
                                                            @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
                                                            @PathVariable(name = "organization_id") Long sourceId,
                                                            @RequestParam(required = false) String messageName,
@@ -129,7 +129,7 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
-    public ResponseEntity<Page<WebhookRecordVO>> pagingByMessage(@ApiIgnore
+    public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
                                                                  @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                  @PathVariable(name = "organization_id") Long sourceId,
                                                                  @RequestParam(name = "webhook_id", required = false) Long webhookId,
