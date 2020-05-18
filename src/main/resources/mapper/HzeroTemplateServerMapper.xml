@@ -18,11 +18,11 @@
         htslpm.enabled_flag pmEnabledFlag
         FROM hmsg_template_server hts
         LEFT JOIN hmsg_template_server_line htslemail on hts.temp_server_id = htslemail.temp_server_id and
-        htslemail.type_code='email'
+        htslemail.type_code='EMAIL'
         LEFT JOIN hmsg_template_server_line htslsms on hts.temp_server_id = htslsms.temp_server_id and
-        htslsms.type_code='sms'
+        htslsms.type_code='SMS'
         LEFT JOIN hmsg_template_server_line htslpm on hts.temp_server_id = htslpm.temp_server_id and
-        htslsms.type_code='pm'
+        htslsms.type_code='PM'
         where hts.enabled_flag = 1
         <if test="level != null">
             AND hts.category_code = #{level}
