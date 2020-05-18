@@ -376,9 +376,15 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         sendSettingDetailTreeVO.setName(sendSettingVO.getMessageName());
         sendSettingDetailTreeVO.setCategoryCode(sendSettingVO.getSubcategoryCode());
         sendSettingDetailTreeVO.setCode(sendSettingVO.getMessageCode());
-        sendSettingDetailTreeVO.setEmailEnabledFlag(sendSettingVO.getEmailEnabledFlag() != null && (sendSettingVO.getEmailEnabledFlag().equals(1)));
-        sendSettingDetailTreeVO.setPmEnabledFlag(sendSettingVO.getPmEnabledFlag() != null && sendSettingVO.getPmEnabledFlag().equals(1));
-        sendSettingDetailTreeVO.setSmsEnabledFlag(sendSettingVO.getSmsEnabledFlag() != null && sendSettingVO.getSmsEnabledFlag().equals(1));
+        sendSettingDetailTreeVO.setEmailEnabledFlag(Optional.ofNullable(sendSettingVO.getEmailEnabledFlag())
+                .map(t -> t.equals(1))
+                .orElse(false));
+        sendSettingDetailTreeVO.setPmEnabledFlag(Optional.ofNullable(sendSettingVO.getPmEnabledFlag())
+                .map(t -> t.equals(1))
+                .orElse(false));
+        sendSettingDetailTreeVO.setSmsEnabledFlag(Optional.ofNullable(sendSettingVO.getSmsEnabledFlag())
+                .map(t -> t.equals(1))
+                .orElse(false));
     }
 
 }
