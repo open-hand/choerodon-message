@@ -93,7 +93,7 @@ hzero:
     enable: true
   resource:
     # 匹配的资源才会解析JwtToken便于得到UserDetails
-    pattern: ${HZERO_RESOURCE_PATTERN:/v1/*,/hzero/*,/hmsg/v1/*,/hmsg/hzero/*}
+    pattern: ${HZERO_RESOURCE_PATTERN:/v1/*,/hzero/*,/hmsg/v1/*,/hmsg/hzero/*,/choerodon/v1/*}
 
 logging:
   level:
