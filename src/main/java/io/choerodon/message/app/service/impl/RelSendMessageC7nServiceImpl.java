@@ -46,88 +46,52 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
-    private TemplateServerLineRepository templateServerLineRepository;
-    @Autowired
-    private MessageReceiverService messageReceiverService;
-    @Autowired
     private ReceiveSettingC7nMapper receiveSettingC7nMapper;
     @Autowired
     private MessageSettingC7nMapper messageSettingC7nMapper;
     @Autowired
-    private IamClientOperator iamClientOperator;
-    @Autowired
     private WebhookProjectRelMapper webhookProjectRelMapper;
 
-    @Autowired
-    private RedisHelper redisHelper;
 
-    @Override
-    public Map<String, Integer> relSendMessage(MessageSender messageSender) {
-        // 检查接收人列表
-        messageSender = messageReceiverService.queryReceiver(messageSender);
-        TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
-        Assert.notNull(templateServer, BaseConstants.ErrorCode.DATA_NOT_EXISTS);
-        Assert.isTrue(Objects.equals(templateServer.getEnabledFlag(), BaseConstants.Flag.YES), BaseConstants.ErrorCode.DATA_NOT_EXISTS);
-        // 未指定接收配置编码，使用发送配置编码作为接收编码
-        if (StringUtils.isEmpty(messageSender.getReceiveConfigCode())) {
-            messageSender.setReceiveConfigCode(templateServer.getMessageCode());
-        }
-        Map<String, List<TemplateServerLine>> serverLineMap = templateServerLineRepository.enabledTemplateServerLine(templateServer.getTempServerId(), templateServer.getTenantId())
-                .stream().collect(Collectors.groupingBy(TemplateServerLine::getTypeCode));
-        return sendMessage(serverLineMap, messageSender);
+    protected void filterWebReceiver(MessageSender sender) {
+        super.filterWebReceiver(sender);
+        filterReceiver(sender, HmsgConstant.MessageType.WEB);
     }
 
-    private Map<String, Integer> sendMessageC7n(Map<String, List<TemplateServerLine>> serverLineMap, MessageSender messageSender, Long tempServerId) {
-        Map<String, Integer> result = new HashMap<>(4);
-        List<Receiver> receiverList = messageSender.getReceiverAddressList();
+    protected void filterSmsReceiver(MessageSender sender) {
+        super.filterSmsReceiver(sender);
+        filterReceiver(sender, HmsgConstant.MessageType.SMS);
+    }
+
+    protected void filterEmailReceiver(MessageSender sender) {
+        super.filterEmailReceiver(sender);
+        filterReceiver(sender, HmsgConstant.MessageType.EMAIL);
+    }
+
+
+    protected void filterWebHookReceiver(MessageSender sender, Map<String, List<TemplateServerLine>> serverLineMap) {
+        super.filterWebHookReceiver(sender, serverLineMap);
+        webHookFilter(sender, serverLineMap);
+    }
+
+
+    private void filterReceiver(MessageSender messageSender, String messageType) {
+        Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
         Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
         Long envId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName());
         String eventName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
-        // 每种类型的模板只能指定一个
-        // 模板允许站内消息 且 (不指定发送方式且userId不为空 或 发送方式中指定了站内消息)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.WEB) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.WEB)) {
-            receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.WEB);
-            if (!CollectionUtils.isEmpty(receiverList) && projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.WEB)) {
-                sendWeb(serverLineMap, result, messageSender);
+        List<Receiver> receiverList = messageSender.getReceiverAddressList();
+        if (messageType.equals(HmsgConstant.MessageType.WEB) || messageType.equals(HmsgConstant.MessageType.EMAIL)) {
+            receiveFilter(receiverList, tempServerId, projectId, messageType);
+        }
+        // 如果项目层未启动 则不发送 接受者为null
+        if (messageType.equals(HmsgConstant.MessageType.WEB) ||
+                messageType.equals(HmsgConstant.MessageType.EMAIL) ||
+                messageType.equals(HmsgConstant.MessageType.SMS)) {
+            if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
+                receiverList.clear();
             }
         }
-        // 模板允许短信 且 (不指定发送方式且phone不为空 或 发送方式中指定了短信)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.SMS) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.SMS)) {
-            if (projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.SMS)) {
-                sendSms(serverLineMap, result, messageSender);
-            }
-        }
-        // 模板允许邮件 且 (不指定发送方式且email不为空 或 发送方式中指定了邮件)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.EMAIL) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.EMAIL)) {
-            receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.EMAIL);
-            if (!CollectionUtils.isEmpty(receiverList) && projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.EMAIL)) {
-                sendEmail(serverLineMap, result, messageSender);
-            }
-        }
-        // 模板允许语音 且 (不指定发送方式且phone不为空 或 发送方式中指定了与语音)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.CALL) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.CALL)) {
-            sendCall(serverLineMap, result, messageSender);
-        }
-        // 模板允许企业微信 且 (不指定发送方式且userId不为空 或 发送方式中指定了企业微信)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.WC_E) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.WC_E)) {
-            sendEnterpriseWeChat(serverLineMap, result, messageSender);
-        }
-        // 模板允许微信公众号 且 (不指定发送方式且userId不为空 或 发送方式中指定了微信公众号)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.WC_O) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.WC_O)) {
-            sendOfficialWeChat(serverLineMap, result, messageSender);
-        }
-        // 模板允许钉钉 且 (不指定发送方式且userId不为空 或 发送方式中指定了钉钉)
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.DT) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.DT)) {
-            sendDingTalk(serverLineMap, result, messageSender);
-        }
-        // 模板允许WebHook
-        if (serverLineMap.containsKey(HmsgConstant.MessageType.WEB_HOOK) && sendEnable(messageSender.getTypeCodeList(), HmsgConstant.MessageType.WEB_HOOK)) {
-            sendWebHook(serverLineMap, result, messageSender);
-        }
-        if (result.size() == 0) {
-            throw new CommonException(HmsgConstant.ErrorCode.MISSING_RECIPIENT);
-        }
-        return result;
     }
 
 
@@ -165,11 +129,11 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     /**
      * webhook过滤
      *
+     * @param messageSender
      * @param serverLineMap
-     * @param tenantId
-     * @param projectId
      */
-    private void webHookFilter(Map<String, List<TemplateServerLine>> serverLineMap, Long tenantId, Long projectId) {
+    private void webHookFilter(MessageSender messageSender, Map<String, List<TemplateServerLine>> serverLineMap) {
+        Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
         Map<String, List<TemplateServerLine>> newMap = new HashMap<>();
         if (!ObjectUtils.isEmpty(projectId)) {
             List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
@@ -178,7 +142,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 newMap.put(entry.getKey(), values);
             }
         } else {
-            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setTenantId(tenantId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setTenantId(messageSender.getTenantId())).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
             for (Map.Entry<String, List<TemplateServerLine>> entry : serverLineMap.entrySet()) {
                 List<TemplateServerLine> values = entry.getValue().stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
                 newMap.put(entry.getKey(), values);
@@ -187,26 +151,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         serverLineMap.clear();
         serverLineMap.putAll(newMap);
-    }
-
-
-    protected void filterWebReceiver(List<Receiver> receiverList, String receiveConfigCode, Long tenantId, MessageSender messageSender) {
-        Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
-        Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
-        Long envId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName());
-        String eventName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
-        for (Receiver item : receiverList) {
-            if (item.getUserId() != null &&
-                    UserReceiveConfig.check(redisHelper, HmsgConstant.MessageType.WEB, String.valueOf(item.getUserId()), receiveConfigCode, tenantId)) {
-                item.setUserId(null).setTargetUserTenantId(null);
-            }
-        }
-        receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.WEB);
-        // 如果项目层未启动 则不发送 接受者为null
-        if (!projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.WEB)) {
-            receiverList.clear();
-        }
-
     }
 
 
