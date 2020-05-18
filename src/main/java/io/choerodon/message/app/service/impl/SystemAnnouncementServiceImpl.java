@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 
 import com.netflix.discovery.converters.Auto;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.domain.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.SystemAnnouncementVO;
 import io.choerodon.message.app.service.SystemAnnouncementService;
@@ -23,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author dengyouquan
@@ -122,11 +125,16 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 //        return asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
 //    }
 
-    // TODO sticky字段不确定，需要SCP讨论
+
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
+        // TODO 分页排序有问题，暂时不使用分页排序功能
+        // TODO objectVersionNumber需要确认是哪个表的
+//        return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
 
+        List<SystemAnnouncementVO> systemAnnouncementVOList = announcementMapper.fulltextSearch(title, status, params);
+        PageInfo pageInfo = new PageInfo(1, 10);
+        return new Page<>(systemAnnouncementVOList, pageInfo, systemAnnouncementVOList.size());
     }
 
 //    @Override

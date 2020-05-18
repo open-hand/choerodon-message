@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * @author dengyouquan, Eugen
@@ -39,11 +40,11 @@ public class SystemAnnouncementController {
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO dto) {
         dto.setStatus(SystemAnnouncementVO.AnnouncementStatus.WAITING.value());
-        if (dto.getSendDate().isBefore(LocalDate.from(LocalDate.now()))) {
+        if (dto.getSendDate().getTime() < System.currentTimeMillis()) {
             throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
         }
         if (dto.getSendDate() == null) {
-            dto.setSendDate(LocalDate.now());
+            dto.setSendDate(new Date());
         }
         if (dto.getSticky() != null && dto.getSticky() && dto.getEndDate() == null) {
             throw new CommonException("error.create.system.announcement.endDate.is.null");
@@ -66,7 +67,7 @@ public class SystemAnnouncementController {
     @GetMapping("/completed")
     public ResponseEntity<Page<SystemAnnouncementVO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest) {
         return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null,
-                SystemAnnouncementVO.AnnouncementStatus.COMPLETED.value(), null), HttpStatus.OK);
+                SystemAnnouncementVO.AnnouncementStatus.PUBLISHED.value(), null), HttpStatus.OK);
     }
 
 //    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})

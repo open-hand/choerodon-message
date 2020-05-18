@@ -6,7 +6,7 @@ import org.hzero.core.base.BaseConstants;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * @author dengyouquan
@@ -24,7 +24,7 @@ public class SystemAnnouncementVO {
 
     @ApiModelProperty(value = "系统公告时间/非必填")
     @JsonFormat(pattern = BaseConstants.Pattern.DATETIME)
-    private LocalDate sendDate;
+    private Date sendDate;
 
     @ApiModelProperty(value = "是否发送站内信：不填时默认为发送")
     private Boolean sendNotices;
@@ -36,14 +36,13 @@ public class SystemAnnouncementVO {
     private Boolean sticky;
     @ApiModelProperty(value = "悬浮显示结束时间")
     @JsonFormat(pattern = BaseConstants.Pattern.DATETIME)
-
-    private LocalDate endDate;
+    private Date endDate;
 
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
 
     public enum AnnouncementStatus {
-        COMPLETED("COMPLETED"),
+        PUBLISHED("PUBLISHED"),
         WAITING("WAITING");
 
         private final String value;
@@ -121,19 +120,19 @@ public class SystemAnnouncementVO {
         this.sticky = sticky;
     }
 
-    public LocalDate getSendDate() {
+    public Date getSendDate() {
         return sendDate;
     }
 
-    public void setSendDate(LocalDate sendDate) {
+    public void setSendDate(Date sendDate) {
         this.sendDate = sendDate;
     }
 
-    public LocalDate getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 }
