@@ -21,6 +21,8 @@ import io.choerodon.message.infra.validator.CommonValidator;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
+import org.hzero.boot.platform.lov.dto.LovValueDTO;
+import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.message.app.service.MessageTemplateService;
 import org.hzero.message.app.service.TemplateServerService;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -64,6 +67,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private TemplateServerLineRepository templateServerLineRepository;
     @Autowired
     private HzeroTemplateServerMapper hzeroTemplateServerMapper;
+    @Autowired
+    private LovFeignClient lovFeignClient;
 
 
     @Override
@@ -360,15 +365,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         return i;
     }
 
-    public Map<String, String> getMeanings() {
-        ResponseEntity<Map<String, String>> meanings = platformFeignClient.getMeanings(LOV_MESSAGE_CODE);
-        if (!meanings.getStatusCode().is2xxSuccessful()) {
-            throw new CommonException(LOV_ERROR_INFO);
-        }
-        if (meanings.getBody() == null) {
-            throw new CommonException(LOV_ERROR_INFO);
-        }
-        return meanings.getBody();
+    private Map<String, String> getMeanings() {
+        List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, 0L);
+        return valueDTOList.stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning));
     }
 
     private void SendSettingVOConvertToSendSettingDetailTreeVO(SendSettingVO sendSettingVO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {

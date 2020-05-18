@@ -3,6 +3,8 @@ package io.choerodon.message.app.service.impl;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.persistence.Transient;
+
 import org.apache.commons.lang.StringUtils;
 import org.hzero.message.app.service.MessageService;
 import org.hzero.message.app.service.TemplateServerWhService;
@@ -16,6 +18,7 @@ import org.hzero.message.infra.mapper.TemplateServerMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -75,9 +78,11 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
         if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
+//            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
+            return PageHelper.doPage(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
         } else {
-            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
+//            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
+            return PageHelper.doPage(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
         }
     }
 
@@ -92,6 +97,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     }
 
     @Override
+    @Transactional
     public WebHookVO create(Long sourceId, WebHookVO webHookVO, String sourceLevel) {
         //校验type
         if (!WebHookTypeEnum.isInclude(webHookVO.getServerType())) {
@@ -117,8 +123,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             codeStr = tenantDTO.getTenantNum();
             nameStr = tenantDTO.getTenantName();
         }
-        String serverCode = codeStr.length() > CODE_MAX_LENGTH ? codeStr.substring(CODE_MAX_LENGTH) : codeStr;
-        String uuid = UUID.randomUUID().toString().substring(CODE_MAX_LENGTH);
+        String serverCode = codeStr.length() > CODE_MAX_LENGTH ? codeStr.substring(0, CODE_MAX_LENGTH) : codeStr;
+        String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, CODE_MAX_LENGTH);
         webhookServer.setServerCode(String.format("%s-%s", serverCode, uuid));
         String serverName = nameStr.length() > NAME_MAX_LENGTH ? nameStr.substring(NAME_MAX_LENGTH) : nameStr;
         webhookServer.setServerName(String.format("%s-%s", serverName, uuid));
@@ -126,7 +132,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
         for (Long aLong : sendSettingIdList) {
-            TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType());
+            TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType().toUpperCase());
             if (!ObjectUtils.isEmpty(serverLine)) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
                 templateServerWh.setTenantId(0L);
@@ -140,7 +146,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             }
         }
 
-        if (Objects.equals(sourceLevel, sourceLevel)) {
+        if (Objects.equals(ResourceLevel.PROJECT.value(), sourceLevel)) {
             WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO(webhookServer.getServerId(), sourceId);
             webhookProjectRelMapper.insert(webhookProjectRelDTO);
         }
@@ -149,6 +155,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
     @Override
     public WebHookVO update(Long sourceId, WebHookVO webHookVO, String sourceLevel) {
+        WebhookServer oldWebHook = webhookServerRepository.selectOne(new WebhookServer().setServerCode(webHookVO.getServerCode()));
         //校验type
         if (!WebHookTypeEnum.isInclude(webHookVO.getServerType())) {
             throw new CommonException("error.web.hook.type.invalid");
@@ -165,19 +172,24 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             tenantId = projectDTO.getOrganizationId();
         }
-        webhookServer= webhookServerService.updateWebHook(tenantId, webhookServer);
-        TemplateServerWh queryDTO=new TemplateServerWh();
+//        webhookServer = webhookServerService.updateWebHook(tenantId, webhookServer);
+
+        TemplateServerWh queryDTO = new TemplateServerWh();
         queryDTO.setServerCode(webhookServer.getServerCode());
         List<Long> oldSendIds = templateServerWhRepository.select(queryDTO).stream().map(TemplateServerWh::getTempServerId).collect(Collectors.toList());
-        List<Long> updateSendIds = new ArrayList<>();
         Set<Long> newSendIds = webHookVO.getSendSettingIdList();
-        for (Long sendId : oldSendIds) {
-            if (newSendIds.contains(sendId)) {
-                newSendIds.remove(sendId);
-                updateSendIds.add(sendId);
+
+        if (oldWebHook.getServerType().equals(webHookVO.getServerType())) {
+            List<Long> updateSendIds = new ArrayList<>();
+            for (Long sendId : oldSendIds) {
+                if (newSendIds.contains(sendId)) {
+                    newSendIds.remove(sendId);
+                    updateSendIds.add(sendId);
+                }
             }
+            oldSendIds.removeAll(updateSendIds);
         }
-        oldSendIds.removeAll(updateSendIds);
+
         if (!CollectionUtils.isEmpty(oldSendIds)) {
             for (Long aLong : oldSendIds) {
                 TemplateServerWh serverWh = new TemplateServerWh();
@@ -198,12 +210,10 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
                 templateServerWh.setTempServerId(aLong);
                 List<TemplateServerWh> templateServerWhList = new ArrayList<>();
                 templateServerWhList.add(templateServerWh);
-
-                TemplateServerLine templateServerLine=templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
+                TemplateServerLine templateServerLine = templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
                 templateServerWhService.batchCreateTemplateServerWh(templateServerLine.getTempServerLineId(), templateServerWhList);
             }
         }
-
         return webHookVO;
     }
 

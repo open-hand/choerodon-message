@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.core.base.BaseConstants;
+import org.hzero.core.redis.RedisHelper;
 import org.hzero.message.app.service.MessageReceiverService;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.entity.UserReceiveConfig;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private IamClientOperator iamClientOperator;
     @Autowired
     private WebhookProjectRelMapper webhookProjectRelMapper;
+
+    @Autowired
+    private RedisHelper redisHelper;
 
     @Override
     public Map<String, Integer> relSendMessage(MessageSender messageSender) {
@@ -182,6 +187,26 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         serverLineMap.clear();
         serverLineMap.putAll(newMap);
+    }
+
+
+    protected void filterWebReceiver(List<Receiver> receiverList, String receiveConfigCode, Long tenantId, MessageSender messageSender) {
+        Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
+        Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
+        Long envId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName());
+        String eventName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
+        for (Receiver item : receiverList) {
+            if (item.getUserId() != null &&
+                    UserReceiveConfig.check(redisHelper, HmsgConstant.MessageType.WEB, String.valueOf(item.getUserId()), receiveConfigCode, tenantId)) {
+                item.setUserId(null).setTargetUserTenantId(null);
+            }
+        }
+        receiveFilter(receiverList, tempServerId, projectId, HmsgConstant.MessageType.WEB);
+        // 如果项目层未启动 则不发送 接受者为null
+        if (!projectFilter(messageSender, projectId, envId, eventName, HmsgConstant.MessageType.WEB)) {
+            receiverList.clear();
+        }
+
     }
 
 

@@ -48,7 +48,7 @@ public interface IamFeignClient {
     @GetMapping("/choerodon/v1/projects/{project_id}")
     ResponseEntity<ProjectDTO> queryProjectById(@PathVariable("project_id") Long projectId);
 
-    @GetMapping("/choerodon/v1/organizations/{organizationId}")
+    @GetMapping("/v1/{organizationId}/tenants")
     ResponseEntity<TenantDTO> queryTenantById(@PathVariable("organizationId") Long organizationId);
 
     @GetMapping("/v1/projects/{tenant_id}")
