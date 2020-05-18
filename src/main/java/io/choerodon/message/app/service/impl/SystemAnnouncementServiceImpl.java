@@ -1,14 +1,14 @@
 package io.choerodon.message.app.service.impl;
 
 
-import com.netflix.discovery.converters.Auto;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.domain.PageInfo;
-import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
+import io.choerodon.message.api.vo.ScheduleTaskVO;
 import io.choerodon.message.api.vo.SystemAnnouncementVO;
 import io.choerodon.message.app.service.SystemAnnouncementService;
+import io.choerodon.message.infra.feign.AsgardFeignClient;
 import io.choerodon.message.infra.mapper.SystemAnnouncementMapper;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hzero.core.convert.CommonConverter;
 import org.hzero.core.util.EscapeUtils;
@@ -18,14 +18,17 @@ import org.hzero.message.domain.entity.NoticeContent;
 import org.hzero.message.domain.repository.NoticeContentRepository;
 import org.hzero.message.domain.repository.NoticeRepository;
 import org.hzero.message.infra.mapper.NoticePublishedMapper;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author dengyouquan
@@ -38,7 +41,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     private static final Logger logger = LoggerFactory.getLogger(SystemAnnouncementServiceImpl.class);
 
-    private final ModelMapper modelMapper = new ModelMapper();
+    private static final String LANG = "zh_CN";
+    private static final String RECEIVER_TYPE_CODE_ANNOUNCE = "ANNOUNCE";
+    private static final String NOTICE_TYPE_CODE_PTGG = "PTGG";
 
     //    private AsyncSendAnnouncementUtils asyncSendAnnouncementUtils;
     @Autowired
@@ -52,30 +57,57 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Autowired
     private NoticeContentRepository noticeContentRepository;
+
+    @Autowired
+    private AsgardFeignClient asgardFeignClient;
 //    private AsgardFeignClient asgardFeignClient;
 
     public SystemAnnouncementServiceImpl() {
     }
 
-    //TODO 该接口需要SCP讨论
+    // TODO 是否发送站内信字段有问题
+    // TODO scheduleTaskId 字段有问题
+    // TODO RECEIVER_TYPE_CODE_ANNOUNCE
+    // TODO NOTICE_TYPE_CODE_PTGG
     @Override
     public SystemAnnouncementVO create(SystemAnnouncementVO systemAnnouncementVO) {
-//        NoticeDTO noticeDTO = new NoticeDTO();
-//        noticeDTO.setTitle(systemAnnouncementVO.getTitle());
-//        noticeDTO.setNoticeBody(systemAnnouncementVO.getContent());
-//        noticeDTO.setStartDate(systemAnnouncementVO.getSendDate());
-////        noticeDTO.setEndDate(systemAnnouncementVO.getEndDate());
-//        Notice notice = CommonConverter.beanConvert(Notice.class, noticeDTO);
-//        notice.setStatusCode(Notice.STATUS_DRAFT);
-//        noticeRepository.insert(notice);
-//        BeanUtils.copyProperties(notice, noticeDTO);
-//        NoticeContent noticeContent = noticeDTO.getNoticeContent();
-//        noticeContent.setTenantId(noticeDTO.getTenantId()).setNoticeId(noticeDTO.getNoticeId());
-//        // 防范XSS攻击
-//        noticeContent.setNoticeBody(EscapeUtils.preventScript(noticeContent.getNoticeBody()));
-//        noticeContentRepository.insert(noticeContent);
-//        return noticeDTO;
-        return null;
+        logger.info("notify create system announcement,sendDate: {}", systemAnnouncementVO.getSendDate());
+
+        //1.构建hzero的NoticeDTO并将数据插入数据库
+        NoticeDTO noticeDTO = new NoticeDTO();
+        noticeDTO.setTitle(systemAnnouncementVO.getTitle());
+        noticeDTO.setNoticeBody(systemAnnouncementVO.getContent());
+        noticeDTO.setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
+                .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .orElse(null));
+        noticeDTO.setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
+                .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .orElse(null));
+        noticeDTO.setTenantId(0L);
+        noticeDTO.setLang(LANG);
+        noticeDTO.setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE);
+        noticeDTO.setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG);
+        noticeDTO.setStatusCode(SystemAnnouncementVO.AnnouncementStatus.WAITING.value());
+
+        Notice notice = CommonConverter.beanConvert(Notice.class, noticeDTO);
+        noticeRepository.insert(notice);
+
+        BeanUtils.copyProperties(notice, noticeDTO);
+        NoticeContent noticeContent = new NoticeContent();
+        noticeContent.setTenantId(noticeDTO.getTenantId()).setNoticeId(noticeDTO.getNoticeId());
+        // 防范XSS攻击
+        noticeContent.setNoticeBody(EscapeUtils.preventScript(noticeContent.getNoticeBody()));
+        noticeContentRepository.insert(noticeContent);
+
+        //2.创建系统公告同时创建定时任务
+//        Long scheduleTaskId = createScheduleTask(systemAnnouncementVO);
+        // TODO scheduleTaskId 保存到哪里去？
+
+        systemAnnouncementVO.setId(notice.getNoticeId());
+        systemAnnouncementVO.setStatus(SystemAnnouncementVO.AnnouncementStatus.WAITING.value());
+        systemAnnouncementVO.setObjectVersionNumber(notice.getObjectVersionNumber());
+//        systemAnnouncementVO.setScheduleTaskId(scheduleTaskId);
+        return systemAnnouncementVO;
     }
 //
 //    @Override
@@ -104,26 +136,27 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 //        return modelMapper.map(systemAnnouncement, SystemAnnouncementDTO.class);
 //    }
 //
-//    /**
-//     * 根据系统公告创建任务
-//     *
-//     * @param systemAnnouncement
-//     * @return 任务Id
-//     */
-//    private Long createScheduleTask(SystemAnnouncement systemAnnouncement) {
-//        Long methodId = asgardFeignClient.getMethodIdByCode(SITE_NOTYFICATION_CODE).getBody();
-//
-//        Long[] assignUserIds = new Long[1];
-//        assignUserIds[0] = DetailsHelper.getUserDetails().getUserId();
-//
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("systemNocificationId", systemAnnouncement.getId());
-//
-//        ScheduleTaskDTO createTskDTO = new ScheduleTaskDTO(
-//                methodId, params, "系统公告", systemAnnouncement.getTitle(), systemAnnouncement.getSendDate(), assignUserIds);
-//
-//        return asgardFeignClient.createSiteScheduleTask(createTskDTO).getBody().getId();
-//    }
+
+    /**
+     * 根据系统公告创建任务
+     *
+     * @param systemAnnouncementVO
+     * @return 任务Id
+     */
+    private Long createScheduleTask(SystemAnnouncementVO systemAnnouncementVO) {
+        Long methodId = asgardFeignClient.getMethodIdByCode(SITE_NOTYFICATION_CODE).getBody();
+
+        Long[] assignUserIds = new Long[1];
+        assignUserIds[0] = DetailsHelper.getUserDetails().getUserId();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("systemNocificationId", systemAnnouncementVO.getId());
+
+        ScheduleTaskVO scheduleTaskVO = new ScheduleTaskVO(
+                methodId, params, "系统公告", systemAnnouncementVO.getTitle(), systemAnnouncementVO.getSendDate(), assignUserIds);
+
+        return asgardFeignClient.createSiteScheduleTask(scheduleTaskVO).getBody().getId();
+    }
 
 
     @Override

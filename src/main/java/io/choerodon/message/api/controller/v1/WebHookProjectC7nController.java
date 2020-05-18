@@ -42,7 +42,7 @@ public class WebHookProjectC7nController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "项目层 查询WebHook信息（分页接口）")
     @CustomPageRequest
-    public ResponseEntity<Page<WebHookVO>> pagingWebHookInfo(@ApiIgnore
+    public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
                                                              @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
                                                              @PathVariable(name = "project_id") Long sourceId,
                                                              @RequestParam(required = false) String messageName,
@@ -126,7 +126,7 @@ public class WebHookProjectC7nController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
-    public ResponseEntity<Page<WebhookRecordVO>> pagingWebHookSendRecord(@ApiIgnore
+    public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
                                                                  @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                  @PathVariable(name = "project_id") Long projectId,
                                                                  @RequestParam(name = "webhook_id", required = false) Long webhookId,
