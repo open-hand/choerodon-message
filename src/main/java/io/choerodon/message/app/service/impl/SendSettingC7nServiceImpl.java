@@ -19,7 +19,6 @@ import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.core.base.BaseConstants;
@@ -207,7 +206,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     private int getThirdMsgServiceTreeVOS(List<TemplateServer> sendSettingDTOS, String level, String categoryCode, Integer secondParentId, List<MsgServiceTreeVO> msgServiceTreeVOS, Integer i) {
         for (TemplateServer templateServer : sendSettingDTOS) {
-            if (templateServer.getCategoryCode().equals(level) && templateServer.getSubcategoryCode().equals(categoryCode)) {
+            if (level.equals(templateServer.getCategoryCode()) && categoryCode.equals(templateServer.getSubcategoryCode())) {
                 MsgServiceTreeVO treeVO = new MsgServiceTreeVO();
                 treeVO.setParentId((long) secondParentId);
                 treeVO.setId((long) i);
