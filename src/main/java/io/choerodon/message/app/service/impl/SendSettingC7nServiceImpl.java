@@ -2,6 +2,7 @@ package io.choerodon.message.app.service.impl;
 
 
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.domain.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.MessageServiceVO;
@@ -17,7 +18,6 @@ import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
@@ -68,10 +68,14 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode) {
-        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode, firstCode, enabled, receiveConfigFlag, params));
+//        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode, firstCode, enabled, receiveConfigFlag, params));
+        // TODO 分页排序有问题，暂时不使用分页排序功能
+        PageInfo pageInfo = new PageInfo(pageRequest.getPage(), pageRequest.getSize());
+        List<MessageServiceVO> messageServiceVOList = templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode, firstCode, enabled, receiveConfigFlag, params);
+        Page<MessageServiceVO> messageServiceVOPage = new Page<>(messageServiceVOList, pageInfo, messageServiceVOList.size());
         Map<String, String> meaningsMap = getMeanings();
-        serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
-        return serviceVOPage;
+        messageServiceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
+        return messageServiceVOPage;
     }
 
     @Override
