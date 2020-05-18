@@ -16,6 +16,7 @@
         hmsg_template_server hts
         WHERE
         1=1
+        AND category_code is not null and message_code is not null
         <if test="level != null">
             AND category_code = #{level}
         </if>

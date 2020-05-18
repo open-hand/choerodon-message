@@ -26,7 +26,7 @@ import io.choerodon.swagger.annotation.Permission;
  * @description
  */
 @RestController
-@RequestMapping("/choerodon/v1/webhook/{project_id}")
+@RequestMapping("/choerodon/v1/webhook/project/{project_id}")
 public class WebHookProjectC7nController {
 
     private WebHookC7nService webHookC7nService;
@@ -35,6 +35,7 @@ public class WebHookProjectC7nController {
 
     public WebHookProjectC7nController(WebHookC7nService webHookC7nService, WebhookRecordC7nService webhookRecordC7nService) {
         this.webHookC7nService = webHookC7nService;
+        this.webhookRecordC7nService = webhookRecordC7nService;
     }
 
     @GetMapping("/web_hooks")
