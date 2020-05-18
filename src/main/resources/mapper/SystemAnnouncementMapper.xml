@@ -15,8 +15,11 @@
         hnp.title AS title,
         hnp.notice_body AS content,
         hnp.published_date AS sendDate,
-        hnp.published_status_code AS status
+        hnp.end_date AS endDate,
+        hnp.published_status_code AS status,
+        hn.sticky_flag AS sticky
         FROM hmsg_notice_published hnp
+        join hmsg_notice hn on hn.notice_id=hnp.notice_id
         <where>
             <if test="title != null">
                 AND hnp.title LIKE concat(concat('%', #{title}), '%')

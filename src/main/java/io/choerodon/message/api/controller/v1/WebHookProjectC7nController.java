@@ -42,13 +42,13 @@ public class WebHookProjectC7nController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "项目层 查询WebHook信息（分页接口）")
     @CustomPageRequest
-    public ResponseEntity<Page<WebHookVO>> pagingByMessage(@ApiIgnore
-                                                           @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
-                                                           @PathVariable(name = "project_id") Long sourceId,
-                                                           @RequestParam(required = false) String messageName,
-                                                           @RequestParam(required = false) String type,
-                                                           @RequestParam(required = false) Boolean enableFlag,
-                                                           @RequestParam(required = false) String params) {
+    public ResponseEntity<Page<WebHookVO>> pagingWebHookInfo(@ApiIgnore
+                                                             @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
+                                                             @PathVariable(name = "project_id") Long sourceId,
+                                                             @RequestParam(required = false) String messageName,
+                                                             @RequestParam(required = false) String type,
+                                                             @RequestParam(required = false) Boolean enableFlag,
+                                                             @RequestParam(required = false) String params) {
         return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.PROJECT.value(), messageName, type, enableFlag, params), HttpStatus.OK);
     }
 
@@ -126,7 +126,7 @@ public class WebHookProjectC7nController {
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
-    public ResponseEntity<Page<WebhookRecordVO>> pagingByMessage(@ApiIgnore
+    public ResponseEntity<Page<WebhookRecordVO>> pagingWebHookSendRecord(@ApiIgnore
                                                                  @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                  @PathVariable(name = "project_id") Long projectId,
                                                                  @RequestParam(name = "webhook_id", required = false) Long webhookId,
