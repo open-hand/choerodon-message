@@ -9,6 +9,7 @@ import io.choerodon.message.api.vo.MsgServiceTreeVO;
 import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
@@ -83,21 +84,21 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         List<TemplateServer> templateServers = templateServerC7nMapper.selectAllTemplateServer();
         List<MsgServiceTreeVO> msgServiceTreeVOS = new ArrayList<>();
         MsgServiceTreeVO msgServiceTreeVO1 = new MsgServiceTreeVO();
-        msgServiceTreeVO1.setParentId(0L);
+        msgServiceTreeVO1.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO1.setId(1L);
         msgServiceTreeVO1.setName(LevelType.SITE.value());
         msgServiceTreeVO1.setCode(ResourceLevel.SITE.value());
         msgServiceTreeVOS.add(msgServiceTreeVO1);
 
         MsgServiceTreeVO msgServiceTreeVO2 = new MsgServiceTreeVO();
-        msgServiceTreeVO2.setParentId(0L);
+        msgServiceTreeVO2.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO2.setId(2L);
         msgServiceTreeVO2.setName(LevelType.ORGANIZATION.value());
         msgServiceTreeVO2.setCode(ResourceLevel.ORGANIZATION.value());
         msgServiceTreeVOS.add(msgServiceTreeVO2);
 
         MsgServiceTreeVO msgServiceTreeVO3 = new MsgServiceTreeVO();
-        msgServiceTreeVO3.setParentId(0L);
+        msgServiceTreeVO3.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO3.setId(3L);
         msgServiceTreeVO3.setName(LevelType.PROJECT.value());
         msgServiceTreeVO3.setCode(ResourceLevel.PROJECT.value());
@@ -129,7 +130,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public SendSettingVO queryByTempServerId(Long tempServerId) {
-        SendSettingVO sendSettingVO = (SendSettingVO) templateServerService.getTemplateServer(0L, tempServerId);
+        SendSettingVO sendSettingVO = (SendSettingVO) templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
         if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
             List<MessageTemplate> messageTemplates = new ArrayList<>();
             sendSettingVO.getServerList().forEach(t -> {
@@ -326,7 +327,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
                 // 表示第一层的SendSettingDetailTreeVO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                sendSettingDetailTreeDTO.setParentId(0L);
+                sendSettingDetailTreeDTO.setParentId(TenantDTO.DEFAULT_TENANT_ID);
                 sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTO.setCode(subCategoryCode);
@@ -361,7 +362,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     private Map<String, String> getMeanings() {
-        List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, 0L);
+        List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID);
         return valueDTOList.stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning));
     }
 

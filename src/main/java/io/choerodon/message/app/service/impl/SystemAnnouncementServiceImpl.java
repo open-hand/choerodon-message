@@ -4,6 +4,7 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.SystemAnnouncementVO;
 import io.choerodon.message.app.service.SystemAnnouncementService;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.mapper.SystemAnnouncementMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -85,7 +86,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         noticeDTO.setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
                 .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .orElse(null));
-        noticeDTO.setTenantId(0L);
+        noticeDTO.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         noticeDTO.setLang(LANG);
         noticeDTO.setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE);
         noticeDTO.setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG);
@@ -100,10 +101,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         //2.调用hzero公告发布接口
         List<NoticeReceiver> noticeReceiverList = new ArrayList<>();
         noticeReceiverList.add(new NoticeReceiver()
-                .setReceiverSourceId(0L)
+                .setReceiverSourceId(TenantDTO.DEFAULT_TENANT_ID)
                 .setReceiverTypeCode("ALL")
-                .setTenantId(0L));
-        noticeReceiverService.createNoticeReceiver(noticeDTO.getNoticeId(), 0L, noticeReceiverList);
+                .setTenantId(TenantDTO.DEFAULT_TENANT_ID));
+        noticeReceiverService.createNoticeReceiver(noticeDTO.getNoticeId(), TenantDTO.DEFAULT_TENANT_ID, noticeReceiverList);
 
         Notice notice = noticeRepository.selectByPrimaryKey(noticeDTO.getNoticeId());
 
@@ -142,11 +143,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        // TODO objectVersionNumber需要确认是哪个表的
         return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
     }
 
-//    @Override
+    //    @Override
 //    public SystemAnnouncementDTO getDetailById(Long id) {
 //        SystemAnnouncement systemAnnouncement = announcementMapper.selectByPrimaryKey(id);
 //        if (systemAnnouncement == null) {
@@ -156,19 +156,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 //    }
 //
 //
-//    @Override
-//    public void delete(Long id) {
-//        SystemAnnouncement systemAnnouncement = announcementMapper.selectByPrimaryKey(id);
-//        if (systemAnnouncement == null) {
-//            throw new CommonException("error.delete.system.announcement.not.exist,id:" + id);
-//        }
-//        //1.删除系统公告
-//        if (announcementMapper.deleteByPrimaryKey(id) != 1) {
-//            throw new CommonException("error.system.announcement.delete.failed,id:" + id);
-//        }
-//        //2.删除任务
-//        asgardFeignClient.deleteSiteTaskByTaskId(systemAnnouncement.getScheduleTaskId());
-//    }
+    @Override
+    public void delete(Long id) {
+        noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+    }
 //
 //    /**
 //     * 系统公告JobTask

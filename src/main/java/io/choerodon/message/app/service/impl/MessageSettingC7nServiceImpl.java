@@ -8,6 +8,7 @@ import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.TargetUserDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.message.infra.enums.DeleteResourceType;
 import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
@@ -211,7 +212,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             messageSettingDTO.setSmsEnable(false);
         }
         messageSettingDTO.setCode(code);
-        messageSettingDTO.setProjectId(0L);
+        messageSettingDTO.setProjectId(TenantDTO.DEFAULT_TENANT_ID);
         messageSettingC7nMapper.updateOptional(messageSettingDTO);
     }
 
@@ -295,7 +296,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 sendRoleList.stream().filter(role -> !TargetUserType.SPECIFIER.getTypeName().equals(role)).forEach(role -> {
                     TargetUserVO targetUserVO = new TargetUserVO();
                     targetUserVO.setType(role);
-                    targetUserVO.setUserId(0L);
+                    targetUserVO.setUserId(TenantDTO.DEFAULT_TENANT_ID);
                     userList.add(targetUserVO);
                 });
             }

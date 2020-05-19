@@ -15,6 +15,7 @@
         FROM hmsg_notice_published hnp
         join hmsg_notice hn on hn.notice_id=hnp.notice_id
         <where>
+            hn.status_code!='DELETED'
             <if test="title != null">
                 AND hnp.title LIKE concat(concat('%', #{title}), '%')
             </if>
