@@ -31,4 +31,25 @@
         </where>
     </select>
 
+    <select id="selectLastestSticky" resultType="io.choerodon.message.api.vo.SystemAnnouncementVO">
+        SELECT
+        hn.notice_id AS id,
+        hn.title AS title,
+        hnc.notice_body AS content,
+        hn.published_date AS sendDate,
+        hn.end_date AS endDate,
+        hn.status_code AS status,
+        hn.sticky_flag AS sticky,
+        hn.object_version_number AS object_version_number
+        FROM
+        hmsg_notice hn
+        JOIN hmsg_notice_content hnc on hn.notice_id = hnc.notice_id
+        WHERE
+        hn.sticky_flag = 1
+        AND hn.status_code!='DELETED'
+        AND
+        #{currentTime} BETWEEN hn.start_date AND hn.end_date
+        ORDER BY hn.notice_id DESC LIMIT 1
+    </select>
+
 </mapper>

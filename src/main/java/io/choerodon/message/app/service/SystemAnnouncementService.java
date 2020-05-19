@@ -65,11 +65,11 @@ public interface SystemAnnouncementService {
 //     */
 //    void sendSystemNotification(ResourceLevel sourceType, Long sourceId, Long systemNotificationId);
 //
-//    /**
-//     * 获取当前需悬浮显示的最新的系统公告
-//     *
-//     * @return 系统公告
-//     */
-//    SystemAnnouncementVO getLatestSticky();
+    /**
+     * 获取当前需悬浮显示的最新的系统公告
+     *
+     * @return 系统公告
+     */
+    SystemAnnouncementVO getLatestSticky();
 }
 
