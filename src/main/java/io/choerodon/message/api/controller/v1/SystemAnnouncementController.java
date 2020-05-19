@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hzero.message.domain.entity.Notice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,17 +39,17 @@ public class SystemAnnouncementController {
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
-    public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO dto) {
-        if (dto.getSendDate().getTime() < System.currentTimeMillis()) {
+    public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO vo) {
+        if (vo.getSendDate().getTime() < System.currentTimeMillis()) {
             throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
         }
-        if (dto.getSendDate() == null) {
-            dto.setSendDate(new Date());
+        if (vo.getSendDate() == null) {
+            vo.setSendDate(new Date());
         }
-        if (dto.getSticky() != null && dto.getSticky() && dto.getEndDate() == null) {
+        if (vo.getSticky() != null && vo.getSticky() && vo.getEndDate() == null) {
             throw new CommonException("error.create.system.announcement.endDate.is.null");
         }
-        return new ResponseEntity<>(systemAnnouncementService.create(dto), HttpStatus.OK);
+        return new ResponseEntity<>(systemAnnouncementService.create(vo), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
@@ -83,13 +84,13 @@ public class SystemAnnouncementController {
     public void delete(@PathVariable Long id) {
         systemAnnouncementService.delete(id);
     }
-//
-//    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
-//    @ApiOperation(value = "更新系统公告")
-//    @PutMapping("/update")
-//    public ResponseEntity<SystemAnnouncementVO> update(@RequestBody @Validated SystemAnnouncementVO dto) {
-//        return new ResponseEntity<>(systemAnnouncementService.update(dto, ResourceLevel.SITE, 0L), HttpStatus.OK);
-//    }
+
+    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @ApiOperation(value = "更新系统公告")
+    @PutMapping("/update")
+    public ResponseEntity<SystemAnnouncementVO> update(@RequestBody @Validated SystemAnnouncementVO vo) {
+        return new ResponseEntity<>(systemAnnouncementService.update(vo), HttpStatus.OK);
+    }
 
     @Permission(level = ResourceLevel.SITE, permissionLogin = true)
     @ApiOperation(value = "查询当前需悬浮显示的最新公告")
