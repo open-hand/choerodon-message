@@ -16,7 +16,6 @@ import org.hzero.message.domain.entity.NoticeContent;
 import org.hzero.message.domain.entity.NoticeReceiver;
 import org.hzero.message.domain.repository.NoticeContentRepository;
 import org.hzero.message.domain.repository.NoticeRepository;
-import org.hzero.message.infra.mapper.NoticePublishedMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,21 +33,14 @@ import java.util.Optional;
 @Component
 public class SystemAnnouncementServiceImpl implements SystemAnnouncementService {
 
-    // TODO 注释的内容如果没有使用，发版前需要删除， 版本是0.22.0
-    public static final String SITE_NOTYFICATION_CODE = "systemNotification";
-
     private static final Logger logger = LoggerFactory.getLogger(SystemAnnouncementServiceImpl.class);
 
     private static final String LANG = "zh_CN";
     private static final String RECEIVER_TYPE_CODE_ANNOUNCE = "ANNOUNCE";
     private static final String NOTICE_TYPE_CODE_PTGG = "PTGG";
 
-    //    private AsyncSendAnnouncementUtils asyncSendAnnouncementUtils;
     @Autowired
     private SystemAnnouncementMapper announcementMapper;
-
-    @Autowired
-    private NoticePublishedMapper noticePublishedMapper;
 
     @Autowired
     private NoticeRepository noticeRepository;
@@ -72,29 +64,26 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         //1.构建hzero的NoticeDTO并将数据插入数据库
         NoticeDTO noticeDTO = new NoticeDTO();
         // 标题
-        noticeDTO.setTitle(systemAnnouncementVO.getTitle());
-        // 内容
-        noticeDTO.setNoticeBody(systemAnnouncementVO.getContent());
-        // 置顶标志
-        noticeDTO.setStickyFlag(Optional.ofNullable(systemAnnouncementVO.getSticky())
-                .map(flag -> flag ? 1 : 0)
-                .orElse(0));
-        // 开始日期
-        noticeDTO.setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
-                .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .orElse(null));
-        // 结束日志
-        noticeDTO.setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
-                .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .orElse(null));
-        noticeDTO.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
-        noticeDTO.setLang(LANG);
-        noticeDTO.setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE);
-        noticeDTO.setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG);
-        noticeDTO.setStatusCode(Notice.STATUS_DRAFT);
+        noticeDTO.setTitle(systemAnnouncementVO.getTitle())
+                .setNoticeBody(systemAnnouncementVO.getContent())
+                .setStickyFlag(Optional.ofNullable(systemAnnouncementVO.getSticky())
+                        .map(flag -> flag ? 1 : 0)
+                        .orElse(0))
+                .setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
+                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .orElse(null))
+                .setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
+                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .orElse(null))
+                .setTenantId(TenantDTO.DEFAULT_TENANT_ID)
+                .setLang(LANG)
+                .setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE)
+                .setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG)
+                .setStatusCode(Notice.STATUS_DRAFT);
 
-        NoticeContent noticeContent = new NoticeContent();
-        noticeContent.setNoticeBody(noticeDTO.getNoticeBody());
+        NoticeContent noticeContent = new NoticeContent()
+                .setNoticeBody(noticeDTO.getNoticeBody());
+
         noticeDTO.setNoticeContent(noticeContent);
 
         noticeDTO = noticeService.createNotice(noticeDTO);
@@ -109,9 +98,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
         Notice notice = noticeRepository.selectByPrimaryKey(noticeDTO.getNoticeId());
 
-        systemAnnouncementVO.setId(notice.getNoticeId());
-        systemAnnouncementVO.setStatus(notice.getStatusCode());
-        systemAnnouncementVO.setObjectVersionNumber(notice.getObjectVersionNumber());
+        systemAnnouncementVO.setId(notice.getNoticeId())
+                .setStatus(notice.getStatusCode())
+                .setObjectVersionNumber(notice.getObjectVersionNumber());
         return systemAnnouncementVO;
     }
 //
@@ -147,62 +136,30 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
     }
 
-    //    @Override
-//    public SystemAnnouncementDTO getDetailById(Long id) {
-//        SystemAnnouncement systemAnnouncement = announcementMapper.selectByPrimaryKey(id);
-//        if (systemAnnouncement == null) {
-//            throw new CommonException("error.system.announcement.not.exist,id:" + id);
-//        }
-//        return modelMapper.map(systemAnnouncement, SystemAnnouncementDTO.class);
-//    }
-//
-//
+    @Override
+    public SystemAnnouncementVO getDetailById(Long id) {
+        NoticeDTO noticeDTO = noticeRepository.detailNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+        return new SystemAnnouncementVO()
+                .setId(noticeDTO.getNoticeId())
+                .setObjectVersionNumber(noticeDTO.getObjectVersionNumber())
+                .setSendDate(noticeDTO.getPublishedDate())
+                .setEndDate(Optional.ofNullable(noticeDTO.getEndDate())
+                        .map(localDate -> Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                        .orElse(null))
+                .setStatus(noticeDTO.getStatusCode())
+                .setContent(noticeDTO.getNoticeContent().getNoticeBody())
+                .setTitle(noticeDTO.getTitle())
+                .setSticky(Optional.ofNullable(noticeDTO.getStickyFlag())
+                        .map(flag -> flag.equals(1))
+                        .orElse(null)
+                );
+    }
+
+
     @Override
     public void delete(Long id) {
         noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, id);
     }
-//
-//    /**
-//     * 系统公告JobTask
-//     *
-//     * @param map 参数map
-//     */
-//    @JobTask(maxRetryCount = 0, code = "systemNotification", params = {
-//            @JobParam(name = "systemNocificationId", description = "系统公告Id", type = Long.class)
-//    }, description = "平台层发送系统通知")
-//    public void systemNotification(Map<String, Object> map) {
-//        Long systemNocificationId = Optional.ofNullable((Long) map.get("systemNocificationId")).orElseThrow(() -> new CommonException("error.systemNotification.id.empty"));
-//        sendSystemNotification(ResourceLevel.SITE, 0L, systemNocificationId);
-//    }
-//
-//
-//    @Override
-//    public void sendSystemNotification(ResourceLevel sourceType, Long sourceId, Long systemNocificationId) {
-//        //todo 此处只实现平台层系统公告 待实现组织/项目层公告
-//        //根据公告id查询公告
-//        SystemAnnouncement systemAnnouncement = announcementMapper.selectByPrimaryKey(systemNocificationId);
-//        if (systemAnnouncement == null) {
-//            throw new CommonException("error.systemAnnouncement.empty,id:" + systemNocificationId);
-//        }
-//        //如果系统公告“是否发送站内信”字段为“是”，则发送站内信
-//        if (systemAnnouncement.getSendNotices()) {
-//            //发送设置模板:平台层
-//            String code = SITE_NOTYFICATION_CODE;
-//            //发送对象：全体用户
-//            List<Long> allUsersId = Arrays.asList(userFeignClient.getUserIds().getBody());
-//            //设置发送内容
-//            Map<String, Object> params = new HashMap<>();
-//            params.put("title", systemAnnouncement.getTitle());
-//            params.put("content", systemAnnouncement.getContent());
-//            asyncSendAnnouncementUtils.sendNoticeToAll(null, allUsersId, code, params, sourceId);
-//        }
-//        //更新公告状态
-//        systemAnnouncement.setStatus(SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value());
-//        if (announcementMapper.updateByPrimaryKey(systemAnnouncement) != 1) {
-//            throw new CommonException("error.systemAnnouncement.update");
-//        }
-//    }
-
 
     @Override
     public SystemAnnouncementVO getLatestSticky() {

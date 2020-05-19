@@ -69,18 +69,18 @@ public class SystemAnnouncementController {
                 Notice.STATUS_PUBLISHED, null), HttpStatus.OK);
     }
 
-    //    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
-//    @ApiOperation(value = "查看系统公告详情")
-//    @GetMapping("/{id}")
-//    public ResponseEntity<SystemAnnouncementVO> getDetail(@PathVariable("id") Long id) {
-//        return new ResponseEntity<>(systemAnnouncementService.getDetailById(id), HttpStatus.OK);
-//    }
-//
-//
+    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @ApiOperation(value = "查看系统公告详情")
+    @GetMapping("/{id}")
+    public ResponseEntity<SystemAnnouncementVO> getDetail(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(systemAnnouncementService.getDetailById(id), HttpStatus.OK);
+    }
+
+
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "删除系统公告")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable Long id) {
         systemAnnouncementService.delete(id);
     }
 //
