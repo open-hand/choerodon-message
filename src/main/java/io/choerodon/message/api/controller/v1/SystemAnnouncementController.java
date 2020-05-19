@@ -11,12 +11,12 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
+import org.hzero.message.domain.entity.Notice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -39,7 +39,6 @@ public class SystemAnnouncementController {
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO dto) {
-        dto.setStatus(SystemAnnouncementVO.AnnouncementStatus.WAITING.value());
         if (dto.getSendDate().getTime() < System.currentTimeMillis()) {
             throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
         }
@@ -67,7 +66,7 @@ public class SystemAnnouncementController {
     @GetMapping("/completed")
     public ResponseEntity<Page<SystemAnnouncementVO>> pagingQueryCompleted(@SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest) {
         return new ResponseEntity<>(systemAnnouncementService.pagingQuery(pageRequest, null,
-                SystemAnnouncementVO.AnnouncementStatus.PUBLISHED.value(), null), HttpStatus.OK);
+                Notice.STATUS_PUBLISHED, null), HttpStatus.OK);
     }
 
 //    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
