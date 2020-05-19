@@ -31,4 +31,10 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_dingtalk_server.groovy') {
 
         addUniqueConstraint(columnNames:"server_code,tenant_id",tableName:"hmsg_dingtalk_server",constraintName: "hmsg_dingtalk_server_u1")
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-05-14-hmsg_dingtalk_server") {
+        addColumn(tableName: "hmsg_dingtalk_server") {
+            column(name: "agent_id", type: "bigint",  remarks: "默认应用ID")
+        }
+    }
 }

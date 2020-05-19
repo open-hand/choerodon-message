@@ -39,4 +39,10 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_notice.groovy') {
         }
 
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-05-18-hmsg_notice") {
+        addColumn(tableName: "hmsg_notice") {
+            column(name: "sticky_flag", type: "tinyint",   defaultValue:"0",   remarks: "悬浮公告标识")  {constraints(nullable:"false")}
+        }
+    }
 }
