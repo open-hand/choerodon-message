@@ -8,9 +8,11 @@ import io.choerodon.message.infra.mapper.SystemAnnouncementMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hzero.message.api.dto.NoticeDTO;
+import org.hzero.message.app.service.NoticeReceiverService;
 import org.hzero.message.app.service.NoticeService;
 import org.hzero.message.domain.entity.Notice;
 import org.hzero.message.domain.entity.NoticeContent;
+import org.hzero.message.domain.entity.NoticeReceiver;
 import org.hzero.message.domain.repository.NoticeContentRepository;
 import org.hzero.message.domain.repository.NoticeRepository;
 import org.hzero.message.infra.mapper.NoticePublishedMapper;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -53,6 +57,9 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     @Autowired
     private NoticeService noticeService;
 
+    @Autowired
+    private NoticeReceiverService noticeReceiverService;
+
     public SystemAnnouncementServiceImpl() {
     }
 
@@ -62,11 +69,19 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
         //1.构建hzero的NoticeDTO并将数据插入数据库
         NoticeDTO noticeDTO = new NoticeDTO();
+        // 标题
         noticeDTO.setTitle(systemAnnouncementVO.getTitle());
+        // 内容
         noticeDTO.setNoticeBody(systemAnnouncementVO.getContent());
+        // 置顶标志
+        noticeDTO.setStickyFlag(Optional.ofNullable(systemAnnouncementVO.getSticky())
+                .map(flag -> flag ? 1 : 0)
+                .orElse(0));
+        // 开始日期
         noticeDTO.setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
                 .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .orElse(null));
+        // 结束日志
         noticeDTO.setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
                 .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .orElse(null));
@@ -80,10 +95,17 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         noticeContent.setNoticeBody(noticeDTO.getNoticeBody());
         noticeDTO.setNoticeContent(noticeContent);
 
-        noticeService.createNotice(noticeDTO);
+        noticeDTO = noticeService.createNotice(noticeDTO);
 
         //2.调用hzero公告发布接口
-        Notice notice = noticeService.publicNotice(0L, noticeDTO.getNoticeId());
+        List<NoticeReceiver> noticeReceiverList = new ArrayList<>();
+        noticeReceiverList.add(new NoticeReceiver()
+                .setReceiverSourceId(0L)
+                .setReceiverTypeCode("ALL")
+                .setTenantId(0L));
+        noticeReceiverService.createNoticeReceiver(noticeDTO.getNoticeId(), 0L, noticeReceiverList);
+
+        Notice notice = noticeRepository.selectByPrimaryKey(noticeDTO.getNoticeId());
 
         systemAnnouncementVO.setId(notice.getNoticeId());
         systemAnnouncementVO.setStatus(notice.getStatusCode());
