@@ -62,29 +62,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         logger.info("notify create system announcement,sendDate: {}", systemAnnouncementVO.getSendDate());
 
         //1.构建hzero的NoticeDTO并将数据插入数据库
-        NoticeDTO noticeDTO = new NoticeDTO();
-        // 标题
-        noticeDTO.setTitle(systemAnnouncementVO.getTitle())
-                .setNoticeBody(systemAnnouncementVO.getContent())
-                .setStickyFlag(Optional.ofNullable(systemAnnouncementVO.getSticky())
-                        .map(flag -> flag ? 1 : 0)
-                        .orElse(0))
-                .setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
-                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                        .orElse(null))
-                .setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
-                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                        .orElse(null))
-                .setTenantId(TenantDTO.DEFAULT_TENANT_ID)
-                .setLang(LANG)
-                .setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE)
-                .setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG)
-                .setStatusCode(Notice.STATUS_DRAFT);
-
-        NoticeContent noticeContent = new NoticeContent()
-                .setNoticeBody(noticeDTO.getNoticeBody());
-
-        noticeDTO.setNoticeContent(noticeContent);
+        NoticeDTO noticeDTO = VOtoDTO(systemAnnouncementVO);
 
         noticeDTO = noticeService.createNotice(noticeDTO);
 
@@ -103,33 +81,17 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                 .setObjectVersionNumber(notice.getObjectVersionNumber());
         return systemAnnouncementVO;
     }
-//
-//    @Override
-//    public SystemAnnouncementDTO update(SystemAnnouncementDTO dto, ResourceLevel level, Long sourceId) {
-//        //0.若系统公告已经完成
-//        SystemAnnouncement originSA = announcementMapper.selectByPrimaryKey(dto.getId());
-//        if (originSA == null) {
-//            throw new CommonException("error.update.system.announcement.not.exist,id:" + dto.getId());
-//        }
-//        if (originSA.getStatus().equalsIgnoreCase(SystemAnnouncementDTO.AnnouncementStatus.COMPLETED.value())) {
-//            throw new CommonException("error.update.systemAnnouncement.has.been.completed");
-//        }
-//        //1.创建新任务
-//        SystemAnnouncement systemAnnouncement = modelMapper.map(dto, SystemAnnouncement.class);
-//        Long scheduleTaskId = createScheduleTask(systemAnnouncement);
-//        //2.更新系统公告
-//        systemAnnouncement.setScheduleTaskId(scheduleTaskId);
-//        if (announcementMapper.updateByPrimaryKeySelective(systemAnnouncement) != 1) {
-//            //2.1.更新公告失败删除新建任务
-//            asgardFeignClient.deleteSiteTaskByTaskId(scheduleTaskId);
-//            throw new CommonException("error.systemAnnouncement.update");
-//        }
-//        //3.更新公告成功删除原任务
-//        asgardFeignClient.deleteSiteTaskByTaskId(originSA.getScheduleTaskId());
-//
-//        return modelMapper.map(systemAnnouncement, SystemAnnouncementDTO.class);
-//    }
-//
+
+    @Override
+    public SystemAnnouncementVO update(SystemAnnouncementVO systemAnnouncementVO) {
+
+        NoticeDTO noticeDTO = VOtoDTO(systemAnnouncementVO);
+
+        noticeDTO = noticeService.updateNotice(noticeDTO);
+
+        return DTOtoVO(noticeDTO);
+
+    }
 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
@@ -139,6 +101,21 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     @Override
     public SystemAnnouncementVO getDetailById(Long id) {
         NoticeDTO noticeDTO = noticeRepository.detailNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+        return DTOtoVO(noticeDTO);
+    }
+
+
+    @Override
+    public void delete(Long id) {
+        noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+    }
+
+    @Override
+    public SystemAnnouncementVO getLatestSticky() {
+        return announcementMapper.selectLastestSticky(new Date());
+    }
+
+    private SystemAnnouncementVO DTOtoVO(NoticeDTO noticeDTO) {
         return new SystemAnnouncementVO()
                 .setId(noticeDTO.getNoticeId())
                 .setObjectVersionNumber(noticeDTO.getObjectVersionNumber())
@@ -155,14 +132,30 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                 );
     }
 
+    private NoticeDTO VOtoDTO(SystemAnnouncementVO systemAnnouncementVO) {
+        NoticeDTO noticeDTO = new NoticeDTO();
+        noticeDTO.setTitle(systemAnnouncementVO.getTitle())
+                .setNoticeBody(systemAnnouncementVO.getContent())
+                .setStickyFlag(Optional.ofNullable(systemAnnouncementVO.getSticky())
+                        .map(flag -> flag ? 1 : 0)
+                        .orElse(0))
+                .setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
+                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .orElse(null))
+                .setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
+                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                        .orElse(null))
+                .setTenantId(TenantDTO.DEFAULT_TENANT_ID)
+                .setLang(LANG)
+                .setReceiverTypeCode(RECEIVER_TYPE_CODE_ANNOUNCE)
+                .setNoticeTypeCode(NOTICE_TYPE_CODE_PTGG)
+                .setStatusCode(Notice.STATUS_DRAFT);
 
-    @Override
-    public void delete(Long id) {
-        noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, id);
-    }
 
-    @Override
-    public SystemAnnouncementVO getLatestSticky() {
-        return announcementMapper.selectLastestSticky(new Date());
+        NoticeContent noticeContent = new NoticeContent()
+                .setNoticeBody(noticeDTO.getNoticeBody());
+        noticeDTO.setNoticeContent(noticeContent);
+
+        return noticeDTO;
     }
 }
