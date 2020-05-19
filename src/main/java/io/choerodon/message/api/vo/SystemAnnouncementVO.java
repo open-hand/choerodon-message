@@ -25,9 +25,6 @@ public class SystemAnnouncementVO {
     @ApiModelProperty(value = "系统公告时间/非必填")
     @JsonFormat(pattern = BaseConstants.Pattern.DATETIME)
     private Date sendDate;
-
-    @ApiModelProperty(value = "是否发送站内信：不填时默认为发送")
-    private Boolean sendNotices;
     @ApiModelProperty(value = "系统公告状态/非必填")
     private String status;
     @ApiModelProperty(value = "是否顶部悬浮显示")
@@ -43,71 +40,71 @@ public class SystemAnnouncementVO {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
-
-    public Boolean getSendNotices() {
-        return sendNotices;
-    }
-
-    public void setSendNotices(Boolean sendNotices) {
-        this.sendNotices = sendNotices;
+    public Date getSendDate() {
+        return sendDate;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Boolean getSticky() {
         return sticky;
-    }
-
-    public void setSticky(Boolean sticky) {
-        this.sticky = sticky;
-    }
-
-    public Date getSendDate() {
-        return sendDate;
-    }
-
-    public void setSendDate(Date sendDate) {
-        this.sendDate = sendDate;
     }
 
     public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public SystemAnnouncementVO setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public SystemAnnouncementVO setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public SystemAnnouncementVO setContent(String content) {
+        this.content = content;
+        return this;
+    }
+
+    public SystemAnnouncementVO setSendDate(Date sendDate) {
+        this.sendDate = sendDate;
+        return this;
+    }
+
+    public SystemAnnouncementVO setStatus(String status) {
+        this.status = status;
+        return this;
+    }
+
+    public SystemAnnouncementVO setSticky(Boolean sticky) {
+        this.sticky = sticky;
+        return this;
+    }
+
+    public SystemAnnouncementVO setEndDate(Date endDate) {
         this.endDate = endDate;
+        return this;
+    }
+
+    public SystemAnnouncementVO setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+        return this;
     }
 }
