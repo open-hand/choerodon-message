@@ -10,7 +10,8 @@
         hnp.published_date AS sendDate,
         hnp.end_date AS endDate,
         hnp.published_status_code AS status,
-        hn.sticky_flag AS sticky
+        hn.sticky_flag AS sticky,
+        hn.object_version_number AS object_version_number
         FROM hmsg_notice_published hnp
         join hmsg_notice hn on hn.notice_id=hnp.notice_id
         <where>
