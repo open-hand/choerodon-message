@@ -69,7 +69,7 @@ public class SystemAnnouncementController {
                 Notice.STATUS_PUBLISHED, null), HttpStatus.OK);
     }
 
-//    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    //    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
 //    @ApiOperation(value = "查看系统公告详情")
 //    @GetMapping("/{id}")
 //    public ResponseEntity<SystemAnnouncementVO> getDetail(@PathVariable("id") Long id) {
@@ -90,11 +90,11 @@ public class SystemAnnouncementController {
 //    public ResponseEntity<SystemAnnouncementVO> update(@RequestBody @Validated SystemAnnouncementVO dto) {
 //        return new ResponseEntity<>(systemAnnouncementService.update(dto, ResourceLevel.SITE, 0L), HttpStatus.OK);
 //    }
-//
-//    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
-//    @ApiOperation(value = "查询当前需悬浮显示的最新公告")
-//    @GetMapping("/new_sticky")
-//    public ResponseEntity<SystemAnnouncementVO> getNewSticky() {
-//        return new ResponseEntity<>(systemAnnouncementService.getLatestSticky(), HttpStatus.OK);
-//    }
+
+    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @ApiOperation(value = "查询当前需悬浮显示的最新公告")
+    @GetMapping("/new_sticky")
+    public ResponseEntity<SystemAnnouncementVO> getNewSticky() {
+        return new ResponseEntity<>(systemAnnouncementService.getLatestSticky(), HttpStatus.OK);
+    }
 }
