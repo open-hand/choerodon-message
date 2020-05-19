@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.StackingHistogramVO;
 import io.choerodon.message.app.service.MailingRecordService;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.EmailSendStatusEnum;
 import io.choerodon.message.infra.mapper.MailingRecordMapper;
 import org.hzero.message.domain.entity.Message;
@@ -44,7 +45,7 @@ public class MailingRecordServiceImpl implements MailingRecordService {
         }
         StackingHistogramVO stackingHistogramVO = new StackingHistogramVO();
         List<Message> messageList = messageMapper.selectMessage(
-                0L,
+                TenantDTO.DEFAULT_TENANT_ID,
                 null,
                 "EMAIL",
                 null,

@@ -47,12 +47,12 @@ public interface SystemAnnouncementService {
 //     */
 //    SystemAnnouncementVO getDetailById(Long id);
 //
-//    /**
-//     * 根据id删除系统公告
-//     *
-//     * @param id 系统公告ID
-//     */
-//    void delete(Long id);
+    /**
+     * 根据id删除系统公告
+     *
+     * @param id 系统公告ID
+     */
+    void delete(Long id);
 //
 //    /**
 //     * 系统公告的可执行程序具体方法：
