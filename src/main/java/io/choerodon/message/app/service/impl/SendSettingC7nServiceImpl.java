@@ -32,7 +32,6 @@ import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.domain.repository.TemplateServerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -376,6 +375,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         sendSettingDetailTreeVO.setName(sendSettingVO.getMessageName());
         sendSettingDetailTreeVO.setCategoryCode(sendSettingVO.getSubcategoryCode());
         sendSettingDetailTreeVO.setCode(sendSettingVO.getMessageCode());
+        sendSettingDetailTreeVO.setAllowConfig(Optional.ofNullable(sendSettingVO.getReceiveConfigFlag())
+                .map(t -> t.equals(1))
+                .orElse(false));
         sendSettingDetailTreeVO.setEmailEnabledFlag(Optional.ofNullable(sendSettingVO.getEmailEnabledFlag())
                 .map(t -> t.equals(1))
                 .orElse(false));
