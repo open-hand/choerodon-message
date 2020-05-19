@@ -38,15 +38,15 @@ public interface SystemAnnouncementService {
      * @return
      */
     Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String param);
-//
-//    /**
-//     * 根据id获取系统公告详情.
-//     *
-//     * @param id 系统公告ID
-//     * @return 系统公告详情
-//     */
-//    SystemAnnouncementVO getDetailById(Long id);
-//
+
+    /**
+     * 根据id获取系统公告详情.
+     *
+     * @param id 系统公告ID
+     * @return 系统公告详情
+     */
+    SystemAnnouncementVO getDetailById(Long id);
+
     /**
      * 根据id删除系统公告
      *
