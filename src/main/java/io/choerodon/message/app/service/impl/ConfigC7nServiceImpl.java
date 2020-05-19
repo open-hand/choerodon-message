@@ -5,6 +5,7 @@ import io.choerodon.message.api.vo.EmailConfigVO;
 import io.choerodon.message.app.service.ConfigC7nService;
 import io.choerodon.message.infra.ConfigNameEnum;
 
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import org.hzero.message.app.service.EmailServerService;
 import org.hzero.message.app.service.SmsServerService;
 import org.hzero.message.domain.entity.EmailProperty;
@@ -45,7 +46,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
 
     @Override
     public EmailConfigVO createOrUpdateEmail(EmailConfigVO emailConfigVO) {
-        EmailServer emailServer = emailServerService.getEmailServer(0L, ConfigNameEnum.EMAIL_NAME.value());
+        EmailServer emailServer = emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value());
         // 只处理ssl配置
         if (emailConfigVO.getSsl()) {
             emailServer.setEmailProperties(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
@@ -56,7 +57,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
         newEmailServer.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
         newEmailServer.setServerName(ConfigNameEnum.configNames.get(ConfigNameEnum.EMAIL_NAME.value()));
-        newEmailServer.setTenantId(0L);
+        newEmailServer.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         if (StringUtils.isEmpty(emailServer.getServerId())) {
             throw new CommonException("error.get.server.email");
         } else {
@@ -67,13 +68,13 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
 
     @Override
     public EmailConfigVO selectEmail() {
-        EmailServer emailServer = emailServerService.getEmailServer(0L, ConfigNameEnum.EMAIL_NAME.value());
+        EmailServer emailServer = emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value());
         return setEmailConfigVO(new EmailConfigVO(), emailServer);
     }
 
     @Override
     public void testEmailConnect() {
-        JavaMailSenderImpl javaMailSender = (JavaMailSenderImpl) EmailSupporter.javaMailSender(emailServerService.getEmailServer(0L, ConfigNameEnum.EMAIL_NAME.value()));
+        JavaMailSenderImpl javaMailSender = (JavaMailSenderImpl) EmailSupporter.javaMailSender(emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value()));
         try {
             javaMailSender.testConnection();
         } catch (MessagingException e) {
@@ -83,8 +84,8 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
 
     @Override
     public SmsServer createOrUpdateSmsServer(SmsServer smsServer) {
-        SmsServer oleSmsServer = smsServerService.getSmsServer(0L, ConfigNameEnum.SMS_NAME.value());
-        smsServer.setTenantId(0L);
+        SmsServer oleSmsServer = smsServerService.getSmsServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.SMS_NAME.value());
+        smsServer.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         smsServer.setServerCode(ConfigNameEnum.SMS_NAME.value());
         smsServer.setServerName(ConfigNameEnum.configNames.get(ConfigNameEnum.SMS_NAME.value()));
         if (StringUtils.isEmpty(oleSmsServer.getServerId())) {
@@ -97,7 +98,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
 
     @Override
     public SmsServer selectSms() {
-        return smsServerService.getSmsServer(0L, ConfigNameEnum.SMS_NAME.value());
+        return smsServerService.getSmsServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.SMS_NAME.value());
     }
 
     private List<EmailProperty> initEmailProperties(Long emailServerId, String port) {
@@ -106,21 +107,21 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         EmailProperty emailPropertyClass = new EmailProperty();
         emailPropertyClass.setPropertyCode(SSL_PROPERTY_CLASS);
         emailPropertyClass.setPropertyValue(SSL_PROPERTY_CLASS_VALUE);
-        emailPropertyClass.setTenantId(0L);
+        emailPropertyClass.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         emailPropertyClass.setServerId(emailServerId);
         propertyList.add(emailPropertyClass);
 
         EmailProperty emailPropertyPort = new EmailProperty();
         emailPropertyPort.setPropertyCode(SSL_PROPERTY_PORT);
         emailPropertyPort.setPropertyValue(port);
-        emailPropertyPort.setTenantId(0L);
+        emailPropertyPort.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         emailPropertyPort.setServerId(emailServerId);
         propertyList.add(emailPropertyPort);
 
         EmailProperty emailPropertyEnable = new EmailProperty();
         emailPropertyEnable.setPropertyCode(SSL_PROPERTY_ENABLE);
         emailPropertyEnable.setPropertyValue(Boolean.TRUE.toString());
-        emailPropertyEnable.setTenantId(0L);
+        emailPropertyEnable.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         emailPropertyEnable.setServerId(emailServerId);
         propertyList.add(emailPropertyEnable);
         return propertyList;

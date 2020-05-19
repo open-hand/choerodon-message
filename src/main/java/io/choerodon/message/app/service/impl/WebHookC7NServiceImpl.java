@@ -1,27 +1,5 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.hzero.message.app.service.MessageService;
-import org.hzero.message.app.service.TemplateServerWhService;
-import org.hzero.message.app.service.WebhookServerService;
-import org.hzero.message.domain.entity.*;
-import org.hzero.message.domain.repository.TemplateServerWhRepository;
-import org.hzero.message.domain.repository.WebhookServerRepository;
-import org.hzero.message.infra.mapper.MessageTemplateMapper;
-import org.hzero.message.infra.mapper.TemplateServerLineMapper;
-import org.hzero.message.infra.mapper.TemplateServerMapper;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
@@ -38,6 +16,27 @@ import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.apache.commons.lang.StringUtils;
+import org.hzero.message.app.service.MessageService;
+import org.hzero.message.app.service.TemplateServerWhService;
+import org.hzero.message.app.service.WebhookServerService;
+import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.entity.TemplateServerWh;
+import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.repository.TemplateServerWhRepository;
+import org.hzero.message.domain.repository.WebhookServerRepository;
+import org.hzero.message.infra.mapper.MessageTemplateMapper;
+import org.hzero.message.infra.mapper.TemplateServerLineMapper;
+import org.hzero.message.infra.mapper.TemplateServerMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -135,7 +134,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType().toUpperCase());
             if (!ObjectUtils.isEmpty(serverLine)) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
-                templateServerWh.setTenantId(0L);
+                templateServerWh.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
                 templateServerWh.setServerCode(webhookServer.getServerCode());
                 templateServerWh.setServerName(webhookServer.getServerName());
                 templateServerWh.setServerType(webhookServer.getServerType());
@@ -203,7 +202,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         if (!CollectionUtils.isEmpty(newSendIds)) {
             for (Long aLong : newSendIds) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
-                templateServerWh.setTenantId(0L);
+                templateServerWh.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
                 templateServerWh.setServerCode(webhookServer.getServerCode());
                 templateServerWh.setServerName(webhookServer.getServerName());
                 templateServerWh.setServerType(webhookServer.getServerType());
