@@ -2,10 +2,10 @@ package io.choerodon.message.app.service.impl;
 
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.domain.PageInfo;
 import io.choerodon.message.api.vo.SystemAnnouncementVO;
 import io.choerodon.message.app.service.SystemAnnouncementService;
 import io.choerodon.message.infra.mapper.SystemAnnouncementMapper;
+import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hzero.message.api.dto.NoticeDTO;
 import org.hzero.message.app.service.NoticeService;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -121,13 +120,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        // TODO 分页排序有问题，暂时不使用分页排序功能
         // TODO objectVersionNumber需要确认是哪个表的
-//        return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
-
-        List<SystemAnnouncementVO> systemAnnouncementVOList = announcementMapper.fulltextSearch(title, status, params);
-        PageInfo pageInfo = new PageInfo(1, 10);
-        return new Page<>(systemAnnouncementVOList, pageInfo, systemAnnouncementVOList.size());
+        return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
     }
 
 //    @Override
