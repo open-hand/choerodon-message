@@ -85,7 +85,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public List<MsgServiceTreeVO> getMsgServiceTree() {
-        List<TemplateServer> templateServers = templateServerRepository.selectAll();
+        List<TemplateServer> templateServers = templateServerC7nMapper.selectAllTemplateServer();
         List<MsgServiceTreeVO> msgServiceTreeVOS = new ArrayList<>();
         MsgServiceTreeVO msgServiceTreeVO1 = new MsgServiceTreeVO();
         msgServiceTreeVO1.setParentId(0L);
@@ -115,7 +115,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         for (TemplateServer templateServer : templateServers) {
             Set<String> categoryCodes = categoryMap.get(templateServer.getCategoryCode());
             if (categoryCodes != null) {
-                categoryCodes.add(templateServer.getCategoryCode());
+                categoryCodes.add(templateServer.getSubcategoryCode());
             }
         }
         getSecondMsgServiceTreeVOS(categoryMap, msgServiceTreeVOS, templateServers);

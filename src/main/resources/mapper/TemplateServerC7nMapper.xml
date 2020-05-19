@@ -40,4 +40,11 @@
         </if>
     </select>
 
+    <select id="selectAllTemplateServer" resultType="org.hzero.message.domain.entity.TemplateServer">
+        SELECT hts.*
+        FROM
+            hmsg_template_server hts
+        WHERE
+            category_code is not null and message_code is not null
+    </select>
 </mapper>

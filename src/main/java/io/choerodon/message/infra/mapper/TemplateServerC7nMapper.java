@@ -3,6 +3,7 @@ package io.choerodon.message.infra.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.hzero.message.domain.entity.TemplateServer;
 
 import io.choerodon.message.api.vo.MessageServiceVO;
 
@@ -30,5 +31,7 @@ public interface TemplateServerC7nMapper {
                                                 @Param("enabled") Boolean enabled,
                                                 @Param("receiveConfigFlag") Boolean receiveConfigFlag,
                                                 @Param("params") String params);
+
+    List<TemplateServer> selectAllTemplateServer();
 
 }
