@@ -41,21 +41,6 @@ public class SystemAnnouncementVO {
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
 
-    public enum AnnouncementStatus {
-        PUBLISHED("PUBLISHED"),
-        WAITING("WAITING");
-
-        private final String value;
-
-        private AnnouncementStatus(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return this.value;
-        }
-    }
-
     public Long getId() {
         return id;
     }
