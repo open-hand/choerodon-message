@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -201,10 +202,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 //            throw new CommonException("error.systemAnnouncement.update");
 //        }
 //    }
-//
-//
-//    @Override
-//    public SystemAnnouncementDTO getLatestSticky() {
-//        return announcementMapper.selectLastestSticky(new Date());
-//    }
+
+
+    @Override
+    public SystemAnnouncementVO getLatestSticky() {
+        return announcementMapper.selectLastestSticky(new Date());
+    }
 }
