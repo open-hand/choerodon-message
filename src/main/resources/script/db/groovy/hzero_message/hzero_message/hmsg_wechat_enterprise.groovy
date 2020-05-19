@@ -62,4 +62,10 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_wechat_enterprise.groovy') {
         }
         modifyDataType(tableName: "hmsg_wechat_enterprise", columnName: 'callback_url', newDataType: "varchar(" + 480 * weight + ")")
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-05-14-hmsg_wechat_enterprise") {
+        addColumn(tableName: "hmsg_wechat_enterprise") {
+            column(name: "agent_id", type: "bigint",  remarks: "默认应用ID")
+        }
+    }
 }

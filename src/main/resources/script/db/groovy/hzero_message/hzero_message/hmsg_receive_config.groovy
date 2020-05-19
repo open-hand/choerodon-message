@@ -56,7 +56,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config.groovy') {
 
     changeSet(author: "hzero@hand-china.com", id: "2020-04-27-hmsg_receive_config") {
         addColumn(tableName: 'hmsg_receive_config') {
-            column(name: "update_flag", type: "tinyint(1)", defaultValue:"1", remarks: "更新标识")  {constraints(nullable:"false")}
+            column(name: "editable_flag", type: "tinyint(1)", defaultValue:"1", remarks: "更新标识")  {constraints(nullable:"false")}
         }
     }
 }
