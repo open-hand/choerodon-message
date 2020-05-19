@@ -30,8 +30,6 @@ public class SystemAnnouncementVO {
     private Boolean sendNotices;
     @ApiModelProperty(value = "系统公告状态/非必填")
     private String status;
-    @ApiModelProperty(value = "关联任务Id")
-    private Long scheduleTaskId;
     @ApiModelProperty(value = "是否顶部悬浮显示")
     private Boolean sticky;
     @ApiModelProperty(value = "悬浮显示结束时间")
@@ -87,14 +85,6 @@ public class SystemAnnouncementVO {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Long getScheduleTaskId() {
-        return scheduleTaskId;
-    }
-
-    public void setScheduleTaskId(Long scheduleTaskId) {
-        this.scheduleTaskId = scheduleTaskId;
     }
 
     public Boolean getSticky() {
