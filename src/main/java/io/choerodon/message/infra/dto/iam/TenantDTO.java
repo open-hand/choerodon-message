@@ -1,21 +1,18 @@
 package io.choerodon.message.infra.dto.iam;
 
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
+import io.choerodon.mybatis.annotation.MultiLanguageField;
+import io.choerodon.mybatis.domain.AuditDomain;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.hzero.core.util.Regexs;
 
-import io.choerodon.mybatis.annotation.MultiLanguageField;
-import io.choerodon.mybatis.domain.AuditDomain;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.util.Objects;
 
 public class TenantDTO extends AuditDomain {
 
@@ -26,6 +23,7 @@ public class TenantDTO extends AuditDomain {
 
     public static final String NULL_VALUE = "";
     public static final String LIMIT_USER_QTY = "limitUserQty";
+    public static final Long DEFAULT_TENANT_ID = 0L;
 
 
     /**

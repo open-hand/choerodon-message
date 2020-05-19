@@ -77,12 +77,12 @@ public class SystemAnnouncementController {
 //    }
 //
 //
-//    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
-//    @ApiOperation(value = "删除系统公告")
-//    @DeleteMapping("/{id}")
-//    public void delete(@PathVariable long id) {
-//        systemAnnouncementService.delete(id);
-//    }
+    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
+    @ApiOperation(value = "删除系统公告")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable long id) {
+        systemAnnouncementService.delete(id);
+    }
 //
 //    @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
 //    @ApiOperation(value = "更新系统公告")
