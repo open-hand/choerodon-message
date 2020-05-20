@@ -113,9 +113,11 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId, String messageType) {
         List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
-        List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
-        List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
-        receiverAddressList.removeAll(removeUserList);
+        if (!CollectionUtils.isEmpty(receiverAddressList)) {
+            List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
+            List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
+            receiverAddressList.removeAll(removeUserList);
+        }
     }
 
     /**
