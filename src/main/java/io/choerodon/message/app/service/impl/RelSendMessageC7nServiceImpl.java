@@ -1,36 +1,23 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
-import org.hzero.core.base.BaseConstants;
-import org.hzero.core.redis.RedisHelper;
-import org.hzero.message.app.service.MessageReceiverService;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
-import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
-import org.hzero.message.domain.entity.UserReceiveConfig;
-import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
@@ -113,11 +100,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId, String messageType) {
         List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(receiverAddressList)) {
-            List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
-            List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
-            receiverAddressList.removeAll(removeUserList);
-        }
+        List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
+        List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
+        receiverAddressList.removeAll(removeUserList);
     }
 
     /**
