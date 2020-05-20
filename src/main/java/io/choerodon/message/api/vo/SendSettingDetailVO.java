@@ -42,152 +42,170 @@ public class SendSettingDetailVO {
         return id;
     }
 
-    public void setId(Long id) {
+    public SendSettingDetailVO setId(Long id) {
         this.id = id;
+        return this;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public SendSettingDetailVO setCode(String code) {
         this.code = code;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public SendSettingDetailVO setName(String name) {
         this.name = name;
-    }
-
-    public Boolean getBacklogFlag() {
-        return backlogFlag;
-    }
-
-    public void setBacklogFlag(Boolean backlogFlag) {
-        this.backlogFlag = backlogFlag;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public Long getEmailTemplateId() {
-        return emailTemplateId;
-    }
-
-    public void setEmailTemplateId(Long emailTemplateId) {
-        this.emailTemplateId = emailTemplateId;
-    }
-
-    public Long getSmsTemplateId() {
-        return smsTemplateId;
-    }
-
-    public void setSmsTemplateId(Long smsTemplateId) {
-        this.smsTemplateId = smsTemplateId;
-    }
-
-    public Long getPmTemplateId() {
-        return pmTemplateId;
-    }
-
-    public void setPmTemplateId(Long pmTemplateId) {
-        this.pmTemplateId = pmTemplateId;
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
-    public Integer getRetryCount() {
-        return retryCount;
-    }
-
-    public void setRetryCount(Integer retryCount) {
-        this.retryCount = retryCount;
-    }
-
-    public Boolean getIsSendInstantly() {
-        return isSendInstantly;
-    }
-
-    public void setIsSendInstantly(Boolean sendInstantly) {
-        isSendInstantly = sendInstantly;
-    }
-
-    public Boolean getIsManualRetry() {
-        return isManualRetry;
-    }
-
-    public void setIsManualRetry(Boolean manualRetry) {
-        isManualRetry = manualRetry;
-    }
-
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
-
-    public Boolean getAllowConfig() {
-        return isAllowConfig;
-    }
-
-    public void setAllowConfig(Boolean allowConfig) {
-        isAllowConfig = allowConfig;
+        return this;
     }
 
     public String getCategoryCode() {
         return categoryCode;
     }
 
-    public void setCategoryCode(String categoryCode) {
+    public SendSettingDetailVO setCategoryCode(String categoryCode) {
         this.categoryCode = categoryCode;
+        return this;
+    }
+
+    public Boolean getBacklogFlag() {
+        return backlogFlag;
+    }
+
+    public SendSettingDetailVO setBacklogFlag(Boolean backlogFlag) {
+        this.backlogFlag = backlogFlag;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public SendSettingDetailVO setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public Long getEmailTemplateId() {
+        return emailTemplateId;
+    }
+
+    public SendSettingDetailVO setEmailTemplateId(Long emailTemplateId) {
+        this.emailTemplateId = emailTemplateId;
+        return this;
+    }
+
+    public Long getSmsTemplateId() {
+        return smsTemplateId;
+    }
+
+    public SendSettingDetailVO setSmsTemplateId(Long smsTemplateId) {
+        this.smsTemplateId = smsTemplateId;
+        return this;
+    }
+
+    public Long getPmTemplateId() {
+        return pmTemplateId;
+    }
+
+    public SendSettingDetailVO setPmTemplateId(Long pmTemplateId) {
+        this.pmTemplateId = pmTemplateId;
+        return this;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public SendSettingDetailVO setLevel(String level) {
+        this.level = level;
+        return this;
+    }
+
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public SendSettingDetailVO setRetryCount(Integer retryCount) {
+        this.retryCount = retryCount;
+        return this;
+    }
+
+    public Boolean getSendInstantly() {
+        return isSendInstantly;
+    }
+
+    public SendSettingDetailVO setSendInstantly(Boolean sendInstantly) {
+        isSendInstantly = sendInstantly;
+        return this;
+    }
+
+    public Boolean getManualRetry() {
+        return isManualRetry;
+    }
+
+    public SendSettingDetailVO setManualRetry(Boolean manualRetry) {
+        isManualRetry = manualRetry;
+        return this;
+    }
+
+    public Boolean getAllowConfig() {
+        return isAllowConfig;
+    }
+
+    public SendSettingDetailVO setAllowConfig(Boolean allowConfig) {
+        isAllowConfig = allowConfig;
+        return this;
     }
 
     public Boolean getSmsEnabledFlag() {
         return smsEnabledFlag;
     }
 
-    public void setSmsEnabledFlag(Boolean smsEnabledFlag) {
+    public SendSettingDetailVO setSmsEnabledFlag(Boolean smsEnabledFlag) {
         this.smsEnabledFlag = smsEnabledFlag;
+        return this;
     }
 
     public Boolean getWebhookEnabledFlag() {
         return webhookEnabledFlag;
     }
 
-    public void setWebhookEnabledFlag(Boolean webhookEnabledFlag) {
+    public SendSettingDetailVO setWebhookEnabledFlag(Boolean webhookEnabledFlag) {
         this.webhookEnabledFlag = webhookEnabledFlag;
+        return this;
     }
 
     public Boolean getPmEnabledFlag() {
         return pmEnabledFlag;
     }
 
-    public void setPmEnabledFlag(Boolean pmEnabledFlag) {
+    public SendSettingDetailVO setPmEnabledFlag(Boolean pmEnabledFlag) {
         this.pmEnabledFlag = pmEnabledFlag;
+        return this;
     }
 
     public Boolean getEmailEnabledFlag() {
         return emailEnabledFlag;
     }
 
-    public void setEmailEnabledFlag(Boolean emailEnabledFlag) {
+    public SendSettingDetailVO setEmailEnabledFlag(Boolean emailEnabledFlag) {
         this.emailEnabledFlag = emailEnabledFlag;
+        return this;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public SendSettingDetailVO setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+        return this;
     }
 }

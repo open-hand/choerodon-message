@@ -1,11 +1,10 @@
 package io.choerodon.message.api.vo;
 
-import java.util.List;
-import javax.persistence.Column;
-
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.message.domain.entity.MessageTemplate;
 import org.hzero.message.domain.entity.TemplateServer;
+
+import java.util.List;
 
 /**
  * @author jiameng.cao
@@ -25,6 +24,12 @@ public class SendSettingVO extends TemplateServer {
     private Integer webhookEnabledFlag;
 
     private Integer webhookJsonEnabledFlag;
+
+    private Long emailTemplateId;
+
+    private Long smsTemplateId;
+
+    private Long pmTemplateId;
 
     private List<MessageTemplate> messageTemplates;
 
@@ -82,5 +87,29 @@ public class SendSettingVO extends TemplateServer {
 
     public void setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public Long getEmailTemplateId() {
+        return emailTemplateId;
+    }
+
+    public void setEmailTemplateId(Long emailTemplateId) {
+        this.emailTemplateId = emailTemplateId;
+    }
+
+    public Long getSmsTemplateId() {
+        return smsTemplateId;
+    }
+
+    public void setSmsTemplateId(Long smsTemplateId) {
+        this.smsTemplateId = smsTemplateId;
+    }
+
+    public Long getPmTemplateId() {
+        return pmTemplateId;
+    }
+
+    public void setPmTemplateId(Long pmTemplateId) {
+        this.pmTemplateId = pmTemplateId;
     }
 }

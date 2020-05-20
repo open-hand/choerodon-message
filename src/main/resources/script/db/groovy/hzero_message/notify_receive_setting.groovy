@@ -12,7 +12,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_receive_setting.groovy') {
             column(name: 'SEND_SETTING_ID', type: 'BIGINT UNSIGNED', remarks: '发送设置id') {
                 constraints(nullable: false)
             }
-            column(name: 'MESSAGE_TYPE', type: 'VARCHAR(16)', remarks: '模版类型:email,sms,pm') {
+            column(name: 'MESSAGE_TYPE', type: 'VARCHAR(16)', remarks: '模版类型:email,sms,web') {
                 constraints(nullable: false)
             }
             column(name: 'SOURCE_ID', type: 'BIGINT UNSIGNED', remarks: '创建该记录的源id，可以是projectId,也可以是organizarionId等')
@@ -33,7 +33,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_receive_setting.groovy') {
     changeSet(author: 'longhe1996@icloud.com', id: '2019-10-22-notify_receive_setting-mpdify-column') {
         setTableRemarks(tableName: "NOTIFY_RECEIVE_SETTING", remarks: "此表用于存储用户的接收设置(记录用户拒绝接受的消息)")
         addColumn(tableName: 'NOTIFY_RECEIVE_SETTING') {
-            column(name: 'SENDING_TYPE', type: 'VARCHAR(16)',defaultValue: "EMPTY STRING", remarks: '模版类型:email,sms,pm,webhook') {
+            column(name: 'SENDING_TYPE', type: 'VARCHAR(16)',defaultValue: "EMPTY STRING", remarks: '模版类型:email,sms,web,webhook') {
                 constraints(nullable: false)
             }
         }
