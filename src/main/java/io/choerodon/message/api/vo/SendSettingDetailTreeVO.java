@@ -8,15 +8,17 @@ public class SendSettingDetailTreeVO extends SendSettingDetailVO {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public SendSettingDetailTreeVO setParentId(Long parentId) {
         this.parentId = parentId;
+        return this;
     }
 
     public Long getSequenceId() {
         return sequenceId;
     }
 
-    public void setSequenceId(Long sequenceId) {
+    public SendSettingDetailTreeVO setSequenceId(Long sequenceId) {
         this.sequenceId = sequenceId;
+        return this;
     }
 }

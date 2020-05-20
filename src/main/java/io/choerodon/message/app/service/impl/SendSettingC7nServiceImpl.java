@@ -367,23 +367,18 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     private void SendSettingVOConvertToSendSettingDetailTreeVO(SendSettingVO sendSettingVO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
-        sendSettingDetailTreeVO.setId(sendSettingVO.getTempServerId());
-        sendSettingDetailTreeVO.setLevel(level);
-        sendSettingDetailTreeVO.setName(sendSettingVO.getMessageName());
-        sendSettingDetailTreeVO.setCategoryCode(sendSettingVO.getSubcategoryCode());
-        sendSettingDetailTreeVO.setCode(sendSettingVO.getMessageCode());
-        sendSettingDetailTreeVO.setAllowConfig(Optional.ofNullable(sendSettingVO.getReceiveConfigFlag())
-                .map(t -> t.equals(1))
-                .orElse(false));
-        sendSettingDetailTreeVO.setEmailEnabledFlag(Optional.ofNullable(sendSettingVO.getEmailEnabledFlag())
-                .map(t -> t.equals(1))
-                .orElse(false));
-        sendSettingDetailTreeVO.setPmEnabledFlag(Optional.ofNullable(sendSettingVO.getPmEnabledFlag())
-                .map(t -> t.equals(1))
-                .orElse(false));
-        sendSettingDetailTreeVO.setSmsEnabledFlag(Optional.ofNullable(sendSettingVO.getSmsEnabledFlag())
-                .map(t -> t.equals(1))
-                .orElse(false));
+        sendSettingDetailTreeVO.setId(sendSettingVO.getTempServerId())
+                .setLevel(level)
+                .setName(sendSettingVO.getMessageName())
+                .setCategoryCode(sendSettingVO.getSubcategoryCode())
+                .setCode(sendSettingVO.getMessageCode())
+                .setEmailTemplateId(sendSettingVO.getEmailTemplateId())
+                .setSmsTemplateId(sendSettingVO.getSmsTemplateId())
+                .setPmTemplateId(sendSettingVO.getPmTemplateId())
+                .setAllowConfig(Optional.ofNullable(sendSettingVO.getReceiveConfigFlag()).map(t -> t.equals(1)).orElse(false))
+                .setEmailEnabledFlag(Optional.ofNullable(sendSettingVO.getEmailEnabledFlag()).map(t -> t.equals(1)).orElse(false))
+                .setPmEnabledFlag(Optional.ofNullable(sendSettingVO.getPmEnabledFlag()).map(t -> t.equals(1)).orElse(false))
+                .setSmsEnabledFlag(Optional.ofNullable(sendSettingVO.getSmsEnabledFlag()).map(t -> t.equals(1)).orElse(false));
     }
 
 }
