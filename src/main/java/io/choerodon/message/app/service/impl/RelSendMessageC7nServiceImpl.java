@@ -77,9 +77,18 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
         Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
-        Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
-        Long envId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName());
-        String eventName = (String) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName());
+        Long projectId = null;
+        Long envId = null;
+        String eventName = null;
+        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
+            projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
+        }
+        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName()))) {
+            envId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName())));
+        }
+        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()))) {
+            eventName = String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()));
+        }
         List<Receiver> receiverList = messageSender.getReceiverAddressList();
         if (messageType.equals(HmsgConstant.MessageType.WEB) || messageType.equals(HmsgConstant.MessageType.EMAIL)) {
             receiveFilter(receiverList, tempServerId, projectId, messageType);
@@ -88,7 +97,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (messageType.equals(HmsgConstant.MessageType.WEB) ||
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
                 messageType.equals(HmsgConstant.MessageType.SMS)) {
-            if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
+            if (projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
         }
@@ -133,24 +142,19 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * @param serverLineMap
      */
     private void webHookFilter(MessageSender messageSender, Map<String, List<TemplateServerLine>> serverLineMap) {
-        Long projectId = (Long) messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName());
-        Map<String, List<TemplateServerLine>> newMap = new HashMap<>();
-        if (!ObjectUtils.isEmpty(projectId)) {
-            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
-            for (Map.Entry<String, List<TemplateServerLine>> entry : serverLineMap.entrySet()) {
-                List<TemplateServerLine> values = entry.getValue().stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
-                newMap.put(entry.getKey(), values);
-            }
-        } else {
-            List<String> webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setTenantId(messageSender.getTenantId())).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
-            for (Map.Entry<String, List<TemplateServerLine>> entry : serverLineMap.entrySet()) {
-                List<TemplateServerLine> values = entry.getValue().stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
-                newMap.put(entry.getKey(), values);
-            }
-
+        Long projectId = null;
+        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
+            projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
-        serverLineMap.clear();
-        serverLineMap.putAll(newMap);
+        List<String> webServerCodes;
+        if (!ObjectUtils.isEmpty(projectId)) {
+            webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+        } else {
+            webServerCodes = webhookProjectRelMapper.selectByTenantId(messageSender.getTenantId()).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+        }
+        List<TemplateServerLine> lineList = serverLineMap.get(HmsgConstant.MessageType.WEB_HOOK);
+        List<TemplateServerLine> values = lineList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+        serverLineMap.put(HmsgConstant.MessageType.WEB_HOOK, values);
     }
 
 

@@ -111,7 +111,7 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
     MessageSettingDTO selectByParams(@Param("projectId") Long projectId,
                                      @Param("messageCode") String messageCode,
                                      @Param("envId") Long envId,
-                                     @Param("envName") String envName,
+                                     @Param("eventName") String eventName,
                                      @Param("messageType") String messageType
                                      );
 }

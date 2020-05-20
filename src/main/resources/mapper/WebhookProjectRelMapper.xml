@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.WebhookProjectRelMapper">
+
+    <select id="selectByTenantId" resultType="io.choerodon.message.infra.dto.WebhookProjectRelDTO">
+        SELECT
+            *
+        from webhook_project_rel
+        where
+            TENANT_ID = #{tenantId}
+        and PROJECT_ID is not null
+    </select>
+
+</mapper>
