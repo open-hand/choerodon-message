@@ -14,15 +14,21 @@
         hts.enabled_flag,
         hts.object_version_number,
         htslemail.enabled_flag emailEnabledFlag,
+        hmtemail.template_id emailTemplateId,
         htslsms.enabled_flag smsEnabledFlag,
-        htslpm.enabled_flag pmEnabledFlag
+        hmtsms.template_id smsTemplateId,
+        htslpm.enabled_flag pmEnabledFlag,
+        hmtpm.template_id pmTemplateId
         FROM hmsg_template_server hts
-        LEFT JOIN hmsg_template_server_line htslemail on hts.temp_server_id = htslemail.temp_server_id and
+        LEFT JOIN hmsg_template_server_line htslemail ON hts.temp_server_id = htslemail.temp_server_id AND
         htslemail.type_code='EMAIL'
-        LEFT JOIN hmsg_template_server_line htslsms on hts.temp_server_id = htslsms.temp_server_id and
+        LEFT JOIN hmsg_template_server_line htslsms ON hts.temp_server_id = htslsms.temp_server_id AND
         htslsms.type_code='SMS'
-        LEFT JOIN hmsg_template_server_line htslpm on hts.temp_server_id = htslpm.temp_server_id and
-        htslsms.type_code='PM'
+        LEFT JOIN hmsg_template_server_line htslpm ON hts.temp_server_id = htslpm.temp_server_id AND
+        htslpm.type_code='WEB'
+        LEFT JOIN hmsg_message_template hmtemail ON hmtemail.template_code=htslemail.template_code
+        LEFT JOIN hmsg_message_template hmtsms ON hmtsms.template_code=htslsms.template_code
+        LEFT JOIN hmsg_message_template hmtpm ON hmtpm.template_code=htslpm.template_code
         where hts.enabled_flag = 1
         <if test="level != null">
             AND hts.category_code = #{level}
