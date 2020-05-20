@@ -16,7 +16,7 @@ public class ReceiveSettingVO {
     @ApiModelProperty(value = "发送设置id/必填")
     @NotNull(message = "error.receiveSetting.sendSettingIdNull")
     private Long sendSettingId;
-    @ApiModelProperty(value = "消息类型（email,pm）/必填")
+    @ApiModelProperty(value = "消息类型（email,web）/必填")
     @NotEmpty(message = "error.receiveSetting.sendingTypeEmpty")
     private String sendingType;
     @ApiModelProperty(value = "是否禁用消息通知/非必填")
