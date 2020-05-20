@@ -173,13 +173,13 @@
                 AND nms.EVENT_NAME = #{eventName}
             </if>
         <choose>
-            <when test="type != null and type ='EMAIL'">
+            <when test="messageType != null and type ='EMAIL'">
                 AND nms.EMAIL_ENABLE = TRUE
             </when>
-            <when test="type != null and type ='SMS'">
+            <when test="messageType != null and type ='SMS'">
                 AND nms.EMAIL_ENABLE = TRUE
             </when>
-            <when test="type != null and type ='WEB'">
+            <when test="messageType != null and type ='WEB'">
                 AND nms.PM_ENABLE = TRUE
             </when>
         </choose>
