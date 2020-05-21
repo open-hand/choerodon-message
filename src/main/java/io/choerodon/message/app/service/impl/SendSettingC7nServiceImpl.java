@@ -31,6 +31,7 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.domain.repository.TemplateServerRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -127,7 +128,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public SendSettingVO queryByTempServerId(Long tempServerId) {
-        SendSettingVO sendSettingVO = (SendSettingVO) templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
+        TemplateServer templateServer=templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
+        SendSettingVO sendSettingVO = new SendSettingVO();
+        BeanUtils.copyProperties(templateServer,sendSettingVO);
         if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
             List<MessageTemplate> messageTemplates = new ArrayList<>();
             sendSettingVO.getServerList().forEach(t -> {
@@ -239,7 +242,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 break;
             case WEB:
                 sendSettingVO.setPmEnabledFlag(templateServerLine.getEnabledFlag());
-            case WH:
+            case WEB_HOOK:
                 if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
                     sendSettingVO.setWebhookJsonEnabledFlag(templateServerLine.getEnabledFlag());
                 }
@@ -262,7 +265,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             case WEB:
                 templateServerLine.setEnabledFlag(sendSettingVO.getPmEnabledFlag());
                 break;
-            case WH:
+            case WEB_HOOK:
                 if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
                     templateServerLine.setEnabledFlag(sendSettingVO.getWebhookJsonEnabledFlag());
                 }
