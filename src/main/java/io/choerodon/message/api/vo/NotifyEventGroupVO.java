@@ -10,6 +10,15 @@ package io.choerodon.message.api.vo;
 public class NotifyEventGroupVO {
     private Long id;
     private String name;
+    private String categoryCode;
+
+    public String getCategoryCode() {
+        return categoryCode;
+    }
+
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
+    }
 
     public Long getId() {
         return id;

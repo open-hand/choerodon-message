@@ -30,6 +30,15 @@ public class SendSettingVO extends TemplateServer {
     private Long smsTemplateId;
 
     private Long pmTemplateId;
+    private String sendingType;
+
+    public String getSendingType() {
+        return sendingType;
+    }
+
+    public void setSendingType(String sendingType) {
+        this.sendingType = sendingType;
+    }
 
     private List<MessageTemplate> messageTemplates;
 
