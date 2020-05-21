@@ -16,46 +16,88 @@
     </select>
     <select id="listDefaultAndEnabledSettingByNotifyType" resultMap="customMessageSettingMap">
         SELECT
-        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID, nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-        nss.ID AS NSS_ID, nss.NAME, nss.EMAIL_ENABLED_FLAG, nss.PM_ENABLED_FLAG, nss.SMS_ENABLED_FLAG,
-        nt.ID NT_ID, nt.SENDING_TYPE,
-        nssc.ID AS GROUP_ID,
-        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
-        FROM notify_message_setting nms
-        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
-        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
-        LEFT JOIN notify_template nt ON nss.CODE = nt.SEND_SETTING_CODE
+        nms.ID,
+        nms.ENV_ID,
+        nms.NOTIFY_TYPE,
+        nms.CODE,
+        nms.PROJECT_ID,
+        nms.EVENT_NAME,
+        nms.SMS_ENABLE,
+        nms.PM_ENABLE,
+        nms.EMAIL_ENABLE,
+        nms.OBJECT_VERSION_NUMBER,
+        hts.message_name AS name,
+        hts.SUBCATEGORY_CODE,
+        htsl.type_code as SENDING_TYPE,
+        htsl.ENABLED_FLAG ,
+        nmstu.ID AS NMSTU_ID,
+        nmstu.USER_ID,
+        nmstu.TYPE,
+        nmstu.MESSAGE_SETTING_ID
+        FROM
+        notify_message_setting nms
+        INNER JOIN hmsg_template_server hts ON nms.`CODE` =hts.MESSAGE_CODE
+        LEFT JOIN hmsg_template_server_line htsl ON htsl.temp_server_id=hts.temp_server_id
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = 0 AND nss.IS_ENABLED = TRUE
+        WHERE
+        nms.NOTIFY_TYPE = #{notifyType}
+        AND nms.PROJECT_ID = 0
+        AND hts.ENABLED_FLAG = 1
     </select>
     <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
         SELECT
-        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-        nss.NAME,
-        nssc.ID AS GROUP_ID,
-        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
-        FROM notify_message_setting nms
-        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
-        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
-        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nss.IS_ENABLED = TRUE
+          nms.ID,
+          nms.ENV_ID,
+          nms.NOTIFY_TYPE,
+          nms.CODE,
+          nms.PROJECT_ID,
+          nms.EVENT_NAME,
+          nms.SMS_ENABLE,
+          nms.PM_ENABLE,
+          nms.EMAIL_ENABLE,
+          nms.OBJECT_VERSION_NUMBER,
+          hts.message_name AS name,
+          nmstu.ID AS NMSTU_ID,
+          nmstu.USER_ID,
+          nmstu.TYPE,
+          nmstu.MESSAGE_SETTING_ID
+        FROM
+          notify_message_setting nms
+          INNER JOIN hmsg_template_server hts ON nms.CODE = hts.message_code
+          LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        WHERE
+          nms.NOTIFY_TYPE = #{notifyType}
+          AND nms.PROJECT_ID = #{projectId}
+          AND hts.ENABLED_FLAG = 1
     </select>
     <select id="listMessageSettingByProjectIdAndEnvId"
             resultMap="customMessageSettingMap">
         SELECT
-        nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
-        nss.NAME,
-        nssc.ID AS GROUP_ID,
-        nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
-        FROM notify_message_setting nms
-        INNER JOIN notify_send_setting nss ON nms.CODE = nss.CODE
-        LEFT JOIN notify_send_setting_category nssc ON nss.CATEGORY_CODE = nssc.CODE
-        LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
-        WHERE nms.NOTIFY_TYPE = #{notifyType} AND nms.PROJECT_ID = #{projectId} AND nms.ENV_ID = #{envId} AND
-        nss.IS_ENABLED = TRUE
+          nms.ID,
+          nms.ENV_ID,
+          nms.NOTIFY_TYPE,
+          nms.CODE,
+          nms.PROJECT_ID,
+          nms.EVENT_NAME,
+          nms.SMS_ENABLE,
+          nms.PM_ENABLE,
+          nms.EMAIL_ENABLE,
+          nms.OBJECT_VERSION_NUMBER,
+          hts.message_name AS name,
+          nmstu.ID AS NMSTU_ID,
+          nmstu.USER_ID,
+          nmstu.TYPE,
+          nmstu.MESSAGE_SETTING_ID
+        FROM
+          notify_message_setting nms
+          INNER JOIN hmsg_template_server hts ON nms.CODE = hts.message_code
+          LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        WHERE
+          nms.NOTIFY_TYPE = #{notifyType}
+          AND nms.PROJECT_ID = #{projectId}
+          AND nms.ENV_ID = #{envId}
+          AND hts.ENABLED_FLAG = 1
+
     </select>
     <select id="getSettingByTypeAndCode" resultMap="messageSettingMap">
         SELECT
@@ -130,6 +172,8 @@
         <result property="groupId" column="GROUP_ID"/>
         <result property="name" column="NAME"/>
         <result property="eventName" column="EVENT_NAME"/>
+        <result property="enabledFlag" column="ENABLED_FLAG"/>
+        <result property="subcategoryCode" column="SUBCATEGORY_CODE"/>
         <association property="sendSetting" javaType="io.choerodon.message.api.vo.SendSettingVO">
             <result property="emailEnabledFlag" column="EMAIL_ENABLED_FLAG"/>
             <result property="pmEnabledFlag" column="PM_ENABLED_FLAG"/>
@@ -158,20 +202,20 @@
 
     <select id="selectByParams" resultType="io.choerodon.message.infra.dto.MessageSettingDTO">
         SELECT
-            nms.ID,
-            nms.`CODE`,
-            nms.EVENT_NAME
+        nms.ID,
+        nms.`CODE`,
+        nms.EVENT_NAME
         FROM
-            notify_message_setting nms
+        notify_message_setting nms
         WHERE
-            nms. CODE = #{messageCode}
-            AND nms.PROJECT_ID = #{projectId}
-            <if test="envId!=null">
-                AND nms.ENV_ID = #{envId}
-            </if>
-            <if test="eventName!=null">
-                AND nms.EVENT_NAME = #{eventName}
-            </if>
+        nms. CODE = #{messageCode}
+        AND nms.PROJECT_ID = #{projectId}
+        <if test="envId!=null">
+            AND nms.ENV_ID = #{envId}
+        </if>
+        <if test="eventName!=null">
+            AND nms.EVENT_NAME = #{eventName}
+        </if>
         <choose>
             <when test="messageType != null and messageType =='EMAIL'">
                 AND nms.EMAIL_ENABLE = TRUE
@@ -183,5 +227,15 @@
                 AND nms.PM_ENABLE = TRUE
             </when>
         </choose>
+    </select>
+
+    <select id="listCategoryCode" resultType="string">
+        SELECT DISTINCT
+	      hts.subcategory_code
+        FROM
+          notify_message_setting nms
+	    INNER JOIN hmsg_template_server hts ON nms.CODE = hts.MESSAGE_CODE
+        WHERE
+      	  nms.NOTIFY_TYPE = #{notifyType}
     </select>
 </mapper>
