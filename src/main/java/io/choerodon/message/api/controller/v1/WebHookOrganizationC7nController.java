@@ -30,7 +30,7 @@ import io.choerodon.swagger.annotation.Permission;
  */
 @Api(tags = C7nSwaggerApiConfig.CHOERODON_WEBHOOK_ORGANIZATION)
 @RestController
-@RequestMapping("/choerodon/v1/organitaion/{organization_id}/web_hooks")
+@RequestMapping("/choerodon/v1/organization/{organization_id}/web_hooks")
 public class WebHookOrganizationC7nController {
 
     private WebHookC7nService webHookC7nService;
