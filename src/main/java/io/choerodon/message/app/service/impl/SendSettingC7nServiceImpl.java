@@ -13,7 +13,6 @@ import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
-import io.choerodon.message.infra.feign.PlatformFeignClient;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
@@ -59,8 +58,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private MessageClientProperties messageClientProperties;
     @Autowired
     private TemplateServerC7nMapper templateServerC7nMapper;
-    @Autowired
-    private PlatformFeignClient platformFeignClient;
     @Autowired
     private TemplateServerRepository templateServerRepository;
     @Autowired
