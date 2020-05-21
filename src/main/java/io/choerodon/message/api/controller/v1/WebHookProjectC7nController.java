@@ -2,11 +2,14 @@ package io.choerodon.message.api.controller.v1;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.hzero.message.app.service.MessageService;
 
+import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,11 +38,15 @@ public class WebHookProjectC7nController {
 
     private WebHookC7nService webHookC7nService;
     private WebhookRecordC7nService webhookRecordC7nService;
+    private SendSettingC7nService sendSettingC7nService;
 
 
-    public WebHookProjectC7nController(WebHookC7nService webHookC7nService, WebhookRecordC7nService webhookRecordC7nService) {
+    public WebHookProjectC7nController(WebHookC7nService webHookC7nService,
+                                       WebhookRecordC7nService webhookRecordC7nService,
+                                       SendSettingC7nService sendSettingC7nService) {
         this.webHookC7nService = webHookC7nService;
         this.webhookRecordC7nService = webhookRecordC7nService;
+        this.sendSettingC7nService = sendSettingC7nService;
     }
 
     @GetMapping
@@ -47,12 +54,12 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "项目层 查询WebHook信息（分页接口）")
     @CustomPageRequest
     public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
-                                                             @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
-                                                             @PathVariable(name = "project_id") Long sourceId,
-                                                             @RequestParam(required = false) String messageName,
-                                                             @RequestParam(required = false) String type,
-                                                             @RequestParam(required = false) Boolean enableFlag,
-                                                             @RequestParam(required = false) String params) {
+                                                           @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
+                                                           @PathVariable(name = "project_id") Long sourceId,
+                                                           @RequestParam(required = false) String messageName,
+                                                           @RequestParam(required = false) String type,
+                                                           @RequestParam(required = false) Boolean enableFlag,
+                                                           @RequestParam(required = false) String params) {
         return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.PROJECT.value(), messageName, type, enableFlag, params), HttpStatus.OK);
     }
 
@@ -148,6 +155,18 @@ public class WebHookProjectC7nController {
             @PathVariable(name = "project_id") Long projectId,
             @PathVariable(name = "record_id") Long recordId) {
         return new ResponseEntity<>(webhookRecordC7nService.queryById(projectId, recordId, ResourceLevel.PROJECT.value()), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "项目层可用于创建webhook事件查询")
+    @GetMapping("/send_settings")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    public ResponseEntity<WebHookVO.SendSetting> getTempServerForWebhook(
+            @PathVariable("project_id") Long projectId,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "description", required = false) String description,
+            @ApiParam(value = "webhook类型 DingTalk/WeChat/Json")
+            @RequestParam(name = "type") String type) {
+        return new ResponseEntity<>(sendSettingC7nService.getTempServerForWebhook(projectId, ResourceLevel.PROJECT.value(), name, description, type), HttpStatus.OK);
     }
 
 }

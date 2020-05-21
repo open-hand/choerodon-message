@@ -4,23 +4,25 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.MessageServiceVO;
-import io.choerodon.message.api.vo.MsgServiceTreeVO;
-import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
-import io.choerodon.message.api.vo.SendSettingVO;
+import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.feign.IamFeignClient;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
+import org.hzero.boot.platform.lov.dto.LovDTO;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.core.base.BaseConstants;
@@ -48,8 +50,11 @@ import java.util.stream.Collectors;
 public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
-    public static final String LOV_ERROR_INFO = "error.get.lov.meaning";
     public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
+    private static final String AGILE = "AGILE";
+    private static final String ADD_OR_IMPORT_USER = "add-or-import-user";
+    private static final String ISSUE_STATUS_CHANGE_NOTICE = "issue-status-change-notice";
+    private static final String PRO_MANAGEMENT = "pro-management";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -67,6 +72,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private HzeroTemplateServerMapper hzeroTemplateServerMapper;
     @Autowired
     private LovFeignClient lovFeignClient;
+    @Autowired
+    private IamClientOperator iamClientOperator;
 
 
     @Override
@@ -128,9 +135,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public SendSettingVO queryByTempServerId(Long tempServerId) {
-        TemplateServer templateServer=templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
+        TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
         SendSettingVO sendSettingVO = new SendSettingVO();
-        BeanUtils.copyProperties(templateServer,sendSettingVO);
+        BeanUtils.copyProperties(templateServer, sendSettingVO);
         if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
             List<MessageTemplate> messageTemplates = new ArrayList<>();
             sendSettingVO.getServerList().forEach(t -> {
@@ -314,6 +321,33 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         getSecondSendSettingDetailTreeVOS(levelAndCategoryCodeMap, sendSettingDetailTreeDTOS, sendSettingVOList);
 
         return sendSettingDetailTreeDTOS;
+    }
+
+    @Override
+    public WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type) {
+        WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
+        Map<String, String> lovMap = getMeanings();
+        Map<String, String> result = new HashMap<>();
+        List<String> agileCategories = new ArrayList<>();
+        if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
+            ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
+            if (projectDTO.getCategory().equals(AGILE)) {
+                agileCategories.add(ADD_OR_IMPORT_USER);
+                agileCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
+                agileCategories.add(PRO_MANAGEMENT);
+            }
+        }
+        // todo description scp
+        type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, name, description);
+        sendSettingDTOS.forEach(t -> {
+            if (lovMap.containsKey(t.getSubcategoryCode())) {
+                result.put(t.getSubcategoryCode(),lovMap.get(t.getSubcategoryCode()));
+            }
+        });
+        sendSetting.setCategories(result);
+        sendSetting.setSendSettings(sendSettingDTOS);
+        return sendSetting;
     }
 
     private void getSecondSendSettingDetailTreeVOS(Map<String, Set<String>> levelAndCategoryCodeMap,
