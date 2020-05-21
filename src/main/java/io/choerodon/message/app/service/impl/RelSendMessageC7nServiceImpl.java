@@ -12,6 +12,7 @@ import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
@@ -99,10 +100,12 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * @param projectId
      */
     private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId, String messageType) {
-        List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
-        List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
-        List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
-        receiverAddressList.removeAll(removeUserList);
+        if(!CollectionUtils.isEmpty(receiverAddressList)) {
+            List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
+            List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
+            List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
+            receiverAddressList.removeAll(removeUserList);
+        }
     }
 
     /**
@@ -117,7 +120,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
         MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
-        return !ObjectUtils.isEmpty(messageSettingDTO);
+        return ObjectUtils.isEmpty(messageSettingDTO);
 
     }
 
