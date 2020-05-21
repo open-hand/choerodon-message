@@ -11,14 +11,15 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.message.api.vo.ReceiveSettingVO;
 import io.choerodon.message.app.service.ReceiveSettingC7nService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.swagger.annotation.Permission;
 
 /**
  * @author dengyouquan
  **/
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_RECEIVE_SETTING)
 @RestController
 @RequestMapping("/choerodon/v1/notices/receive_setting")
-@Api("个人配置是否接收通知接口")
 public class ReceiveSettingC7nController {
     private ReceiveSettingC7nService receiveSettingService;
 

@@ -44,8 +44,8 @@
         <if test="type!=null">
             AND hws.server_type =#{type}
         </if>
-        <if test="webHookId!=null">
-            AND hws.server_id =#{webHookId}
+        <if test="webhookId!=null">
+            AND hws.server_id =#{webhookId}
         </if>
     </select>
 

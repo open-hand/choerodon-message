@@ -1,7 +1,10 @@
 package io.choerodon.message.api.controller.v1;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.message.app.service.MessageService;
+
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import org.springframework.http.HttpStatus;
@@ -25,8 +28,9 @@ import io.choerodon.swagger.annotation.Permission;
  * @date 2020/5/10
  * @description
  */
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_WEBHOOK_ORGANIZATION)
 @RestController
-@RequestMapping("/choerodon/v1/webhook/organitaion/{organization_id}/web_hooks")
+@RequestMapping("/choerodon/v1/organitaion/{organization_id}/web_hooks")
 public class WebHookOrganizationC7nController {
 
     private WebHookC7nService webHookC7nService;
@@ -96,7 +100,7 @@ public class WebHookOrganizationC7nController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "禁用WebHook")
-    @PutMapping("/{id}/disabled")
+    @PutMapping("/{id}/update_status")
     public ResponseEntity updateEnabledFlag(
             @PathVariable("organization_id") Long organizationId,
             @PathVariable("id") Long id,
@@ -117,7 +121,7 @@ public class WebHookOrganizationC7nController {
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据ID查询webhook")
-    @GetMapping("/{webhook_id}")
+    @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
             @PathVariable("organization_id") Long organizationId,
             @PathVariable("webhook_id") Long webHookId) {
@@ -125,7 +129,7 @@ public class WebHookOrganizationC7nController {
     }
 
 
-    @GetMapping("/record")
+    @GetMapping("/records")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
@@ -141,7 +145,7 @@ public class WebHookOrganizationC7nController {
     }
 
     @ApiOperation(value = "查询WebHook发送记录详情")
-    @GetMapping("/record/{record_id}")
+    @GetMapping("/details/{record_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebhookRecordVO> getWebhookRecordDetails(
             @PathVariable(name = "organization_id") Long organizationId,

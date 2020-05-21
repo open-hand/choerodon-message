@@ -1,7 +1,10 @@
 package io.choerodon.message.api.controller.v1;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.message.app.service.MessageService;
+
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import org.springframework.http.HttpStatus;
@@ -25,8 +28,9 @@ import io.choerodon.swagger.annotation.Permission;
  * @date 2020/5/10
  * @description
  */
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_WEBHOOK_PROJECT)
 @RestController
-@RequestMapping("/choerodon/v1/webhook/project/{project_id}")
+@RequestMapping("/choerodon/v1/project/{project_id}/web_hooks")
 public class WebHookProjectC7nController {
 
     private WebHookC7nService webHookC7nService;
@@ -38,7 +42,7 @@ public class WebHookProjectC7nController {
         this.webhookRecordC7nService = webhookRecordC7nService;
     }
 
-    @GetMapping("/web_hooks")
+    @GetMapping
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "项目层 查询WebHook信息（分页接口）")
     @CustomPageRequest
@@ -52,7 +56,7 @@ public class WebHookProjectC7nController {
         return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.PROJECT.value(), messageName, type, enableFlag, params), HttpStatus.OK);
     }
 
-    @GetMapping("/web_hooks/check_path")
+    @GetMapping("/check_path")
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
@@ -64,7 +68,7 @@ public class WebHookProjectC7nController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "项目层新增WebHook")
-    @PostMapping("/web_hooks")
+    @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(@PathVariable(name = "project_id") Long projectId,
                                                  @RequestBody @Validated WebHookVO webHookVO) {
         return new ResponseEntity<>(webHookC7nService.create(projectId, webHookVO, ResourceLevel.PROJECT.value()), HttpStatus.OK);
@@ -72,7 +76,7 @@ public class WebHookProjectC7nController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "更新WebHook")
-    @PutMapping("/web_hooks/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<WebHookVO> update(@PathVariable("project_id") Long projectId,
                                             @PathVariable("id") Long id,
                                             @RequestBody @Validated WebHookVO webHookVO) {
@@ -82,7 +86,7 @@ public class WebHookProjectC7nController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "删除WebHook")
-    @DeleteMapping("/web_hooks/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity delete(
             @PathVariable("project_id") Long projectId,
             @PathVariable("id") Long id) {
@@ -92,7 +96,7 @@ public class WebHookProjectC7nController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "禁用WebHook")
-    @PutMapping("/web_hooks/{id}/disabled")
+    @PutMapping("/{id}/update_status")
     public ResponseEntity updateEnabledFlag(
             @PathVariable("project_id") Long projectId,
             @PathVariable("id") Long id,
@@ -114,7 +118,7 @@ public class WebHookProjectC7nController {
 
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "根据ID查询webhook")
-    @GetMapping("/{webhook_id}")
+    @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
             @PathVariable("project_id") Long projectId,
             @PathVariable("webhook_id") Long webHookId) {
@@ -122,7 +126,7 @@ public class WebHookProjectC7nController {
     }
 
 
-    @GetMapping
+    @GetMapping(value = "/records")
     @Permission(level = ResourceLevel.PROJECT)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest

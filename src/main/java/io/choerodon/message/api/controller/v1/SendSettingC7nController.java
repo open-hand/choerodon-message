@@ -16,6 +16,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -24,14 +25,14 @@ import io.choerodon.swagger.annotation.Permission;
 
 import java.util.List;
 
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_SEND_SETTING)
 @RestController
 @RequestMapping("/choerodon/v1/notices/send_settings")
-@Api("全局层发送设置接口")
-public class SendSettingSiteC7nController {
+public class SendSettingC7nController {
 
     private SendSettingC7nService sendSettingC7nService;
 
-    public SendSettingSiteC7nController(SendSettingC7nService sendSettingC7nService) {
+    public SendSettingC7nController(SendSettingC7nService sendSettingC7nService) {
         this.sendSettingC7nService = sendSettingC7nService;
     }
 
