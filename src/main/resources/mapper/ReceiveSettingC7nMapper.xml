@@ -26,7 +26,7 @@
         </foreach>
         <choose>
             <when test="projectId != null">
-                AND nrs.SOURCE_ID = 1  AND nrs.SOURCE_TYPE = 'project'
+                AND nrs.SOURCE_ID = #{projectId}  AND nrs.SOURCE_TYPE = 'project'
             </when>
             <otherwise>
                 AND nrs.SOURCE_TYPE = 'site'
