@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 〈功能简述〉
@@ -27,8 +28,8 @@ public class CustomMessageSettingVO {
     @ApiModelProperty("通知类型，用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")
     private String notifyType;
 
-    @ApiModelProperty(value = "分组的id")
-    private Long groupId;
+    @ApiModelProperty(value = "分组的id,这就为categoryCode")
+    private String groupId;
 
     @ApiModelProperty("消息code")
     private String code;
@@ -75,6 +76,28 @@ public class CustomMessageSettingVO {
     @JsonIgnore
     private SendSettingVO sendSetting;
 
+    @ApiModelProperty(value = "消息父类型code")
+    private String subcategoryCode;
+
+    @ApiModelProperty("消息对应的line表中的类型是否启用")
+    private Integer enabledFlag;
+
+    public Integer getEnabledFlag() {
+        return enabledFlag;
+    }
+
+    public void setEnabledFlag(Integer enabledFlag) {
+        this.enabledFlag = enabledFlag;
+    }
+
+    public String getSubcategoryCode() {
+        return subcategoryCode;
+    }
+
+    public void setSubcategoryCode(String subcategoryCode) {
+        this.subcategoryCode = subcategoryCode;
+    }
+
     private int order;
 
 
@@ -102,11 +125,11 @@ public class CustomMessageSettingVO {
         this.notifyType = notifyType;
     }
 
-    public Long getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 

@@ -12,13 +12,19 @@ import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
 import io.choerodon.message.infra.enums.DeleteResourceType;
 import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.feign.DevopsFeignClient;
 import io.choerodon.message.infra.feign.IamFeignClient;
+import io.choerodon.message.infra.feign.PlatformFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 
+import org.hzero.boot.platform.lov.dto.LovValueDTO;
+import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -34,6 +40,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
+    public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
     private static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private static final String ERROR_SAVE_MESSAGE_SETTING = "error.save.message.setting";
     private static final String ERROR_UPDATE_MESSAGE_SETTING = "error.createOrUpdateEmail.message.setting";
@@ -48,11 +55,19 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     private IamFeignClient iamFeignClient;
 
-    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper, MessageSettingTargetUserC7nService messageSettingTargetUserService, DevopsFeignClient devopsFeignClient, IamFeignClient iamFeignClient) {
+    private LovFeignClient lovFeignClient;
+
+
+    public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper,
+                                        MessageSettingTargetUserC7nService messageSettingTargetUserService,
+                                        DevopsFeignClient devopsFeignClient,
+                                        IamFeignClient iamFeignClient,
+                                        LovFeignClient lovFeignClient) {
         this.messageSettingC7nMapper = messageSettingC7nMapper;
         this.messageSettingTargetUserService = messageSettingTargetUserService;
         this.devopsFeignClient = devopsFeignClient;
         this.iamFeignClient = iamFeignClient;
+        this.lovFeignClient = lovFeignClient;
     }
 
     @PostConstruct
@@ -64,10 +79,17 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
         // 平台层没有启用任何发送设置
+
         List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         if (CollectionUtils.isEmpty(defaultMessageSettingList)) {
             return messageSettingWarpVO;
         }
+        defaultMessageSettingList.stream().map(customMessageSettingVO -> {
+            String lovCode = customMessageSettingVO.getSubcategoryCode();
+            customMessageSettingVO.setGroupId(lovCode);
+            return customMessageSettingVO;
+        }).collect(Collectors.toList());
+
         // 计算平台层是否启用发送短信，站内信，邮件
         calculateStieSendSetting(defaultMessageSettingList);
         List<NotifyEventGroupVO> notifyEventGroupList = listEventGroupList(projectId, notifyType);
@@ -100,7 +122,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         // 装配VO
         messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
-
         return messageSettingWarpVO;
     }
 
@@ -242,7 +263,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     private List<NotifyEventGroupVO> filterEventGroupBySettingList(List<CustomMessageSettingVO> customMessageSettingList, List<NotifyEventGroupVO> notifyEventGroupList) {
-        Set<Long> groupIds = customMessageSettingList.stream().map(CustomMessageSettingVO::getGroupId).collect(Collectors.toSet());
+        Set<String> groupIds = customMessageSettingList.stream().map(CustomMessageSettingVO::getGroupId).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(groupIds)) {
             return new ArrayList<>();
         }
@@ -254,25 +275,19 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     private void calculateStieSendSetting(List<CustomMessageSettingVO> defaultMessageSettingList) {
-        // todo
-//        defaultMessageSettingList.forEach(settingVO -> {
-//            if (Boolean.TRUE.equals(settingVO.getSendSetting().getPmEnabledFlag())
-//                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
-//                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.WEB.getValue().equals(template.getSendingType()))) {
-//                settingVO.setPmEnabledFlag(true);
-//            }
-//            if (Boolean.TRUE.equals(settingVO.getSendSetting().getEmailEnabledFlag())
-//                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
-//                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.EMAIL.getValue().equals(template.getSendingType()))) {
-//                settingVO.setEmailEnabledFlag(true);
-//            }
-//            if (Boolean.TRUE.equals(settingVO.getSendSetting().getSmsEnabledFlag())
-//                    && !CollectionUtils.isEmpty(settingVO.getSendSetting().getTemplates())
-//                    && settingVO.getSendSetting().getTemplates().stream().anyMatch(template -> SendingTypeEnum.SMS.getValue().equals(template.getSendingType()))) {
-//                settingVO.setSmsEnabledFlag(true);
-//            }
-//        });
-
+        defaultMessageSettingList.forEach(settingVO -> {
+            if (settingVO.getEnabledFlag() == 1) {
+                if (SendingTypeEnum.WEB.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
+                    settingVO.setPmEnabledFlag(true);
+                }
+                if (SendingTypeEnum.EMAIL.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
+                    settingVO.setEmailEnabledFlag(true);
+                }
+                if (SendingTypeEnum.SMS.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
+                    settingVO.setSmsEnabledFlag(true);
+                }
+            }
+        });
     }
 
 
@@ -352,6 +367,12 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
             List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
+            //
+            customMessageSettingList.stream().map(customMessageSettingVO -> {
+                String lovCode = customMessageSettingVO.getSubcategoryCode();
+                customMessageSettingVO.setGroupId(lovCode);
+                return customMessageSettingVO;
+            });
             Map<String, CustomMessageSettingVO> custommessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getEventName, v -> v));
             defaultMessageSettingList.forEach(setting -> {
                 CustomMessageSettingVO customMessageSettingVO = custommessageSettingVOMap.get(setting.getEventName());
@@ -369,7 +390,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             });
             resorceDeleteSettingList.addAll(customMessageSettingList);
         });
-        resorceDeleteSettingList.forEach(settingVO -> settingVO.setGroupId(settingVO.getEnvId()));
+        resorceDeleteSettingList.forEach(settingVO -> settingVO.setGroupId(settingVO.getEnvId().toString()));
         return resorceDeleteSettingList;
     }
 
@@ -397,7 +418,19 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private List<NotifyEventGroupVO> listEventGroupList(Long projectId, String notifyType) {
         if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)
                 || ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
-            return messageSettingC7nMapper.listCategoriesBySettingType(notifyType);
+            List<NotifyEventGroupVO> notifyEventGroupVOS = new ArrayList<>();
+            List<String> stringList = messageSettingC7nMapper.listCategoryCode(notifyType);
+            if (CollectionUtils.isEmpty(stringList)) {
+                return Collections.emptyList();
+            }
+            stringList.forEach(s -> {
+                NotifyEventGroupVO notifyEventGroupVO = new NotifyEventGroupVO();
+                notifyEventGroupVO.setCategoryCode(s);
+                Map<String, String> stringStringMap = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID).stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning));
+                notifyEventGroupVO.setName(stringStringMap.get(s));
+                notifyEventGroupVOS.add(notifyEventGroupVO);
+            });
+            return notifyEventGroupVOS;
         }
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
             return devopsFeignClient.listByActive(projectId, true).getBody();
