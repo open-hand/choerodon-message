@@ -15,15 +15,16 @@ import io.choerodon.message.api.vo.CustomMessageSettingVO;
 import io.choerodon.message.api.vo.MessageSettingVO;
 import io.choerodon.message.api.vo.MessageSettingWarpVO;
 import io.choerodon.message.app.service.MessageSettingC7nService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.swagger.annotation.Permission;
 
 /**
  * User: Mr.Wang
  * Date: 2019/12/3
  */
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_MESSAGE_SETTING)
 @RestController
 @RequestMapping("/choerodon/v1/projects/{project_id}/message_settings")
-@Api("发送消息设置接口")
 public class MessageSettingC7nController {
     @Autowired
     private MessageSettingC7nService messageSettingService;

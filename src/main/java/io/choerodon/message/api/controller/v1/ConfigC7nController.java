@@ -18,13 +18,13 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.EmailConfigVO;
 import io.choerodon.message.app.service.ConfigC7nService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.swagger.annotation.Permission;
 
-;
 
+@Api(tags = C7nSwaggerApiConfig.CHOERODON_CONFIG)
 @RestController
 @RequestMapping("/choerodon/v1/notices/configs")
-@Api("邮箱，短信，站内信配置接口")
 public class ConfigC7nController {
     @Autowired
     private ConfigC7nService configC7nService;
