@@ -15,7 +15,6 @@ import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.feign.DevopsFeignClient;
 import io.choerodon.message.infra.feign.IamFeignClient;
-import io.choerodon.message.infra.feign.PlatformFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
