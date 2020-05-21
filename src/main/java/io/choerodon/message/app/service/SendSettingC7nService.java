@@ -1,10 +1,7 @@
 package io.choerodon.message.app.service;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.message.api.vo.MessageServiceVO;
-import io.choerodon.message.api.vo.MsgServiceTreeVO;
-import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
-import io.choerodon.message.api.vo.SendSettingVO;
+import io.choerodon.message.api.vo.*;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import java.util.List;
@@ -66,4 +63,6 @@ public interface SendSettingC7nService {
 
 
     List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, int allowConfig);
+
+     WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type);
 }

@@ -2,11 +2,14 @@ package io.choerodon.message.api.controller.v1;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.hzero.message.app.service.MessageService;
 
+import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,13 +39,16 @@ public class WebHookOrganizationC7nController {
     private WebHookC7nService webHookC7nService;
     private MessageService messageService;
     private WebhookRecordC7nService webhookRecordC7nService;
+    private SendSettingC7nService sendSettingC7nService;
 
 
     public WebHookOrganizationC7nController(WebHookC7nService webHookC7nService, WebhookRecordC7nService webhookRecordC7nService,
-                                            MessageService messageService) {
+                                            MessageService messageService,
+                                            SendSettingC7nService sendSettingC7nService) {
         this.webHookC7nService = webHookC7nService;
         this.messageService = messageService;
         this.webhookRecordC7nService = webhookRecordC7nService;
+        this.sendSettingC7nService = sendSettingC7nService;
     }
 
     @GetMapping
@@ -73,7 +79,7 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "组织层新增WebHook")
     @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(@PathVariable(name = "organization_id") Long organizationId,
-                                                 @RequestBody  WebHookVO webHookVO) {
+                                                 @RequestBody WebHookVO webHookVO) {
         return new ResponseEntity<>(webHookC7nService.create(organizationId, webHookVO, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
@@ -134,12 +140,12 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
     public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
-                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                                 @PathVariable(name = "organization_id") Long sourceId,
-                                                                 @RequestParam(name = "webhook_id", required = false) Long webhookId,
-                                                                 @RequestParam(required = false) String status,
-                                                                 @RequestParam(required = false, name = "name") String eventName,
-                                                                 @RequestParam(required = false, name = "type") String type) {
+                                                                       @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                       @PathVariable(name = "organization_id") Long sourceId,
+                                                                       @RequestParam(name = "webhook_id", required = false) Long webhookId,
+                                                                       @RequestParam(required = false) String status,
+                                                                       @RequestParam(required = false, name = "name") String eventName,
+                                                                       @RequestParam(required = false, name = "type") String type) {
 
         return new ResponseEntity<>(webhookRecordC7nService.pagingWebHookRecord(pageRequest, sourceId, webhookId, status, eventName, type, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
@@ -151,6 +157,18 @@ public class WebHookOrganizationC7nController {
             @PathVariable(name = "organization_id") Long organizationId,
             @PathVariable(name = "record_id") Long recordId) {
         return new ResponseEntity<>(webhookRecordC7nService.queryById(organizationId, recordId, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "组织层可用于创建webhook事件查询")
+    @GetMapping("/send_settings")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    public ResponseEntity<WebHookVO.SendSetting> getTempServerForWebhook(
+            @PathVariable("organization_id") Long organizationId,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "description", required = false) String description,
+            @ApiParam(value = "webhook类型 DingTalk/WeChat/Json")
+            @RequestParam(name = "type") String type) {
+        return new ResponseEntity<>(sendSettingC7nService.getTempServerForWebhook(organizationId, ResourceLevel.ORGANIZATION.value(), name, description, type), HttpStatus.OK);
     }
 
 }
