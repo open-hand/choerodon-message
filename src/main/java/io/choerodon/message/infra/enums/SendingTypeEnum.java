@@ -4,7 +4,7 @@ public enum SendingTypeEnum {
     EMAIL("EMAIL"),
     SMS("SMS"),
     WEB("WEB"),
-    WH("WEB_HOOK");
+    WEB_HOOK("WEB_HOOK");
 
     private String value;
 
