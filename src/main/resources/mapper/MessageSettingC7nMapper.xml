@@ -209,7 +209,14 @@
         notify_message_setting nms
         WHERE
         nms. CODE = #{messageCode}
-        AND nms.PROJECT_ID = #{projectId}
+        <choose>
+            <when test="projectId != null">
+                AND nms.PROJECT_ID = #{projectId}
+            </when>
+            <otherwise>
+                AND nms.PROJECT_ID = 0
+            </otherwise>
+        </choose>
         <if test="envId!=null">
             AND nms.ENV_ID = #{envId}
         </if>
