@@ -136,16 +136,19 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
+        Long tenantId = null;
+        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+        }
         List<String> webServerCodes;
         if (!ObjectUtils.isEmpty(projectId)) {
             webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
         } else {
-            webServerCodes = webhookProjectRelMapper.selectByTenantId(messageSender.getTenantId()).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
         }
         List<TemplateServerLine> lineList = serverLineMap.get(HmsgConstant.MessageType.WEB_HOOK);
         List<TemplateServerLine> values = lineList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         serverLineMap.put(HmsgConstant.MessageType.WEB_HOOK, values);
     }
-
 
 }
