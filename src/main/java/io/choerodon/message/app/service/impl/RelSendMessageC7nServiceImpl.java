@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.choerodon.message.infra.constant.MessageCodeConstants;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.message.app.service.TemplateServerService;
@@ -64,6 +65,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
+        if (MessageCodeConstants.INVITE_USER.equals(messageSender.getMessageCode())) {
+            return;
+        }
         Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
         Long projectId = null;
         Long envId = null;
@@ -100,7 +104,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * @param projectId
      */
     private void receiveFilter(List<Receiver> receiverAddressList, Long tempServerId, Long projectId, String messageType) {
-        if(!CollectionUtils.isEmpty(receiverAddressList)) {
+        if (!CollectionUtils.isEmpty(receiverAddressList)) {
             List<Long> userIds = receiverAddressList.stream().map(Receiver::getUserId).collect(Collectors.toList());
             List<Long> removeUserIds = receiveSettingC7nMapper.selectByTemplateServerId(projectId, tempServerId, userIds, messageType);
             List<Receiver> removeUserList = receiverAddressList.stream().filter(t -> removeUserIds.contains(t.getUserId())).collect(Collectors.toList());
