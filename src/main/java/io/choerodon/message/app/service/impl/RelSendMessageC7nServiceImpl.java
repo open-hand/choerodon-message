@@ -3,7 +3,6 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
-import io.choerodon.message.infra.constant.MessageCodeConstants;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
@@ -15,7 +14,6 @@ import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.TemplateServer;
-import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -67,9 +64,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
-        if (MessageCodeConstants.INVITE_USER.equals(messageSender.getMessageCode())) {
-            return;
-        }
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
@@ -92,7 +86,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if ((messageType.equals(HmsgConstant.MessageType.WEB) ||
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
                 messageType.equals(HmsgConstant.MessageType.SMS))
-                && templateServer.getCategoryCode().equals(ResourceLevel.PROJECT.value())) {
+                && messageSettingC7nMapper.selectProjectMessage().contains(messageSender.getMessageCode())) {
             if (projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
@@ -153,14 +147,19 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             webHookSenderList.clear();
         }
         List<String> webServerCodes;
+        List<WebHookSender> senderList;
         if (!ObjectUtils.isEmpty(projectId)) {
+            //项目成获取到应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
+            // 组织层获取到不应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            senderList=webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         }
-//        List<TemplateServerLine> lineList = serverLineMap.get(HmsgConstant.MessageType.WEB_HOOK);
-//        List<TemplateServerLine> values = lineList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
-//        serverLineMap.put(HmsgConstant.MessageType.WEB_HOOK, webHookSenderList);
+        webHookSenderList.clear();
+        webHookSenderList.addAll(senderList);
+
     }
 
 }
