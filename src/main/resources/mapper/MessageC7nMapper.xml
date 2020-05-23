@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.MessageC7nMapper">
+
+    <select id="selectEmailMessage" resultType="org.hzero.message.domain.entity.Message">
+        <bind name="lang" value="@io.choerodon.mybatis.helper.LanguageHelper@language()" />
+        select
+        hm.message_id,
+        hm.tenant_id,
+        hm.message_type_code,
+        hm.server_code,
+        hm.subject,
+        hm.object_version_number,
+        hm.send_flag,
+        hm.creation_date
+        from hmsg_message hm
+        join hmsg_message_transaction hmt on hm.message_id = hmt.message_id
+       WHERE hm.message_type_code = 'EMAIL'
+        and hmt.last_update_date &gt;= #{startDate}
+        and hmt.last_update_date &lt;= #{endDate}
+        order by hmt.last_update_date DESC
+    </select>
+
+</mapper>
