@@ -117,4 +117,6 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
 
     List<String> listCategoryCode(@Param("notifyType") String notifyType);
 
+    List<String> selectProjectMessage();
+
 }
