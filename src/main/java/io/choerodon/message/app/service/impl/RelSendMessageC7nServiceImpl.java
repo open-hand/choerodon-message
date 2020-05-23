@@ -1,9 +1,14 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import io.choerodon.core.enums.MessageAdditionalType;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.app.service.RelSendMessageC7nService;
+import io.choerodon.message.infra.constant.MessageCodeConstants;
+import io.choerodon.message.infra.dto.MessageSettingDTO;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
+import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.message.app.service.TemplateServerService;
@@ -16,14 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import io.choerodon.core.enums.MessageAdditionalType;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.app.service.RelSendMessageC7nService;
-import io.choerodon.message.infra.dto.MessageSettingDTO;
-import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
-import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
-import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -66,6 +66,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
+        if (MessageCodeConstants.INVITE_USER.equals(messageSender.getMessageCode())) {
+            return;
+        }
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
