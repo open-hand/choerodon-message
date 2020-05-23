@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.choerodon.message.infra.constant.MessageCodeConstants;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
+import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -65,10 +66,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
-        if (MessageCodeConstants.INVITE_USER.equals(messageSender.getMessageCode())) {
-            return;
-        }
-        Long tempServerId = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode()).getTempServerId();
+        TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
+        Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
         Long envId = null;
         String eventName = null;
@@ -86,9 +85,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             receiveFilter(receiverList, tempServerId, projectId, messageType);
         }
         // 如果项目层未启动 则不发送 接受者为null
-        if (messageType.equals(HmsgConstant.MessageType.WEB) ||
+        if ((messageType.equals(HmsgConstant.MessageType.WEB) ||
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
-                messageType.equals(HmsgConstant.MessageType.SMS)) {
+                messageType.equals(HmsgConstant.MessageType.SMS))
+                && templateServer.getCategoryCode().equals(ResourceLevel.PROJECT.value())) {
             if (projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
