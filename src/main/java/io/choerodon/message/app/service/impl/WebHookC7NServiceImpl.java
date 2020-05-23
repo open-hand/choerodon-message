@@ -1,21 +1,8 @@
 package io.choerodon.message.app.service.impl;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.WebHookVO;
-import io.choerodon.message.app.service.WebHookC7nService;
-import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-import io.choerodon.message.infra.dto.iam.ProjectDTO;
-import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.WebHookTypeEnum;
-import io.choerodon.message.infra.feign.operator.IamClientOperator;
-import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
-import io.choerodon.message.infra.mapper.WebHookC7nMapper;
-import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
-import io.choerodon.message.infra.utils.ConversionUtil;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.hzero.message.app.service.MessageService;
 import org.hzero.message.app.service.TemplateServerWhService;
@@ -35,8 +22,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.WebHookVO;
+import io.choerodon.message.app.service.WebHookC7nService;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
+import io.choerodon.message.infra.mapper.WebHookC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author scp
@@ -77,11 +78,9 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
         if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-//            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
-            return PageHelper.doPage(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
+            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
         } else {
-//            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
-            return PageHelper.doPage(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
+            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
         }
     }
 
