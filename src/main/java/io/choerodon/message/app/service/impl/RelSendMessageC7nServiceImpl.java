@@ -11,6 +11,7 @@ import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
+import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.TemplateServer;
@@ -59,9 +60,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
 
-    protected void filterWebHookReceiver(MessageSender sender, Map<String, List<TemplateServerLine>> serverLineMap) {
-        super.filterWebHookReceiver(sender, serverLineMap);
-        webHookFilter(sender, serverLineMap);
+    protected void filterWebHookReceiver(MessageSender sender,List<WebHookSender> webHookSenderList) {
+//        super.filterWebHookReceiver(webHookSenderList);
+        webHookFilter(sender, webHookSenderList);
     }
 
 
@@ -136,9 +137,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * webhook过滤
      *
      * @param messageSender
-     * @param serverLineMap
+     * @param webHookSenderList
      */
-    private void webHookFilter(MessageSender messageSender, Map<String, List<TemplateServerLine>> serverLineMap) {
+    private void webHookFilter(MessageSender messageSender, List<WebHookSender> webHookSenderList) {
         Long projectId = null;
         if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
@@ -147,15 +148,19 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
             tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
         }
+        // 组织id和项目id都未传 不能发送
+        if (tenantId == null && projectId == null) {
+            webHookSenderList.clear();
+        }
         List<String> webServerCodes;
         if (!ObjectUtils.isEmpty(projectId)) {
             webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
         } else {
             webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
         }
-        List<TemplateServerLine> lineList = serverLineMap.get(HmsgConstant.MessageType.WEB_HOOK);
-        List<TemplateServerLine> values = lineList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
-        serverLineMap.put(HmsgConstant.MessageType.WEB_HOOK, values);
+//        List<TemplateServerLine> lineList = serverLineMap.get(HmsgConstant.MessageType.WEB_HOOK);
+//        List<TemplateServerLine> values = lineList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+//        serverLineMap.put(HmsgConstant.MessageType.WEB_HOOK, webHookSenderList);
     }
 
 }
