@@ -1,5 +1,6 @@
 package io.choerodon.message.api.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.message.domain.entity.MessageTemplate;
 import org.hzero.message.domain.entity.TemplateServer;
@@ -10,6 +11,7 @@ import java.util.List;
  * @author jiameng.cao
  * @date 2019/10/30
  */
+@JsonInclude
 public class SendSettingVO extends TemplateServer {
 
     @ApiModelProperty(value = "邮件重发次数")
@@ -40,7 +42,7 @@ public class SendSettingVO extends TemplateServer {
         this.sendingType = sendingType;
     }
 
-    private List<MessageTemplate> messageTemplates;
+    private List<MessageTemplateVO> messageTemplateVOS;
 
     public Integer getEmailEnabledFlag() {
         return emailEnabledFlag;
@@ -82,12 +84,12 @@ public class SendSettingVO extends TemplateServer {
         this.webhookJsonEnabledFlag = webhookJsonEnabledFlag;
     }
 
-    public List<MessageTemplate> getMessageTemplates() {
-        return messageTemplates;
+    public List<MessageTemplateVO> getMessageTemplateVOS() {
+        return messageTemplateVOS;
     }
 
-    public void setMessageTemplates(List<MessageTemplate> messageTemplates) {
-        this.messageTemplates = messageTemplates;
+    public void setMessageTemplateVOS(List<MessageTemplateVO> messageTemplateVOS) {
+        this.messageTemplateVOS = messageTemplateVOS;
     }
 
     public Integer getRetryCount() {
