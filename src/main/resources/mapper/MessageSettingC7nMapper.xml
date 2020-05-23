@@ -245,4 +245,13 @@
         WHERE
       	  nms.NOTIFY_TYPE = #{notifyType}
     </select>
+    
+    <select id="selectProjectMessage" resultType="java.lang.String">
+        SELECT DISTINCT
+            nms.`CODE`
+        FROM
+            notify_message_setting nms
+        WHERE
+            nms.PROJECT_ID = 0
+    </select>
 </mapper>
