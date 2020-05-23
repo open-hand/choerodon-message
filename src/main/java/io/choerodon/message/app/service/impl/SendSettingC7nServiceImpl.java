@@ -11,7 +11,6 @@ import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
-import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
@@ -22,7 +21,6 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
-import org.hzero.boot.platform.lov.dto.LovDTO;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.core.base.BaseConstants;
@@ -139,13 +137,16 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         SendSettingVO sendSettingVO = new SendSettingVO();
         BeanUtils.copyProperties(templateServer, sendSettingVO);
         if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
-            List<MessageTemplate> messageTemplates = new ArrayList<>();
+            List<MessageTemplateVO> messageTemplates = new ArrayList<>();
             sendSettingVO.getServerList().forEach(t -> {
-                        messageTemplates.add(messageTemplateService.getMessageTemplate(BaseConstants.DEFAULT_TENANT_ID, t.getTemplateCode(), messageClientProperties.getDefaultLang()));
+                        MessageTemplateVO template = new MessageTemplateVO();
+                        BeanUtils.copyProperties(messageTemplateService.getMessageTemplate(BaseConstants.DEFAULT_TENANT_ID, t.getTemplateCode(), messageClientProperties.getDefaultLang()), template);
+                        messageTemplates.add(template);
+                        template.setSendingType(t.getTypeCode());
                         setSendTypeEnable(t, sendSettingVO);
                     }
             );
-            sendSettingVO.setMessageTemplates(messageTemplates);
+            sendSettingVO.setMessageTemplateVOS(messageTemplates);
         }
         return sendSettingVO;
     }
@@ -243,6 +244,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         switch (SendingTypeEnum.valueOf(templateServerLine.getTypeCode())) {
             case EMAIL:
                 sendSettingVO.setEmailEnabledFlag(templateServerLine.getEnabledFlag());
+                sendSettingVO.setRetryCount(templateServerLine.getTryTimes());
                 break;
             case SMS:
                 sendSettingVO.setSmsEnabledFlag(templateServerLine.getEnabledFlag());
@@ -250,7 +252,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             case WEB:
                 sendSettingVO.setPmEnabledFlag(templateServerLine.getEnabledFlag());
             case WEB_HOOK:
-                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue().toUpperCase())) {
                     sendSettingVO.setWebhookJsonEnabledFlag(templateServerLine.getEnabledFlag());
                 }
                 if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.WECHAT.getValue())) {
@@ -342,7 +344,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
-                result.put(t.getSubcategoryCode(),lovMap.get(t.getSubcategoryCode()));
+                result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
             }
         });
         sendSetting.setCategories(result);
