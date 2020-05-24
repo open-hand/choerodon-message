@@ -57,8 +57,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
 
-    protected void filterWebHookReceiver(MessageSender sender,List<WebHookSender> webHookSenderList) {
-//        super.filterWebHookReceiver(webHookSenderList);
+    protected void filterWebHookReceiver(MessageSender sender, List<WebHookSender> webHookSenderList) {
+        super.filterWebHookReceiver(sender, webHookSenderList);
         webHookFilter(sender, webHookSenderList);
     }
 
