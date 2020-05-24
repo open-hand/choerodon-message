@@ -59,7 +59,7 @@
            JOIN hmsg_template_server_line htsl ON htsl.temp_server_id = hts.temp_server_id
            AND htsl.enabled_flag = TRUE
            AND htsl.type_code = 'WEB_HOOK'
-           AND htsl.template_code LIKE concat(concat('%',#{messageType}),'%')
+           <!--AND htsl.template_code LIKE concat(concat('%',#{messageType}),'%')-->
         WHERE hts.category_code=#{level}
         <if test="agileCategories!=null and agileCategories.size>0">
             And hts.subcategory_code in
