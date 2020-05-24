@@ -76,7 +76,7 @@ env:
     # Redis 端口
     SPRING_REDIS_PORT: 6379
     # Redis db
-    SPRING_REDIS_DATABASE: 2
+    SPRING_REDIS_DATABASE: 1
     # 资源池中最大连接数
     # 默认8，-1表示无限制；可根据服务并发redis情况及服务端的支持上限调整
     SPRING_REDIS_POOL_MAX_ACTIVE: 50
