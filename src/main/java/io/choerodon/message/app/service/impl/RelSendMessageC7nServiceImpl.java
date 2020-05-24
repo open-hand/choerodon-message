@@ -1,7 +1,6 @@
 package io.choerodon.message.app.service.impl;
 
 import io.choerodon.core.enums.MessageAdditionalType;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -69,13 +68,16 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         Long projectId = null;
         Long envId = null;
         String eventName = null;
-        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
-        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName()))) {
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName()))) {
             envId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName())));
         }
-        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()))) {
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()))) {
             eventName = String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()));
         }
         List<Receiver> receiverList = messageSender.getReceiverAddressList();
@@ -135,11 +137,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private void webHookFilter(MessageSender messageSender, List<WebHookSender> webHookSenderList) {
         Long projectId = null;
-        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
         Long tenantId = null;
-        if (!ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
             tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
         }
         // 组织id和项目id都未传 不能发送
