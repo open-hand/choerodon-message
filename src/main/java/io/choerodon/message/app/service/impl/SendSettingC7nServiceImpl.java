@@ -179,7 +179,12 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
         List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(id, BaseConstants.DEFAULT_TENANT_ID);
         if (!CollectionUtils.isEmpty(lineList)) {
-            lineList.forEach(t -> setEnabledFlag(t, sendSettingVO));
+            lineList.forEach(t -> {
+                setEnabledFlag(t, sendSettingVO);
+                if (t.getTypeCode().equals(SendingTypeEnum.EMAIL.getValue())) {
+                    t.setTryTimes(sendSettingVO.getRetryCount());
+                }
+            });
             templateServerLineRepository.batchUpdateByPrimaryKey(lineList);
         }
         return sendSettingVO;
@@ -275,7 +280,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 templateServerLine.setEnabledFlag(sendSettingVO.getPmEnabledFlag());
                 break;
             case WEB_HOOK:
-                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue())) {
+                if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue().toUpperCase())) {
                     templateServerLine.setEnabledFlag(sendSettingVO.getWebhookJsonEnabledFlag());
                 }
                 if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.WECHAT.getValue())) {
