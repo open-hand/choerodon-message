@@ -53,6 +53,10 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String ADD_OR_IMPORT_USER = "add-or-import-user";
     private static final String ISSUE_STATUS_CHANGE_NOTICE = "issue-status-change-notice";
     private static final String PRO_MANAGEMENT = "pro-management";
+    private static final String WEBHOOK_OTHER = "webHookOther";
+    private static final String WEBHOOK_JSON = "webHookJson";
+    private static final String JSON = "JSON";
+    private static final String DINGTALK_WECHAT = "DingTalkAndWeChat";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -345,6 +349,12 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             }
         }
         // todo description scp
+        if (WEBHOOK_OTHER.equals(type)) {
+            type = DINGTALK_WECHAT;
+        }
+        if (JSON.equals(type)) {
+            type = JSON;
+        }
         type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
         List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, name, description);
         sendSettingDTOS.forEach(t -> {
