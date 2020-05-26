@@ -6,7 +6,8 @@
         SELECT
         temp_server_id as id,
         message_code,
-        message_name as introduce,
+        message_name as messageName,
+        description,
         enabled_flag as enabled,
         subcategory_code AS message_type,
         category_code AS LEVEL,

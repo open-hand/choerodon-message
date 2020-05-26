@@ -42,6 +42,17 @@ public class MessageServiceVO {
     @ApiModelProperty(value = "乐观所版本号")
     private Long objectVersionNumber;
 
+    @ApiModelProperty(value = "描述字段")
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Long getId() {
         return id;
     }
@@ -117,5 +128,13 @@ public class MessageServiceVO {
 
     public void setEdit(Boolean edit) {
         this.edit = edit;
+    }
+
+    public String getMessageName() {
+        return messageName;
+    }
+
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
     }
 }
