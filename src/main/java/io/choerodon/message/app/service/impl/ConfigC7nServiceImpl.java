@@ -3,7 +3,7 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.EmailConfigVO;
 import io.choerodon.message.app.service.ConfigC7nService;
-import io.choerodon.message.infra.ConfigNameEnum;
+import io.choerodon.message.infra.enums.ConfigNameEnum;
 
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import org.hzero.message.app.service.EmailServerService;

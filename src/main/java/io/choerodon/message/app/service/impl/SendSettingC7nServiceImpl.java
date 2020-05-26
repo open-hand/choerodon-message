@@ -8,6 +8,7 @@ import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.ConfigNameEnum;
 import io.choerodon.message.infra.enums.LevelType;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
@@ -35,6 +36,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,6 +58,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String WEBHOOK_OTHER = "webHookOther";
     private static final String WEBHOOK_JSON = "webHookJson";
     private static final String JSON = "JSON";
+    private static final String MESSAGE_CHOERODON = "CHOERODON.";
     private static final String DINGTALK_WECHAT = "DingTalkAndWeChat";
 
     @Autowired
@@ -365,6 +368,44 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         sendSetting.setCategories(result);
         sendSetting.setSendSettings(sendSettingDTOS);
         return sendSetting;
+    }
+
+    @Override
+    public MessageTemplateVO createMessageTemplate(MessageTemplateVO messageTemplateVO) {
+        MessageTemplate messageTemplate = new MessageTemplate();
+        // 1.准备消息模板数据
+        TemplateServer templateServer = templateServerRepository.selectOne(new TemplateServer().setMessageCode(messageTemplateVO.getMessageCode()));
+        BeanUtils.copyProperties(messageTemplateVO, messageTemplate);
+        messageTemplate.setTemplateName(templateServer.getMessageName());
+        messageTemplate.setTemplateTitle(templateServer.getMessageName());
+        messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        if (!StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
+            String templateCodeSuffix = messageTemplateVO.getWebhookType().contains(WebHookTypeEnum.JSON.getValue()) ? messageTemplateVO.getWebhookType().toUpperCase() : messageTemplateVO.getWebhookType();
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + templateCodeSuffix);
+        } else {
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase());
+        }
+        messageTemplate.setLang(messageClientProperties.getDefaultLang());
+        messageTemplate.setEnabledFlag(1);
+        messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
+
+        // 2. template_server_line表
+        TemplateServerLine templateServerLine = new TemplateServerLine();
+        templateServerLine.setTempServerId(templateServer.getTempServerId());
+        switch (SendingTypeEnum.forValue(messageTemplateVO.getSendingType().toUpperCase())){
+            case EMAIL:
+                templateServerLine.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
+                break;
+            case SMS:
+                templateServerLine.setServerCode(ConfigNameEnum.SMS_NAME.value());
+                break;
+        }
+        templateServerLine.setTypeCode(messageTemplateVO.getSendingType().toUpperCase());
+        templateServerLine.setTemplateCode(messageTemplate.getTemplateCode());
+        templateServerLine.setEnabledFlag(1);
+        templateServerLineRepository.insert(templateServerLine);
+        BeanUtils.copyProperties(messageTemplate,messageTemplateVO);
+        return messageTemplateVO;
     }
 
     private void getSecondSendSettingDetailTreeVOS(Map<String, Set<String>> levelAndCategoryCodeMap,

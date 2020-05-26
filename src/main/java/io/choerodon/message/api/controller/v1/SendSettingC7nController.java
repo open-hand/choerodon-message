@@ -1,20 +1,18 @@
 package io.choerodon.message.api.controller.v1;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.message.api.vo.MessageServiceVO;
-import io.choerodon.message.api.vo.MsgServiceTreeVO;
-import io.choerodon.message.api.vo.SendSettingDetailTreeVO;
+import io.choerodon.message.api.vo.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.core.util.Results;
+import org.hzero.message.domain.entity.MessageTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.SendSettingVO;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -111,5 +109,13 @@ public class SendSettingC7nController {
     @ApiOperation(value = "检查资源删除验证通知是否启用")
     public ResponseEntity<Boolean> checkResourceDeleteEnabled() {
         return ResponseEntity.ok(sendSettingC7nService.checkResourceDeleteEnabled());
+    }
+
+
+    @ApiOperation("创建消息模板")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/template")
+    public ResponseEntity<MessageTemplateVO> createMessageTemplate(@RequestBody MessageTemplateVO messageTemplateVO) {
+        return Results.created(sendSettingC7nService.createMessageTemplate(messageTemplateVO));
     }
 }
