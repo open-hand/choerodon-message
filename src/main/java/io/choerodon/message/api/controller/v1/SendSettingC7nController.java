@@ -113,7 +113,7 @@ public class SendSettingC7nController {
 
 
     @ApiOperation("创建消息模板")
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(level = ResourceLevel.SITE)
     @PostMapping("/template")
     public ResponseEntity<MessageTemplateVO> createMessageTemplate(@RequestBody MessageTemplateVO messageTemplateVO) {
         return Results.created(sendSettingC7nService.createMessageTemplate(messageTemplateVO));
