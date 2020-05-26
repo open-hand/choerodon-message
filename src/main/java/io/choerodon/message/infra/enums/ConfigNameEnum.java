@@ -1,4 +1,4 @@
-package io.choerodon.message.infra;
+package io.choerodon.message.infra.enums;
 
 import java.util.HashMap;
 

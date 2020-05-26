@@ -6,6 +6,8 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import java.util.List;
 
+import org.hzero.message.domain.entity.MessageTemplate;
+
 /**
  * @author scp
  * @date 2020/5/7
@@ -64,5 +66,7 @@ public interface SendSettingC7nService {
 
     List<SendSettingDetailTreeVO> queryByLevelAndAllowConfig(String level, int allowConfig);
 
-     WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type);
+    WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type);
+
+    MessageTemplateVO createMessageTemplate(MessageTemplateVO messageTemplateVO);
 }
