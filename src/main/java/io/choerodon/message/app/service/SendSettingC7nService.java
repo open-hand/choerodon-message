@@ -52,7 +52,7 @@ public interface SendSettingC7nService {
 
     void updateReceiveConfigFlag(Long tempServerId, Boolean receiveConfigFlag);
 
-    SendSettingVO queryByTempServerId(Long tempServerId);
+    SendSettingVO queryByTempServerCode(String tempServerCode);
 
     SendSettingVO queryByCode(String messageCode);
 

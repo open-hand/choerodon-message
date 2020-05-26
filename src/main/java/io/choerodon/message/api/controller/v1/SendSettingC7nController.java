@@ -6,7 +6,6 @@ import io.choerodon.message.api.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.core.util.Results;
-import org.hzero.message.domain.entity.MessageTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +59,8 @@ public class SendSettingC7nController {
     @GetMapping("/detail")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "全局层查看发送设置详情")
-    public ResponseEntity<SendSettingVO> query(@RequestParam Long tempServerId) {
-        return new ResponseEntity<>(sendSettingC7nService.queryByTempServerId(tempServerId), HttpStatus.OK);
+    public ResponseEntity<SendSettingVO> query(@RequestParam String tempServerCode) {
+        return new ResponseEntity<>(sendSettingC7nService.queryByTempServerCode(tempServerCode), HttpStatus.OK);
     }
 
     @GetMapping("/list/allow_config")
