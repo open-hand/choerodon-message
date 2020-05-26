@@ -139,8 +139,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     @Override
-    public SendSettingVO queryByTempServerId(Long tempServerId) {
-        TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerId);
+    public SendSettingVO queryByTempServerCode(String tempServerCode) {
+        TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerCode);
         SendSettingVO sendSettingVO = new SendSettingVO();
         BeanUtils.copyProperties(templateServer, sendSettingVO);
         if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
@@ -164,7 +164,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (ObjectUtils.isEmpty(templateServer)) {
             throw new CommonException("error.query.tempServer");
         }
-        return queryByTempServerId(templateServer.getTempServerId());
+        return queryByTempServerCode(messageCode);
     }
 
     @Override
