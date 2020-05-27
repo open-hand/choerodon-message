@@ -1,5 +1,6 @@
 package io.choerodon.message.api.ws;
 
+import io.choerodon.message.infra.utils.OnlineCountStorageUtils;
 import org.hzero.websocket.handler.SocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,12 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
+    private OnlineCountStorageUtils onlineCountStorageUtils;
+
+    public NotifyWebSocketHandler(OnlineCountStorageUtils onlineCountStorageUtils) {
+        this.onlineCountStorageUtils = onlineCountStorageUtils;
+    }
+
     @Override
     public String processor() {
         return "choerodon_msg";
@@ -30,7 +37,30 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        String userId = session.getHandshakeHeaders().getFirst("X-WebSocket-UserID");
+        //今日访问人数+1，在线人数+1,发送在线信息
         LOGGER.info("Get sitMsg's subscription,sessionId: {}", session.getId());
+        Integer originCount = onlineCountStorageUtils.getOnlineCount();
+        onlineCountStorageUtils.addNumberOfVisitorsToday(userId);
+        onlineCountStorageUtils.addOnlineCount(userId, session.getId());
+        if (!originCount.equals(onlineCountStorageUtils.getOnlineCount())) {
+            onlineCountStorageUtils.makeVisitorsInfo();
+            // TODO 发送在线消息          有没有必要
+//            webSocketHelper.sendMessageByKey(ONLINE_INFO_KEY_PATH, new SendMessagePayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
+        }
+
+        // TODO 发送未读站内信数量
+//        Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, key);
+//            String code = map.get("code");
+//            if (SITE_MSG_CODE.equals(code)) {
+//                String id = map.get("id");
+//                if (id != null) {
+//                    int unReadNum = siteMsgRecordMapper.selectCountOfUnRead(Long.parseLong(userId));
+//                    if (unReadNum > 0) {
+//                        webSocketHelper.sendMessageBySession(session, new SendMessagePayload<>(MSG_TYPE_PM, key, unReadNum));
+//                    }
+//                }
+//            }
     }
 
     @Override
