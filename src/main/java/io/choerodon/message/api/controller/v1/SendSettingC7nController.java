@@ -71,7 +71,7 @@ public class SendSettingC7nController {
     }
 
 
-    @PutMapping("/enabled")
+    @PutMapping("/update_status")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "根据code启用消息服务")
     public ResponseEntity updateStatus(@RequestParam("code") String code, @RequestParam(value = "status") Boolean status) {
