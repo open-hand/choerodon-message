@@ -356,7 +356,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (WEBHOOK_OTHER.equals(type)) {
             type = DINGTALK_WECHAT;
         }
-        if (JSON.equals(type)) {
+        if (WEBHOOK_JSON.equals(type)) {
             type = JSON;
         }
         type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;

@@ -54,7 +54,8 @@
             hts.temp_server_id,
             hts.subcategory_code,
             hts.message_code,
-            hts.message_name
+            hts.message_name,
+            hts.description
         FROM
             hmsg_template_server hts
            JOIN hmsg_template_server_line htsl ON htsl.temp_server_id = hts.temp_server_id
