@@ -143,9 +143,10 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerCode);
         SendSettingVO sendSettingVO = new SendSettingVO();
         BeanUtils.copyProperties(templateServer, sendSettingVO);
-        if (!CollectionUtils.isEmpty(sendSettingVO.getServerList())) {
+        List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(templateServer.getTempServerId(), BaseConstants.DEFAULT_TENANT_ID);
+        if (!CollectionUtils.isEmpty(lineList)) {
             List<MessageTemplateVO> messageTemplates = new ArrayList<>();
-            sendSettingVO.getServerList().forEach(t -> {
+            lineList.forEach(t -> {
                         MessageTemplateVO template = new MessageTemplateVO();
                         BeanUtils.copyProperties(messageTemplateService.getMessageTemplate(BaseConstants.DEFAULT_TENANT_ID, t.getTemplateCode(), messageClientProperties.getDefaultLang()), template);
                         messageTemplates.add(template);
@@ -182,7 +183,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     public SendSettingVO updateSendSetting(Long id, SendSettingVO sendSettingVO) {
         TemplateServer templateServer = templateServerRepository.selectByPrimaryKey(id);
         templateServer.setReceiveConfigFlag(sendSettingVO.getReceiveConfigFlag());
-        templateServerService.updateTemplateServer(templateServer);
+        templateServerRepository.updateByPrimaryKey(templateServer);
 
         List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(id, BaseConstants.DEFAULT_TENANT_ID);
         if (!CollectionUtils.isEmpty(lineList)) {
