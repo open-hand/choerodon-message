@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.message.domain.entity.TemplateServer;
@@ -15,6 +16,7 @@ import org.hzero.message.domain.entity.WebhookServer;
  * @author bgzyy
  * @since 2019/9/11
  */
+@JsonInclude
 public class WebHookVO extends WebhookServer {
 
 
