@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     private static final String NOTICE_TYPE_CODE_PTGG = "PTGG";
 
     @Autowired
-    private SystemAnnouncementMapper announcementMapper;
+    private SystemAnnouncementMapper systemAnnouncementMapper;
 
     @Autowired
     private NoticeRepository noticeRepository;
@@ -95,7 +94,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        return PageHelper.doPageAndSort(pageRequest, () -> announcementMapper.fulltextSearch(title, status, params));
+        return PageHelper.doPageAndSort(pageRequest, () -> systemAnnouncementMapper.fulltextSearch(title, status, params));
     }
 
     @Override
@@ -112,7 +111,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public SystemAnnouncementVO getLatestSticky() {
-        return announcementMapper.selectLastestSticky(new Date());
+        return systemAnnouncementMapper.selectLastestSticky(new Date());
     }
 
     private SystemAnnouncementVO DTOtoVO(NoticeDTO noticeDTO) {
@@ -121,7 +120,6 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                 .setObjectVersionNumber(noticeDTO.getObjectVersionNumber())
                 .setSendDate(noticeDTO.getPublishedDate())
                 .setEndDate(Optional.ofNullable(noticeDTO.getEndDate())
-                        .map(localDate -> Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
                         .orElse(null))
                 .setStatus(noticeDTO.getStatusCode())
                 .setContent(noticeDTO.getNoticeContent().getNoticeBody())
@@ -140,10 +138,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                         .map(flag -> flag ? 1 : 0)
                         .orElse(0))
                 .setStartDate(Optional.ofNullable(systemAnnouncementVO.getSendDate())
-                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                         .orElse(null))
                 .setEndDate(Optional.ofNullable(systemAnnouncementVO.getEndDate())
-                        .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                         .orElse(null))
                 .setTenantId(TenantDTO.DEFAULT_TENANT_ID)
                 .setLang(LANG)
