@@ -50,7 +50,7 @@ public class WebHookProjectC7nController {
     }
 
     @GetMapping
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "项目层 查询WebHook信息（分页接口）")
     @CustomPageRequest
     public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
@@ -64,7 +64,7 @@ public class WebHookProjectC7nController {
     }
 
     @GetMapping("/check_path")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
             @PathVariable(name = "project_id") Long projectId,
@@ -73,7 +73,7 @@ public class WebHookProjectC7nController {
         return new ResponseEntity<>(webHookC7nService.checkPath(id, path), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "项目层新增WebHook")
     @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(@PathVariable(name = "project_id") Long projectId,
@@ -81,7 +81,7 @@ public class WebHookProjectC7nController {
         return new ResponseEntity<>(webHookC7nService.create(projectId, webHookVO, ResourceLevel.PROJECT.value()), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "更新WebHook")
     @PutMapping("/{id}")
     public ResponseEntity<WebHookVO> update(@PathVariable("project_id") Long projectId,
@@ -91,7 +91,7 @@ public class WebHookProjectC7nController {
     }
 
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "删除WebHook")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(
@@ -101,7 +101,7 @@ public class WebHookProjectC7nController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "禁用WebHook")
     @PutMapping("/{id}/update_status")
     public ResponseEntity updateEnabledFlag(
@@ -112,7 +112,7 @@ public class WebHookProjectC7nController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "项目层重试发送记录")
     @GetMapping("/{record_id}/retry")
     public ResponseEntity retry(
@@ -123,7 +123,7 @@ public class WebHookProjectC7nController {
     }
 
 
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "根据ID查询webhook")
     @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
@@ -134,7 +134,7 @@ public class WebHookProjectC7nController {
 
 
     @GetMapping(value = "/records")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
     public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
@@ -150,7 +150,7 @@ public class WebHookProjectC7nController {
 
     @ApiOperation(value = "查询WebHook发送记录详情")
     @GetMapping("/details/{record_id}")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebhookRecordVO> getWebhookRecordDetails(
             @PathVariable(name = "project_id") Long projectId,
             @PathVariable(name = "record_id") Long recordId) {
