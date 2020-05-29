@@ -30,7 +30,7 @@ public class MessageSettingC7nController {
     private MessageSettingC7nService messageSettingService;
 
     @GetMapping("/type/{notify_type}/code/{code}")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
     public ResponseEntity<MessageSettingVO> getSettingByCode(
             @PathVariable(value = "project_id") Long projectId,
@@ -43,7 +43,7 @@ public class MessageSettingC7nController {
     }
 
     @GetMapping("/{notify_type}")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
     public ResponseEntity<MessageSettingWarpVO> listByType(
             @PathVariable(value = "project_id") Long projectId,
@@ -54,7 +54,7 @@ public class MessageSettingC7nController {
     }
 
     @PutMapping("/{notify_type}/batch")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "批量修改消息设置")
     public ResponseEntity<Void> batchUpdateByType(
             @PathVariable(value = "project_id") Long projectId,
