@@ -32,10 +32,6 @@ public class SystemAnnouncementController {
         this.systemAnnouncementService = systemAnnouncementService;
     }
 
-    public void setSystemAnnouncementService(SystemAnnouncementService systemAnnouncementService) {
-        this.systemAnnouncementService = systemAnnouncementService;
-    }
-
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
