@@ -126,6 +126,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         webhookServer.setServerCode(String.format("%s-%s", serverCode, uuid));
         String serverName = nameStr.length() > NAME_MAX_LENGTH ? nameStr.substring(NAME_MAX_LENGTH) : nameStr;
         webhookServer.setServerName(String.format("%s-%s", serverName, uuid));
+        webhookServer.setEnabledFlag(1);
         webhookServer = webhookServerService.createWebHook(tenantId, webhookServer);
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
