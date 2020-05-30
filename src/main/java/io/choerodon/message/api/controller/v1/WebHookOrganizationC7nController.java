@@ -56,7 +56,7 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "查询WebHook信息（分页接口）")
     @CustomPageRequest
     public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
-                                                           @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
+                                                           @SortDefault(value = "server_id", direction = Sort.Direction.DESC) PageRequest pageable,
                                                            @PathVariable(name = "organization_id") Long sourceId,
                                                            @RequestParam(required = false) String messageName,
                                                            @RequestParam(required = false) String type,
