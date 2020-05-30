@@ -7,7 +7,7 @@
         hnp.notice_id AS id,
         hnp.title AS title,
         hnp.notice_body AS content,
-        hnp.published_date AS sendDate,
+        hnp.start_date AS sendDate,
         hnp.end_date AS endDate,
         hnp.published_status_code AS status,
         hn.sticky_flag AS sticky,
