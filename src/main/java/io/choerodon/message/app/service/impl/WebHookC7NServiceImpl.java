@@ -131,7 +131,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
         for (Long aLong : sendSettingIdList) {
-            TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType().toUpperCase());
+            TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, webHookVO.getServerType());
             if (!ObjectUtils.isEmpty(serverLine)) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
                 templateServerWh.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
