@@ -14,7 +14,6 @@ import org.hzero.message.app.service.NoticeService;
 import org.hzero.message.domain.entity.Notice;
 import org.hzero.message.domain.entity.NoticeContent;
 import org.hzero.message.domain.entity.NoticeReceiver;
-import org.hzero.message.domain.repository.NoticeContentRepository;
 import org.hzero.message.domain.repository.NoticeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +44,6 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     private NoticeRepository noticeRepository;
 
     @Autowired
-    private NoticeContentRepository noticeContentRepository;
-
-    @Autowired
     private NoticeService noticeService;
 
     @Autowired
@@ -76,7 +72,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         Notice notice = noticeRepository.selectByPrimaryKey(noticeDTO.getNoticeId());
 
         systemAnnouncementVO.setId(notice.getNoticeId())
-                .setStatus(notice.getStatusCode())
+                .setStatus(getTrueStatus(notice.getPublishedDate()))
                 .setObjectVersionNumber(notice.getObjectVersionNumber());
         return systemAnnouncementVO;
     }
@@ -94,7 +90,13 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
-        return PageHelper.doPageAndSort(pageRequest, () -> systemAnnouncementMapper.fulltextSearch(title, status, params));
+        Page<SystemAnnouncementVO> systemAnnouncementVOPage = PageHelper.doPageAndSort(pageRequest, () -> systemAnnouncementMapper.fulltextSearch(title, status, params));
+        systemAnnouncementVOPage.getContent().forEach(
+                systemAnnouncementVO -> {
+                    systemAnnouncementVO.setStatus(getTrueStatus(systemAnnouncementVO.getSendDate()));
+                }
+        );
+        return systemAnnouncementVOPage;
     }
 
     @Override
@@ -118,10 +120,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         return new SystemAnnouncementVO()
                 .setId(noticeDTO.getNoticeId())
                 .setObjectVersionNumber(noticeDTO.getObjectVersionNumber())
-                .setSendDate(noticeDTO.getPublishedDate())
+                .setSendDate(noticeDTO.getStartDate())
                 .setEndDate(Optional.ofNullable(noticeDTO.getEndDate())
                         .orElse(null))
-                .setStatus(noticeDTO.getStatusCode())
+                .setStatus(getTrueStatus(noticeDTO.getPublishedDate()))
                 .setContent(noticeDTO.getNoticeContent().getNoticeBody())
                 .setTitle(noticeDTO.getTitle())
                 .setSticky(Optional.ofNullable(noticeDTO.getStickyFlag())
@@ -153,5 +155,16 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         noticeDTO.setNoticeContent(noticeContent);
 
         return noticeDTO;
+    }
+
+    /**
+     * 直接从数据库取出的status字段不满足实际需求，因此根据发送时间与系统当前时间比较来获取状态
+     */
+    private String getTrueStatus(Date publishDate) {
+        if (publishDate.getTime() < System.currentTimeMillis()) {
+            return Notice.STATUS_PUBLISHED;
+        } else {
+            return "WAITING";
+        }
     }
 }

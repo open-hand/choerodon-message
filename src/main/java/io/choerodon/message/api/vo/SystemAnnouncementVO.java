@@ -21,8 +21,7 @@ public class SystemAnnouncementVO {
     @ApiModelProperty(value = "系统公告内容/必填")
     @NotEmpty(message = "error.announcement.content.empty")
     private String content;
-
-    @ApiModelProperty(value = "系统公告时间/非必填")
+    @ApiModelProperty(value = "系统公告开始时间(也就是发送时间)")
     @JsonFormat(pattern = BaseConstants.Pattern.DATETIME)
     private Date sendDate;
     @ApiModelProperty(value = "系统公告状态/非必填")
