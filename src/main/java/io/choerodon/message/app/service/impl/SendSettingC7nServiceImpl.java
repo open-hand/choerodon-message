@@ -378,7 +378,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         TemplateServer templateServer = templateServerRepository.selectOne(new TemplateServer().setMessageCode(messageTemplateVO.getMessageCode()));
         BeanUtils.copyProperties(messageTemplateVO, messageTemplate);
         messageTemplate.setTemplateName(templateServer.getMessageName());
-        messageTemplate.setTemplateTitle(templateServer.getMessageName());
         messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         if (!StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
             String templateCodeSuffix = messageTemplateVO.getWebhookType().contains(WebHookTypeEnum.JSON.getValue()) ? messageTemplateVO.getWebhookType().toUpperCase() : messageTemplateVO.getWebhookType();
