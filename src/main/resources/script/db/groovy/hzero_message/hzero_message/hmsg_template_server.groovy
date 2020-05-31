@@ -1,4 +1,4 @@
-package script.db.groovy.hzero_message.hzero_message
+package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server.groovy') {
     changeSet(author: "qingsheng.chen@hand-china.com", id: "2019-01-02-hmsg_template_server") {
@@ -55,6 +55,19 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server.groovy') {
     changeSet(author: "hzero@hand-china.com", id: "2020-04-27-hmsg_template_server") {
         addColumn(tableName: 'hmsg_template_server') {
             column(name: "receive_config_flag", type: "tinyint(1)", defaultValue:"0", remarks: "自定义配置接收标识")  {constraints(nullable:"false")}
+        }
+    }
+
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-05-22-hmsg_template_server") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        addColumn(tableName: 'hmsg_template_server') {
+            column(name: "description", type: "varchar(" + 480 * weight + ")", remarks: "描述")
         }
     }
 }

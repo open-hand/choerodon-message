@@ -1,4 +1,4 @@
-package script.db.groovy.hzero_message.hzero_message
+package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/hmsg_wechat_official.groovy') {
     changeSet(author: "hzero@hand-china.com", id: "2019-10-28-hmsg_wechat_official") {
