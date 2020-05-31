@@ -1,4 +1,4 @@
-package script.db.groovy.hzero_message.hzero_message
+package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy') {
     changeSet(author: "qingsheng.chen@hand-china.com", id: "2019-01-02-hmsg_template_server_line") {
@@ -41,6 +41,11 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
         }
     }
 
+    changeSet(author: "hzero@hand-china.com", id: "2020-04-26-hmsg_template_server_line") {
+        addColumn(tableName: 'hmsg_template_server_line') {
+            column(name: "try_times", type: "int(11)", remarks: "重试次数")
+        }
+    }
 
     changeSet(author: "hzero@hand-china.com", id: "2020-04-27-hmsg_template_server_line") {
         addColumn(tableName: 'hmsg_template_server_line') {
@@ -51,11 +56,5 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
     changeSet(author: "hzero@hand-china.com", id: "2020-05-15_hmsg_template_server_line") {
         dropUniqueConstraint(tableName: "hmsg_template_server_line", constraintName: "hmsg_template_server_line_u1")
         addUniqueConstraint(tableName: "hmsg_template_server_line", constraintName: "hmsg_template_server_line_u1", columnNames: "temp_server_id,type_code,template_code")
-    }
-
-    changeSet(author: "hzero@hand-china.com", id: "2020-05-20-hmsg_template_server_line") {
-        addColumn(tableName: 'hmsg_template_server_line') {
-            column(name: "try_times", type: "int(11)", remarks: "重试次数")
-        }
     }
 }
