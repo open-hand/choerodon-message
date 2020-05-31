@@ -1,11 +1,6 @@
 package io.choerodon.message.api.controller.v1;
 
-import io.choerodon.core.iam.InitRoleCode;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.StackingHistogramVO;
-import io.choerodon.message.app.service.MailingRecordService;
-import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
-import io.choerodon.swagger.annotation.Permission;
+import java.util.Date;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
+import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.StackingHistogramVO;
+import io.choerodon.message.app.service.MailingRecordService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
+import io.choerodon.swagger.annotation.Permission;
 
 /**
  * 〈功能简述〉
@@ -29,7 +29,7 @@ import java.util.Date;
 @RequestMapping("/choerodon/v1/mails/records")
 public class MailRecordController {
 
-    private MailingRecordService mailingRecordService;
+    private final MailingRecordService mailingRecordService;
 
     public MailRecordController(MailingRecordService mailingRecordService) {
         this.mailingRecordService = mailingRecordService;
