@@ -30,8 +30,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class NotifyWebSocketInterceptor implements SocketInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyWebSocketInterceptor.class);
 
-    private RestTemplate restTemplate;
-    private WebSocketConfig webSocketConfig;
+    private final RestTemplate restTemplate;
+    private final WebSocketConfig webSocketConfig;
 
     public NotifyWebSocketInterceptor(RestTemplate restTemplate, WebSocketConfig webSocketConfig) {
         this.restTemplate = restTemplate;
@@ -52,9 +52,9 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, "bearer " + accessToken);
                 HttpEntity<String> entity = new HttpEntity<>(headers);
-                ResponseEntity responseEntity = restTemplate.exchange(webSocketConfig.getOauthUrl(), HttpMethod.GET, entity, String.class);
+                ResponseEntity<String> responseEntity = restTemplate.exchange(webSocketConfig.getOauthUrl(), HttpMethod.GET, entity, String.class);
                 if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                    JSONObject object = JSONObject.parseObject(responseEntity.getBody().toString());
+                    JSONObject object = JSONObject.parseObject(responseEntity.getBody());
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserName", object.getJSONObject("principal").getString("username"));
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserID", object.getJSONObject("principal").getString("userId"));
                     return true;

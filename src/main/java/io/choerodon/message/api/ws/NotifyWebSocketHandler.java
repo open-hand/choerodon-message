@@ -45,8 +45,6 @@ public class NotifyWebSocketHandler implements SocketHandler {
         onlineCountStorageUtils.addOnlineCount(userId, session.getId());
         if (!originCount.equals(onlineCountStorageUtils.getOnlineCount())) {
             onlineCountStorageUtils.makeVisitorsInfo();
-            // TODO 发送在线消息          有没有必要
-//            webSocketHelper.sendMessageByKey(ONLINE_INFO_KEY_PATH, new SendMessagePayload<>(NotifyReceiveMessageHandler.ONLINE_INFO_CODE, NotifyReceiveMessageHandler.ONLINE_INFO_KEY_PATH, onlineCountStorageUtils.makeVisitorsInfo()));
         }
 
         // TODO 发送未读站内信数量
