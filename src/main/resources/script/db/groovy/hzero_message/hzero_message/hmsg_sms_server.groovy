@@ -1,4 +1,4 @@
-package script.db.groovy.hzero_message.hzero_message
+package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/hmsg_sms_server.groovy') {
     changeSet(author: "qingsheng.chen@hand-china.com", id: "2019-01-02-hmsg_sms_server") {
