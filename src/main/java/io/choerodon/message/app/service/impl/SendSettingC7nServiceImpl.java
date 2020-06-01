@@ -175,7 +175,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             throw new CommonException("error.query.tempServer");
         }
         templateServer.setEnabledFlag(ConversionUtil.booleanConverToInteger(status));
-        templateServerService.updateTemplateServer(templateServer);
+        templateServerRepository.updateOptional(templateServer, TemplateServer.FIELD_ENABLED_FLAG);
     }
 
 
