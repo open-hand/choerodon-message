@@ -80,4 +80,14 @@
             hws.server_id=#{webHookId}
     </select>
 
+    <select id="queryWebHook" resultType="long">
+      SELECT
+	     htsw.temp_server_id
+      FROM
+	     hmsg_webhook_server hws
+	  JOIN hmsg_template_server_wh htsw ON hws.server_code = htsw.server_code
+      WHERE
+	     hws.server_id =#{webHookId}
+    </select>
+
 </mapper>
