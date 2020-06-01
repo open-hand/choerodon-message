@@ -1,43 +1,43 @@
 package io.choerodon.message.app.service.impl;
 
-        import java.util.*;
-        import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.Collectors;
 
-        import org.apache.commons.lang.StringUtils;
-        import org.hzero.message.app.service.MessageService;
-        import org.hzero.message.app.service.TemplateServerWhService;
-        import org.hzero.message.app.service.WebhookServerService;
-        import org.hzero.message.domain.entity.TemplateServerLine;
-        import org.hzero.message.domain.entity.TemplateServerWh;
-        import org.hzero.message.domain.entity.WebhookServer;
-        import org.hzero.message.domain.repository.TemplateServerWhRepository;
-        import org.hzero.message.domain.repository.WebhookServerRepository;
-        import org.hzero.message.infra.mapper.MessageTemplateMapper;
-        import org.hzero.message.infra.mapper.TemplateServerLineMapper;
-        import org.hzero.message.infra.mapper.TemplateServerMapper;
-        import org.springframework.beans.BeanUtils;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.stereotype.Service;
-        import org.springframework.transaction.annotation.Transactional;
-        import org.springframework.util.CollectionUtils;
-        import org.springframework.util.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hzero.message.app.service.MessageService;
+import org.hzero.message.app.service.TemplateServerWhService;
+import org.hzero.message.app.service.WebhookServerService;
+import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.entity.TemplateServerWh;
+import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.repository.TemplateServerWhRepository;
+import org.hzero.message.domain.repository.WebhookServerRepository;
+import org.hzero.message.infra.mapper.MessageTemplateMapper;
+import org.hzero.message.infra.mapper.TemplateServerLineMapper;
+import org.hzero.message.infra.mapper.TemplateServerMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-        import io.choerodon.core.domain.Page;
-        import io.choerodon.core.exception.CommonException;
-        import io.choerodon.core.iam.ResourceLevel;
-        import io.choerodon.message.api.vo.WebHookVO;
-        import io.choerodon.message.app.service.WebHookC7nService;
-        import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-        import io.choerodon.message.infra.dto.iam.ProjectDTO;
-        import io.choerodon.message.infra.dto.iam.TenantDTO;
-        import io.choerodon.message.infra.enums.WebHookTypeEnum;
-        import io.choerodon.message.infra.feign.operator.IamClientOperator;
-        import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
-        import io.choerodon.message.infra.mapper.WebHookC7nMapper;
-        import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
-        import io.choerodon.message.infra.utils.ConversionUtil;
-        import io.choerodon.mybatis.pagehelper.PageHelper;
-        import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.WebHookVO;
+import io.choerodon.message.app.service.WebHookC7nService;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
+import io.choerodon.message.infra.mapper.WebHookC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author scp
@@ -237,7 +237,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public WebHookVO queryById(Long webHookId) {
         //查询可选发送设置主键集合
-        WebHookVO webHookVO = webHookC7nMapper.queryById(webHookId);
+        WebHookVO webHookVO = Optional.ofNullable(webHookC7nMapper.queryById(webHookId)).orElse(new WebHookVO());
         //查询已选发送设置主键集合
         Set<Long> templateServerIds = webHookC7nMapper.queryWebHook(webHookId);
         webHookVO.setSendSettingIdList(templateServerIds);
