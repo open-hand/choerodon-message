@@ -42,8 +42,14 @@ public class SystemAnnouncementController {
         if (vo.getSendDate() == null) {
             vo.setSendDate(new Date());
         }
-        if (vo.getSticky() != null && vo.getSticky() && vo.getEndDate() == null) {
-            throw new CommonException("error.create.system.announcement.endDate.is.null");
+        if (vo.getSticky() != null && vo.getSticky()) {
+            if (vo.getEndDate() == null) {
+                throw new CommonException("error.create.system.announcement.endDate.is.null");
+            }
+            if (vo.getEndDate().getTime() < vo.getSendDate().getTime()) {
+                throw new CommonException("error.create.system.announcement.endDate.cant.before.than.sendDate");
+            }
+
         }
         return new ResponseEntity<>(systemAnnouncementService.create(vo), HttpStatus.OK);
     }
