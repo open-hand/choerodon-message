@@ -1,6 +1,7 @@
 package io.choerodon.message.infra.mapper;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -35,4 +36,5 @@ public interface WebHookC7nMapper {
     WebHookVO queryById(@Param("webHookId") Long webHookId);
 
 
+    Set<Long> queryWebHook(@Param("webHookId") Long webHookId);
 }
