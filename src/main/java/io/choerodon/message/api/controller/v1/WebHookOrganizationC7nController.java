@@ -3,13 +3,10 @@ package io.choerodon.message.api.controller.v1;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hzero.core.util.Results;
 import org.hzero.message.app.service.MessageService;
-
-import io.choerodon.message.app.service.SendSettingC7nService;
-import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,9 +17,13 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebHookVO;
 import io.choerodon.message.api.vo.WebhookRecordVO;
+import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.app.service.WebHookC7nService;
 import io.choerodon.message.app.service.WebhookRecordC7nService;
+import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 
@@ -35,6 +36,8 @@ import io.choerodon.swagger.annotation.Permission;
 @RestController
 @RequestMapping("/choerodon/v1/organization/{organization_id}/web_hooks")
 public class WebHookOrganizationC7nController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebHookOrganizationC7nController.class);
+
 
     private WebHookC7nService webHookC7nService;
     private MessageService messageService;
@@ -169,6 +172,15 @@ public class WebHookOrganizationC7nController {
             @ApiParam(value = "webhook类型 DingTalk/WeChat/Json")
             @RequestParam(name = "type") String type) {
         return new ResponseEntity<>(sendSettingC7nService.getTempServerForWebhook(organizationId, ResourceLevel.ORGANIZATION.value(), name, description, type), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "接收webhook接口")
+    @PostMapping("/receive")
+    @Permission(permissionPublic = true)
+    public ResponseEntity receive(
+            @RequestBody String json) {
+        LOGGER.info("===========================================================\n{}", json);
+        return Results.success();
     }
 
 }
