@@ -65,19 +65,22 @@
 
     <select id="queryById" resultMap="WebHookVO">
         SELECT
-            hws.server_id,
-            hws.webhook_address,
-            hws.server_type,
-            hws.enabled_flag,
-            hts.message_code as messageCode,
-            hts.message_name as messageName,
-            hts.temp_server_id as tempServerId
+	       any_value ( hws.server_id ) AS server_id,
+	       any_value ( hws.webhook_address ) AS webhook_address,
+	       any_value ( hws.server_type ) AS server_type,
+	       any_value ( hws.enabled_flag ) AS enabled_flag,
+	       any_value ( hts.message_name ) AS messageName,
+	       any_value ( hts.message_code ) AS messageCode,
+	       any_value ( hts.temp_server_id ) AS tempServerId
         FROM
-            hmsg_webhook_server hws
-            INNER JOIN hmsg_template_server_line htsl on htsl.server_id=hws.server_id
-            INNER JOIN hmsg_template_server hts on hts.temp_server_id=htsl.temp_server_id
-        where
-            hws.server_id=#{webHookId}
+	       hmsg_webhook_server hws,
+	       hmsg_template_server_line htsl,
+	       hmsg_template_server hts
+        WHERE
+      	   htsl.template_code LIKE CONCAT( '%', hws.server_type, '%' )
+	     AND hts.temp_server_id = htsl.temp_server_id  	AND hws.enabled_flag=1
+         GROUP BY
+         	hts.message_code
     </select>
 
     <select id="queryWebHook" resultType="long">
