@@ -161,7 +161,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             throw new CommonException("error.web.hook.type.invalid");
         }
         //0.校验web hook path
-        if (!checkPath(null, webHookVO.getWebhookAddress())) {
+        if (!checkPath(webHookVO.getServerId(), webHookVO.getWebhookAddress())) {
             throw new CommonException("error.web.hook.path.duplicate");
         }
 
