@@ -172,7 +172,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             tenantId = projectDTO.getOrganizationId();
         }
-//        webhookServer = webhookServerService.updateWebHook(tenantId, webhookServer);
+        webhookServer = webhookServerService.updateWebHook(tenantId, webhookServer);
 
         TemplateServerWh queryDTO = new TemplateServerWh();
         queryDTO.setServerCode(webhookServer.getServerCode());
@@ -241,7 +241,11 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         WebHookVO webHookVO = Optional.ofNullable(webHookC7nMapper.queryById(webHookId)).orElse(new WebHookVO());
         //查询已选发送设置主键集合
         Set<Long> templateServerIds = webHookC7nMapper.queryWebHook(webHookId);
-        webHookVO.setSendSettingIdList(templateServerIds);
-        return webHookVO;
+        WebhookServer webhookServer = webhookServerRepository.selectByPrimaryKey(webHookId);
+        WebHookVO result = new WebHookVO();
+        BeanUtils.copyProperties(webhookServer, result);
+        result.setTemplateServers(webHookVO.getTemplateServers());
+        result.setSendSettingIdList(templateServerIds);
+        return result;
     }
 }
