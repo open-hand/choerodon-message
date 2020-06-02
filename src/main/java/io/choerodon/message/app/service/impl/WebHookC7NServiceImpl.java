@@ -148,6 +148,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
         if (Objects.equals(ResourceLevel.PROJECT.value(), sourceLevel)) {
             WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO(webhookServer.getServerId(), sourceId);
+            webhookProjectRelDTO.setTenantId(tenantId);
+            webhookProjectRelDTO.setServerCode(webhookServer.getServerCode());
             webhookProjectRelMapper.insert(webhookProjectRelDTO);
         }
         return webHookVO;
