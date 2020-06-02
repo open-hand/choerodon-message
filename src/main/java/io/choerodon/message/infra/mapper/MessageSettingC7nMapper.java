@@ -113,10 +113,13 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
                                      @Param("envId") Long envId,
                                      @Param("eventName") String eventName,
                                      @Param("messageType") String messageType
-                                     );
+    );
 
     List<String> listCategoryCode(@Param("notifyType") String notifyType);
 
     List<String> selectProjectMessage();
 
+
+
+    List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType);
 }
