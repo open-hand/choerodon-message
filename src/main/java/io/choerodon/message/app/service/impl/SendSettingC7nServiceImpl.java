@@ -52,6 +52,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
     public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private static final String AGILE = "AGILE";
+    private static final String OPERATIONS = "OPERATIONS";
     private static final String ADD_OR_IMPORT_USER = "add-or-import-user";
     private static final String ISSUE_STATUS_CHANGE_NOTICE = "issue-status-change-notice";
     private static final String PRO_MANAGEMENT = "pro-management";
@@ -344,15 +345,18 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         Map<String, String> lovMap = getMeanings();
         Map<String, String> result = new HashMap<>();
         List<String> agileCategories = new ArrayList<>();
+        Boolean contains = true;
         if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            if (projectDTO.getCategory().equals(AGILE)) {
+            if (projectDTO.getCategory().equals(AGILE) || projectDTO.getCategory().equals(OPERATIONS)) {
                 agileCategories.add(ADD_OR_IMPORT_USER);
                 agileCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
                 agileCategories.add(PRO_MANAGEMENT);
             }
+            if (projectDTO.getCategory().equals(OPERATIONS)) {
+                contains = false;
+            }
         }
-        // todo description scp
         if (WEBHOOK_OTHER.equals(type)) {
             type = DINGTALK_WECHAT;
         }
@@ -360,7 +364,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             type = JSON;
         }
         type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
@@ -392,7 +396,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         // 2. template_server_line表
         TemplateServerLine templateServerLine = new TemplateServerLine();
         templateServerLine.setTempServerId(templateServer.getTempServerId());
-        switch (SendingTypeEnum.forValue(messageTemplateVO.getSendingType().toUpperCase())){
+        switch (SendingTypeEnum.forValue(messageTemplateVO.getSendingType().toUpperCase())) {
             case EMAIL:
                 templateServerLine.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
                 break;
@@ -404,7 +408,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         templateServerLine.setTemplateCode(messageTemplate.getTemplateCode());
         templateServerLine.setEnabledFlag(1);
         templateServerLineRepository.insert(templateServerLine);
-        BeanUtils.copyProperties(messageTemplate,messageTemplateVO);
+        BeanUtils.copyProperties(messageTemplate, messageTemplateVO);
         return messageTemplateVO;
     }
 
