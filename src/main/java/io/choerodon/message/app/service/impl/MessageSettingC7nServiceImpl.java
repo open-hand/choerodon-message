@@ -77,12 +77,15 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     @Override
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
-        // 平台层没有启用任何发送设置
-
-        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
-        if (CollectionUtils.isEmpty(defaultMessageSettingList)) {
+        //查询平台层的发送设置
+        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType);
+        if (CollectionUtils.isEmpty(defaultMessageSettings)) {
             return messageSettingWarpVO;
         }
+        //查询通知对象
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
+        assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
+
         defaultMessageSettingList.stream().map(customMessageSettingVO -> {
             String lovCode = customMessageSettingVO.getSubcategoryCode();
             customMessageSettingVO.setGroupId(lovCode);
@@ -122,6 +125,39 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
         return messageSettingWarpVO;
+    }
+
+    private void assemblingSendSetting(List<CustomMessageSettingVO> targetUser, List<CustomMessageSettingVO> defaultMessageSettingList) {
+        defaultMessageSettingList.forEach(customMessageSettingVO -> {
+            if (SendingTypeEnum.EMAIL.getValue().equals(customMessageSettingVO.getSendingType()) && customMessageSettingVO.getEnabledFlag()) {
+                customMessageSettingVO.setEmailEnabledFlag(Boolean.TRUE);
+            }
+            if (SendingTypeEnum.SMS.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+                customMessageSettingVO.setSmsEnabledFlag(Boolean.TRUE);
+            }
+            if (SendingTypeEnum.WEB.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+                customMessageSettingVO.setPmEnabledFlag(Boolean.TRUE);
+            }
+        });
+        targetUser.forEach(customMessageSettingVO -> {
+            defaultMessageSettingList.forEach(customMessageSettingVO1 -> {
+                if (SendingTypeEnum.EMAIL.getValue().equals(customMessageSettingVO1.getSendingType())
+                        && customMessageSettingVO1.getCode().equals(customMessageSettingVO.getCode())
+                        && customMessageSettingVO1.getEnabledFlag()) {
+                    customMessageSettingVO.setEmailEnabledFlag(Boolean.TRUE);
+                }
+                if (SendingTypeEnum.WEB.getValue().equals(customMessageSettingVO1.getSendingType())
+                        && customMessageSettingVO1.getCode().equals(customMessageSettingVO.getCode())
+                        && customMessageSettingVO1.getEnabledFlag()) {
+                    customMessageSettingVO.setPmEnabledFlag(Boolean.TRUE);
+                }
+                if (SendingTypeEnum.SMS.getValue().equals(customMessageSettingVO1.getSendingType())
+                        && customMessageSettingVO1.getCode().equals(customMessageSettingVO.getCode())
+                        && customMessageSettingVO1.getEnabledFlag()) {
+                    customMessageSettingVO.setSmsEnabledFlag(Boolean.TRUE);
+                }
+            });
+        });
     }
 
 
@@ -275,7 +311,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     private void calculateStieSendSetting(List<CustomMessageSettingVO> defaultMessageSettingList) {
         defaultMessageSettingList.forEach(settingVO -> {
-            if (settingVO.getEnabledFlag() == 1) {
+            if (settingVO.getEnabledFlag()) {
                 if (SendingTypeEnum.WEB.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
                     settingVO.setPmEnabledFlag(true);
                 }
