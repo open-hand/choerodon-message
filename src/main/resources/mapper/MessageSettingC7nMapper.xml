@@ -254,4 +254,30 @@
         WHERE
             nms.PROJECT_ID = 0
     </select>
+
+    <select id="listDefaultSettingByNotifyType" resultType="io.choerodon.message.api.vo.CustomMessageSettingVO">
+        SELECT
+	       nms.ID,
+	       nms.ENV_ID,
+	       nms.NOTIFY_TYPE,
+	       nms.CODE,
+	       nms.PROJECT_ID,
+	       nms.EVENT_NAME,
+	       nms.SMS_ENABLE,
+	       nms.PM_ENABLE,
+	       nms.EMAIL_ENABLE,
+	       nms.OBJECT_VERSION_NUMBER,
+	       hts.message_name AS NAME,
+	       hts.SUBCATEGORY_CODE,
+	       htsl.type_code AS SENDING_TYPE,
+	       htsl.ENABLED_FLAG
+        FROM
+	       notify_message_setting nms
+	    INNER JOIN hmsg_template_server hts ON nms.`CODE` = hts.MESSAGE_CODE
+	    LEFT JOIN hmsg_template_server_line htsl ON htsl.temp_server_id = hts.temp_server_id
+        WHERE
+	       nms.NOTIFY_TYPE = #{notifyType}
+	       AND nms.PROJECT_ID = 0
+	       AND hts.ENABLED_FLAG = 1
+    </select>
 </mapper>
