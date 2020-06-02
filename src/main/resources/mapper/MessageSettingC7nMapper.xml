@@ -57,6 +57,7 @@
           nms.EMAIL_ENABLE,
           nms.OBJECT_VERSION_NUMBER,
           hts.message_name AS name,
+          hts.SUBCATEGORY_CODE,
           nmstu.ID AS NMSTU_ID,
           nmstu.USER_ID,
           nmstu.TYPE,
