@@ -86,12 +86,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
         assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
 
-        defaultMessageSettingList.stream().map(customMessageSettingVO -> {
-            String lovCode = customMessageSettingVO.getSubcategoryCode();
-            customMessageSettingVO.setGroupId(lovCode);
-            return customMessageSettingVO;
-        }).collect(Collectors.toList());
-
         // 计算平台层是否启用发送短信，站内信，邮件
         calculateStieSendSetting(defaultMessageSettingList);
         List<NotifyEventGroupVO> notifyEventGroupList = listEventGroupList(projectId, notifyType);
@@ -108,6 +102,11 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)) {
             customMessageSettingList = handleResorceDeleteSettings(notifyEventGroupList, defaultMessageSettingList, projectId, notifyType);
         }
+        customMessageSettingList.stream().map(customMessageSettingVO -> {
+            String lovCode = customMessageSettingVO.getSubcategoryCode();
+            customMessageSettingVO.setGroupId(lovCode);
+            return customMessageSettingVO;
+        }).collect(Collectors.toList());
 
         // 计算通知对象
         calculateSendRole(customMessageSettingList);
