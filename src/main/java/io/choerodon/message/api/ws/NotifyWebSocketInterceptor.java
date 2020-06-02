@@ -45,16 +45,18 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+        MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUri(serverHttpRequest.getURI()).build().getQueryParams();
+        String accessToken = parameters.getFirst(WebSocketConstant.Attributes.TOKEN);
+        String responseJson = null;
         try {
-            MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUri(serverHttpRequest.getURI()).build().getQueryParams();
-            String accessToken = parameters.getFirst(WebSocketConstant.Attributes.TOKEN);
             if (accessToken != null) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, "bearer " + accessToken);
                 HttpEntity<String> entity = new HttpEntity<>(headers);
                 ResponseEntity<String> responseEntity = restTemplate.exchange(webSocketConfig.getOauthUrl(), HttpMethod.GET, entity, String.class);
                 if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                    JSONObject object = JSONObject.parseObject(responseEntity.getBody());
+                    responseJson = responseEntity.getBody();
+                    JSONObject object = JSONObject.parseObject(responseJson);
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserName", object.getJSONObject("principal").getString("username"));
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserID", object.getJSONObject("principal").getString("userId"));
                     return true;
@@ -67,10 +69,10 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 return false;
             }
         } catch (RestClientException e) {
-            LOGGER.error("reject webSocket connect, redirect request to oauth-server error", e);
+            LOGGER.error("reject webSocket connect, redirect request to oauth-server error. The token is {}", accessToken, e);
             return false;
         } catch (JSONException e) {
-            LOGGER.error("reject webSocket connect, oauth-server response json error", e);
+            LOGGER.error("reject webSocket connect, oauth-server response json error. the json is {}", responseJson, e);
             return false;
         }
     }
