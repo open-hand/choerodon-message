@@ -24,7 +24,7 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
-    private OnlineCountStorageUtils onlineCountStorageUtils;
+    private final OnlineCountStorageUtils onlineCountStorageUtils;
 
     public NotifyWebSocketHandler(OnlineCountStorageUtils onlineCountStorageUtils) {
         this.onlineCountStorageUtils = onlineCountStorageUtils;
@@ -37,6 +37,7 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        // 这一步的头是在拦截器中设置的
         String userId = session.getHandshakeHeaders().getFirst("X-WebSocket-UserID");
         //今日访问人数+1，在线人数+1,发送在线信息
         LOGGER.info("Get sitMsg's subscription,sessionId: {}", session.getId());
