@@ -80,13 +80,23 @@ public class CustomMessageSettingVO {
     private String subcategoryCode;
 
     @ApiModelProperty("消息对应的line表中的类型是否启用")
-    private Integer enabledFlag;
+    private Boolean enabledFlag;
 
-    public Integer getEnabledFlag() {
+    private String sendingType;
+
+    public String getSendingType() {
+        return sendingType;
+    }
+
+    public void setSendingType(String sendingType) {
+        this.sendingType = sendingType;
+    }
+
+    public Boolean getEnabledFlag() {
         return enabledFlag;
     }
 
-    public void setEnabledFlag(Integer enabledFlag) {
+    public void setEnabledFlag(Boolean enabledFlag) {
         this.enabledFlag = enabledFlag;
     }
 
