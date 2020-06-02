@@ -63,8 +63,14 @@
            AND htsl.type_code = 'WEB_HOOK'
            AND htsl.template_code LIKE concat(concat('%',#{messageType}),'%')
         WHERE hts.category_code=#{level}
-        <if test="agileCategories!=null and agileCategories.size>0">
+        <if test="agileCategories!=null and agileCategories.size>0 and contains==true">
             And hts.subcategory_code in
+            <foreach item="category"  collection="agileCategories" open="(" separator="," close=")">
+                #{category}
+            </foreach>
+        </if>
+        <if test="agileCategories!=null and agileCategories.size>0 and contains==false">
+            And hts.subcategory_code not in
             <foreach item="category"  collection="agileCategories" open="(" separator="," close=")">
                 #{category}
             </foreach>
