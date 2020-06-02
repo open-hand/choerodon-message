@@ -37,6 +37,7 @@ public interface TemplateServerC7nMapper {
     List<TemplateServer> selectForWebHook(@Param("level") String level,
                                           @Param("messageType") String messageType,
                                           @Param("agileCategories") List<String> agileCategories,
+                                          @Param("contains") Boolean contains,
                                           @Param("name") String name,
                                           @Param("description") String description);
 
