@@ -1,9 +1,9 @@
 package io.choerodon.message.infra.enums;
 
 public enum WebHookTypeEnum {
-    DINGTALK("DingTalk"),
-    WECHAT("WeChat"),
-    JSON("Json");
+    DINGTALK("DINGTALK"),
+    WECHAT("WECHAT"),
+    JSON("JSON");
 
     private String value;
 
