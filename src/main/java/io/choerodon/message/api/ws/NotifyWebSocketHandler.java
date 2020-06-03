@@ -48,7 +48,7 @@ public class NotifyWebSocketHandler implements SocketHandler {
             onlineCountStorageUtils.makeVisitorsInfo();
         }
 
-        // TODO 发送未读站内信数量
+        // TODO 发送未读站内信数量 优先级低
 //        Map<String, String> map = matcher.extractUriTemplateVariables(SIT_MSG_KEY_PATH, key);
 //            String code = map.get("code");
 //            if (SITE_MSG_CODE.equals(code)) {
