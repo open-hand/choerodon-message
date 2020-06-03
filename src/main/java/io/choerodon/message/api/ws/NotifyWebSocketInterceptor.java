@@ -61,7 +61,7 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserID", object.getJSONObject("principal").getString("userId"));
                     return true;
                 } else {
-                    LOGGER.warn("reject webSocket connect, redirect request to oauth-server not 2xx");
+                    LOGGER.warn("reject webSocket connect, redirect request to {} not 2xx", webSocketConfig.getOauthUrl());
                     return false;
                 }
             } else {
@@ -69,7 +69,7 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 return false;
             }
         } catch (RestClientException e) {
-            LOGGER.error("reject webSocket connect, redirect request to oauth-server error. The token is {}", accessToken, e);
+            LOGGER.error("reject webSocket connect, redirect request to {} error. The token is {}.", webSocketConfig.getOauthUrl(), accessToken);
             return false;
         } catch (JSONException e) {
             LOGGER.error("reject webSocket connect, oauth-server response json error. the json is {}", responseJson, e);
