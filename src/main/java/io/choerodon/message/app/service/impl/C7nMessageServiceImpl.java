@@ -38,6 +38,6 @@ public class C7nMessageServiceImpl implements C7nMessageService {
                 ).build());
 
         // 这里面会调用将消息已读的逻辑
-        userMessageService.deleteMessage(0L, userId, userMessageList.stream().map(UserMessage::getMessageId).collect(Collectors.toList()));
+        userMessageService.deleteMessage(0L, userId, userMessageList.stream().map(UserMessage::getUserMessageId).collect(Collectors.toList()));
     }
 }
