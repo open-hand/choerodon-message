@@ -84,7 +84,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode) {
-        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode, firstCode, enabled, receiveConfigFlag, params));
+        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode.toUpperCase(), firstCode.toUpperCase(), enabled, receiveConfigFlag, params));
         Map<String, String> meaningsMap = getMeanings();
         serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
         return serviceVOPage;
