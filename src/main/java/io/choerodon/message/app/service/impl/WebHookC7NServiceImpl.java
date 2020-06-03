@@ -25,6 +25,7 @@ import org.springframework.util.ObjectUtils;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.utils.PageUtils;
 import io.choerodon.message.api.vo.WebHookVO;
 import io.choerodon.message.app.service.WebHookC7nService;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -76,12 +77,14 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
     @Override
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
+        List<WebHookVO> list;
         if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params));
+            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
         } else {
-            return PageHelper.doPageAndSort(pageRequest, () -> webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params));
+            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params);
         }
+        return PageUtils.createPageFromList(list, pageRequest);
     }
 
     @Override
