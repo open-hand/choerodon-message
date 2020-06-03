@@ -11,9 +11,9 @@ import java.util.Map;
  * @Date 2019/12/17 20:41
  */
 public enum AgileNotifyTypeEnum {
-    ISSUE_ASSIGNEE("issueAssignee"),
-    ISSUE_SOLVE("issueSolve"),
-    ISSUE_CREATE("issueCreate");
+    ISSUE_ASSIGNEE("ISSUEASSIGNEE"),
+    ISSUE_SOLVE("ISSUESOLVE"),
+    ISSUE_CREATE("ISSUECREATE");
     private final String value;
 
     AgileNotifyTypeEnum(String value) {
