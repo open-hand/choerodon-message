@@ -98,27 +98,27 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         msgServiceTreeVO1.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO1.setId(1L);
         msgServiceTreeVO1.setName(LevelType.SITE.value());
-        msgServiceTreeVO1.setCode(ResourceLevel.SITE.value());
+        msgServiceTreeVO1.setCode(ResourceLevel.SITE.value().toUpperCase());
         msgServiceTreeVOS.add(msgServiceTreeVO1);
 
         MsgServiceTreeVO msgServiceTreeVO2 = new MsgServiceTreeVO();
         msgServiceTreeVO2.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO2.setId(2L);
         msgServiceTreeVO2.setName(LevelType.ORGANIZATION.value());
-        msgServiceTreeVO2.setCode(ResourceLevel.ORGANIZATION.value());
+        msgServiceTreeVO2.setCode(ResourceLevel.ORGANIZATION.value().toUpperCase());
         msgServiceTreeVOS.add(msgServiceTreeVO2);
 
         MsgServiceTreeVO msgServiceTreeVO3 = new MsgServiceTreeVO();
         msgServiceTreeVO3.setParentId(TenantDTO.DEFAULT_TENANT_ID);
         msgServiceTreeVO3.setId(3L);
         msgServiceTreeVO3.setName(LevelType.PROJECT.value());
-        msgServiceTreeVO3.setCode(ResourceLevel.PROJECT.value());
+        msgServiceTreeVO3.setCode(ResourceLevel.PROJECT.value().toUpperCase());
         msgServiceTreeVOS.add(msgServiceTreeVO3);
 
         Map<String, Set<String>> categoryMap = new HashMap<>();
-        categoryMap.put(ResourceLevel.SITE.value(), new HashSet<>());
-        categoryMap.put(ResourceLevel.ORGANIZATION.value(), new HashSet<>());
-        categoryMap.put(ResourceLevel.PROJECT.value(), new HashSet<>());
+        categoryMap.put(ResourceLevel.SITE.value().toUpperCase(), new HashSet<>());
+        categoryMap.put(ResourceLevel.ORGANIZATION.value().toUpperCase(), new HashSet<>());
+        categoryMap.put(ResourceLevel.PROJECT.value().toUpperCase(), new HashSet<>());
         for (TemplateServer templateServer : templateServers) {
             Set<String> categoryCodes = categoryMap.get(templateServer.getCategoryCode());
             if (categoryCodes != null) {
@@ -211,9 +211,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         for (String level : categoryMap.keySet()) {
             for (String categoryCode : categoryMap.get(level)) {
                 MsgServiceTreeVO msgServiceTreeVO = new MsgServiceTreeVO();
-                if (level.equals(ResourceLevel.SITE.value())) {
+                if (level.equals(ResourceLevel.SITE.value().toUpperCase())) {
                     msgServiceTreeVO.setParentId(1L);
-                } else if (level.equals(ResourceLevel.ORGANIZATION.value())) {
+                } else if (level.equals(ResourceLevel.ORGANIZATION.value().toUpperCase())) {
                     msgServiceTreeVO.setParentId(2L);
                 } else {
                     msgServiceTreeVO.setParentId(3L);
@@ -325,7 +325,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
         // key: 资源层级     value: categoryCode集合
         Map<String, Set<String>> levelAndCategoryCodeMap = new HashMap<>();
-        levelAndCategoryCodeMap.put(ResourceLevel.valueOf(level.toUpperCase()).value(), new HashSet<>());
+        levelAndCategoryCodeMap.put(level.toUpperCase(), new HashSet<>());
 
         // for循环里过滤掉不是level层级的categoryCode
         for (SendSettingVO sendSettingVO : sendSettingVOList) {
@@ -346,7 +346,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         Map<String, String> result = new HashMap<>();
         List<String> agileCategories = new ArrayList<>();
         Boolean contains = true;
-        if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
+        if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             if (projectDTO.getCategory().equals(AGILE) || projectDTO.getCategory().equals(OPERATIONS)) {
                 agileCategories.add(ADD_OR_IMPORT_USER);
