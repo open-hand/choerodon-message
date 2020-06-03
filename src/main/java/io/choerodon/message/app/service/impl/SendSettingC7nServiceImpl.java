@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
-    public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
+    public static final String RESOURCE_DELETE_CONFIRMATION = "RESOURCEDELETECONFIRMATION";
     private static final String AGILE = "AGILE";
     private static final String OPERATIONS = "OPERATIONS";
     private static final String ADD_OR_IMPORT_USER = "ADD-OR-IMPORT-USER";
@@ -60,7 +60,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String WEBHOOK_JSON = "webHookJson";
     private static final String JSON = "JSON";
     private static final String MESSAGE_CHOERODON = "CHOERODON.";
-    private static final String DINGTALK_WECHAT = "DingTalkAndWeChat";
+    private static final String DINGTALK_WECHAT = "dingtalkandwechat";
 
     @Autowired
     private TemplateServerService templateServerService;
