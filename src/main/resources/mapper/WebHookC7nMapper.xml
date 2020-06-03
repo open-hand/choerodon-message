@@ -30,7 +30,7 @@
         INNER JOIN hmsg_template_server_line htsl ON htsl.temp_server_id = htsh.temp_server_id
         AND (
         htsl.template_code LIKE '%JSON%'
-        OR htsl.template_code LIKE '%DingTalkAndWeChat%'
+        OR htsl.template_code LIKE '%DINGTALKANDWECHAT%'
         )
         INNER JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
         <if test="projectId!=null">

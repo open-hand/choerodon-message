@@ -78,7 +78,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
         List<WebHookVO> list;
-        if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel)) {
+        if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
         } else {
@@ -114,7 +114,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         String codeStr;
         String nameStr;
         Long tenantId = sourceId;
-        if (sourceLevel.equals(ResourceLevel.PROJECT.value().toUpperCase())) {
+        if (sourceLevel.toUpperCase().equals(ResourceLevel.PROJECT.value().toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             codeStr = projectDTO.getCode();
             nameStr = projectDTO.getName();
@@ -134,7 +134,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
         for (Long aLong : sendSettingIdList) {
-            String type = webHookVO.getServerType().equals(WebHookTypeEnum.JSON.getValue()) ? webHookVO.getServerType().toUpperCase() : webHookVO.getServerType();
+            String type =  webHookVO.getServerType().toUpperCase();
             TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, type);
             if (!ObjectUtils.isEmpty(serverLine)) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
@@ -149,7 +149,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             }
         }
 
-        if (Objects.equals(ResourceLevel.PROJECT.value().toUpperCase(), sourceLevel)) {
+        if (Objects.equals(ResourceLevel.PROJECT.value().toUpperCase(), sourceLevel.toUpperCase())) {
             WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO(webhookServer.getServerId(), sourceId);
             webhookProjectRelDTO.setTenantId(tenantId);
             webhookProjectRelDTO.setServerCode(webhookServer.getServerCode());
