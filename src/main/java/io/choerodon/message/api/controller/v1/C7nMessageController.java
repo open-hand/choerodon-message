@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.choerodon.message.app.service.C7nMessageService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
+import io.choerodon.swagger.annotation.Permission;
 
 /**
  * @author zmf
@@ -23,6 +24,7 @@ public class C7nMessageController {
     @Autowired
     private C7nMessageService c7nMessageService;
 
+    @Permission(permissionLogin = true)
     @ApiOperation("彻底删除用户当前的所有站内信")
     @DeleteMapping("/user/delete_all")
     @ResponseStatus(HttpStatus.NO_CONTENT)
