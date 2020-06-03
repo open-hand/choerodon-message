@@ -363,8 +363,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (WEBHOOK_JSON.equals(type)) {
             type = JSON;
         }
-        type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type, agileCategories, contains, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), agileCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
