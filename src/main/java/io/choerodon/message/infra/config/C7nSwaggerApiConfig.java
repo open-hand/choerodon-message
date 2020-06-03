@@ -21,6 +21,7 @@ public class C7nSwaggerApiConfig {
     public static final String CHOERODON_MESSAGE_SETTING = "Choerodon Message Setting";
     public static final String CHOERODON_RECEIVE_SETTING = "Choerodon Receive Setting";
     public static final String CHOERODON_SEND_SETTING = "Choerodon Send Setting";
+    public static final String CHOEROODN_USER_MESSAGES = "Choerodon User Messages";
 
 
     @Autowired
@@ -32,6 +33,7 @@ public class C7nSwaggerApiConfig {
                 new Tag(CHOERODON_MAIL_RECORD, "Choerodon邮件记录"),
                 new Tag(CHOERODON_MESSAGE_SETTING, "choerodon消息项目层设置"),
                 new Tag(CHOERODON_RECEIVE_SETTING, "choerodon消息接收设置"),
+                new Tag(CHOEROODN_USER_MESSAGES, "choerodon用户站内信"),
                 new Tag(CHOERODON_SEND_SETTING, "choerodon消息发送设置")
         );
     }
