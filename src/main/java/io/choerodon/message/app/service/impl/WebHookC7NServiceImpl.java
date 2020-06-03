@@ -78,7 +78,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
         List<WebHookVO> list;
-        if (ResourceLevel.PROJECT.value().equals(sourceLevel)) {
+        if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
         } else {
@@ -114,7 +114,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         String codeStr;
         String nameStr;
         Long tenantId = sourceId;
-        if (sourceLevel.equals(ResourceLevel.PROJECT.value())) {
+        if (sourceLevel.equals(ResourceLevel.PROJECT.value().toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             codeStr = projectDTO.getCode();
             nameStr = projectDTO.getName();
@@ -149,7 +149,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             }
         }
 
-        if (Objects.equals(ResourceLevel.PROJECT.value(), sourceLevel)) {
+        if (Objects.equals(ResourceLevel.PROJECT.value().toUpperCase(), sourceLevel)) {
             WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO(webhookServer.getServerId(), sourceId);
             webhookProjectRelDTO.setTenantId(tenantId);
             webhookProjectRelDTO.setServerCode(webhookServer.getServerCode());
@@ -173,7 +173,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         WebhookServer webhookServer = new WebhookServer();
         BeanUtils.copyProperties(webHookVO, webhookServer);
         Long tenantId = sourceId;
-        if (sourceLevel.equals(ResourceLevel.PROJECT.value())) {
+        if (sourceLevel.equals(ResourceLevel.PROJECT.value().toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             tenantId = projectDTO.getOrganizationId();
         }
