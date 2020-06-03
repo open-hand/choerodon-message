@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
-    public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
+    public static final String RESOURCE_DELETE_CONFIRMATION = "RESOURCEDELETECONFIRMATION";
     private static final String AGILE = "AGILE";
     private static final String OPERATIONS = "OPERATIONS";
     private static final String ADD_OR_IMPORT_USER = "ADD-OR-IMPORT-USER";
@@ -60,7 +60,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String WEBHOOK_JSON = "webHookJson";
     private static final String JSON = "JSON";
     private static final String MESSAGE_CHOERODON = "CHOERODON.";
-    private static final String DINGTALK_WECHAT = "DingTalkAndWeChat";
+    private static final String DINGTALK_WECHAT = "dingtalkandwechat";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -84,7 +84,11 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     @Override
     public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode) {
-        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, secondCode.toUpperCase(), firstCode.toUpperCase(), enabled, receiveConfigFlag, params));
+        secondCode = secondCode == null ? null : secondCode.toUpperCase();
+        firstCode = firstCode == null ? null : firstCode.toUpperCase();
+        String finalSecondCode = secondCode;
+        String finalFirstCode = firstCode;
+        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, finalSecondCode, finalFirstCode, enabled, receiveConfigFlag, params));
         Map<String, String> meaningsMap = getMeanings();
         serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
         return serviceVOPage;
@@ -363,8 +367,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (WEBHOOK_JSON.equals(type)) {
             type = JSON;
         }
-        type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type, agileCategories, contains, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), agileCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
