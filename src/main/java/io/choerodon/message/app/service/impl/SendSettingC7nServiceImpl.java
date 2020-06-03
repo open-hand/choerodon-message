@@ -53,9 +53,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     public static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
     private static final String AGILE = "AGILE";
     private static final String OPERATIONS = "OPERATIONS";
-    private static final String ADD_OR_IMPORT_USER = "add-or-import-user";
-    private static final String ISSUE_STATUS_CHANGE_NOTICE = "issue-status-change-notice";
-    private static final String PRO_MANAGEMENT = "pro-management";
+    private static final String ADD_OR_IMPORT_USER = "ADD-OR-IMPORT-USER";
+    private static final String ISSUE_STATUS_CHANGE_NOTICE = "ISSUE-STATUS-CHANGE-NOTICE";
+    private static final String PRO_MANAGEMENT = "PRO-MANAGEMENT";
     private static final String WEBHOOK_OTHER = "webHookOther";
     private static final String WEBHOOK_JSON = "webHookJson";
     private static final String JSON = "JSON";
@@ -364,7 +364,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             type = JSON;
         }
         type = type.equals(WebHookTypeEnum.JSON.getValue()) ? type.toUpperCase() : type;
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel, type, agileCategories, contains, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type, agileCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
