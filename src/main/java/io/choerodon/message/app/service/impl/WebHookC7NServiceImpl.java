@@ -223,8 +223,18 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     }
 
     @Override
+    @Transactional
     public void delete(Long sourceId, Long webHookId, String sourceLevel) {
-        webHookC7nMapper.deleteWebHook(webHookId);
+        if (sourceLevel.equals(ResourceLevel.PROJECT.value())) {
+            WebhookProjectRelDTO webhookProjectRelDTO = new WebhookProjectRelDTO();
+            webhookProjectRelDTO.setProjectId(sourceId);
+            webhookProjectRelDTO.setWebhookId(webHookId);
+            webhookProjectRelMapper.delete(webhookProjectRelDTO);
+        }
+        TemplateServerWh templateServerWh = new TemplateServerWh();
+        templateServerWh.setServerCode(webhookServerRepository.selectByPrimaryKey(webHookId).getServerCode());
+        templateServerWhRepository.delete(templateServerWh);
+        webhookServerRepository.deleteByPrimaryKey(webHookId);
     }
 
     @Override
