@@ -53,13 +53,15 @@
     </select>
 
     <delete id="deleteWebHook">
-        DELETE hws.*, hwsl.*, htsl.*,hwsh.*
+        DELETE hws.*,
+            htsl.*,
+            wpr.*,
+            hwsh.*
         FROM
-            hmsg_webhook_server hws
-            JOIN hmsg_webhook_server_tl hwsl ON hwsl.server_id = hws.server_id
+            hmsg_webhook_server AS hws
             JOIN hmsg_template_server_line htsl ON htsl.server_code = hws.server_code
-            LEFT JOIN  webhook_project_rel wpr on wpr.webhook_id=hws.server_id
-            JOIN hmsg_template_server_wh hwsh on hwsh.server_code=hws.server_code
+            LEFT JOIN webhook_project_rel wpr ON wpr.webhook_id = hws.server_id
+            JOIN hmsg_template_server_wh hwsh ON hwsh.server_code = hws.server_code
         WHERE hws.server_id=#{webhookId}
     </delete>
 

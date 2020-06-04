@@ -31,7 +31,7 @@ public interface WebHookC7nMapper {
                                   @Param("enableFlag") Boolean enableFlag,
                                   @Param("params") String params);
 
-    void deleteWebHook(@Param("webHookId") Long webHookId);
+    void deleteWebHook(@Param("webhookId") Long webHookId);
 
     WebHookVO queryById(@Param("webHookId") Long webHookId);
 
