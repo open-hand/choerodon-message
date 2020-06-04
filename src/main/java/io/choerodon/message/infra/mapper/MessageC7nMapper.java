@@ -16,12 +16,9 @@ public interface MessageC7nMapper {
     List<Message> selectEmailMessage(@Param("startDate") Date startDate,
                                      @Param("endDate") Date endDate);
 
-    List<MessageC7nDTO> listMessage(@Param("tenantId") Long tenantId,
-                                    @Param("serverCode") String serverCode,
-                                    @Param("messageTypeCode") String messageTypeCode,
-                                    @Param("subject") String subject,
-                                    @Param("trxStatusCode") String trxStatusCode,
-                                    @Param("startDate") Date startDate,
-                                    @Param("endDate") Date endDate,
-                                    @Param("receiver") String receiver);
+    List<MessageC7nDTO> listMessage(@Param("status") String status,
+                                    @Param("receiveEmail") String receiveEmail,
+                                    @Param("templateType") String templateType,
+                                    @Param("failedReason") String failedReason,
+                                    @Param("params") String params);
 }

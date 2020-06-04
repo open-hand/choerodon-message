@@ -6,14 +6,13 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import java.util.Date;
 
+import org.springframework.data.domain.Pageable;
+
 public interface MessageC7nService {
-    Page<MessageC7nDTO> listMessage(Long tenantId,
-                                    String serverCode,
-                                    String messageTypeCode,
-                                    String subject,
-                                    String trxStatusCode,
-                                    Date startDate,
-                                    Date endDate,
-                                    String receiver,
+    Page<MessageC7nDTO> listMessage(String status,
+                                    String receiveEmail,
+                                    String templateType,
+                                    String failedReason,
+                                    String params,
                                     PageRequest pageRequest);
 }
