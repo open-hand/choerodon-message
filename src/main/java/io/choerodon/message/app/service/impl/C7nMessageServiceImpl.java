@@ -1,13 +1,10 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.hzero.message.app.service.UserMessageService;
 import org.hzero.message.domain.entity.UserMessage;
 import org.hzero.message.domain.repository.UserMessageRepository;
-import org.hzero.mybatis.domian.Condition;
-import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +27,13 @@ public class C7nMessageServiceImpl implements C7nMessageService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAllSiteMessages() {
         Long userId = DetailsHelper.getUserDetails().getUserId();
+        UserMessage condition = new UserMessage();
+        condition.setUserId(Objects.requireNonNull(userId));
 
-        // 查出用户的所有站内信
-        List<UserMessage> userMessageList = userMessageRepository.selectByCondition(Condition.builder(UserMessage.class)
-                .andWhere(Sqls.custom()
-                        .andEqualTo(UserMessage.FIELD_USER_ID, userId)
-                ).build());
+        // 将所有消息已读
+        userMessageService.readMessage(0L, userId);
 
-        // 这里面会调用将消息已读的逻辑
-        userMessageService.deleteMessage(0L, userId, userMessageList.stream().map(UserMessage::getUserMessageId).collect(Collectors.toList()));
+        // 删除用户的所有信息
+        userMessageRepository.delete(condition);
     }
 }
