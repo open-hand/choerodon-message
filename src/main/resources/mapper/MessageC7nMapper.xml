@@ -23,7 +23,58 @@
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
-
+        hmr.receiver_address AS email,
+        temp.message_code as messageCode,
+        temp.message_name as messageName,
+        temp.trx_status_code as status,
+        temp.transaction_message as failedReason,
+        temp.creation_date
+        FROM
+        hmsg_message_receiver hmr
+        JOIN (
+        SELECT
+        hm.message_id,
+        hm.tenant_id,
+        hm.message_type_code,
+        hts.message_code,
+        hts.message_name,
+        hm.server_code,
+        hmt.trx_status_code,
+        hmt.transaction_message,
+        hm.creation_date,
+        hm. SUBJECT,
+        hm.object_version_number
+        FROM
+        hmsg_message hm
+        JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+        AND hm.message_type_code = 'EMAIL'
+        JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
+        AND htsl.template_code = hm.template_code
+        JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+        ) AS temp ON hmr.message_id = temp.message_id
+        <where>
+            <if test="status != null and status != ''">
+                and temp.status = #{status}
+            </if>
+            <if test="receiveEmail != null and receiveEmail != ''">
+                and hmr.receiver_address =  LIKE concat(concat('%',#{receiveEmail}),'%')
+            </if>
+            <if test="templateType != null and templateType != ''">
+                and temp.message_code =  LIKE concat(concat('%',#{templateType}),'%')
+            </if>
+            <if test="failedReason != null and failedReason != ''">
+                and temp.transaction_message =  LIKE concat(concat('%',#{failedReason}),'%')
+            </if>
+            <if test="params != null">
+                AND (
+                temp.status LIKE concat(concat('%',#{params}),'%') OR
+                hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
+                temp.transaction_message LIKE concat(concat('%',#{params}),'%') OR
+                temp.message_code LIKE concat(concat('%',#{params}),'%')
+                )
+            </if>
+        </where>
+        order by temp.creation_date DESC
     </select>
 
 </mapper>
