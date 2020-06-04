@@ -69,4 +69,18 @@ public class MailRecordController {
         return new ResponseEntity<>(messageC7nService.listMessage(status, receiveEmail, templateType, failedReason, params, pageRequest), HttpStatus.OK);
     }
 
+    @Permission(level = ResourceLevel.SITE)
+    @GetMapping("/webhooks")
+    @ApiOperation(value = "查询webhook消息记录（分页接口）")
+    @CustomPageRequest
+    public ResponseEntity<Page<MessageC7nDTO>> pageWebHooks(@ApiIgnore
+                                                            @SortDefault(value = "message_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                            @RequestParam(required = false) String status,
+                                                            @RequestParam(required = false) String webhookAddress,
+                                                            @RequestParam(required = false) String templateType,
+                                                            @RequestParam(required = false) String failedReason,
+                                                            @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(messageC7nService.listWebHooks(status, webhookAddress, templateType, failedReason, params, pageRequest), HttpStatus.OK);
+    }
+
 }
