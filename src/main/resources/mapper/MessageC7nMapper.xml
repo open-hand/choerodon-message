@@ -26,7 +26,7 @@
         hmr.receiver_address AS email,
         temp.message_code as messageCode,
         temp.message_name as messageName,
-        temp.trx_status_code as status,
+        temp.trx_status_code as statusCode,
         temp.transaction_message as failedReason,
         temp.creation_date
         FROM
@@ -85,7 +85,7 @@
             hm.server_code,
             hm.creation_date,
             hws.webhook_address as webhookAddress,
-            hmt.trx_status_code AS STATUS,
+            hmt.trx_status_code AS statusCode,
             hmt.transaction_message AS failedReason,
             hm. SUBJECT AS messageName
         FROM
