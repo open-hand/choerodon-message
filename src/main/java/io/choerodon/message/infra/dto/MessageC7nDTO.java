@@ -2,14 +2,36 @@ package io.choerodon.message.infra.dto;
 
 import java.util.Date;
 
-import org.hzero.message.domain.entity.Message;
+import org.hzero.boot.platform.lov.annotation.LovValue;
 
 public class MessageC7nDTO {
     private String email;
     private String messageCode;
     private String messageName;
     private String failedReason;
-    private String status;
+    @LovValue(
+            lovCode = "HMSG.TRANSACTION_STATUS"
+    )
+    private String statusCode;
+
+    private String statusMeaning;
+
+    public String getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public String getStatusMeaning() {
+        return statusMeaning;
+    }
+
+    public void setStatusMeaning(String statusMeaning) {
+        this.statusMeaning = statusMeaning;
+    }
+
     private Date creationDate;
     private String webhookAddress;
 
@@ -53,13 +75,6 @@ public class MessageC7nDTO {
         this.email = email;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getFailedReason() {
         return failedReason;
