@@ -3,6 +3,7 @@ package io.choerodon.message.api.vo;
 import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.boot.platform.lov.annotation.LovValue;
 
 /**
  * @author jiameng.cao
@@ -25,8 +26,12 @@ public class WebhookRecordVO {
     @ApiModelProperty(value = "webhook类型")
     private String webHookType;
 
-    @ApiModelProperty(value = "状态")
-    private String status;
+    @LovValue(
+            lovCode = "HMSG.TRANSACTION_STATUS"
+    )
+    private String statusCode;
+
+    private String statusMeaning;
 
     @ApiModelProperty(value = "错误信息")
     private String errorInfo;
@@ -82,14 +87,6 @@ public class WebhookRecordVO {
         this.webHookType = webHookType;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Date getCreationDate() {
         return creationDate;
     }
@@ -104,5 +101,21 @@ public class WebhookRecordVO {
 
     public void setErrorInfo(String errorInfo) {
         this.errorInfo = errorInfo;
+    }
+
+    public String getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public String getStatusMeaning() {
+        return statusMeaning;
+    }
+
+    public void setStatusMeaning(String statusMeaning) {
+        this.statusMeaning = statusMeaning;
     }
 }
