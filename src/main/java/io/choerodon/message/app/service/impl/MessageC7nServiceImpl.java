@@ -25,4 +25,9 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     public Page<MessageC7nDTO> listMessage(String status, String receiveEmail, String templateType, String failedReason, String params, PageRequest pageRequest) {
         return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, receiveEmail, templateType, failedReason, params));
     }
+
+    @Override
+    public Page<MessageC7nDTO> listWebHooks(String status, String webhookAddress, String templateType, String failedReason, String params, PageRequest pageRequest) {
+        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listWebHooks(status, webhookAddress, templateType, failedReason, params));
+    }
 }
