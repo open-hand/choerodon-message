@@ -50,6 +50,16 @@
         <if test="params != null">
             AND (hws.webhook_address like concat(concat('%',#{params}),'%') or hts.message_name like concat(concat('%',#{params}),'%'))
         </if>
+        <if test="projectId==null">
+            AND hws.server_id NOT IN (
+            SELECT
+            WEBHOOK_ID
+            FROM
+            webhook_project_rel
+            WHERE
+            tenant_id = #{tenantId}
+            )
+        </if>
     </select>
 
     <delete id="deleteWebHook">
