@@ -1,5 +1,6 @@
 package io.choerodon.message.app.service.impl;
 
+import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ public class WebhookRecordC7nServiceImpl implements WebhookRecordC7nService {
     }
 
     @Override
+    @ProcessLovValue
     public WebhookRecordVO queryById(Long sourceId, Long recordId, String sourceLevel) {
         return webhookRecordC7nMapper.selectById(recordId);
     }
