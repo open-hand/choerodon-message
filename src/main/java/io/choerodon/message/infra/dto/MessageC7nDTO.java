@@ -11,6 +11,15 @@ public class MessageC7nDTO {
     private String failedReason;
     private String status;
     private Date creationDate;
+    private String webhookAddress;
+
+    public String getWebhookAddress() {
+        return webhookAddress;
+    }
+
+    public void setWebhookAddress(String webhookAddress) {
+        this.webhookAddress = webhookAddress;
+    }
 
     public Date getCreationDate() {
         return creationDate;
