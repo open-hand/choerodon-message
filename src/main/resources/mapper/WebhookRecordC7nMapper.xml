@@ -53,24 +53,25 @@
 
     <select id="selectById" resultType="io.choerodon.message.api.vo.WebhookRecordVO">
         SELECT
-            hm.message_id,
+            hmt.transaction_id as recordId,
             hts.message_code,
             hts.message_name,
-            hmt.trx_status_code,
+            hmt.trx_status_code as status,
             hm.creation_date,
             hm.content,
             hws.webhook_address,
             hmt.transaction_message as errorInfo,
-            hws.server_type
+            hws.server_type as webHookType
         FROM
             hmsg_message hm
             JOIN hmsg_message_transaction hmt ON hmt.message_id = hm.message_id
-            JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
-            JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
-
             JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
+            JOIN hmsg_template_server_wh htsw ON htsw.server_code = hm.server_code
+            JOIN hmsg_template_server_line htsl ON htsl.temp_server_line_id = htsw.temp_server_line_id
+                                                   AND hm.template_code = htsl.template_code
+            JOIN hmsg_template_server hts ON hts.temp_server_id = htsw.temp_server_id
         WHERE
             hm.message_type_code = 'WEB_HOOK'
-            AND  hmt.transaction_id=#{record_id}
+            AND  hmt.transaction_id=#{recordId}
     </select>
 </mapper>
