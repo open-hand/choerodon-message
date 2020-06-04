@@ -185,6 +185,23 @@ service:
     # prometheus.io/path: '/actuator/prometheus'
   # prometheus.io/port: '8031'
 
+## Ingress 相关配置
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+##
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    # nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+  path: /
+  host: api.example.com
+  tls: []
+  # - secretName: api-example-tls
+  #   hosts:
+  #   - api.example.com
+
+
 ## 指标收集
 metrics:
   # 收集应用的指标数据路径
