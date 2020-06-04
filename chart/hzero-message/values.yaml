@@ -112,7 +112,7 @@ env:
     # 日志级别
     LOG_LEVEL: info
     # JVM参数
-    JAVA_OPTS: >
+    JAVA_OPTS: >-
       -Xms1024m
       -Xmx1536m
 
