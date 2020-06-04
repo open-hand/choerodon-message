@@ -15,4 +15,11 @@ public interface MessageC7nService {
                                     String failedReason,
                                     String params,
                                     PageRequest pageRequest);
+
+    Page<MessageC7nDTO> listWebHooks(String status,
+                                     String webhookAddress,
+                                     String templateType,
+                                     String failedReason,
+                                     String params,
+                                     PageRequest pageRequest);
 }
