@@ -16,18 +16,20 @@
 
     <select id="pagingWebHookRecord" resultType="io.choerodon.message.api.vo.WebhookRecordVO">
         SELECT
-        hmt.transaction_id as recordId,
+        hmt.transaction_id AS recordId,
         hts.message_code,
         hts.message_name,
-        hmt.trx_status_code,
+        hmt.trx_status_code as status,
         hm.creation_date,
         hws.webhook_address,
-        hws.server_type
+        hws.server_type as webHookType
         FROM
         hmsg_message hm
         JOIN hmsg_message_transaction hmt ON hmt.message_id = hm.message_id
-        JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
-        JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+        JOIN hmsg_template_server_wh htsw ON htsw.server_code = hm.server_code
+        JOIN hmsg_template_server_line htsl ON htsl.temp_server_line_id = htsw.temp_server_line_id
+        AND hm.template_code = htsl.template_code
+        JOIN hmsg_template_server hts ON hts.temp_server_id = htsw.temp_server_id
         JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
         <if test="projectId!=null">
             INNER JOIN webhook_project_rel wpr on wpr.project_id=#{projectId} and wpr.webhook_id=hws.server_id
