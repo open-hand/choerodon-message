@@ -56,7 +56,7 @@
             hmt.transaction_id as recordId,
             hts.message_code,
             hts.message_name,
-            hmt.trx_status_code as status,
+            hmt.trx_status_code as statusCode,
             hm.creation_date,
             hm.content,
             hws.webhook_address,
