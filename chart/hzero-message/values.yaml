@@ -63,6 +63,11 @@ env:
     # 获取用户信息的接口
     HZERO_WEBSOCKET_OAUTHURL: http://hzero-oauth/oauth/api/user
 
+    # 是否启用配置中心
+    SPRING_CLOUD_CONFIG_ENABLED: false
+    # 配置中心地址
+    SPRING_CLOUD_CONFIG_URI: http://dev.hzero.org:8010/
+
     # Redis 主机地址
     SPRING_REDIS_HOST: localhost
     # Redis 端口
@@ -169,11 +174,11 @@ service:
     # 服务端口
     http:
       port: 8030
-      nodePort: 30092
+      nodePort: 30126
     # 管理端口
     actuator:
       port: 8031
-      nodePort: 30093
+      nodePort: 30127
   ## externalIPs 设置
   # externalIPs:
   #   - externalIp1
