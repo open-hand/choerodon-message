@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>hzero-message</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.22.0.RELEASE</version>
     <name>hzero-message</name>
     <description>Demo project for Spring Boot</description>
 

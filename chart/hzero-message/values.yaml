@@ -3,7 +3,7 @@ preJob:
   # job 超时时间
   timeout: 1200
   # 工具 jar 包镜像库地址
-  image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.6.7
+  image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.7.0
   preInitDB:
     # 是否初始化hzero_message数据库
     enabled: true
@@ -60,9 +60,6 @@ env:
     # 注册服务地址
     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
 
-    # 网关地址
-    CHOERODON_GATEWAY_URL: http://api.example.com
-
     # 获取用户信息的接口
     HZERO_WEBSOCKET_OAUTHURL: http://hzero-oauth/oauth/api/user
 
@@ -111,17 +108,17 @@ env:
     HZERO_SMS_FAKE: false
     # 日志级别
     LOG_LEVEL: info
-    # JVM参数
-    JAVA_OPTS: >-
-      -Xms1024m
-      -Xmx1536m
+#    # JVM参数
+#    JAVA_OPTS: >-
+#      -Xms1024m
+#      -Xmx1536m
 
-    ## Skywalking 配置参数
-    # SKYWALKING_OPTS: >-
-    #   -javaagent:/agent/skywalking-agent.jar
-    #   -Dskywalking.agent.application_code=asgard-service
-    #   -Dskywalking.agent.sample_n_per_3_secs=-1
-    #   -Dskywalking.collector.backend_service=oap.skywalking:11800
+#    # Skywalking 配置参数
+#     SKYWALKING_OPTS: >-
+#       -javaagent:/agent/skywalking-agent.jar
+#       -Dskywalking.agent.application_code=asgard-service
+#       -Dskywalking.agent.sample_n_per_3_secs=-1
+#       -Dskywalking.collector.backend_service=oap.skywalking:11800
 
 
 ## Liveness 和 Readiness 探针相关配置
@@ -183,7 +180,7 @@ service:
   annotations: {}
     # prometheus.io/scrape: 'true'
     # prometheus.io/path: '/actuator/prometheus'
-  # prometheus.io/port: '8031'
+    # prometheus.io/port: '8031'
 
 ## Ingress 相关配置
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -201,8 +198,7 @@ ingress:
   #   hosts:
   #   - api.example.com
 
-
-## 指标收集
+# 指标收集
 metrics:
   # 收集应用的指标数据路径
   path: /actuator/prometheus
