@@ -23,6 +23,7 @@
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
+        hmr.receiver_id AS id,
         hmr.receiver_address AS email,
         temp.message_code as messageCode,
         temp.message_name as messageName,
@@ -57,55 +58,56 @@
                 and temp.status = #{status}
             </if>
             <if test="receiveEmail != null and receiveEmail != ''">
-                and hmr.receiver_address =  LIKE concat(concat('%',#{receiveEmail}),'%')
+                and hmr.receiver_address = LIKE concat(concat('%',#{receiveEmail}),'%')
             </if>
             <if test="templateType != null and templateType != ''">
-                and (temp.message_code =  LIKE concat(concat('%',#{templateType}),'%') or temp.message_name =  LIKE concat(concat('%',#{templateType}),'%'))
+                and (temp.message_code = LIKE concat(concat('%',#{templateType}),'%') or temp.message_name = LIKE
+                concat(concat('%',#{templateType}),'%'))
             </if>
             <if test="failedReason != null and failedReason != ''">
-                and temp.transaction_message =  LIKE concat(concat('%',#{failedReason}),'%')
+                and temp.transaction_message = LIKE concat(concat('%',#{failedReason}),'%')
             </if>
             <if test="params != null">
                 AND (
                 temp.status LIKE concat(concat('%',#{params}),'%') OR
                 hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
                 temp.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-                temp.message_name =  LIKE concat(concat('%',#{templateType}),'%') OR
+                temp.message_name = LIKE concat(concat('%',#{templateType}),'%') OR
                 temp.message_code LIKE concat(concat('%',#{params}),'%')
                 )
             </if>
         </where>
         order by temp.creation_date DESC
     </select>
-    
+
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
-            hm.message_id,
-            hm.message_type_code,
-            hm.server_code,
-            hm.creation_date,
-            hws.webhook_address as webhookAddress,
-            hmt.trx_status_code AS statusCode,
-            hmt.transaction_message AS failedReason,
-            hm. SUBJECT AS messageName
+        hm.message_id,
+        hm.message_type_code,
+        hm.server_code,
+        hm.creation_date,
+        hws.webhook_address as webhookAddress,
+        hmt.trx_status_code AS statusCode,
+        hmt.transaction_message AS failedReason,
+        hm. SUBJECT AS messageName
         FROM
-            hmsg_message hm
-            JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
-            JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
+        hmsg_message hm
+        JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+        JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
         WHERE
-            hm.message_type_code = 'WEB_HOOK'
+        hm.message_type_code = 'WEB_HOOK'
         <where>
             <if test="status != null and status != ''">
                 hmt.transaction_message = #{status}
             </if>
             <if test="webhookAddress != null and receiveEmail != ''">
-                and hws.webhook_address =  LIKE concat(concat('%',#{webhookAddress}),'%')
+                and hws.webhook_address = LIKE concat(concat('%',#{webhookAddress}),'%')
             </if>
             <if test="templateType != null and templateType != ''">
-                and  hm. SUBJECT  =  LIKE concat(concat('%',#{templateType}),'%')
+                and hm. SUBJECT = LIKE concat(concat('%',#{templateType}),'%')
             </if>
             <if test="failedReason != null and failedReason != ''">
-                and hmt.transaction_message =  LIKE concat(concat('%',#{failedReason}),'%')
+                and hmt.transaction_message = LIKE concat(concat('%',#{failedReason}),'%')
             </if>
             <if test="params != null">
                 AND (
@@ -117,7 +119,7 @@
             </if>
         </where>
         ORDER BY
-            hm.creation_date DESC
+        hm.creation_date DESC
     </select>
 
 </mapper>
