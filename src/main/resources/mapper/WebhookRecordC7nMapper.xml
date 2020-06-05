@@ -19,7 +19,7 @@
         hmt.transaction_id AS recordId,
         hts.message_code,
         hts.message_name,
-        hmt.trx_status_code as status,
+        hmt.trx_status_code as statusCode,
         hm.creation_date,
         hws.webhook_address,
         hws.server_type as webHookType
