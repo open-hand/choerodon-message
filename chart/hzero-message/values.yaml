@@ -113,6 +113,8 @@ env:
     HZERO_SMS_FAKE: false
     # 日志级别
     LOG_LEVEL: info
+    # 资源匹配路径
+    HZERO_RESOURCE_PATTERN: /v1/*,/hzero/*,/iam/v1/*,/iam/hzero/*,/choerodon/v1/*
 #    # JVM参数
 #    JAVA_OPTS: >-
 #      -Xms1024m
