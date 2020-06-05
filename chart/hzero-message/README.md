@@ -62,7 +62,6 @@ Parameter | Description	| Default
 `env.open.CHOERODON_RESOURCE_JWT_IGNORE` |忽略jwt的url | `/favicon.ico`
 `env.open.EUREKA_CLIENT_SERVICEURL_DEFAULTZONE` | 注册服务地址 | `http://register-server.io-choerodon:8000/eureka/`
 `env.open.CHOERODON_CLEANPERMISSION` | 清理permission表中的旧接口和role_permission表中角色和权限层级不匹配的脏数据 | `false`
-`env.open.CHOERODON_GATEWAY_URL` | 网关地址 | `http://api.staging.saas.hand-china.com`
 `service.enabled` | 是否创建k8s service | `false`
 `service.type` |  service类型 | `ClusterIP`
 `service.port` | service端口 | `8030`
