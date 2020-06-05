@@ -1,9 +1,5 @@
 package io.choerodon.message.app.service.impl;
 
-import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebhookRecordVO;
@@ -12,6 +8,9 @@ import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.WebhookRecordC7nMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author scp
@@ -26,6 +25,7 @@ public class WebhookRecordC7nServiceImpl implements WebhookRecordC7nService {
     private IamClientOperator iamClientOperator;
 
     @Override
+    @ProcessLovValue
     public Page<WebhookRecordVO> pagingWebHookRecord(PageRequest pageRequest, Long sourceId, Long webhookId, String status, String eventName, String type, String sourceLevel) {
         if (sourceLevel.equals(ResourceLevel.PROJECT.value())) {
             Long tenantId = iamClientOperator.queryProjectById(sourceId).getOrganizationId();
