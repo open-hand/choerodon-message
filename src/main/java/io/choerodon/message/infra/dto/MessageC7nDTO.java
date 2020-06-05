@@ -1,10 +1,11 @@
 package io.choerodon.message.infra.dto;
 
-import java.util.Date;
-
 import org.hzero.boot.platform.lov.annotation.LovValue;
 
+import java.util.Date;
+
 public class MessageC7nDTO {
+    private Long id;
     private String email;
     private String messageCode;
     private String messageName;
@@ -82,5 +83,14 @@ public class MessageC7nDTO {
 
     public void setFailedReason(String failedReason) {
         this.failedReason = failedReason;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public MessageC7nDTO setId(Long id) {
+        this.id = id;
+        return this;
     }
 }
