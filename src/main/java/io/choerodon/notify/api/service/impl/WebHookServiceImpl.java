@@ -95,6 +95,9 @@ public class WebHookServiceImpl implements WebHookService {
             for (WebHookDTO hook : hooks) {
 
                 Map<String, Object> userParams = dto.getParams();
+                if (userParams.containsKey("url")) {
+                    userParams.put("url", ChineseToUrls(userParams.get("url").toString()));
+                }
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
                 if (WebHookTypeEnum.DINGTALK.getValue().equalsIgnoreCase(hook.getType())) {
                     webhookRecordDTO.setWebhookPath(hook.getWebhookPath());
@@ -374,4 +377,34 @@ public class WebHookServiceImpl implements WebHookService {
                 .orElseThrow(() -> new NotExistedException("error.web.hook.does.not.existed"));
     }
 
+
+
+    /**
+     * 汉字转换成URL码
+     */
+    public static String ChineseToUrls(String s) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= 0 && c <= 255) {
+                sb.append(c);
+            } else {
+                byte[] b;
+                try {
+                    //指定需要的编码类型
+                    b = String.valueOf(c).getBytes("utf-8");
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                    b = new byte[0];
+                }
+                for (int j = 0; j < b.length; j++) {
+                    int k = b[j];
+                    if (k < 0)
+                        k += 256;
+                    sb.append("%" + Integer.toHexString(k).toUpperCase());
+                }
+            }
+        }
+        return sb.toString();
+    }
 }
