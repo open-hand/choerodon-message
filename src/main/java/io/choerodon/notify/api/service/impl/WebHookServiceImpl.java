@@ -95,7 +95,7 @@ public class WebHookServiceImpl implements WebHookService {
             for (WebHookDTO hook : hooks) {
 
                 Map<String, Object> userParams = dto.getParams();
-                if (userParams.containsKey("url")) {
+                if (userParams.containsKey("url") && !StringUtils.isEmpty(userParams.get("url"))) {
                     userParams.put("url", ChineseToUrls(userParams.get("url").toString()));
                 }
                 String content = templateRender.renderTemplate(template, userParams, TemplateRender.TemplateType.CONTENT);
