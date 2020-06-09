@@ -15,6 +15,7 @@ import org.hzero.message.domain.repository.WebhookServerRepository;
 import org.hzero.message.infra.mapper.MessageTemplateMapper;
 import org.hzero.message.infra.mapper.TemplateServerLineMapper;
 import org.hzero.message.infra.mapper.TemplateServerMapper;
+import org.hzero.mybatis.helper.DataSecurityHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -257,6 +258,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         //查询已选发送设置主键集合
         Set<Long> templateServerIds = webHookC7nMapper.queryWebHook(webHookId);
         WebhookServer webhookServer = webhookServerRepository.selectByPrimaryKey(webHookId);
+        webhookServer.setSecret(DataSecurityHelper.decrypt(webhookServer.getSecret()));
         WebHookVO result = new WebHookVO();
         BeanUtils.copyProperties(webhookServer, result);
         result.setTemplateServers(webHookVO.getTemplateServers());
