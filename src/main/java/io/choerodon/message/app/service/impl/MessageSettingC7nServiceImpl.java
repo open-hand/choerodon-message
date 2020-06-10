@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Service
 public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
-    private static final String RESOURCE_DELETE_CONFIRMATION = "resourceDeleteConfirmation";
+    private static final String RESOURCE_DELETE_CONFIRMATION = "RESOURCEDELETECONFIRMATION";
     private static final String ERROR_SAVE_MESSAGE_SETTING = "error.save.message.setting";
     private static final String ERROR_UPDATE_MESSAGE_SETTING = "error.createOrUpdateEmail.message.setting";
     private static final String ERROR_PARAM_INVALID = "error.param.invalid";
@@ -401,7 +401,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
             List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
-            //
             customMessageSettingList.stream().map(customMessageSettingVO -> {
                 String lovCode = customMessageSettingVO.getSubcategoryCode();
                 customMessageSettingVO.setGroupId(lovCode);
