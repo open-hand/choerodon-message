@@ -23,7 +23,7 @@
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
-        hmr.receiver_id AS id,
+        temp.transaction_id AS id,
         hmr.receiver_address AS email,
         temp.message_code as messageCode,
         temp.message_name as messageName,
@@ -34,6 +34,7 @@
         hmsg_message_receiver hmr
         JOIN (
         SELECT
+        hmt.transaction_id as transaction_id,
         hm.message_id,
         hm.tenant_id,
         hm.message_type_code,
