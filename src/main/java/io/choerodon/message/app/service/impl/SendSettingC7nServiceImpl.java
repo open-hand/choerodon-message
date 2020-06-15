@@ -60,7 +60,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String WEBHOOK_JSON = "webHookJson";
     private static final String JSON = "JSON";
     private static final String MESSAGE_CHOERODON = "CHOERODON.";
-    private static final String DINGTALK_WECHAT = "dingtalkandwechat";
+    private static final String DINGTALK_WECHAT = "DINGTALKANDWECHAT";
 
     @Autowired
     private TemplateServerService templateServerService;
