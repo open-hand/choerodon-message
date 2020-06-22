@@ -7,6 +7,7 @@ import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
@@ -126,8 +127,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
         MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
         //如果项目下配置没有开启，则查询默认配置
-        if(Objects.isNull(messageSettingDTO)){
-             messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), envId, eventName, messageType);
+        if (Objects.isNull(messageSettingDTO)) {
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), envId, eventName, messageType);
         }
         return ObjectUtils.isEmpty(messageSettingDTO);
 
@@ -164,11 +165,17 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         } else {
             // 组织层获取到不应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
-            senderList=webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         }
         webHookSenderList.clear();
         webHookSenderList.addAll(senderList);
-
+        //如果是钉钉类型的消息清除接收者
+        if (!CollectionUtils.isEmpty(webHookSenderList)) {
+            for (WebHookSender webHookSender : webHookSenderList) {
+                webHookSender.setReceiverAddressList(null);
+            }
+        }
+        messageSender.setReceiverAddressList(null);
     }
 
 }
