@@ -138,7 +138,7 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
     public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
-                                                                 @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                 @SortDefault(value = "creationDate", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                  @PathVariable(name = "project_id") Long projectId,
                                                                  @RequestParam(name = "webhook_id", required = false) Long webhookId,
                                                                  @RequestParam(required = false) String status,
