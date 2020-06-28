@@ -37,6 +37,9 @@
         WHERE
         hm.message_type_code = 'WEB_HOOK'
         AND  hm.tenant_id=#{tenantId}
+        <if test="projectId == null">
+            AND hts.category_code='ORGANIZATION'
+        </if>
         <if test="status!=null">
             AND hmt.trx_status_code=#{status}
         </if>
