@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,5 +39,15 @@ public class OnlineCountController {
     @GetMapping(value = "/current/list", produces = "application/json")
     public ResponseEntity<Map<String, Integer>> getCurrentCountPerHour() {
         return new ResponseEntity<>(onlineCountStorageUtils.getCurrentCountPerHour(), HttpStatus.OK);
+    }
+
+    /**
+     * 当前在线用户id
+     */
+    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.SITE_DEVELOPER})
+    @ApiOperation(value = "当前在线用户id")
+    @GetMapping(value = "/current/ids", produces = "application/json")
+    public ResponseEntity<List<Long>> getOnlineUserIds() {
+        return new ResponseEntity<>(onlineCountStorageUtils.getOnlineUserIds(), HttpStatus.OK);
     }
 }
