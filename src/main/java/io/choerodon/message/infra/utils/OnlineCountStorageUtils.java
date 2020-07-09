@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class OnlineCountStorageUtils {
@@ -133,5 +134,12 @@ public class OnlineCountStorageUtils {
             startCalendar.add(Calendar.HOUR, +1);
         }
         return map;
+    }
+
+    public List<Long> getOnlineUserIds() {
+        return Objects.requireNonNull(redisTemplate.opsForSet().members(NUMBER_OF_VISITORS_TODAY))
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
     }
 }
