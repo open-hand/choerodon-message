@@ -3,6 +3,8 @@ package io.choerodon.message.api.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * @author dengyouquan
  **/
@@ -35,6 +37,7 @@ public class OrganizationProjectVO {
     }
 
     public static class Organization {
+        @Encrypt
         private Long id;
         private String name;
         private String code;
@@ -75,6 +78,7 @@ public class OrganizationProjectVO {
     }
 
     public static class Project {
+        @Encrypt
         private Long id;
         private String name;
         private String code;

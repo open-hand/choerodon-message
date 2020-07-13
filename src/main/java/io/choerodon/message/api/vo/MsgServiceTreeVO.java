@@ -1,12 +1,16 @@
 package io.choerodon.message.api.vo;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * @author jiameng.cao
  * @date 2019/10/29
  */
 public class MsgServiceTreeVO {
+    @Encrypt
     private Long parentId;
 
+    @Encrypt
     private Long id;
 
     private String name;
