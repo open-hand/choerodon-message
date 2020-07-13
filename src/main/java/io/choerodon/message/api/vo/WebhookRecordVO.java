@@ -4,12 +4,14 @@ import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.boot.platform.lov.annotation.LovValue;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
  * @author jiameng.cao
  * @date 2019/11/4
  */
 public class WebhookRecordVO {
+    @Encrypt
     private Long recordId;
     @ApiModelProperty(value = "消息Code")
     private String messageCode;

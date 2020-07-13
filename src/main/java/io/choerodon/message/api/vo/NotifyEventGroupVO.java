@@ -1,5 +1,7 @@
 package io.choerodon.message.api.vo;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * 〈功能简述〉
  * 〈通知设置分组VO〉
@@ -8,7 +10,9 @@ package io.choerodon.message.api.vo;
  * @Date 2019/12/11 11:14
  */
 public class NotifyEventGroupVO {
+    @Encrypt
     private Long id;
+
     private String name;
     private String categoryCode;
 
