@@ -91,6 +91,7 @@
         WHERE
       	   htsl.template_code LIKE CONCAT( '%', hws.server_type, '%' )
 	     AND hts.temp_server_id = htsl.temp_server_id  	AND hws.enabled_flag=1
+	     AND hws.server_id =#{webHookId}
          GROUP BY
          	hts.message_code
     </select>
