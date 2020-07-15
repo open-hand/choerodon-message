@@ -25,4 +25,11 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_email_filter.groovy') {
 
         addUniqueConstraint(columnNames:"server_id,address",tableName:"hmsg_email_filter",constraintName: "hmsg_email_filter_u1")
     }
+    changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_email_filter") {
+        addColumn(tableName: 'hmsg_email_filter') {
+            column(name: "tenant_id", type: "bigint", defaultValue: "0", remarks: "租户ID,hpfm_tenant.tenant_id") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 }
