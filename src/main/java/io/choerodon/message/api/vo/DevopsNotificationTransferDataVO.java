@@ -2,21 +2,27 @@ package io.choerodon.message.api.vo;
 
 import java.util.List;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * Creator: ChangpingShi0213@gmail.com
  * Date:  17:23 2019/5/13
  * Description:
  */
 public class DevopsNotificationTransferDataVO {
+    @Encrypt
     private Long id;
+    @Encrypt
     private Long envId;
     private String envName;
+    @Encrypt
     private Long projectId;
     private String notifyTriggerEvent;
     private String notifyObject;
     private String notifyType;
     private List<DevopsNotificationUserRelVO> userRelDTOS;
     private Long objectVersionNumber;
+    @Encrypt
     private List<Long> userRelIds;
 
     public Long getId() {

@@ -21,7 +21,7 @@ import io.choerodon.swagger.annotation.Permission;
 @RestController
 @RequestMapping("/choerodon/v1/notices/receive_setting")
 public class ReceiveSettingC7nController {
-    private ReceiveSettingC7nService receiveSettingService;
+    private final ReceiveSettingC7nService receiveSettingService;
 
     public ReceiveSettingC7nController(ReceiveSettingC7nService receiveSettingService) {
         this.receiveSettingService = receiveSettingService;
