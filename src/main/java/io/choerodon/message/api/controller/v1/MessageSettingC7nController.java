@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +34,11 @@ public class MessageSettingC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
     public ResponseEntity<MessageSettingVO> getSettingByCode(
+            @Encrypt
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @PathVariable(value = "code") String code,
+            @Encrypt
             @RequestParam(value = "env_id", required = false) Long envId,
             @RequestParam(value = "event_name", required = false) String eventName
             ) {
@@ -46,6 +49,7 @@ public class MessageSettingC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
     public ResponseEntity<MessageSettingWarpVO> listByType(
+            @Encrypt
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @ApiParam(value = "事件名称（过滤条件）")
@@ -57,6 +61,7 @@ public class MessageSettingC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "批量修改消息设置")
     public ResponseEntity<Void> batchUpdateByType(
+            @Encrypt
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @RequestBody List<CustomMessageSettingVO> messageSettingVOS) {

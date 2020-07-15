@@ -1,10 +1,12 @@
 package io.choerodon.message.infra.dto;
 
-import org.hzero.boot.platform.lov.annotation.LovValue;
-
 import java.util.Date;
 
+import org.hzero.boot.platform.lov.annotation.LovValue;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 public class MessageC7nDTO {
+    @Encrypt
     private Long id;
     private String email;
     private String messageCode;

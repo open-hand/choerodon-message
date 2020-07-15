@@ -6,6 +6,7 @@ import io.choerodon.message.api.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ import java.util.List;
 @RequestMapping("/choerodon/v1/notices/send_settings")
 public class SendSettingC7nController {
 
-    private SendSettingC7nService sendSettingC7nService;
+    private final SendSettingC7nService sendSettingC7nService;
 
     public SendSettingC7nController(SendSettingC7nService sendSettingC7nService) {
         this.sendSettingC7nService = sendSettingC7nService;
@@ -74,7 +75,7 @@ public class SendSettingC7nController {
     @PutMapping("/update_status")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "根据code启用消息服务")
-    public ResponseEntity updateStatus(@RequestParam("code") String code, @RequestParam(value = "status") Boolean status) {
+    public ResponseEntity<Void> updateStatus(@RequestParam("code") String code, @RequestParam(value = "status") Boolean status) {
         sendSettingC7nService.enableOrDisabled(code, status);
         return Results.success();
     }
@@ -83,14 +84,20 @@ public class SendSettingC7nController {
     @PutMapping("/{id}/send_setting")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "修改发送设置")
-    public ResponseEntity<SendSettingVO> updateSendSetting(@PathVariable("id") Long id, @RequestBody SendSettingVO settingVO) {
+    public ResponseEntity<SendSettingVO> updateSendSetting(
+            @Encrypt
+            @PathVariable("id") Long id,
+            @RequestBody SendSettingVO settingVO) {
         return ResponseEntity.ok(sendSettingC7nService.updateSendSetting(id, settingVO));
     }
 
     @PutMapping("/{id}/receive_config_flag")
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "允许配置接受设置")
-    public ResponseEntity updateReceiveConfigFlag(@PathVariable("id") Long id, Boolean receiveConfigFlag) {
+    public ResponseEntity<Void> updateReceiveConfigFlag(
+            @Encrypt
+            @PathVariable("id") Long id,
+            Boolean receiveConfigFlag) {
         sendSettingC7nService.updateReceiveConfigFlag(id, receiveConfigFlag);
         return Results.success();
     }

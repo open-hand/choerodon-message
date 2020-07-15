@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 
 /**
@@ -19,7 +20,7 @@ import org.hzero.message.domain.entity.WebhookServer;
 @JsonInclude
 public class WebHookVO extends WebhookServer {
 
-
+    @Encrypt
     @NotEmpty(message = "error.web.hook.create.or.update.send.setting.ids.can.not.be.empty")
     @ApiModelProperty("已选发送设置主键集合")
     private Set<Long> sendSettingIdList;

@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.infra.utils.OnlineCountStorageUtils;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class OnlineCountController {
     /**
      * 当前在线用户id
      */
-    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.SITE_DEVELOPER})
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionWithin = true)
     @ApiOperation(value = "当前在线用户id")
     @GetMapping(value = "/current/ids", produces = "application/json")
     public ResponseEntity<List<Long>> getOnlineUserIds() {
