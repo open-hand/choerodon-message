@@ -27,7 +27,6 @@ public class ReceiveSettingVO {
     @ApiModelProperty(value = "是否禁用消息通知/非必填")
     private Boolean disable;
 
-    @Encrypt
     private Long sourceId;
     private String sourceType;
 
