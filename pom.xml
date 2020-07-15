@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.17.1.BETA</version>
+        <version>0.17.1.RELEASE</version>
     </parent>
 
     <artifactId>hzero-message</artifactId>
-    <version>0.22.0.RELEASE</version>
+    <version>0.22.6.RELEASE</version>
     <name>hzero-message</name>
     <description>Demo project for Spring Boot</description>
 
