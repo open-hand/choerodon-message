@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.message.domain.entity.MessageTemplate;
 import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.List;
 
@@ -27,10 +28,13 @@ public class SendSettingVO extends TemplateServer {
 
     private Integer webhookJsonEnabledFlag;
 
+    @Encrypt
     private Long emailTemplateId;
 
+    @Encrypt
     private Long smsTemplateId;
 
+    @Encrypt
     private Long pmTemplateId;
     private String sendingType;
 

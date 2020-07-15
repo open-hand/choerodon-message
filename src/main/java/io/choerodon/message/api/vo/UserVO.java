@@ -2,11 +2,13 @@ package io.choerodon.message.api.vo;
 
 import java.util.Objects;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * @author dengyouquan
  */
 public class UserVO {
-
+    @Encrypt
     private Long id;
 
     private String loginName;

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -16,18 +17,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Date 2019/12/11 11:16
  */
 public class CustomMessageSettingVO {
-
+    @Encrypt
     private Long id;
 
+    @Encrypt
     @ApiModelProperty("项目Id")
     private Long projectId;
 
-    @ApiModelProperty("项目Id")
+    @Encrypt
+    @ApiModelProperty("环境Id")
     private Long envId;
 
     @ApiModelProperty("通知类型，用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")
     private String notifyType;
 
+    @Encrypt
     @ApiModelProperty(value = "分组的id,这就为categoryCode")
     private String groupId;
 
@@ -70,6 +74,7 @@ public class CustomMessageSettingVO {
     @ApiModelProperty(value = "指定用户集合")
     private List<TargetUserVO> userList;
 
+    @Encrypt
     @ApiModelProperty(value = "指定用户id集合")
     private Set<Long> specifierIds;
 
