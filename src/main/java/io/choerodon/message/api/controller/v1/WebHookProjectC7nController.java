@@ -54,7 +54,6 @@ public class WebHookProjectC7nController {
     public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(
             @ApiIgnore
             @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageable,
-            @Encrypt
             @PathVariable(name = "project_id") Long sourceId,
             @RequestParam(required = false) String messageName,
             @RequestParam(required = false) String type,
@@ -67,7 +66,6 @@ public class WebHookProjectC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
-            @Encrypt
             @PathVariable(name = "project_id") Long projectId,
             @Encrypt
             @RequestParam(value = "id", required = false) Long id,
@@ -79,7 +77,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "项目层新增WebHook")
     @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(
-            @Encrypt
             @PathVariable(name = "project_id") Long projectId,
             @RequestBody @Validated WebHookVO webHookVO) {
         return new ResponseEntity<>(webHookC7nService.create(projectId, webHookVO, ResourceLevel.PROJECT.value()), HttpStatus.OK);
@@ -89,7 +86,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "更新WebHook")
     @PutMapping("/{id}")
     public ResponseEntity<WebHookVO> update(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @Encrypt
             @PathVariable("id") Long id,
@@ -102,7 +98,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "删除WebHook")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @Encrypt
             @PathVariable("id") Long id) {
@@ -114,7 +109,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "禁用WebHook")
     @PutMapping("/{id}/update_status")
     public ResponseEntity<Void> updateEnabledFlag(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @Encrypt
             @PathVariable("id") Long id,
@@ -127,7 +121,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "项目层重试发送记录")
     @GetMapping("/{record_id}/retry")
     public ResponseEntity<Void> retry(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @Encrypt
             @PathVariable("record_id") Long recordId) {
@@ -140,7 +133,6 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "根据ID查询webhook")
     @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @Encrypt
             @PathVariable("webhook_id") Long webHookId) {
@@ -155,7 +147,6 @@ public class WebHookProjectC7nController {
     public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(
             @ApiIgnore
             @SortDefault(value = "creationDate", direction = Sort.Direction.DESC) PageRequest pageRequest,
-            @Encrypt
             @PathVariable(name = "project_id") Long projectId,
             @Encrypt
             @RequestParam(name = "webhook_id", required = false) Long webhookId,
@@ -169,7 +160,6 @@ public class WebHookProjectC7nController {
     @GetMapping("/details/{record_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebhookRecordVO> getWebhookRecordDetails(
-            @Encrypt
             @PathVariable(name = "project_id") Long projectId,
             @Encrypt
             @PathVariable(name = "record_id") Long recordId) {
@@ -180,7 +170,6 @@ public class WebHookProjectC7nController {
     @GetMapping("/send_settings")
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebHookVO.SendSetting> getTempServerForWebhook(
-            @Encrypt
             @PathVariable("project_id") Long projectId,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "description", required = false) String description,

@@ -20,7 +20,6 @@ public class CustomMessageSettingVO {
     @Encrypt
     private Long id;
 
-    @Encrypt
     @ApiModelProperty("项目Id")
     private Long projectId;
 
