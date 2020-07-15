@@ -57,4 +57,11 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
         dropUniqueConstraint(tableName: "hmsg_template_server_line", constraintName: "hmsg_template_server_line_u1")
         addUniqueConstraint(tableName: "hmsg_template_server_line", constraintName: "hmsg_template_server_line_u1", columnNames: "temp_server_id,type_code,template_code")
     }
+    changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_template_server_line") {
+        addColumn(tableName: 'hmsg_template_server_line') {
+            column(name: "tenant_id", type: "bigint", defaultValue: "0", remarks: "租户ID,hpfm_tenant.tenant_id") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 }
