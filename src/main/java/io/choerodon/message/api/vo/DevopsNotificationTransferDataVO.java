@@ -15,7 +15,6 @@ public class DevopsNotificationTransferDataVO {
     @Encrypt
     private Long envId;
     private String envName;
-    @Encrypt
     private Long projectId;
     private String notifyTriggerEvent;
     private String notifyObject;
