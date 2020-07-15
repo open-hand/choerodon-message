@@ -7,14 +7,12 @@ import org.hzero.starter.keyencrypt.core.Encrypt;
  * @author superlee
  */
 public class ProjectVO {
-    @Encrypt
     @ApiModelProperty(value = "主键ID/非必填")
     private Long id;
 
     @ApiModelProperty(value = "项目名/必填")
     private String name;
 
-    @Encrypt
     @ApiModelProperty(value = "组织ID/非必填")
     private Long organizationId;
 

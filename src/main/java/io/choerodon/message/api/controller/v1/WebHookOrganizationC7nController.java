@@ -62,7 +62,6 @@ public class WebHookOrganizationC7nController {
     public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(
             @ApiIgnore
             @SortDefault(value = "server_id", direction = Sort.Direction.DESC) PageRequest pageable,
-            @Encrypt
             @PathVariable(name = "organization_id") Long sourceId,
             @RequestParam(required = false) String messageName,
             @RequestParam(required = false) String type,
@@ -75,7 +74,6 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
-            @Encrypt
             @PathVariable(name = "organization_id") Long organizationId,
             @Encrypt
             @RequestParam(value = "id", required = false) Long id,
@@ -87,7 +85,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "组织层新增WebHook")
     @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(
-            @Encrypt
             @PathVariable(name = "organization_id") Long organizationId,
             @RequestBody WebHookVO webHookVO) {
         return new ResponseEntity<>(webHookC7nService.create(organizationId, webHookVO, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
@@ -97,7 +94,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "更新WebHook")
     @PutMapping("/{id}")
     public ResponseEntity<WebHookVO> update(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @Encrypt
             @PathVariable("id") Long id,
@@ -111,7 +107,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "删除WebHook")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @Encrypt
             @PathVariable("id") Long id) {
@@ -123,7 +118,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "禁用WebHook")
     @PutMapping("/{id}/update_status")
     public ResponseEntity<Void> updateEnabledFlag(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @Encrypt
             @PathVariable("id") Long id,
@@ -136,7 +130,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "组织层重试发送记录")
     @GetMapping("/{record_id}/retry")
     public ResponseEntity<Void> retry(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @Encrypt
             @PathVariable("record_id") Long recordId) {
@@ -148,7 +141,6 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "根据ID查询webhook")
     @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @Encrypt
             @PathVariable("webhook_id") Long webHookId) {
@@ -163,7 +155,6 @@ public class WebHookOrganizationC7nController {
     public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(
             @ApiIgnore
             @SortDefault(value = "transaction_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-            @Encrypt
             @PathVariable(name = "organization_id") Long sourceId,
             @Encrypt
             @RequestParam(name = "webhook_id", required = false) Long webhookId,
@@ -178,7 +169,6 @@ public class WebHookOrganizationC7nController {
     @GetMapping("/details/{record_id}")
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebhookRecordVO> getWebhookRecordDetails(
-            @Encrypt
             @PathVariable(name = "organization_id") Long organizationId,
             @Encrypt
             @PathVariable(name = "record_id") Long recordId) {
@@ -189,7 +179,6 @@ public class WebHookOrganizationC7nController {
     @GetMapping("/send_settings")
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebHookVO.SendSetting> getTempServerForWebhook(
-            @Encrypt
             @PathVariable("organization_id") Long organizationId,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "description", required = false) String description,

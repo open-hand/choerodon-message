@@ -21,7 +21,6 @@ public class MessageSettingVO {
     @ApiModelProperty("消息code")
     private String code;
 
-    @Encrypt
     @ApiModelProperty("项目Id")
     private Long projectId;
 
