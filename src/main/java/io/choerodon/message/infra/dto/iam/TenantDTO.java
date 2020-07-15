@@ -42,7 +42,6 @@ public class TenantDTO extends AuditDomain {
     //
     // 数据库字段
     // ------------------------------------------------------------------------------
-    @Encrypt
     @Id
     @GeneratedValue
     @ApiModelProperty("租户ID")

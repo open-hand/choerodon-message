@@ -49,7 +49,6 @@ public class MessageSettingC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "根据通知类型，查询通知设置列表")
     public ResponseEntity<MessageSettingWarpVO> listByType(
-            @Encrypt
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @ApiParam(value = "事件名称（过滤条件）")
@@ -61,7 +60,6 @@ public class MessageSettingC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "批量修改消息设置")
     public ResponseEntity<Void> batchUpdateByType(
-            @Encrypt
             @PathVariable(value = "project_id") Long projectId,
             @PathVariable(value = "notify_type") String notifyType,
             @RequestBody List<CustomMessageSettingVO> messageSettingVOS) {
