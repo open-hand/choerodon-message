@@ -27,4 +27,11 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_event.groovy') {
         }
 
     }
+    changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_message_event") {
+        addColumn(tableName: 'hmsg_message_event') {
+            column(name: "tenant_id", type: "bigint", defaultValue: "0", remarks: "租户ID,hpfm_tenant.tenant_id") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 }
