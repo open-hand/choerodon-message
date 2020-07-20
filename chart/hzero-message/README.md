@@ -1,4 +1,4 @@
-# Choerodon Base Service
+# Choerodon hzero message
 支持短信、邮箱、站内消息发送，并能够灵活管理消息模板和对接云平台支持的微服务                              
 ## Introduction
 
