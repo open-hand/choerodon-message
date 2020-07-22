@@ -1,19 +1,5 @@
 package io.choerodon.message.api.controller.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.hzero.core.util.Results;
-import org.hzero.message.app.service.MessageService;
-import org.hzero.starter.keyencrypt.core.Encrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebHookVO;
@@ -27,6 +13,19 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.hzero.core.util.Results;
+import org.hzero.message.app.service.MessageService;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author scp
@@ -122,7 +121,7 @@ public class WebHookOrganizationC7nController {
             @Encrypt
             @PathVariable("id") Long id,
             @RequestParam(value = "enable_flag") Boolean enableFlag) {
-        webHookC7nService.updateEnabledFlag(id, enableFlag);
+        webHookC7nService.updateEnabledFlag(organizationId, id, enableFlag);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
