@@ -1,15 +1,5 @@
 package io.choerodon.message.api.controller.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.hzero.starter.keyencrypt.core.Encrypt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebHookVO;
@@ -23,6 +13,15 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author scp
@@ -113,7 +112,7 @@ public class WebHookProjectC7nController {
             @Encrypt
             @PathVariable("id") Long id,
             @RequestParam(value = "enable_flag") Boolean enableFlag) {
-        webHookC7nService.updateEnabledFlag(id, enableFlag);
+        webHookC7nService.updateEnabledFlagInProject(projectId, id, enableFlag);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
