@@ -2,6 +2,19 @@ package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/datafix_for_hzero_1_4_0.groovy') {
     changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_email_filter")
+            tableExists(tableName: "hmsg_email_server")
+            tableExists(tableName: "hmsg_message_event")
+            tableExists(tableName: "hmsg_template_server")
+            tableExists(tableName: "hmsg_receive_config_tl")
+            tableExists(tableName: "hmsg_receive_config")
+            tableExists(tableName: "hmsg_receive_config_tl")
+            tableExists(tableName: "hmsg_template_arg")
+            tableExists(tableName: "hmsg_message_template")
+            tableExists(tableName: "hmsg_template_arg_tl")
+            tableExists(tableName: "hmsg_template_server_line")
+        }
         sql("""
             UPDATE hmsg_email_filter hef
             SET hef.tenant_id = ( SELECT hes.tenant_id FROM hmsg_email_server hes WHERE hes.server_id = hef.server_id)
