@@ -69,6 +69,7 @@ public class NotifyWebSocketHandler implements SocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        LOGGER.info("User offline ,websocket session Id: {}", session.getId());
         String userId = session.getHandshakeHeaders().getFirst("X-WebSocket-UserID");
         onlineCountStorageUtils.subOnlineCount(userId, session.getId());
     }
