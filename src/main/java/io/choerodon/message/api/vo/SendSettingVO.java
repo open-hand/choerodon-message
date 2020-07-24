@@ -33,6 +33,15 @@ public class SendSettingVO extends TemplateServer {
 
     private Long pmTemplateId;
     private String sendingType;
+    private Integer edit;
+
+    public Integer getEdit() {
+        return edit;
+    }
+
+    public void setEdit(Integer edit) {
+        this.edit = edit;
+    }
 
     public String getSendingType() {
         return sendingType;
