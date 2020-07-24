@@ -151,11 +151,15 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     @Override
     public SendSettingVO queryByTempServerCode(String tempServerCode) {
         TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerCode);
-        NotifyMessageSettingConfigDTO notifyMessageSettingConfigDTO = new NotifyMessageSettingConfigDTO();
-        notifyMessageSettingConfigDTO.setMessageCode(tempServerCode);
+        NotifyMessageSettingConfigDTO configDTO = new NotifyMessageSettingConfigDTO();
+        configDTO.setMessageCode(tempServerCode);
+        configDTO.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         SendSettingVO sendSettingVO = new SendSettingVO();
         BeanUtils.copyProperties(templateServer, sendSettingVO);
-        sendSettingVO.setEdit(notifyMessageSettingConfigMapper.selectOne(notifyMessageSettingConfigDTO).getEdit());
+        NotifyMessageSettingConfigDTO messageSettingConfigDTO = notifyMessageSettingConfigMapper.selectOne(configDTO);
+        if (messageSettingConfigDTO != null) {
+            sendSettingVO.setEdit(messageSettingConfigDTO.getEdit());
+        }
         List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(templateServer.getTempServerId(), BaseConstants.DEFAULT_TENANT_ID);
         if (!CollectionUtils.isEmpty(lineList)) {
             List<MessageTemplateVO> messageTemplates = new ArrayList<>();
