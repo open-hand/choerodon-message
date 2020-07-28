@@ -6,6 +6,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.ConfigNameEnum;
@@ -14,6 +15,7 @@ import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
+import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
 import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
@@ -81,6 +83,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     @Autowired
     private IamClientOperator iamClientOperator;
 
+    @Autowired
+    private NotifyMessageSettingConfigMapper notifyMessageSettingConfigMapper;
+
 
     @Override
     public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode) {
@@ -146,8 +151,11 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     @Override
     public SendSettingVO queryByTempServerCode(String tempServerCode) {
         TemplateServer templateServer = templateServerService.getTemplateServer(TenantDTO.DEFAULT_TENANT_ID, tempServerCode);
+        NotifyMessageSettingConfigDTO notifyMessageSettingConfigDTO = new NotifyMessageSettingConfigDTO();
+        notifyMessageSettingConfigDTO.setMessageCode(tempServerCode);
         SendSettingVO sendSettingVO = new SendSettingVO();
         BeanUtils.copyProperties(templateServer, sendSettingVO);
+        sendSettingVO.setEdit(notifyMessageSettingConfigMapper.selectOne(notifyMessageSettingConfigDTO).getEdit());
         List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(templateServer.getTempServerId(), BaseConstants.DEFAULT_TENANT_ID);
         if (!CollectionUtils.isEmpty(lineList)) {
             List<MessageTemplateVO> messageTemplates = new ArrayList<>();
