@@ -34,5 +34,15 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
             column(name: "LAST_UPDATE_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
         }
         addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING', columnNames: 'NOTIFY_TYPE, CODE, PROJECT_ID, EVENT_NAME, ENV_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_U1')
+
+    }
+
+    changeSet(author: 'xiangwang04@gmail.com', id: '2020-07-24-delete-unique'){
+        sql("""
+            drop INDEX  UK_NOTIFY_MESSAGE_SETTING_U1 on notify_message_setting
+            """)
+        sql("""
+            ALTER TABLE notify_message_setting MODIFY COLUMN EVENT_NAME VARCHAR(64) null
+         """)
     }
 }
