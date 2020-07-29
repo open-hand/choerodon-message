@@ -53,7 +53,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private DevopsFeignClient devopsFeignClient;
 
     private IamFeignClient iamFeignClient;
-
+    
     private LovFeignClient lovFeignClient;
 
 
