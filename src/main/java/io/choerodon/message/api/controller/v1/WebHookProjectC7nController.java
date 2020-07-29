@@ -98,7 +98,6 @@ public class WebHookProjectC7nController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable("project_id") Long projectId,
-            @Encrypt
             @PathVariable("id") Long id) {
         webHookC7nService.delete(projectId, id, ResourceLevel.PROJECT.value());
         return new ResponseEntity<>(HttpStatus.OK);
