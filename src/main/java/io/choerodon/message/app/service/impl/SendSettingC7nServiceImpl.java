@@ -205,6 +205,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         List<TemplateServerLine> lineList = templateServerService.listTemplateServerLine(id, BaseConstants.DEFAULT_TENANT_ID);
         if (!CollectionUtils.isEmpty(lineList)) {
             lineList.forEach(t -> {
+                t.setTenantId(BaseConstants.DEFAULT_TENANT_ID);
                 setEnabledFlag(t, sendSettingVO);
                 if (t.getTypeCode().equals(SendingTypeEnum.EMAIL.getValue())) {
                     t.setTryTimes(sendSettingVO.getRetryCount());
