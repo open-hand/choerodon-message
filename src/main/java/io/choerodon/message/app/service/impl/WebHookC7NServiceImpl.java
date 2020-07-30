@@ -15,9 +15,11 @@ import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
 import io.choerodon.message.infra.mapper.WebHookC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.mapper.WebhookServerC7nMapper;
 import io.choerodon.message.infra.utils.CommonExAssertUtil;
 import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.hzero.message.app.service.MessageService;
 import org.hzero.message.app.service.TemplateServerWhService;
@@ -30,6 +32,7 @@ import org.hzero.message.domain.repository.WebhookServerRepository;
 import org.hzero.message.infra.mapper.MessageTemplateMapper;
 import org.hzero.message.infra.mapper.TemplateServerLineMapper;
 import org.hzero.message.infra.mapper.TemplateServerMapper;
+import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.hzero.mybatis.helper.DataSecurityHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +77,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     private TemplateServerWhService templateServerWhService;
     @Autowired
     private TemplateServerWhRepository templateServerWhRepository;
+    @Autowired
+    private WebhookServerC7nMapper webhookServerC7nMapper;
 
 
     @Override
@@ -89,13 +94,28 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     }
 
     @Override
-    public Boolean checkPath(Long id, String address) {
+    public Boolean checkPath(Long sourceId, String address, String source) {
         if (StringUtils.isEmpty(address)) {
             throw new CommonException("error.web.hook.check.path.can.not.be.empty");
         }
-        WebhookServer existDTO = webhookServerRepository.selectOne(new WebhookServer().setWebhookAddress(address));
-        return ObjectUtils.isEmpty(existDTO)
-                || (!ObjectUtils.isEmpty(existDTO) && existDTO.getServerId().equals(id));
+        //webhook项目下唯一
+        if (StringUtils.equals(ResourceLevel.PROJECT.value(), source)) {
+            if (webhookServerC7nMapper.existWebHookUnderProject(address, sourceId) != null) {
+                return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
+            }
+        }
+        //webhook 组织下唯一
+        else if (StringUtils.equals(ResourceLevel.ORGANIZATION.value(), source)) {
+            if (webhookServerC7nMapper.existWebHookUnderOrganization(address, sourceId) != null) {
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+            }
+        } else {
+            throw new CommonException("error.web.hook.check.path.level");
+        }
     }
 
     @Override
@@ -106,7 +126,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             throw new CommonException("error.web.hook.type.invalid");
         }
         //0.校验web hook path
-        if (!checkPath(null, webHookVO.getWebhookAddress())) {
+        if (!checkPath(sourceId, webHookVO.getWebhookAddress(), sourceLevel)) {
             throw new CommonException("error.web.hook.path.duplicate");
         }
 
@@ -167,7 +187,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             throw new CommonException("error.web.hook.type.invalid");
         }
         //0.校验web hook path
-        if (!checkPath(webHookVO.getServerId(), webHookVO.getWebhookAddress())) {
+        if (!checkPath(webHookVO.getServerId(), webHookVO.getWebhookAddress(), sourceLevel)) {
             throw new CommonException("error.web.hook.path.duplicate");
         }
 

@@ -13,6 +13,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -66,10 +67,8 @@ public class WebHookProjectC7nController {
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
             @PathVariable(name = "project_id") Long projectId,
-            @Encrypt
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam("path") String path) {
-        return new ResponseEntity<>(webHookC7nService.checkPath(id, path), HttpStatus.OK);
+        return new ResponseEntity<>(webHookC7nService.checkPath(projectId, path, ResourceLevel.PROJECT.value()), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)

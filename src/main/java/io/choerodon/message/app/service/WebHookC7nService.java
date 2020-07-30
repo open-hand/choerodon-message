@@ -36,7 +36,7 @@ public interface WebHookC7nService {
      * @param id
      * @param path
      */
-    Boolean checkPath(Long id, String path);
+    Boolean checkPath(Long id, String path,String source);
 
 
     /**
