@@ -137,9 +137,9 @@ public class OnlineCountStorageUtils {
     }
 
     public List<Long> getOnlineUserIds() {
-        return Objects.requireNonNull(redisTemplate.opsForSet().members(NUMBER_OF_VISITORS_TODAY))
-                .stream()
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+        return redisTemplate.keys(ONLINE_COUNT + "*").stream().map(i -> {
+            int charAtIndex = i.indexOf(":");
+            return Long.parseLong(i.substring(charAtIndex + 1));
+        }).collect(Collectors.toList());
     }
 }
