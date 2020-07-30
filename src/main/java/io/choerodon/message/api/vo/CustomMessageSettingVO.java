@@ -30,7 +30,6 @@ public class CustomMessageSettingVO {
     @ApiModelProperty("通知类型，用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")
     private String notifyType;
 
-    @Encrypt
     @ApiModelProperty(value = "分组的id,这就为categoryCode")
     private String groupId;
 
