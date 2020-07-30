@@ -13,6 +13,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -76,7 +77,7 @@ public class WebHookOrganizationC7nController {
             @PathVariable(name = "organization_id") Long organizationId,
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam("path") String path) {
-        return new ResponseEntity<>(webHookC7nService.checkPath(id, path), HttpStatus.OK);
+        return new ResponseEntity<>(webHookC7nService.checkPath(id, path, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.SITE)
