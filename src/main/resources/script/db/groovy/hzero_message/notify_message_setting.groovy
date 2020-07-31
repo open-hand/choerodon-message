@@ -42,7 +42,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
                drop INDEX  UK_NOTIFY_MESSAGE_SETTING_U1 on notify_message_setting
          """)
         sql("""
-            update notify_message_setting set EVENT_NAME = 'defaultValue' where PROJECT_ID = 0
+            update notify_message_setting set EVENT_NAME = 'defaultValue' where PROJECT_ID = 0 and EVENT_NAME = '' 
             """)
     }
 }
