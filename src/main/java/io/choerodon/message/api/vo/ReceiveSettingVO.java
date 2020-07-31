@@ -35,28 +35,6 @@ public class ReceiveSettingVO {
     @NotNull(message = "error.receiveSetting.userIdNull")
     private Long userId;
 
-    public static PropertyMap<ReceiveSettingVO, ReceiveSettingDTO> dto2Entity() {
-        return new PropertyMap<ReceiveSettingVO, io.choerodon.message.infra.dto.ReceiveSettingDTO>() {
-            @Override
-            protected void configure() {
-                skip().setCreatedBy(null);
-                skip().setCreationDate(null);
-                skip().setLastUpdateDate(null);
-                skip().setLastUpdatedBy(null);
-                skip().setObjectVersionNumber(null);
-            }
-        };
-    }
-
-
-    public static PropertyMap<io.choerodon.message.infra.dto.ReceiveSettingDTO, ReceiveSettingDTO> entity2Dto() {
-        return new PropertyMap<io.choerodon.message.infra.dto.ReceiveSettingDTO, ReceiveSettingDTO>() {
-            protected void configure() {
-                //因为ReceiveSetting 和 ReceiveSettingDTO 字段完全相同，我们使用默认转换
-            }
-        };
-    }
-
     public Long getId() {
         return id;
     }
