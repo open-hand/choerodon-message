@@ -22,7 +22,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_event.groovy') {
             column(name: "creation_date", type: "datetime",   defaultValueComputed:"CURRENT_TIMESTAMP",   remarks: "")  {constraints(nullable:"false")}  
             column(name: "created_by", type: "bigint",   defaultValue:"-1",   remarks: "")  {constraints(nullable:"false")}  
             column(name: "last_updated_by", type: "bigint",   defaultValue:"-1",   remarks: "")  {constraints(nullable:"false")}  
-            column(name: "last_update_date", type: "datetime",   defaultValueComputed:"CURRENT_TIMESTAMP",   remarks: "")  {constraints(nullable:"false")}  
+            column(name: "last_update_date", type: "datetime",   defaultValueComputed:"CURRENT_TIMESTAMP",   remarks: "")  {constraints(nullable:"false")}
 
         }
 
@@ -33,5 +33,15 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_event.groovy') {
                 constraints(nullable: "false")
             }
         }
+    }
+    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_template_server")
+        }
+        sql("""
+            UPDATE hmsg_message_event hme
+            SET hme.tenant_id = ( SELECT hts.tenant_id FROM hmsg_template_server hts WHERE hts.temp_server_id = hme.temp_server_id)
+            WHERE hme.temp_server_id in ( SELECT temp_server_id FROM hmsg_template_server);
+            """)
     }
 }
