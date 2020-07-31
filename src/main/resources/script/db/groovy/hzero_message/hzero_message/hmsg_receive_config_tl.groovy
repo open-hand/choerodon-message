@@ -15,7 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config_tl.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames:"receive_id,lang",tableName:"hmsg_receive_config_tl",constraintName: "hmsg_receive_config_tl_u1")
+        addUniqueConstraint(columnNames: "receive_id,lang", tableName: "hmsg_receive_config_tl", constraintName: "hmsg_receive_config_tl_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_receive_config_tl") {
         addColumn(tableName: 'hmsg_receive_config_tl') {
@@ -23,5 +23,15 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config_tl.groovy') {
                 constraints(nullable: "false")
             }
         }
+    }
+    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_receive_config")
+        }
+        sql("""
+            UPDATE hmsg_receive_config_tl hrct
+            SET hrct.tenant_id = ( SELECT hrc.tenant_id FROM hmsg_receive_config hrc WHERE hrct.receive_id = hrc.receive_id)
+            WHERE hrct.receive_id in ( SELECT receive_id FROM hmsg_receive_config);
+            """)
     }
 }
