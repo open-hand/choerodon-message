@@ -75,9 +75,8 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
             @PathVariable(name = "organization_id") Long organizationId,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam("path") String path) {
-        return new ResponseEntity<>(webHookC7nService.checkPath(id, path, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
+        return new ResponseEntity<>(webHookC7nService.checkPath(organizationId, path, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.SITE)

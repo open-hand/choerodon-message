@@ -172,6 +172,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             for (WebHookSender webHookSender : webHookSenderList) {
+                webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
             }
         }
