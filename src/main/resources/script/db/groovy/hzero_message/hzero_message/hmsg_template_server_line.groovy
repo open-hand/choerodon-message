@@ -64,4 +64,14 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
             }
         }
     }
+    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_template_server")
+        }
+        sql("""
+            UPDATE hmsg_template_server_line htsl
+            SET htsl.tenant_id = ( SELECT hts.tenant_id FROM hmsg_template_server hts WHERE hts.temp_server_id = htsl.temp_server_id)
+            WHERE htsl.temp_server_id in ( SELECT temp_server_id FROM hmsg_template_server);
+            """)
+    }
 }

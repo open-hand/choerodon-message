@@ -15,7 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_arg_tl.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames:"arg_id,lang",tableName:"hmsg_template_arg_tl",constraintName: "hmsg_template_arg_tl_u1")
+        addUniqueConstraint(columnNames: "arg_id,lang", tableName: "hmsg_template_arg_tl", constraintName: "hmsg_template_arg_tl_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_template_arg_tl") {
         addColumn(tableName: 'hmsg_template_arg_tl') {
@@ -23,5 +23,15 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_arg_tl.groovy') {
                 constraints(nullable: "false")
             }
         }
+    }
+    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_template_arg")
+        }
+        sql("""
+            UPDATE hmsg_template_arg_tl htat
+            SET htat.tenant_id = ( SELECT hta.tenant_id FROM hmsg_template_arg hta WHERE hta.arg_id = htat.arg_id)
+            WHERE htat.arg_id in ( SELECT arg_id FROM hmsg_template_arg);
+            """)
     }
 }

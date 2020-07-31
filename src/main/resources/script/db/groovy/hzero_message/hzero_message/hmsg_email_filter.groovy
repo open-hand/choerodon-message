@@ -23,7 +23,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_email_filter.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames:"server_id,address",tableName:"hmsg_email_filter",constraintName: "hmsg_email_filter_u1")
+        addUniqueConstraint(columnNames: "server_id,address", tableName: "hmsg_email_filter", constraintName: "hmsg_email_filter_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_email_filter") {
         addColumn(tableName: 'hmsg_email_filter') {
@@ -31,5 +31,15 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_email_filter.groovy') {
                 constraints(nullable: "false")
             }
         }
+    }
+    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
+        preConditions(onFail: "MARK_RAN") {
+            tableExists(tableName: "hmsg_email_server")
+        }
+        sql("""
+            UPDATE hmsg_email_filter hef
+            SET hef.tenant_id = ( SELECT hes.tenant_id FROM hmsg_email_server hes WHERE hes.server_id = hef.server_id)
+            WHERE hef.server_id in ( SELECT server_id FROM hmsg_email_server);
+            """)
     }
 }
