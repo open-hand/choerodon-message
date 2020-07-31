@@ -109,9 +109,9 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         //webhook 组织下唯一
         else if (StringUtils.equals(ResourceLevel.ORGANIZATION.value(), source)) {
             if (webhookServerC7nMapper.existWebHookUnderOrganization(address, sourceId) != null) {
-                return Boolean.TRUE;
-            } else {
                 return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
             }
         } else {
             throw new CommonException("error.web.hook.check.path.level");
