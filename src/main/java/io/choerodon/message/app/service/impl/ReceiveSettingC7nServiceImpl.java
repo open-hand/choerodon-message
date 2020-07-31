@@ -1,6 +1,7 @@
 package io.choerodon.message.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.utils.ConvertUtils;
 import io.choerodon.message.api.vo.ReceiveSettingVO;
 import io.choerodon.message.app.service.ReceiveSettingC7nService;
 import io.choerodon.message.infra.dto.ReceiveSettingDTO;
@@ -35,7 +36,7 @@ public class ReceiveSettingC7nServiceImpl implements ReceiveSettingC7nService {
         ReceiveSettingDTO receiveSettingDTO = new ReceiveSettingDTO();
         receiveSettingDTO.setUserId(userId);
         receiveSettingDTO.setSourceType(sourceType);
-        return modelMapper.map(receiveSettingC7nMapper.select(receiveSettingDTO), List.class);
+        return ConvertUtils.convertList(receiveSettingC7nMapper.select(receiveSettingDTO), ReceiveSettingVO.class);
     }
 
     @Override
