@@ -39,10 +39,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
 
     changeSet(author: 'xiangwang04@gmail.com', id: '2020-07-24-delete-unique'){
         sql("""
-            drop INDEX  UK_NOTIFY_MESSAGE_SETTING_U1 on notify_message_setting
+            update notify_message_setting set EVENT_NAME = 'defaultValue' where PROJECT_ID = 0
             """)
-        sql("""
-            ALTER TABLE notify_message_setting MODIFY COLUMN EVENT_NAME VARCHAR(64) null
-         """)
     }
 }
