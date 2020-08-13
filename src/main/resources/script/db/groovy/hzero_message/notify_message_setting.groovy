@@ -2,8 +2,8 @@ package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
     changeSet(author: 'xiangwang04@gmail.com', id: '2019-12-03-add-notify_message_setting') {
-        if(helper.dbType().isSupportSequence()){
-            createSequence(sequenceName: 'NOTIFY_MESSAGE_SETTING_S', startValue:"1")
+        if (helper.dbType().isSupportSequence()) {
+            createSequence(sequenceName: 'NOTIFY_MESSAGE_SETTING_S', startValue: "1")
         }
         createTable(tableName: "NOTIFY_MESSAGE_SETTING") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
@@ -21,12 +21,12 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
             column(name: 'ENV_ID', type: 'BIGINT UNSIGNED', defaultValue: "0", remarks: '环境id') {
                 constraints(nullable: false)
             }
-            column(name: 'EVENT_NAME', type: 'VARCHAR(64)',  defaultValue: "", remarks: '资源删除事件名字') {
+            column(name: 'EVENT_NAME', type: 'VARCHAR(64)', defaultValue: "", remarks: '资源删除事件名字') {
                 constraints(nullable: false)
             }
             column(name: 'PM_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "1", remarks: '是否发送站内信。1发送，0不发送')
             column(name: 'EMAIL_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '是否发送邮件。1发送，0不发送')
-            column(name: 'SMS_ENABLE', type: 'TINYINT UNSIGNED',  remarks: '是否发送短信')
+            column(name: 'SMS_ENABLE', type: 'TINYINT UNSIGNED', remarks: '是否发送短信')
             column(name: "OBJECT_VERSION_NUMBER", type: "BIGINT UNSIGNED", defaultValue: "1")
             column(name: "CREATED_BY", type: "BIGINT UNSIGNED", defaultValue: "0")
             column(name: "CREATION_DATE", type: "DATETIME", defaultValueComputed: "CURRENT_TIMESTAMP")
@@ -37,12 +37,12 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
 
     }
 
-    changeSet(author: 'xiangwang04@gmail.com', id: '2020-07-24-delete-unique'){
+    changeSet(author: 'xiangwang04@gmail.com', id: '2020-07-24-delete-unique') {
         sql("""
-            drop INDEX  UK_NOTIFY_MESSAGE_SETTING_U1 on notify_message_setting
-            """)
-        sql("""
-            ALTER TABLE notify_message_setting MODIFY COLUMN EVENT_NAME VARCHAR(64) null
+               drop INDEX  UK_NOTIFY_MESSAGE_SETTING_U1 on notify_message_setting
          """)
+        sql("""
+            update notify_message_setting set EVENT_NAME = 'defaultValue' where PROJECT_ID = 0 and EVENT_NAME = '' 
+            """)
     }
 }
