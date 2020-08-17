@@ -10,6 +10,7 @@ import io.choerodon.message.infra.constant.MisConstants;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
@@ -236,7 +237,11 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
                 templateServerWh.setTempServerId(aLong);
                 List<TemplateServerWh> templateServerWhList = new ArrayList<>();
                 templateServerWhList.add(templateServerWh);
-                TemplateServerLine templateServerLine = templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
+
+                TemplateServerLine serverLineQueryDTO = new TemplateServerLine();
+                serverLineQueryDTO.setTempServerId(aLong);
+                serverLineQueryDTO.setTypeCode(SendingTypeEnum.WEB_HOOK.getValue());
+                TemplateServerLine templateServerLine = templateServerLineMapper.selectOne(serverLineQueryDTO);
                 templateServerWhService.batchCreateTemplateServerWh(templateServerLine.getTempServerLineId(), templateServerWhList);
             }
         }
