@@ -3,6 +3,7 @@ package io.choerodon.message.api.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.core.base.BaseConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -12,8 +13,10 @@ import java.util.Date;
  * @author dengyouquan
  **/
 public class SystemAnnouncementVO {
+    @Encrypt
     @ApiModelProperty(value = "系统公告ID/非必填")
     private Long id;
+
     @ApiModelProperty(value = "系统公告标题/必填")
     @NotEmpty(message = "error.announcement.title.empty")
     @Size(min = 1, max = 64, message = "error.announcement.title.length")

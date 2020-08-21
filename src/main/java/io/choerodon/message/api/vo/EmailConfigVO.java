@@ -1,8 +1,7 @@
 package io.choerodon.message.api.vo;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class EmailConfigVO {
 
