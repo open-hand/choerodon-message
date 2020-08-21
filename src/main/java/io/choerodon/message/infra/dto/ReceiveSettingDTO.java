@@ -16,7 +16,7 @@ import java.util.Objects;
 @Table(name = "notify_receive_setting")
 public class ReceiveSettingDTO extends AuditDomain {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long sendSettingId;
     private Long sourceId;

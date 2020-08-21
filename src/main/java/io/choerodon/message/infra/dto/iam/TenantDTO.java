@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 import org.hzero.core.util.Regexs;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -41,7 +42,6 @@ public class TenantDTO extends AuditDomain {
     //
     // 数据库字段
     // ------------------------------------------------------------------------------
-
     @Id
     @GeneratedValue
     @ApiModelProperty("租户ID")
