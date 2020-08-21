@@ -1,12 +1,12 @@
 package io.choerodon.message.api.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
  * @author superlee
  */
 public class ProjectVO {
-
     @ApiModelProperty(value = "主键ID/非必填")
     private Long id;
 

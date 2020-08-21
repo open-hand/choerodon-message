@@ -1,8 +1,10 @@
 package io.choerodon.message.api.vo;
 
 
-public class SendSettingDetailVO {
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
+public class SendSettingDetailVO {
+    @Encrypt
     private Long id;
 
     private String code;
@@ -15,10 +17,13 @@ public class SendSettingDetailVO {
 
     private String description;
 
+    @Encrypt
     private Long emailTemplateId;
 
+    @Encrypt
     private Long smsTemplateId;
 
+    @Encrypt
     private Long pmTemplateId;
 
     private String level;

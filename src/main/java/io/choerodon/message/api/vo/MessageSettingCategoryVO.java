@@ -2,6 +2,8 @@ package io.choerodon.message.api.vo;
 
 import java.util.List;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 
 /**
@@ -10,6 +12,7 @@ import io.choerodon.message.infra.dto.MessageSettingDTO;
  */
 
 public class MessageSettingCategoryVO {
+    @Encrypt
     private Long id;
     private String name;
     private List<MessageSettingDTO> messageSettingDTO;

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.WebhookServerC7nMapper">
+
+    <select id="existWebHookUnderProject" resultType="integer">
+         SELECT
+	       1
+         FROM
+           hmsg_webhook_server hws
+         INNER JOIN webhook_project_rel wpr ON hws.server_id = wpr.WEBHOOK_ID
+         WHERE
+            hws.webhook_address = #{address}
+         AND wpr.PROJECT_ID = #{projectId}
+            LIMIT 1
+    </select>
+
+    <select id="existWebHookUnderOrganization" resultType="integer">
+         SELECT
+	       1
+         FROM
+           hmsg_webhook_server hws
+         WHERE hws.TENANT_ID=#{orgId,jdbcType=BIGINT}
+		   AND hws.webhook_address=#{address,jdbcType=VARCHAR}
+		   LIMIT 1
+    </select>
+</mapper>
