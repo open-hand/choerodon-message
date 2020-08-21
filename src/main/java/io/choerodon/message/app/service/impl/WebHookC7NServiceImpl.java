@@ -216,7 +216,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
                 templateServerWh.setTempServerId(aLong);
                 List<TemplateServerWh> templateServerWhList = new ArrayList<>();
                 templateServerWhList.add(templateServerWh);
-                TemplateServerLine templateServerLine = templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
+                String type = webHookVO.getServerType().toUpperCase();
+                TemplateServerLine templateServerLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, type);
                 templateServerWhService.batchCreateTemplateServerWh(templateServerLine.getTempServerLineId(), templateServerWhList);
             }
         }
