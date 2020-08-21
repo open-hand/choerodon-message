@@ -3,6 +3,8 @@ package io.choerodon.message.api.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * @author dengyouquan
  **/

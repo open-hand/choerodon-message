@@ -79,7 +79,6 @@
                 )
             </if>
         </where>
-        order by temp.creation_date DESC
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">

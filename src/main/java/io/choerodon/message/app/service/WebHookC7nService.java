@@ -1,9 +1,6 @@
 package io.choerodon.message.app.service;
 
-import org.hzero.message.domain.entity.WebhookServer;
-
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebHookVO;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
@@ -39,7 +36,7 @@ public interface WebHookC7nService {
      * @param id
      * @param path
      */
-    Boolean checkPath(Long id, String path);
+    Boolean checkPath(Long id, String path,String source);
 
 
     /**
@@ -56,7 +53,9 @@ public interface WebHookC7nService {
 
     void delete(Long sourceId, Long webHookId, String sourceLevel);
 
-    void updateEnabledFlag(Long webHookId, Boolean enableFlag);
+    void updateEnabledFlag(Long organizationId, Long webHookId, Boolean enableFlag);
+
+    void updateEnabledFlagInProject(Long projectId, Long webhookId, Boolean enabledFlag);
 
     void resendMessage(Long tenantId, Long recordId);
 

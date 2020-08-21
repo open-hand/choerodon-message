@@ -1,6 +1,7 @@
 package io.choerodon.message.api.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
  * 该VO用于消息列表页(对应库表 notify_send_setting)
@@ -8,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author Eugen
  */
 public class MessageServiceVO {
-
+    @Encrypt
     @ApiModelProperty(value = "发送设置主键")
     private Long id;
 
