@@ -12,6 +12,7 @@ import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.message.domain.entity.Notice;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -75,7 +76,7 @@ public class SystemAnnouncementController {
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "查看系统公告详情")
     @GetMapping("/{id}")
-    public ResponseEntity<SystemAnnouncementVO> getDetail(@PathVariable("id") Long id) {
+    public ResponseEntity<SystemAnnouncementVO> getDetail(@Encrypt @PathVariable("id") Long id) {
         return new ResponseEntity<>(systemAnnouncementService.getDetailById(id), HttpStatus.OK);
     }
 
@@ -83,7 +84,7 @@ public class SystemAnnouncementController {
     @Permission(level = ResourceLevel.SITE, roles = {InitRoleCode.SITE_ADMINISTRATOR})
     @ApiOperation(value = "删除系统公告")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@Encrypt @PathVariable Long id) {
         systemAnnouncementService.delete(id);
     }
 

@@ -1,5 +1,7 @@
 package io.choerodon.message.api.vo;
 
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 /**
  * 〈功能简述〉
  * 〈通知用户VO〉
@@ -8,11 +10,16 @@ package io.choerodon.message.api.vo;
  * @Date 2019/12/11 13:48
  */
 public class TargetUserVO {
+    @Encrypt
     private Long id;
+
+    @Encrypt
     private Long userId;
     private String realName;
     private String loginName;
     private String type;
+
+    @Encrypt
     private Long messageSettingId;
 
     public String getRealName() {
