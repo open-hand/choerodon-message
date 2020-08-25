@@ -124,6 +124,11 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-asgard</artifactId>
+        </dependency>
     </dependencies>
 
     <repositories>
