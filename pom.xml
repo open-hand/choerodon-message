@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>hzero-message</artifactId>
-    <version>0.23.3.RELEASE</version>
+    <version>0.23.4-SNAPSHOT</version>
     <name>hzero-message</name>
     <description>Message Service For Choerodon</description>
 
