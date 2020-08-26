@@ -10,6 +10,7 @@ import io.choerodon.message.infra.constant.MisConstants;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
