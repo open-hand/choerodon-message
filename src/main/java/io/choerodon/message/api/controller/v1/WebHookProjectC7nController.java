@@ -1,5 +1,15 @@
 package io.choerodon.message.api.controller.v1;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.WebHookVO;
@@ -13,16 +23,6 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.hzero.starter.keyencrypt.core.Encrypt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author scp
@@ -58,8 +58,9 @@ public class WebHookProjectC7nController {
             @RequestParam(required = false) String messageName,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Boolean enableFlag,
-            @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.PROJECT.value(), messageName, type, enableFlag, params), HttpStatus.OK);
+            @RequestParam(required = false) String params,
+            @RequestParam(required = false) String messageCode) {
+        return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.PROJECT.value(), messageName, type, enableFlag, params, messageCode), HttpStatus.OK);
     }
 
     @GetMapping("/check_path")
