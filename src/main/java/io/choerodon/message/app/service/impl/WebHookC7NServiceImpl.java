@@ -83,13 +83,13 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
 
     @Override
-    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
+    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params, String messageCode) {
         List<WebHookVO> list;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params, messageCode);
         } else {
-            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params, messageCode);
         }
         return PageUtils.createPageFromList(list, pageRequest);
     }

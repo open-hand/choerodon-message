@@ -28,7 +28,8 @@ public interface WebHookC7nService {
                                   String messageName,
                                   String type,
                                   Boolean enableFlag,
-                                  String params);
+                                  String params,
+                                  String messageCode);
 
     /**
      * WebHook 地址校验重复
