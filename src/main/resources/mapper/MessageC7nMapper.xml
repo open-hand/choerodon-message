@@ -123,4 +123,15 @@
         hm.creation_date DESC
     </select>
 
+
+    <delete id="deleteRecordHalfAYear">
+        DELETE
+        FROM
+        hmsg_message
+        WHERE
+        <![CDATA[`creation_date` <= DATE_ADD(curdate( ), INTERVAL - 6 MONTH)]]>
+        AND
+        message_type_code = 'WEB_HOOK'
+    </delete>
+
 </mapper>
