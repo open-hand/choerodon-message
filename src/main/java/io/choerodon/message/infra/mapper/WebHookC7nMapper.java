@@ -29,7 +29,8 @@ public interface WebHookC7nMapper {
                                   @Param("messageName") String messageName,
                                   @Param("type") String type,
                                   @Param("enableFlag") Boolean enableFlag,
-                                  @Param("params") String params);
+                                  @Param("params") String param,
+                                  @Param("messageCode") String messageCode);
 
     void deleteWebHook(@Param("webhookId") Long webHookId);
 
