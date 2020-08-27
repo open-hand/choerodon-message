@@ -19,9 +19,6 @@
             <if test="title != null">
                 AND hnp.title LIKE concat(concat('%', #{title}), '%')
             </if>
-            <if test="status != null">
-                AND hnp.published_status_code = #{status}
-            </if>
             <if test="params != null">
                 AND (
                 hn.title LIKE concat(concat('%',#{params}), '%') OR
