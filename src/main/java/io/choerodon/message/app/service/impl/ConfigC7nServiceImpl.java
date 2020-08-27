@@ -135,8 +135,8 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         emailServer.setHost(emailConfigVO.getHost());
         emailServer.setPort(emailConfigVO.getPort().toString());
         emailServer.setProtocolMeaning(emailConfigVO.getProtocol());
-        emailServer.setUsername(emailConfigVO.getSendName());
-        emailServer.setSender(emailConfigVO.getAccount());
+        emailServer.setUsername(emailConfigVO.getAccount());
+        emailServer.setSender(emailConfigVO.getSendName());
         emailServer.setPasswordEncrypted(emailConfigVO.getPassword());
         emailServer.setObjectVersionNumber(emailConfigVO.getObjectVersionNumber());
         return emailServer;
@@ -146,8 +146,8 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         emailConfigVO.setHost(emailServer.getHost());
         emailConfigVO.setPort(Integer.parseInt(emailServer.getPort()));
         emailConfigVO.setProtocol(emailServer.getProtocol());
-        emailConfigVO.setSendName(emailServer.getUsername());
-        emailConfigVO.setAccount(emailServer.getSender());
+        emailConfigVO.setSendName(emailServer.getSender());
+        emailConfigVO.setAccount(emailServer.getUsername());
         emailConfigVO.setPassword(emailServer.getPasswordEncrypted());
         emailConfigVO.setObjectVersionNumber(emailServer.getObjectVersionNumber());
         Map<String, String> map = emailServer.getEmailProperties().stream().collect(Collectors.toMap(EmailProperty::getPropertyCode, EmailProperty::getPropertyValue));
