@@ -19,11 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author dengyouquan
@@ -96,6 +98,10 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                     systemAnnouncementVO.setStatus(getTrueStatus(systemAnnouncementVO.getSendDate()));
                 }
         );
+        if (StringUtils.isEmpty(status)) {
+            List<SystemAnnouncementVO> announcementVOList = systemAnnouncementVOPage.getContent().stream().filter(t -> t.getStatus().equals(status)).collect(Collectors.toList());
+            systemAnnouncementVOPage.setContent(announcementVOList);
+        }
         return systemAnnouncementVOPage;
     }
 
