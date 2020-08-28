@@ -68,9 +68,29 @@ mybatis:
   mapperLocations: classpath*:/mapper/*.xml
   configuration:
     mapUnderscoreToCamelCase: true
+    key-generator: snowflake
+    snowflake:
+      start-timestamp: 1577808000000
+      meta-provider: redis
+      meta-provider-redis-db: ${SPRING_REDIS_DATABASE:1}
+      meta-provider-redis-refresh-interval: 540000
+      meta-provider-redis-expire: 600000
+
 mapper:
   not-empty: true
 
+choerodon:
+  saga:
+    consumer:
+      enabled: true # 是否启用消费端
+      thread-num: 5  # 消费线程数
+      max-poll-size: 200 # 每次拉取的最大消息数量
+      poll-interval-ms: 1000 # 拉取消息的间隔(毫秒)，默认1000毫秒
+  schedule:
+    consumer:
+      enabled: true # 启用任务调度消费端
+      thread-num: 1 # 任务调度消费线程数
+      poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
 hzero:
   websocket:
     # 用于连接websocket的路径

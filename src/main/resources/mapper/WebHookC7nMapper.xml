@@ -60,6 +60,9 @@
             tenant_id = #{tenantId}
             )
         </if>
+        <if test="messageCode !=null">
+            AND hts.message_code=#{messageCode}
+        </if>
     </select>
 
     <delete id="deleteWebHook">
