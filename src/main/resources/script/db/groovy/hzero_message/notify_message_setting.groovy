@@ -45,4 +45,22 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
             update notify_message_setting set EVENT_NAME = 'defaultValue' where PROJECT_ID = 0 and EVENT_NAME = '' 
             """)
     }
+
+    changeSet( author: 'xiangwang04@mail.com','2020-08-28-fix-message-data'){
+        sql("""
+            DELETE 
+            FROM
+              notify_message_setting_target 
+            WHERE
+            MESSAGE_SETTING_ID IN ( SELECT ID FROM notify_message_setting WHERE PROJECT_ID != 0 AND ENV_ID = 0 AND EVENT_NAME != 'defaultValue' AND NOTIFY_TYPE = 'resourceDelete' )
+        """)
+        sql("""
+            DELETE FROM 
+              notify_message_setting 
+            WHERE PROJECT_ID !=0 AND ENV_ID=0 AND EVENT_NAME != 'defaultValue' and NOTIFY_TYPE ='resourceDelete'
+        """)
+        addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING', columnNames: 'NOTIFY_TYPE, CODE, PROJECT_ID, EVENT_NAME, ENV_ID', constraintName: 'UK_NOTIFY_MESSAGE_SETTING_U1')
+    }
+
+
 }
