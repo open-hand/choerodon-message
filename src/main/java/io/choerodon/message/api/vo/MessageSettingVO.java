@@ -4,6 +4,7 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import io.choerodon.message.infra.dto.TargetUserDTO;
 
@@ -12,15 +13,17 @@ import io.choerodon.message.infra.dto.TargetUserDTO;
  * Date: 2019/12/3
  */
 public class MessageSettingVO {
-
+    @Encrypt
     private Long id;
     @NotEmpty(message = "error.messageSetting.notifyType.empty")
     @ApiModelProperty("通知类型（必填），用作tab分页，敏捷消息类型agileNotify，devops消息类型devopsNotify")
     private String notifyType;
     @ApiModelProperty("消息code")
     private String code;
+
     @ApiModelProperty("项目Id")
     private Long projectId;
+
     @ApiModelProperty("是否发送站内信")
     private Boolean pmEnable;
     @ApiModelProperty("是否发送邮件")
@@ -30,13 +33,19 @@ public class MessageSettingVO {
     @ApiModelProperty(value = "消息设置的分组")
     private String category;
     @ApiModelProperty(value = "分组的id")
+
+    @Encrypt
     private Long categoryId;
     @ApiModelProperty(value = "消息接收对象")
+
     private List<TargetUserDTO> targetUserDTOS;
     @ApiModelProperty(value = "消息设置的名字")
     private String name;
+
+    @Encrypt
     @ApiModelProperty(value = "环境的id")
     private Long envId;
+
     @ApiModelProperty(value = "是否发送短信")
     private Boolean smsEnable;
     @ApiModelProperty(value = "资源删除验证事件名字")

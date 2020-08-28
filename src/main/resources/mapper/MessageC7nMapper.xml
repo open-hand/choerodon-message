@@ -79,7 +79,6 @@
                 )
             </if>
         </where>
-        order by temp.creation_date DESC
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
@@ -123,5 +122,16 @@
         ORDER BY
         hm.creation_date DESC
     </select>
+
+
+    <delete id="deleteRecordHalfAYear">
+        DELETE
+        FROM
+        hmsg_message
+        WHERE
+        <![CDATA[`creation_date` <= DATE_ADD(curdate( ), INTERVAL - 6 MONTH)]]>
+        AND
+        message_type_code = 'WEB_HOOK'
+    </delete>
 
 </mapper>

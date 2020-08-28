@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.hzero.core.util.Results;
 import org.hzero.message.app.service.MessageService;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class WebHookOrganizationC7nController {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebHookOrganizationC7nController.class);
 
 
-    private WebHookC7nService webHookC7nService;
+    private final WebHookC7nService webHookC7nService;
     private MessageService messageService;
     private WebhookRecordC7nService webhookRecordC7nService;
     private SendSettingC7nService sendSettingC7nService;
@@ -58,14 +59,15 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook信息（分页接口）")
     @CustomPageRequest
-    public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(@ApiIgnore
-                                                           @SortDefault(value = "server_id", direction = Sort.Direction.DESC) PageRequest pageable,
-                                                           @PathVariable(name = "organization_id") Long sourceId,
-                                                           @RequestParam(required = false) String messageName,
-                                                           @RequestParam(required = false) String type,
-                                                           @RequestParam(required = false) Boolean enableFlag,
-                                                           @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.ORGANIZATION.value(), messageName, type, enableFlag, params), HttpStatus.OK);
+    public ResponseEntity<Page<WebHookVO>> pageWebHookInfo(
+            @ApiIgnore
+            @SortDefault(value = "server_id", direction = Sort.Direction.DESC) PageRequest pageable,
+            @PathVariable(name = "organization_id") Long sourceId,
+            @RequestParam(required = false) String messageName,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Boolean enableFlag,
+            @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(webHookC7nService.pagingWebHook(pageable, sourceId, ResourceLevel.ORGANIZATION.value(), messageName, type, enableFlag, params,null), HttpStatus.OK);
     }
 
     @GetMapping("/check_path")
@@ -73,25 +75,27 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "校验WebHook地址是否已经存在")
     public ResponseEntity<Boolean> check(
             @PathVariable(name = "organization_id") Long organizationId,
-            @RequestParam(value = "id", required = false) Long id,
             @RequestParam("path") String path) {
-        return new ResponseEntity<>(webHookC7nService.checkPath(id, path), HttpStatus.OK);
+        return new ResponseEntity<>(webHookC7nService.checkPath(organizationId, path, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "组织层新增WebHook")
     @PostMapping
-    public ResponseEntity<WebHookVO> createInOrg(@PathVariable(name = "organization_id") Long organizationId,
-                                                 @RequestBody WebHookVO webHookVO) {
+    public ResponseEntity<WebHookVO> createInOrg(
+            @PathVariable(name = "organization_id") Long organizationId,
+            @RequestBody WebHookVO webHookVO) {
         return new ResponseEntity<>(webHookC7nService.create(organizationId, webHookVO, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "更新WebHook")
     @PutMapping("/{id}")
-    public ResponseEntity<WebHookVO> update(@PathVariable("organization_id") Long organizationId,
-                                            @PathVariable("id") Long id,
-                                            @RequestBody @Validated WebHookVO webHookVO) {
+    public ResponseEntity<WebHookVO> update(
+            @PathVariable("organization_id") Long organizationId,
+            @Encrypt
+            @PathVariable("id") Long id,
+            @RequestBody @Validated WebHookVO webHookVO) {
         webHookVO.setServerId(id);
         return new ResponseEntity<>(webHookC7nService.update(organizationId, webHookVO, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
@@ -100,8 +104,9 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "删除WebHook")
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(
+    public ResponseEntity<Void> delete(
             @PathVariable("organization_id") Long organizationId,
+            @Encrypt
             @PathVariable("id") Long id) {
         webHookC7nService.delete(organizationId, id, ResourceLevel.ORGANIZATION.value());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -110,19 +115,21 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "禁用WebHook")
     @PutMapping("/{id}/update_status")
-    public ResponseEntity updateEnabledFlag(
+    public ResponseEntity<Void> updateEnabledFlag(
             @PathVariable("organization_id") Long organizationId,
+            @Encrypt
             @PathVariable("id") Long id,
             @RequestParam(value = "enable_flag") Boolean enableFlag) {
-        webHookC7nService.updateEnabledFlag(id, enableFlag);
+        webHookC7nService.updateEnabledFlag(organizationId, id, enableFlag);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "组织层重试发送记录")
     @GetMapping("/{record_id}/retry")
-    public ResponseEntity retry(
+    public ResponseEntity<Void> retry(
             @PathVariable("organization_id") Long organizationId,
+            @Encrypt
             @PathVariable("record_id") Long recordId) {
         messageService.resendMessage(organizationId, recordId);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -133,6 +140,7 @@ public class WebHookOrganizationC7nController {
     @GetMapping("/{webhook_id}/record")
     public ResponseEntity<WebHookVO> queryById(
             @PathVariable("organization_id") Long organizationId,
+            @Encrypt
             @PathVariable("webhook_id") Long webHookId) {
         return new ResponseEntity<>(webHookC7nService.queryById(webHookId), HttpStatus.OK);
     }
@@ -142,13 +150,15 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "查询WebHook发送记录(分页接口)")
     @CustomPageRequest
-    public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(@ApiIgnore
-                                                                       @SortDefault(value = "transaction_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                                       @PathVariable(name = "organization_id") Long sourceId,
-                                                                       @RequestParam(name = "webhook_id", required = false) Long webhookId,
-                                                                       @RequestParam(required = false) String status,
-                                                                       @RequestParam(required = false, name = "name") String eventName,
-                                                                       @RequestParam(required = false, name = "type") String type) {
+    public ResponseEntity<Page<WebhookRecordVO>> pageWebHookSendRecord(
+            @ApiIgnore
+            @SortDefault(value = "transaction_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+            @PathVariable(name = "organization_id") Long sourceId,
+            @Encrypt
+            @RequestParam(name = "webhook_id", required = false) Long webhookId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, name = "name") String eventName,
+            @RequestParam(required = false, name = "type") String type) {
 
         return new ResponseEntity<>(webhookRecordC7nService.pagingWebHookRecord(pageRequest, sourceId, webhookId, status, eventName, type, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
@@ -158,6 +168,7 @@ public class WebHookOrganizationC7nController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     public ResponseEntity<WebhookRecordVO> getWebhookRecordDetails(
             @PathVariable(name = "organization_id") Long organizationId,
+            @Encrypt
             @PathVariable(name = "record_id") Long recordId) {
         return new ResponseEntity<>(webhookRecordC7nService.queryById(organizationId, recordId, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
