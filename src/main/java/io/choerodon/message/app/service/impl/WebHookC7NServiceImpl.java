@@ -1,7 +1,25 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.utils.PageUtils;
+import io.choerodon.message.api.vo.WebHookVO;
+import io.choerodon.message.app.service.WebHookC7nService;
+import io.choerodon.message.infra.constant.MisConstants;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
+import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
+import io.choerodon.message.infra.mapper.WebHookC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.mapper.WebhookServerC7nMapper;
+import io.choerodon.message.infra.utils.CommonExAssertUtil;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.hzero.message.app.service.MessageService;
@@ -15,6 +33,7 @@ import org.hzero.message.domain.repository.WebhookServerRepository;
 import org.hzero.message.infra.mapper.MessageTemplateMapper;
 import org.hzero.message.infra.mapper.TemplateServerLineMapper;
 import org.hzero.message.infra.mapper.TemplateServerMapper;
+import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.hzero.mybatis.helper.DataSecurityHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,23 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.core.utils.PageUtils;
-import io.choerodon.message.api.vo.WebHookVO;
-import io.choerodon.message.app.service.WebHookC7nService;
-import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-import io.choerodon.message.infra.dto.iam.ProjectDTO;
-import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.WebHookTypeEnum;
-import io.choerodon.message.infra.feign.operator.IamClientOperator;
-import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
-import io.choerodon.message.infra.mapper.WebHookC7nMapper;
-import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
-import io.choerodon.message.infra.utils.ConversionUtil;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -74,28 +78,45 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     private TemplateServerWhService templateServerWhService;
     @Autowired
     private TemplateServerWhRepository templateServerWhRepository;
+    @Autowired
+    private WebhookServerC7nMapper webhookServerC7nMapper;
 
 
     @Override
-    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
+    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params, String messageCode) {
         List<WebHookVO> list;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params, messageCode);
         } else {
-            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params, messageCode);
         }
         return PageUtils.createPageFromList(list, pageRequest);
     }
 
     @Override
-    public Boolean checkPath(Long id, String address) {
+    public Boolean checkPath(Long sourceId, String address, String source) {
         if (StringUtils.isEmpty(address)) {
             throw new CommonException("error.web.hook.check.path.can.not.be.empty");
         }
-        WebhookServer existDTO = webhookServerRepository.selectOne(new WebhookServer().setWebhookAddress(address));
-        return ObjectUtils.isEmpty(existDTO)
-                || (!ObjectUtils.isEmpty(existDTO) && existDTO.getServerId().equals(id));
+        //webhook项目下唯一
+        if (StringUtils.equals(ResourceLevel.PROJECT.value(), source)) {
+            if (webhookServerC7nMapper.existWebHookUnderProject(address, sourceId) != null) {
+                return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
+            }
+        }
+        //webhook 组织下唯一
+        else if (StringUtils.equals(ResourceLevel.ORGANIZATION.value(), source)) {
+            if (webhookServerC7nMapper.existWebHookUnderOrganization(address, sourceId) != null) {
+                return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
+            }
+        } else {
+            throw new CommonException("error.web.hook.check.path.level");
+        }
     }
 
     @Override
@@ -106,7 +127,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             throw new CommonException("error.web.hook.type.invalid");
         }
         //0.校验web hook path
-        if (!checkPath(null, webHookVO.getWebhookAddress())) {
+        if (!checkPath(sourceId, webHookVO.getWebhookAddress(), sourceLevel)) {
             throw new CommonException("error.web.hook.path.duplicate");
         }
 
@@ -135,7 +156,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
         Set<Long> sendSettingIdList = webHookVO.getSendSettingIdList();
         for (Long aLong : sendSettingIdList) {
-            String type =  webHookVO.getServerType().toUpperCase();
+            String type = webHookVO.getServerType().toUpperCase();
             TemplateServerLine serverLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, type);
             if (!ObjectUtils.isEmpty(serverLine)) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
@@ -167,7 +188,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
             throw new CommonException("error.web.hook.type.invalid");
         }
         //0.校验web hook path
-        if (!checkPath(webHookVO.getServerId(), webHookVO.getWebhookAddress())) {
+        if (!checkPath(webHookVO.getServerId(), webHookVO.getWebhookAddress(), sourceLevel)) {
             throw new CommonException("error.web.hook.path.duplicate");
         }
 
@@ -240,10 +261,17 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     }
 
     @Override
-    public void updateEnabledFlag(Long webHookId, Boolean enableFlag) {
+    public void updateEnabledFlag(Long organizationId, Long webHookId, Boolean enableFlag) {
         WebhookServer webhookServer = webhookServerRepository.selectByPrimaryKey(webHookId);
+        CommonExAssertUtil.assertTrue(organizationId.equals(webhookServer.getTenantId()), MisConstants.ERROR_OPERATING_RESOURCE_IN_OTHER_ORGANIZATION);
         webhookServer.setEnabledFlag(ConversionUtil.booleanConverToInteger(enableFlag));
         webhookServerService.updateWebHook(webhookServer.getTenantId(), webhookServer);
+    }
+
+    @Override
+    public void updateEnabledFlagInProject(Long projectId, Long webhookId, Boolean enabledFlag) {
+        ProjectDTO projectDTO = iamClientOperator.queryProjectById(projectId);
+        updateEnabledFlag(projectDTO.getOrganizationId(), webhookId, enabledFlag);
     }
 
     @Override
