@@ -131,7 +131,7 @@
         hmsg_message hm
         JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
         WHERE
-        <![CDATA[`creation_date` <= DATE_ADD(curdate( ), INTERVAL - #{cleanNum} DAY))]]>
+        <![CDATA[hm.`creation_date` <= DATE_ADD(curdate( ), INTERVAL - #{cleanNum} DAY)]]>
         AND hm.message_type_code = #{messageType}
     </delete>
 
