@@ -2,6 +2,7 @@ package io.choerodon.message.infra.mapper;
 
 import java.util.Date;
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.hzero.message.domain.entity.Message;
 
@@ -28,6 +29,7 @@ public interface MessageC7nMapper {
                                      @Param("failedReason") String failedReason,
                                      @Param("params") String params);
 
-    void deleteRecordHalfAYear();
+    void deleteRecord(@Param("messageType") String messageType,
+                      @Param("cleanNum") Integer cleanNum);
 
 }
