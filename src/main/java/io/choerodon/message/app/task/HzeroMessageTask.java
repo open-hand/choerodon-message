@@ -43,7 +43,7 @@ public class HzeroMessageTask {
     @JobTask(code = "cleanMessageRecord", maxRetryCount = 0, description = "清除消息发送记录",
             params = {
                     @JobParam(name = MESSAGE_TYPE, description = "清理消息类型"),
-                    @JobParam(name = CLEAN_NUM, description = "清理多少天前的数据")})
+                    @JobParam(name = CLEAN_NUM, description = "清理多少天前的数据", type = Integer.class)})
     public Map<String, Object> cleanRecord(Map<String, Object> data) {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin clearing records<<<<<<<<<<<<<<<<<<<<<<<<<<");
         try {
