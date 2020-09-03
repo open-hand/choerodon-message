@@ -439,7 +439,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
                 // 表示第一层的SendSettingDetailTreeVO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                sendSettingDetailTreeDTO.setParentId(TenantDTO.DEFAULT_TENANT_ID);
                 sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTO.setCode(subCategoryCode);
