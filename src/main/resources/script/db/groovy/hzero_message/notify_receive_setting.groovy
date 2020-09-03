@@ -43,4 +43,13 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_receive_setting.groovy') {
         dropColumn(tableName: 'NOTIFY_RECEIVE_SETTING', columnName: 'MESSAGE_TYPE')
         dropColumn(tableName: 'NOTIFY_RECEIVE_SETTING', columnName: 'IS_DISABLED')
     }
+
+    changeSet(author: 'wangxiang@hand.com', id: '2020-09-03-fixReceiveDate'){
+        sql("""
+             UPDATE notify_receive_setting nrs 
+             SET nrs.SENDING_TYPE = 'WEB' 
+             WHERE
+             nrs.SENDING_TYPE = 'pm'
+        """)
+    }
 }
