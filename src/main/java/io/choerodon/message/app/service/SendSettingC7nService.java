@@ -1,12 +1,10 @@
 package io.choerodon.message.app.service;
 
+import java.util.List;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.*;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-
-import java.util.List;
-
-import org.hzero.message.domain.entity.MessageTemplate;
 
 /**
  * @author scp
@@ -28,7 +26,7 @@ public interface SendSettingC7nService {
      * @param pageRequest       分页信息
      * @return 分页结果
      */
-    Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode);
+    Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode, String introduce);
 
 
     /**
