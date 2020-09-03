@@ -26,7 +26,7 @@
             AND hts.category_code = #{level}
         </if>
         <if test="messageCode != null">
-            AND hts.message_code = #{categoryCode}
+            AND hts.message_code = #{messageCode}
         </if>
         <if test="messageName != null">
             AND hts.message_name LIKE concat(concat('%',#{messageName}),'%')
@@ -38,11 +38,15 @@
             AND hts.enabled_flag = #{enabled}
         </if>
         <if test="receiveConfigFlag != null">
-            AND hts.receive_config_flag = #{allowConfig}
+            AND hts.receive_config_flag = #{receiveConfigFlag}
         </if>
         <if test="params != null">
             AND hts.message_code LIKE concat(concat('%',#{params}),'%')
         </if>
+        <if test="introduce != null ">
+            AND hts.description LIKE concat(concat('%',#{introduce}),'%')
+        </if>
+
     </select>
 
     <select id="selectAllTemplateServer" resultType="org.hzero.message.domain.entity.TemplateServer">

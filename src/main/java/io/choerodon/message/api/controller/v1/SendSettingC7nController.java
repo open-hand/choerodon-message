@@ -1,17 +1,17 @@
 package io.choerodon.message.api.controller.v1;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.message.api.vo.*;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.hzero.core.util.Results;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -19,8 +19,6 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
-
-import java.util.List;
 
 @Api(tags = C7nSwaggerApiConfig.CHOERODON_SEND_SETTING)
 @RestController
@@ -45,8 +43,9 @@ public class SendSettingC7nController {
                                                            @RequestParam(required = false) Boolean receiveConfigFlag,
                                                            @RequestParam(required = false) String params,
                                                            @RequestParam(required = false) String firstCode,
-                                                           @RequestParam(required = false) String secondCode) {
-        return new ResponseEntity<>(sendSettingC7nService.pagingAll(messageCode, messageName, enabled, receiveConfigFlag, params, pageRequest, firstCode, secondCode), HttpStatus.OK);
+                                                           @RequestParam(required = false) String secondCode,
+                                                           @RequestParam(required = false) String introduce) {
+        return new ResponseEntity<>(sendSettingC7nService.pagingAll(messageCode, messageName, enabled, receiveConfigFlag, params, pageRequest, firstCode, secondCode, introduce), HttpStatus.OK);
     }
 
     @GetMapping("/tree")
