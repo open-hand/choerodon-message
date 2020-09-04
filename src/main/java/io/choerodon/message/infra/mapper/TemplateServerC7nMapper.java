@@ -30,7 +30,8 @@ public interface TemplateServerC7nMapper {
                                                 @Param("level") String level,
                                                 @Param("enabled") Boolean enabled,
                                                 @Param("receiveConfigFlag") Boolean receiveConfigFlag,
-                                                @Param("params") String params);
+                                                @Param("params") String params,
+                                                @Param("introduce") String introduce);
 
     List<TemplateServer> selectAllTemplateServer();
 
