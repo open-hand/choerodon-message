@@ -79,7 +79,7 @@ public class WebHookOrganizationC7nController {
         return new ResponseEntity<>(webHookC7nService.checkPath(organizationId, path, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
     }
 
-    @Permission(level = ResourceLevel.SITE)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation(value = "组织层新增WebHook")
     @PostMapping
     public ResponseEntity<WebHookVO> createInOrg(
