@@ -10,6 +10,7 @@ import io.choerodon.message.infra.constant.MisConstants;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.enums.WebHookTypeEnum;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.TemplateServerLineC7nMapper;
@@ -82,13 +83,13 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
 
 
     @Override
-    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params) {
+    public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params, String messageCode) {
         List<WebHookVO> list;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params, messageCode);
         } else {
-            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params);
+            list = webHookC7nMapper.pagingWebHook(sourceId, null, messageName, type, enableFlag, params, messageCode);
         }
         return PageUtils.createPageFromList(list, pageRequest);
     }
@@ -109,9 +110,9 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         //webhook 组织下唯一
         else if (StringUtils.equals(ResourceLevel.ORGANIZATION.value(), source)) {
             if (webhookServerC7nMapper.existWebHookUnderOrganization(address, sourceId) != null) {
-                return Boolean.TRUE;
-            } else {
                 return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
             }
         } else {
             throw new CommonException("error.web.hook.check.path.level");
@@ -236,7 +237,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
                 templateServerWh.setTempServerId(aLong);
                 List<TemplateServerWh> templateServerWhList = new ArrayList<>();
                 templateServerWhList.add(templateServerWh);
-                TemplateServerLine templateServerLine = templateServerLineMapper.selectOne(new TemplateServerLine().setTempServerId(aLong));
+                String type = webHookVO.getServerType().toUpperCase();
+                TemplateServerLine templateServerLine = templateServerLineC7nMapper.queryByTempServerIdAndType(aLong, type);
                 templateServerWhService.batchCreateTemplateServerWh(templateServerLine.getTempServerLineId(), templateServerWhList);
             }
         }

@@ -1,11 +1,12 @@
 package io.choerodon.message.infra.mapper;
 
-import io.choerodon.message.infra.dto.MessageC7nDTO;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.hzero.message.domain.entity.Message;
 
-import java.util.Date;
-import java.util.List;
+import io.choerodon.message.infra.dto.MessageC7nDTO;
 
 /**
  * @author scp
@@ -23,8 +24,12 @@ public interface MessageC7nMapper {
                                     @Param("params") String params);
 
     List<MessageC7nDTO> listWebHooks(@Param("status") String status,
-                                    @Param("webhookAddress") String webhookAddress,
-                                    @Param("templateType") String templateType,
-                                    @Param("failedReason") String failedReason,
-                                    @Param("params") String params);
+                                     @Param("webhookAddress") String webhookAddress,
+                                     @Param("templateType") String templateType,
+                                     @Param("failedReason") String failedReason,
+                                     @Param("params") String params);
+
+    void deleteRecord(@Param("messageType") String messageType,
+                      @Param("cleanNum") Integer cleanNum);
+
 }
