@@ -396,14 +396,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         MessageTemplate messageTemplate = new MessageTemplate();
         // 1.准备消息模板数据
         TemplateServer templateServer = templateServerRepository.selectOne(new TemplateServer().setMessageCode(messageTemplateVO.getMessageCode()));
-        TemplateServerLine condition = new TemplateServerLine();
-        condition.setTypeCode(messageTemplateVO.getSendingType());
-        condition.setTempServerId(templateServer.getTempServerId());
-        TemplateServerLine serverLine = templateServerLineRepository.selectOne(condition);
-        if (serverLine == null) {
-            throw new CommonException("message.template.cannot.be.created.because.sending.type.is.not.supported.");
-        }
-
         BeanUtils.copyProperties(messageTemplateVO, messageTemplate);
         messageTemplate.setTemplateName(templateServer.getMessageName());
         messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
