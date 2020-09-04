@@ -421,6 +421,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         templateServerLine.setTypeCode(messageTemplateVO.getSendingType().toUpperCase());
         templateServerLine.setTemplateCode(messageTemplate.getTemplateCode());
         templateServerLine.setEnabledFlag(1);
+        templateServerLine.setTenantId(0L);
         templateServerLineRepository.insert(templateServerLine);
         BeanUtils.copyProperties(messageTemplate, messageTemplateVO);
         return messageTemplateVO;
@@ -437,7 +438,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
                 // 表示第一层的SendSettingDetailTreeVO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                sendSettingDetailTreeDTO.setParentId(TenantDTO.DEFAULT_TENANT_ID);
                 sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTO.setCode(subCategoryCode);
