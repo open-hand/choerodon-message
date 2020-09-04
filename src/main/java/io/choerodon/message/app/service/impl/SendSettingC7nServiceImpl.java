@@ -1,6 +1,26 @@
 package io.choerodon.message.app.service.impl;
 
 
+import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
+import org.hzero.boot.message.config.MessageClientProperties;
+import org.hzero.boot.platform.lov.dto.LovValueDTO;
+import org.hzero.boot.platform.lov.feign.LovFeignClient;
+import org.hzero.core.base.BaseConstants;
+import org.hzero.message.app.service.MessageTemplateService;
+import org.hzero.message.app.service.TemplateServerService;
+import org.hzero.message.domain.entity.MessageTemplate;
+import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.repository.TemplateServerLineRepository;
+import org.hzero.message.domain.repository.TemplateServerRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
@@ -21,27 +41,6 @@ import io.choerodon.message.infra.utils.ConversionUtil;
 import io.choerodon.message.infra.validator.CommonValidator;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.hzero.boot.message.config.MessageClientProperties;
-import org.hzero.boot.platform.lov.dto.LovValueDTO;
-import org.hzero.boot.platform.lov.feign.LovFeignClient;
-import org.hzero.core.base.BaseConstants;
-import org.hzero.message.app.service.MessageTemplateService;
-import org.hzero.message.app.service.TemplateServerService;
-import org.hzero.message.domain.entity.MessageTemplate;
-import org.hzero.message.domain.entity.TemplateServer;
-import org.hzero.message.domain.entity.TemplateServerLine;
-import org.hzero.message.domain.repository.TemplateServerLineRepository;
-import org.hzero.message.domain.repository.TemplateServerRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -88,12 +87,12 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
 
     @Override
-    public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode) {
+    public Page<MessageServiceVO> pagingAll(String messageCode, String messageName, Boolean enabled, Boolean receiveConfigFlag, String params, PageRequest pageRequest, String firstCode, String secondCode, String introduce) {
         secondCode = secondCode == null ? null : secondCode.toUpperCase();
         firstCode = firstCode == null ? null : firstCode.toUpperCase();
         String finalSecondCode = secondCode;
         String finalFirstCode = firstCode;
-        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, finalSecondCode, finalFirstCode, enabled, receiveConfigFlag, params));
+        Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, finalSecondCode, finalFirstCode, enabled, receiveConfigFlag, params, introduce));
         Map<String, String> meaningsMap = getMeanings();
         serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
         return serviceVOPage;
@@ -423,6 +422,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         templateServerLine.setTypeCode(messageTemplateVO.getSendingType().toUpperCase());
         templateServerLine.setTemplateCode(messageTemplate.getTemplateCode());
         templateServerLine.setEnabledFlag(1);
+        templateServerLine.setTenantId(0L);
         templateServerLineRepository.insert(templateServerLine);
         BeanUtils.copyProperties(messageTemplate, messageTemplateVO);
         return messageTemplateVO;
@@ -439,7 +439,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
                 // 表示第一层的SendSettingDetailTreeVO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                sendSettingDetailTreeDTO.setParentId(TenantDTO.DEFAULT_TENANT_ID);
                 sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTO.setCode(subCategoryCode);
