@@ -79,7 +79,6 @@
                 )
             </if>
         </where>
-        order by temp.creation_date DESC
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
@@ -123,5 +122,17 @@
         ORDER BY
         hm.creation_date DESC
     </select>
+
+
+    <delete id="deleteRecord">
+        DELETE hm,
+        hmt
+        FROM
+        hmsg_message hm
+        JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+        WHERE
+        <![CDATA[hm.`creation_date` <= DATE_ADD(curdate( ), INTERVAL - #{cleanNum} DAY)]]>
+        AND hm.message_type_code = #{messageType}
+    </delete>
 
 </mapper>
