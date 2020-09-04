@@ -13,6 +13,6 @@
     <service name="hzero_message" filename="hzero_message" schema="hzero_message" description="消息服务"/>
     <service name="hzero_monitor" filename="hzero_monitor" schema="hzero_monitor" description="监控审计服务"/>
     <exclusion>
-        hmsg_template_server,hmsg_template_server_line,notify_message_setting_config,hmsg_email_server,hmsg_email_property,hmsg_sms_server,hmsg_message_template,hmsg_template_arg,hmsg_receive_config
+        hmsg_email_server.host,hmsg_email_server.port,hmsg_email_server.protocol,hmsg_email_server.username,hmsg_email_server.password_encrypted,hmsg_email_server.sender,hmsg_email_server.try_times
     </exclusion>
 </services>

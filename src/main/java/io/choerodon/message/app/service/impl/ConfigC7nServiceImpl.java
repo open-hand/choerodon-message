@@ -6,6 +6,7 @@ import io.choerodon.message.app.service.ConfigC7nService;
 import io.choerodon.message.infra.enums.ConfigNameEnum;
 
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+
 import org.hzero.message.app.service.EmailServerService;
 import org.hzero.message.app.service.SmsServerService;
 import org.hzero.message.domain.entity.EmailProperty;
@@ -69,6 +70,9 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     @Override
     public EmailConfigVO selectEmail() {
         EmailServer emailServer = emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value());
+        if (emailServer == null) {
+            return null;
+        }
         return setEmailConfigVO(new EmailConfigVO(), emailServer);
     }
 
