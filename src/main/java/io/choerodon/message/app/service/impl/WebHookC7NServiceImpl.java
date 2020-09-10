@@ -242,6 +242,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public void updateEnabledFlag(Long webHookId, Boolean enableFlag) {
         WebhookServer webhookServer = webhookServerRepository.selectByPrimaryKey(webHookId);
+        //签解密
+        webhookServer.setSecret(DataSecurityHelper.decrypt(webhookServer.getSecret()));
         webhookServer.setEnabledFlag(ConversionUtil.booleanConverToInteger(enableFlag));
         webhookServerService.updateWebHook(webhookServer.getTenantId(), webhookServer);
     }
