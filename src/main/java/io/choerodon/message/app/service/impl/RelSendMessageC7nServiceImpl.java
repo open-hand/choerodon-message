@@ -161,11 +161,15 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (!ObjectUtils.isEmpty(projectId)) {
             //项目成获取到应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
             // 组织层获取到不应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
-            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+            //获取本组织的webhook发送地址
+            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())
+                    && t.getTenantId().equals(Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))))).collect(Collectors.toList());
+
         }
         webHookSenderList.clear();
         webHookSenderList.addAll(senderList);

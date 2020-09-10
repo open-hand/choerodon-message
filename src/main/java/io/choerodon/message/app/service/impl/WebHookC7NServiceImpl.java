@@ -263,6 +263,8 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public void updateEnabledFlag(Long organizationId, Long webHookId, Boolean enableFlag) {
         WebhookServer webhookServer = webhookServerRepository.selectByPrimaryKey(webHookId);
+        //签解密
+        webhookServer.setSecret(DataSecurityHelper.decrypt(webhookServer.getSecret()));
         CommonExAssertUtil.assertTrue(organizationId.equals(webhookServer.getTenantId()), MisConstants.ERROR_OPERATING_RESOURCE_IN_OTHER_ORGANIZATION);
         webhookServer.setEnabledFlag(ConversionUtil.booleanConverToInteger(enableFlag));
         webhookServerService.updateWebHook(webhookServer.getTenantId(), webhookServer);
