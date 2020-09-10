@@ -157,7 +157,7 @@ public class WebHookOrganizationC7nController {
             @Encrypt
             @RequestParam(name = "webhook_id", required = false) Long webhookId,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false, name = "name") String eventName,
+            @RequestParam(required = false, name = "messageName") String eventName,
             @RequestParam(required = false, name = "type") String type) {
 
         return new ResponseEntity<>(webhookRecordC7nService.pagingWebHookRecord(pageRequest, sourceId, webhookId, status, eventName, type, ResourceLevel.ORGANIZATION.value()), HttpStatus.OK);
