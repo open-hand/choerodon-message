@@ -1,13 +1,8 @@
 package io.choerodon.message.app.service.impl;
 
-import io.choerodon.core.enums.MessageAdditionalType;
-import io.choerodon.message.app.service.RelSendMessageC7nService;
-import io.choerodon.message.infra.dto.MessageSettingDTO;
-import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
-import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
-import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
-import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
-
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
@@ -20,9 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import io.choerodon.core.enums.MessageAdditionalType;
+import io.choerodon.message.app.service.RelSendMessageC7nService;
+import io.choerodon.message.infra.dto.MessageSettingDTO;
+import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
+import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
+import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 
 /**
  * @author scp
@@ -161,11 +160,15 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (!ObjectUtils.isEmpty(projectId)) {
             //项目成获取到应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
             // 组织层获取到不应该发送的webhook地址
             webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
-            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
+            //获取本组织的webhook发送地址
+            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())
+                    && t.getTenantId().equals(Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))))).collect(Collectors.toList());
+
         }
         webHookSenderList.clear();
         webHookSenderList.addAll(senderList);
