@@ -1,13 +1,15 @@
 package io.choerodon.message.app.task;
 
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.asgard.schedule.annotation.TimedTask;
+import io.choerodon.message.app.service.MessageCheckLogService;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
 
 /**
@@ -29,8 +31,12 @@ public class HzeroMessageTask {
 
     private MessageC7nMapper messageC7nMapper;
 
-    public HzeroMessageTask(MessageC7nMapper messageC7nMapper) {
+    private MessageCheckLogService messageCheckLogService;
+
+    public HzeroMessageTask(MessageC7nMapper messageC7nMapper,
+                            MessageCheckLogService messageCheckLogService) {
         this.messageC7nMapper = messageC7nMapper;
+        this.messageCheckLogService = messageCheckLogService;
     }
 
 
@@ -53,6 +59,20 @@ public class HzeroMessageTask {
         }
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clearing records<<<<<<<<<<<<<<<<<<<<<<<<<<");
         return data;
+    }
+
+    @JobTask(maxRetryCount = 3, code = "clearMessageTemplate", description = "清理废弃的模板数据")
+    @TimedTask(name = "clearMessageTemplate", description = "清理废弃的模板数据", oneExecution = true,
+            repeatCount = 0, repeatInterval = 1, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS, params = {})
+    public void clearMessageTemplate(Map<String, Object> map) {
+        LOGGER.info("begin to clear message template.");
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin to clear message template<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        try {
+            messageCheckLogService.checkLog("0.24.0");
+        } catch (Exception e) {
+            LOGGER.error("error.clear.message.template", e);
+        }
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clear message template<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
 
 }
