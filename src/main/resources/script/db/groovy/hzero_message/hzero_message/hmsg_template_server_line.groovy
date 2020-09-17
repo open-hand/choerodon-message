@@ -43,13 +43,13 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
 
     changeSet(author: "hzero@hand-china.com", id: "2020-04-26-hmsg_template_server_line") {
         addColumn(tableName: 'hmsg_template_server_line') {
-            column(name: "try_times", type: "int(11)", remarks: "重试次数")
+            column(name: "try_times", type: "int", remarks: "重试次数")
         }
     }
 
     changeSet(author: "hzero@hand-china.com", id: "2020-04-27-hmsg_template_server_line") {
         addColumn(tableName: 'hmsg_template_server_line') {
-            column(name: "enabled_flag", type: "tinyint(1)", defaultValue:"1", remarks: "启用标识")  {constraints(nullable:"false")}
+            column(name: "enabled_flag", type: "tinyint", defaultValue:"1", remarks: "启用标识")  {constraints(nullable:"false")}
         }
     }
 

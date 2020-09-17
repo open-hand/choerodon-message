@@ -47,7 +47,9 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_notice_published.groovy') {
         }
         addColumn(tableName: 'hmsg_notice_published') {
              column(name: "receiver_type_code", type: "varchar(" + 60 * weight + ")",  remarks: "接收方类型,值集：hmsg.NOTICE.RECERVER_TYPE")
-             column(name: "title", type: "varchar(" + 300 * weight + ")",  remarks: "公告主题")
+        }
+        addColumn(tableName: 'hmsg_notice_published') {
+            column(name: "title", type: "varchar(" + 300 * weight + ")",  remarks: "公告主题")
         }
     }
 }
