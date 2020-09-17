@@ -15,7 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config_tl.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames: "receive_id,lang", tableName: "hmsg_receive_config_tl", constraintName: "hmsg_receive_config_tl_u1")
+        addUniqueConstraint(columnNames:"receive_id,lang",tableName:"hmsg_receive_config_tl",constraintName: "hmsg_receive_config_tl_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_receive_config_tl") {
         addColumn(tableName: 'hmsg_receive_config_tl') {
