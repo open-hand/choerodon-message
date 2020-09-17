@@ -23,7 +23,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_email_filter.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames: "server_id,address", tableName: "hmsg_email_filter", constraintName: "hmsg_email_filter_u1")
+        addUniqueConstraint(columnNames:"server_id,address",tableName:"hmsg_email_filter",constraintName: "hmsg_email_filter_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_email_filter") {
         addColumn(tableName: 'hmsg_email_filter') {

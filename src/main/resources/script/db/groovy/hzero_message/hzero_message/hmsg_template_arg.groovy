@@ -26,7 +26,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_arg.groovy') {
    createIndex(tableName: "hmsg_template_arg", indexName: "hmsg_template_arg_n1") {
             column(name: "template_id")
             column(name: "arg_name")
-   }
+        }
 
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_template_arg") {

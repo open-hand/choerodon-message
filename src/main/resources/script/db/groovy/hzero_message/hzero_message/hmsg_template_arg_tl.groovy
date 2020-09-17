@@ -15,7 +15,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_arg_tl.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames: "arg_id,lang", tableName: "hmsg_template_arg_tl", constraintName: "hmsg_template_arg_tl_u1")
+        addUniqueConstraint(columnNames:"arg_id,lang",tableName:"hmsg_template_arg_tl",constraintName: "hmsg_template_arg_tl_u1")
     }
     changeSet(author: "hzero@hand-china.com", id: "2020-06-11-hmsg_template_arg_tl") {
         addColumn(tableName: 'hmsg_template_arg_tl') {
