@@ -44,4 +44,17 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_template.groovy') {
         }
         modifyDataType(tableName: "hmsg_message_template", columnName: 'external_code', newDataType: "varchar(" + 60 * weight + ")")
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-08-27-hmsg_message_template") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        addColumn(tableName: "hmsg_message_template") {
+            column(name: "editor_type", type: "varchar(" + 30 * weight + ")", remarks: "编辑器类型，MD:markdown RT:富文本", defaultValue: "RT")  {constraints(nullable:"false")}
+        }
+    }
+
 }
