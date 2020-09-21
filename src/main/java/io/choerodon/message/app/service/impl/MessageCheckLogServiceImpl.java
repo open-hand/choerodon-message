@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.message.domain.entity.MessageTemplate;
 import org.hzero.message.domain.entity.TemplateArg;
 import org.hzero.message.domain.entity.TemplateServer;
@@ -85,7 +86,8 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
         for (String code : templateCodeList) {
             MessageTemplate messageTemplate = new MessageTemplate();
             messageTemplate.setTemplateCode(code);
-            MessageTemplate template = messageTemplateMapper.selectByCode(0L, code);
+            messageTemplate.setTenantId(BaseConstants.DEFAULT_TENANT_ID);
+            MessageTemplate template = messageTemplateMapper.selectOne(messageTemplate);
             if (template == null) {
                 continue;
             }
