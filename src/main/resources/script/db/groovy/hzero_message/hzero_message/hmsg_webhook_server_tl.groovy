@@ -52,7 +52,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_webhook_server_tl.groovy') {
             )SELECT
                server_id, 
                'en_US', 
-               server_name, 
+               "", 
                tenant_id
             FROM
             hmsg_webhook_server  
