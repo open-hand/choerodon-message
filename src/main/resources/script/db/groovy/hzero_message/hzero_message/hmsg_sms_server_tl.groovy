@@ -25,5 +25,31 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_sms_server_tl.groovy') {
     changeSet(author: "hzero@hand-china.com", id: "2020-09-01-1-hmsg_sms_server_tl") {
         addUniqueConstraint(columnNames: "server_id,lang", tableName: "hmsg_sms_server_tl", constraintName: "hmsg_sms_server_tl_u1")
     }
+
+
+    changeSet(author: "wx@hand-china.com",id: "2020-09-23-fix-sms_server_tl"){
+        sql("""
+          DELETE 
+          FROM
+           hmsg_sms_server_tl;
+
+          INSERT INTO hmsg_sms_server_tl ( server_id, lang, server_name, tenant_id ) SELECT
+           server_id,
+           'zh_CN',
+           server_name,
+           tenant_id 
+          FROM
+           hmsg_sms_server;
+
+          INSERT INTO hmsg_sms_server_tl ( server_id, lang, server_name, tenant_id ) SELECT
+            server_id,
+            'en_US',
+            "default",
+            tenant_id 
+          FROM
+            hmsg_sms_server
+       """)
+
+    }
 }
 
