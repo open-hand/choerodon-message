@@ -52,7 +52,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config_tl.groovy') {
             INSERT INTO hmsg_receive_config_tl ( receive_id, lang, receive_name, tenant_id ) SELECT
               receive_id,
               'en_US',
-              "",
+              "default",
               tenant_id 
             FROM
               hmsg_receive_config

@@ -27,5 +27,29 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_tl.groovy') {
     changeSet(author: "hzero@hand-china.com", id: "2020-09-01-1-hmsg_template_server_tl") {
         addUniqueConstraint(columnNames: "temp_server_id,lang", tableName: "hmsg_template_server_tl", constraintName: "hmsg_template_server_tl_u1")
     }
+
+    changeSet("author": "wx@hand-china.com", id: "") {
+        sql("""
+          DELETE 
+          FROM
+           hmsg_template_server_tl;
+
+          INSERT INTO hmsg_template_server_tl ( temp_server_id, lang, message_name, tenant_id ) SELECT
+           temp_server_id,
+           'zh_CN',
+           message_name,
+           tenant_id 
+          FROM
+           hmsg_template_server;
+
+          INSERT INTO hmsg_template_server_tl ( temp_server_id, lang, message_name, tenant_id ) SELECT
+            temp_server_id,
+            'en_US',
+            "default",
+            tenant_id 
+          FROM
+            hmsg_template_server
+        """)
+    }
 }
 
