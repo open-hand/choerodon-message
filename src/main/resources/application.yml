@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hzero-message
+    name: choerodon-message
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://db.hzero.org:3306/hzero_message?useUnicode=true&characterEncoding=utf-8&useSSL=false}
     username: ${SPRING_DATASOURCE_USERNAME:root}
@@ -79,7 +79,40 @@ mybatis:
 mapper:
   not-empty: true
 
+choerodon:
+  saga:
+    service: choerodon-asgard
+    consumer:
+      enabled: true # 是否启用消费端
+      thread-num: 5  # 消费线程数
+      max-poll-size: 200 # 每次拉取的最大消息数量
+      poll-interval-ms: 1000 # 拉取消息的间隔(毫秒)，默认1000毫秒
+  schedule:
+    consumer:
+      enabled: true # 启用任务调度消费端
+      thread-num: 1 # 任务调度消费线程数
+      poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
+
 hzero:
+  service:
+    platform:
+      name: cherodon-platform
+    oauth:
+      name: choerodon-oauth
+    iam:
+      name: choerdon-iam
+    file:
+      name: choerodon-file
+    message:
+      name: choerodon-message
+    admin:
+      name: choerodon-admin
+    swagger:
+      name: choerodon-swagger
+    gateway:
+      name: choerodon-gateway
+    monitor:
+      name: choerodon-monitor
   websocket:
     # 用于连接websocket的路径
     websocket: /websocket
