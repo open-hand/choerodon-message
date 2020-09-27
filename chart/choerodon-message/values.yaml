@@ -19,7 +19,7 @@ replicaCount: 1
 
 ## 设置默认的 image、imageTag 和 imagePullPolicy。
 image:
-  repository: registry.cn-shanghai.aliyuncs.com/c7n/hzero-message
+  repository: registry.cn-shanghai.aliyuncs.com/c7n/choerodon-message
   tag: ~
   pullPolicy: IfNotPresent
 
@@ -164,7 +164,7 @@ service:
   # 是否启用 service 暴露本服务
   enabled: true
   # Service 名称
-  name: hzero-message
+  name: choerodon-message
   # Service 类型
   type: ClusterIP
   # 指定 service 的 clusterIP
