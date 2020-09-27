@@ -59,7 +59,7 @@ env:
     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
 
     # 获取用户信息的接口
-    HZERO_WEBSOCKET_OAUTHURL: http://hzero-oauth/oauth/api/user
+    HZERO_WEBSOCKET_OAUTHURL: http://choerodon-oauth/oauth/api/user
 
     # 是否启用配置中心
     SPRING_CLOUD_CONFIG_ENABLED: false
