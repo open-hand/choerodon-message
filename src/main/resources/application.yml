@@ -96,11 +96,11 @@ choerodon:
 hzero:
   service:
     platform:
-      name: cherodon-platform
+      name: choerodon-platform
     oauth:
       name: choerodon-oauth
     iam:
-      name: choerdon-iam
+      name: choerodon-iam
     file:
       name: choerodon-file
     message:
