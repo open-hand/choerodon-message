@@ -8,6 +8,8 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 
+import java.util.Collection;
+import java.util.Collections;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
@@ -32,6 +34,11 @@ import java.util.stream.Collectors;
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
 
+    private static final String NO_SEND_WEBHOOK = "NoSendWebHook";
+    private static final String NO_SEND_WEB = "NoSendWeb";
+    private static final String NO_SEND_EMAIL = "NoSendEmail";
+    private static final String NO_SEND_SMS = "NoSendSms";
+
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
@@ -43,22 +50,38 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     protected void filterWebReceiver(MessageSender sender) {
+        //如果有特殊标志则不发送
+        if (isSend(sender, NO_SEND_WEB)) return;
         super.filterWebReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.WEB);
     }
 
+    private boolean isSend(MessageSender sender, String noSendWeb) {
+        if (!CollectionUtils.isEmpty(sender.getAdditionalInformation()) && !ObjectUtils.isEmpty(sender.getAdditionalInformation().get(noSendWeb))) {
+            sender.setReceiverAddressList(Collections.EMPTY_LIST);
+            return true;
+        }
+        return false;
+    }
+
     protected void filterSmsReceiver(MessageSender sender) {
+        if (isSend(sender, NO_SEND_SMS)) return;
         super.filterSmsReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.SMS);
     }
 
     protected void filterEmailReceiver(MessageSender sender) {
+        if (isSend(sender, NO_SEND_EMAIL)) return;
         super.filterEmailReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.EMAIL);
     }
 
 
     protected void filterWebHookReceiver(MessageSender sender, List<WebHookSender> webHookSenderList) {
+        if (!CollectionUtils.isEmpty(sender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(sender.getAdditionalInformation().get(NO_SEND_WEBHOOK))) {
+            webHookSenderList.clear();
+        }
         super.filterWebHookReceiver(sender, webHookSenderList);
         webHookFilter(sender, webHookSenderList);
     }
