@@ -224,17 +224,17 @@
         <if test="eventName!=null">
             AND nms.EVENT_NAME = #{eventName}
         </if>
-        <choose>
-            <when test="messageType != null and messageType =='EMAIL'">
-                AND nms.EMAIL_ENABLE = TRUE
-            </when>
-            <when test="messageType != null and messageType =='SMS'">
-                AND nms.SMS_ENABLE = TRUE
-            </when>
-            <when test="messageType != null and messageType =='WEB'">
-                AND nms.PM_ENABLE = TRUE
-            </when>
-        </choose>
+<!--        <choose>-->
+<!--            <when test="messageType != null and messageType =='EMAIL'">-->
+<!--                AND nms.EMAIL_ENABLE = TRUE-->
+<!--            </when>-->
+<!--            <when test="messageType != null and messageType =='SMS'">-->
+<!--                AND nms.SMS_ENABLE = TRUE-->
+<!--            </when>-->
+<!--            <when test="messageType != null and messageType =='WEB'">-->
+<!--                AND nms.PM_ENABLE = TRUE-->
+<!--            </when>-->
+<!--        </choose>-->
     </select>
 
     <select id="listCategoryCode" resultType="string">
