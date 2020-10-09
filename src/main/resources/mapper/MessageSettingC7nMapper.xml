@@ -203,9 +203,7 @@
 
     <select id="selectByParams" resultType="io.choerodon.message.infra.dto.MessageSettingDTO">
         SELECT
-        nms.ID,
-        nms.`CODE`,
-        nms.EVENT_NAME
+        nms.*
         FROM
         notify_message_setting nms
         WHERE
