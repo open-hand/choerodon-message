@@ -6,8 +6,10 @@ import io.choerodon.message.api.vo.SystemAnnouncementVO;
 import io.choerodon.message.app.service.SystemAnnouncementService;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.mapper.SystemAnnouncementMapper;
+import io.choerodon.message.infra.utils.PageInfoUtil;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hzero.message.api.dto.NoticeDTO;
 import org.hzero.message.app.service.NoticeReceiverService;
 import org.hzero.message.app.service.NoticeService;
@@ -19,11 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author dengyouquan
@@ -96,7 +100,12 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
                     systemAnnouncementVO.setStatus(getTrueStatus(systemAnnouncementVO.getSendDate()));
                 }
         );
-        return systemAnnouncementVOPage;
+        if (!StringUtils.isEmpty(status)) {
+            List<SystemAnnouncementVO> announcementVOList = systemAnnouncementVOPage.getContent().stream().filter(t -> t.getStatus().equals(status)).collect(Collectors.toList());
+            return PageInfoUtil.createPageFromList(announcementVOList, pageRequest);
+        } else {
+            return systemAnnouncementVOPage;
+        }
     }
 
     @Override

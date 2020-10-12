@@ -19,7 +19,7 @@ replicaCount: 1
 
 ## 设置默认的 image、imageTag 和 imagePullPolicy。
 image:
-  repository: registry.cn-shanghai.aliyuncs.com/c7n/hzero-message
+  repository: registry.cn-shanghai.aliyuncs.com/c7n/choerodon-message
   tag: ~
   pullPolicy: IfNotPresent
 
@@ -59,7 +59,7 @@ env:
     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
 
     # 获取用户信息的接口
-    HZERO_WEBSOCKET_OAUTHURL: http://hzero-oauth/oauth/api/user
+    HZERO_WEBSOCKET_OAUTHURL: http://choerodon-oauth/oauth/api/user
 
     # 是否启用配置中心
     SPRING_CLOUD_CONFIG_ENABLED: false
@@ -164,7 +164,7 @@ service:
   # 是否启用 service 暴露本服务
   enabled: true
   # Service 名称
-  name: hzero-message
+  name: choerodon-message
   # Service 类型
   type: ClusterIP
   # 指定 service 的 clusterIP

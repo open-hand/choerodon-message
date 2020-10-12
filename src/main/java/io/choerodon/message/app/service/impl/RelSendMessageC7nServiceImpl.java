@@ -1,5 +1,6 @@
 package io.choerodon.message.app.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,6 +32,11 @@ import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
 
+    private static final String NO_SEND_WEBHOOK = "NoSendWebHook";
+    private static final String NO_SEND_WEB = "NoSendWeb";
+    private static final String NO_SEND_EMAIL = "NoSendEmail";
+    private static final String NO_SEND_SMS = "NoSendSms";
+
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
@@ -42,22 +48,38 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     protected void filterWebReceiver(MessageSender sender) {
+        //如果有特殊标志则不发送
+        if (isSend(sender, NO_SEND_WEB)) return;
         super.filterWebReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.WEB);
     }
 
+    private boolean isSend(MessageSender sender, String noSendWeb) {
+        if (!CollectionUtils.isEmpty(sender.getAdditionalInformation()) && !ObjectUtils.isEmpty(sender.getAdditionalInformation().get(noSendWeb))) {
+            sender.setReceiverAddressList(Collections.EMPTY_LIST);
+            return true;
+        }
+        return false;
+    }
+
     protected void filterSmsReceiver(MessageSender sender) {
+        if (isSend(sender, NO_SEND_SMS)) return;
         super.filterSmsReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.SMS);
     }
 
     protected void filterEmailReceiver(MessageSender sender) {
+        if (isSend(sender, NO_SEND_EMAIL)) return;
         super.filterEmailReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.EMAIL);
     }
 
 
     protected void filterWebHookReceiver(MessageSender sender, List<WebHookSender> webHookSenderList) {
+        if (!CollectionUtils.isEmpty(sender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(sender.getAdditionalInformation().get(NO_SEND_WEBHOOK))) {
+            webHookSenderList.clear();
+        }
         super.filterWebHookReceiver(sender, webHookSenderList);
         webHookFilter(sender, webHookSenderList);
     }
@@ -90,7 +112,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
                 messageType.equals(HmsgConstant.MessageType.SMS))
                 && messageSettingC7nMapper.selectProjectMessage().contains(messageSender.getMessageCode())) {
-            if (projectFilter(messageSender, projectId, envId, eventName, messageType)) {
+            //项目层设置未开启
+            if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
         }
@@ -124,13 +147,27 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      * @return
      */
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
+        //1.查询项目下是否设置了改消息的发送设置.没有就用默认的
         MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
         //如果项目下配置没有开启，则查询默认配置
         if (Objects.isNull(messageSettingDTO)) {
             messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), envId, eventName, messageType);
         }
-        return ObjectUtils.isEmpty(messageSettingDTO);
-
+        //根据消息配置返回项目层是否应该发送消息
+        if (ObjectUtils.isEmpty(messageSettingDTO)) {
+            return Boolean.FALSE;
+        }
+        if (HmsgConstant.MessageType.WEB.equals(messageType)) {
+            return messageSettingDTO.getPmEnable();
+        }
+        if (HmsgConstant.MessageType.EMAIL.equals(messageType)) {
+            return messageSettingDTO.getEmailEnable();
+        }
+        if (HmsgConstant.MessageType.SMS.equals(messageType)) {
+            return messageSettingDTO.getSmsEnable();
+        } else {
+            return Boolean.FALSE;
+        }
     }
 
 
