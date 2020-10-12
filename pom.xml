@@ -8,9 +8,9 @@
         <version>0.18.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hzero-message</artifactId>
+    <artifactId>choerodon-message</artifactId>
     <version>0.24.0-SNAPSHOT</version>
-    <name>hzero-message</name>
+    <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
 
 
