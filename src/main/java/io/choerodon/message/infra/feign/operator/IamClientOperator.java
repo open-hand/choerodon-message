@@ -2,13 +2,16 @@ package io.choerodon.message.infra.feign.operator;
 
 import java.util.List;
 
+import org.hzero.core.base.BaseConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.IamFeignClient;
@@ -47,5 +50,13 @@ public class IamClientOperator {
             throw new CommonException("error.tenant.query.by.id", tenantId);
         }
         return projects.getBody();
+    }
+
+    public UserVO getUser(Long projectId, String loginName) {
+        ResponseEntity<Page<UserVO>> pageResponseEntity = iamFeignClient.pagingQueryUsersWithRolesOnProjectLevel(projectId, BaseConstants.PAGE_NUM, BaseConstants.PAGE_SIZE, loginName);
+        if (!pageResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.get.user.by.loginName", loginName);
+        }
+        return pageResponseEntity.getBody().size() > 0 ? pageResponseEntity.getBody().get(0) : null;
     }
 }

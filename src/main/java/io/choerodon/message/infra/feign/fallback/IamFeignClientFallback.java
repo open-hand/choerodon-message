@@ -1,5 +1,6 @@
 package io.choerodon.message.infra.feign.fallback;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.OrganizationProjectVO;
 import io.choerodon.message.api.vo.ProjectVO;
@@ -71,5 +72,10 @@ public class IamFeignClientFallback implements IamFeignClient {
     @Override
     public ResponseEntity<List<ProjectDTO>> listProjectsByTenantId(Long tenantId) {
         throw new CommonException("error.projects.list");
+    }
+
+    @Override
+    public ResponseEntity<Page<UserVO>> pagingQueryUsersWithRolesOnProjectLevel(Long projectId, int page, int size, String loginName) {
+        throw new CommonException("error.get.user");
     }
 }
