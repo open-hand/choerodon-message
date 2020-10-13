@@ -1,5 +1,6 @@
 package io.choerodon.message.api.vo;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.hzero.starter.keyencrypt.core.Encrypt;
@@ -20,6 +21,16 @@ public class UserVO {
     private String email;
 
     private String phone;
+
+    private List<Role> roles;
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
 
     public Long getId() {
         return id;

@@ -5,6 +5,7 @@ import java.util.List;
 import io.choerodon.message.api.vo.CustomMessageSettingVO;
 import io.choerodon.message.api.vo.MessageSettingVO;
 import io.choerodon.message.api.vo.MessageSettingWarpVO;
+import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 
 /**
@@ -27,4 +28,7 @@ public interface MessageSettingC7nService {
     void updateMessageSetting(MessageSettingDTO messageSettingDTO);
 
     void disableNotifyTypeByCodeAndType(String code, String notiyfType);
+
+    void asyncMessageProjectUser(UserMemberEventPayload userMemberEventPayload);
+
 }
