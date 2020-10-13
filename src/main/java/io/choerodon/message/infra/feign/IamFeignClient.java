@@ -1,10 +1,15 @@
 package io.choerodon.message.infra.feign;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.OrganizationProjectVO;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.CustomPageRequest;
+
+import io.swagger.annotations.ApiParam;
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -53,4 +58,12 @@ public interface IamFeignClient {
 
     @GetMapping("/v1/projects/{tenant_id}")
     ResponseEntity<List<ProjectDTO>> listProjectsByTenantId(@PathVariable("tenant_id") Long tenantId);
+
+    @GetMapping("/choerodon/v1/projects/{project_id}/users/search")
+    ResponseEntity<Page<UserVO>> pagingQueryUsersWithRolesOnProjectLevel(@PathVariable("project_id") Long projectId,
+                                                                         @RequestParam("page") int page,
+                                                                         @RequestParam("size") int size,
+                                                                         @ApiParam(value = "登录名")
+                                                                         @RequestParam(required = false) String loginName);
+
 }
