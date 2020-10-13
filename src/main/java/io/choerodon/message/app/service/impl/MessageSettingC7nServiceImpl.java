@@ -3,10 +3,13 @@ package io.choerodon.message.app.service.impl;
 import io.choerodon.core.enums.ServiceNotifyType;
 import io.choerodon.core.enums.TargetUserType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.*;
+import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
 import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
+import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
 import io.choerodon.message.infra.dto.TargetUserDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
@@ -15,7 +18,10 @@ import io.choerodon.message.infra.enums.DevopsNotifyTypeEnum;
 import io.choerodon.message.infra.enums.SendingTypeEnum;
 import io.choerodon.message.infra.feign.DevopsFeignClient;
 import io.choerodon.message.infra.feign.IamFeignClient;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
+import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
+import io.choerodon.message.infra.utils.OptionalBean;
 
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
@@ -53,8 +59,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private DevopsFeignClient devopsFeignClient;
 
     private IamFeignClient iamFeignClient;
-    
+
     private LovFeignClient lovFeignClient;
+
+    @Autowired
+    private IamClientOperator iamClientOperator;
+    @Autowired
+    private MessageSettingTargetUserC7nMapper messageSettingTargetUserC7nMapper;
 
 
     public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper,
@@ -269,6 +280,35 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         messageSettingDTO.setCode(code);
         messageSettingDTO.setProjectId(TenantDTO.DEFAULT_TENANT_ID);
         messageSettingC7nMapper.updateOptional(messageSettingDTO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void asyncMessageProjectUser(UserMemberEventPayload userMemberEventPayload) {
+        //如果用户在这个项目下没有任何角色，那么删除他在通知里面的对象
+        if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT)) {
+            return;
+        }
+        UserVO user = iamClientOperator.getUser(userMemberEventPayload.getResourceId(), userMemberEventPayload.getUsername());
+        boolean present = OptionalBean.ofNullable(user).getBean(UserVO::getRoles).isPresent();
+        //user存在的时候返回
+        if (present) {
+            return;
+        }
+        //清理项目层通知对象
+        MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
+        messageSettingDTO.setProjectId(userMemberEventPayload.getResourceId());
+        List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.select(messageSettingDTO);
+        if (CollectionUtils.isEmpty(messageSettingDTOS)) {
+            return;
+        }
+        messageSettingDTOS.forEach(settingDTO -> {
+            TargetUserDTO targetUserDTO = new TargetUserDTO();
+            targetUserDTO.setMessageSettingId(settingDTO.getId());
+            targetUserDTO.setUserId(userMemberEventPayload.getUserId());
+            targetUserDTO.setType(TargetUserType.SPECIFIER.getTypeName());
+            messageSettingTargetUserC7nMapper.delete(targetUserDTO);
+        });
     }
 
     private List<CustomMessageSettingVO> sortEvent(String notifyType, List<CustomMessageSettingVO> customMessageSettingList) {
