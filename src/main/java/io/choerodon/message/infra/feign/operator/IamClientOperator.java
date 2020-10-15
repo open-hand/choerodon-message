@@ -15,6 +15,7 @@ import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.IamFeignClient;
+import io.choerodon.message.infra.utils.OptionalBean;
 
 /**
  * Created by Sheep on 2019/7/11.
@@ -59,4 +60,13 @@ public class IamClientOperator {
         }
         return pageResponseEntity.getBody().size() > 0 ? pageResponseEntity.getBody().get(0) : null;
     }
+
+    public List<UserVO> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
+        ResponseEntity<List<UserVO>> listResponseEntity = iamFeignClient.listUsersByIds(ids, onlyEnabled);
+        if (!listResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.get.user.by.ids");
+        }
+        return OptionalBean.ofNullable(listResponseEntity.getBody()).get();
+    }
+
 }
