@@ -3,10 +3,12 @@ package io.choerodon.message.app.service.impl;
 import com.zaxxer.hikari.util.UtilityElf;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.message.domain.entity.MessageTemplate;
@@ -21,10 +23,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import io.choerodon.core.enums.TargetUserType;
+import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.MessageCheckLogService;
+import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
+import io.choerodon.message.infra.dto.TargetUserDTO;
+import io.choerodon.message.infra.feign.IamFeignClient;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
+import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
 import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
+import io.choerodon.message.infra.utils.OptionalBean;
 
 /**
  * Created by wangxiang on 2020/9/15
@@ -53,12 +65,23 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
     @Autowired
     private NotifyMessageSettingConfigMapper notifyMessageSettingConfigMapper;
 
+    @Autowired
+    private MessageSettingC7nMapper messageSettingC7nMapper;
+
+    @Autowired
+    private MessageSettingTargetUserC7nMapper messageSettingTargetUserC7nMapper;
+
+    @Autowired
+    private IamClientOperator iamClientOperator;
+
+    @Autowired
+    private IamFeignClient iamFeignClient;
+
 
     @Override
     public void checkLog(String version) {
         LOGGER.info("start upgrade task");
         executorService.execute(new UpgradeTask(version));
-
     }
 
     class UpgradeTask implements Runnable {
@@ -74,11 +97,48 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
                 if (StringUtils.equalsIgnoreCase("0.24.0", version.trim())) {
                     clearTemplate();
                 }
+                if (StringUtils.equalsIgnoreCase("0.24.alpha", version.trim())) {
+                    clearProjectMessageSetting();
+                }
             } catch (Exception ex) {
                 LOGGER.warn("Exception occurred when applying data migration. The ex is: {}", ex.getMessage());
             }
         }
 
+    }
+
+    private void clearProjectMessageSetting() {
+        //查询项目下所有的自定义的通知设置，和指定用户
+        //根据通知到的之指定用户，看看他们是否在项目下有角色
+        //如果没有则清理
+        List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.selectAll().stream().filter(e -> e.getProjectId() != 0L).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(messageSettingDTOS)) {
+            return;
+        }
+        messageSettingDTOS.forEach(settingDTO -> {
+
+            TargetUserDTO targetUserDTO = new TargetUserDTO();
+            targetUserDTO.setType(TargetUserType.SPECIFIER.getTypeName());
+            targetUserDTO.setMessageSettingId(settingDTO.getId());
+
+            List<TargetUserDTO> targetUserDTOS = messageSettingTargetUserC7nMapper.select(targetUserDTO);
+            if (CollectionUtils.isEmpty(targetUserDTOS)) {
+                return;
+            }
+            List<Long> userIds = targetUserDTOS.stream().map(TargetUserDTO::getUserId).collect(Collectors.toList());
+            Long[] ids = userIds.toArray(new Long[userIds.size()]);
+            Map<Long, List<UserVO>> longListMap = iamClientOperator.listUsersByIds(ids, Boolean.FALSE).stream().collect(Collectors.groupingBy(UserVO::getId));
+            targetUserDTOS.forEach(targetUserDTO1 -> {
+                //根据通知到的之指定用户，看看他们是否在项目下有角色
+                UserVO userVO = longListMap.get(targetUserDTO1.getUserId()).get(0);
+                boolean present = OptionalBean.ofNullable(iamClientOperator.getUser(settingDTO.getProjectId(), userVO.getLoginName())).getBean(UserVO::getRoles).isPresent();
+                //user存在的时候返回
+                if (present) {
+                    return;
+                }
+                messageSettingTargetUserC7nMapper.delete(targetUserDTO1);
+            });
+        });
     }
 
     private void clearTemplate() {

@@ -75,4 +75,24 @@ public class HzeroMessageTask {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clear message template<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
 
+
+    /**
+     * 清理所有项目层设置的数据
+     * @param map
+     */
+    @JobTask(maxRetryCount = 3, code = "clearProjectMessageSetting", description = "清理项目层的通知设置")
+    @TimedTask(name = "clearProjectMessageSetting", description = "清理项目层的通知设置", oneExecution = true,
+            repeatCount = 0, repeatInterval = 1, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS, params = {})
+    public void clearProjectMessageSetting(Map<String, Object> map) {
+        LOGGER.info("begin to clear project message setting.");
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin to clear project message setting<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        try {
+            messageCheckLogService.checkLog("0.24.alpha");
+        } catch (Exception e) {
+            LOGGER.error("error.clear.project.message.setting", e);
+        }
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clear message project message setting<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    }
+
+
 }
