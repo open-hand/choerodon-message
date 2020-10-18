@@ -286,7 +286,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     @Transactional(rollbackFor = Exception.class)
     public void asyncMessageProjectUser(UserMemberEventPayload userMemberEventPayload) {
         //如果用户在这个项目下没有任何角色，那么删除他在通知里面的对象
-        if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT)) {
+        if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT.value())) {
             return;
         }
         UserVO user = iamClientOperator.getUser(userMemberEventPayload.getResourceId(), userMemberEventPayload.getUsername());
