@@ -35,7 +35,7 @@ public class MessageSagaHandler {
             sagaCode = SagaTopic.MEMBER_ROLE_DELETE,
             maxRetryCount = 3,
             concurrentLimitPolicy = SagaDefinition.ConcurrentLimitPolicy.NONE,
-            seq = 2)
+            seq = 1)
     public void asyncMessageProjectUser(String paylod) {
         try {
             JavaType javaType = getCollectionType(ArrayList.class, UserMemberEventPayload.class);
