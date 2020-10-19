@@ -284,7 +284,16 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void asyncMessageProjectUser(UserMemberEventPayload userMemberEventPayload) {
+    public void asyncMessageProjectUser(List<UserMemberEventPayload> userMemberEventPayloads) {
+        if (CollectionUtils.isEmpty(userMemberEventPayloads)) {
+            return;
+        }
+        userMemberEventPayloads.forEach(userMemberEventPayload -> {
+            handUserMember(userMemberEventPayload);
+        });
+    }
+
+    private void handUserMember(UserMemberEventPayload userMemberEventPayload) {
         //如果用户在这个项目下没有任何角色，那么删除他在通知里面的对象
         if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT.value())) {
             return;
