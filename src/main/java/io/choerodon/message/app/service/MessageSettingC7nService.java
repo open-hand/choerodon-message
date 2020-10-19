@@ -29,6 +29,6 @@ public interface MessageSettingC7nService {
 
     void disableNotifyTypeByCodeAndType(String code, String notiyfType);
 
-    void asyncMessageProjectUser(UserMemberEventPayload userMemberEventPayload);
+    void asyncMessageProjectUser(List<UserMemberEventPayload> userMemberEventPayloads);
 
 }
