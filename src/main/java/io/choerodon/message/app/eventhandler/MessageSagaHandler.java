@@ -1,7 +1,11 @@
 package io.choerodon.message.app.eventhandler;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +24,10 @@ import io.choerodon.message.infra.utils.SagaTopic;
 public class MessageSagaHandler {
 
     private static Logger logger = LoggerFactory.getLogger(MessageSagaHandler.class);
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MessageSettingC7nService messageSettingC7nService;
-
 
 
     @SagaTask(code = SagaTopic.MESSAGE_DELETE_PROJECT_USER,
@@ -35,10 +38,15 @@ public class MessageSagaHandler {
             seq = 2)
     public void asyncMessageProjectUser(String paylod) {
         try {
-            UserMemberEventPayload userMemberEventPayload = objectMapper.readValue(paylod, UserMemberEventPayload.class);
-            messageSettingC7nService.asyncMessageProjectUser(userMemberEventPayload);
+            JavaType javaType = getCollectionType(ArrayList.class, UserMemberEventPayload.class);
+            List<UserMemberEventPayload> userMemberEventPayloads = objectMapper.readValue(paylod, javaType);
+            messageSettingC7nService.asyncMessageProjectUser(userMemberEventPayloads);
         } catch (Exception e) {
             logger.error("async.project.message.setting.user.error", e);
         }
+    }
+
+    public static JavaType getCollectionType(Class<?> collectionClass, Class<?>... elementClasses) {
+        return objectMapper.getTypeFactory().constructParametricType(collectionClass, elementClasses);
     }
 }
