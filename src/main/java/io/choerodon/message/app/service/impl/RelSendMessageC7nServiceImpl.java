@@ -10,7 +10,9 @@ import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
+import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +47,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private MessageSettingC7nMapper messageSettingC7nMapper;
     @Autowired
     private WebhookProjectRelMapper webhookProjectRelMapper;
+    @Autowired
+    private WebhookServerMapper webhookServerMapper;
 
 
     protected void filterWebReceiver(MessageSender sender) {
@@ -200,10 +204,12 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
-            // 组织层获取到不应该发送的webhook地址
-            webServerCodes = webhookProjectRelMapper.selectByTenantId(tenantId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            //获取本组织下要发送webhook地址
+            WebhookServer webHookSender = new WebhookServer();
+            webHookSender.setTenantId(tenantId);
+            webServerCodes = webhookServerMapper.select(webHookSender).stream().map(WebhookServer::getServerCode).collect(Collectors.toList());
             //获取本组织的webhook发送地址
-            senderList = webHookSenderList.stream().filter(t -> !webServerCodes.contains(t.getServerCode())
+            senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())
                     && t.getTenantId().equals(Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))))).collect(Collectors.toList());
 
         }
