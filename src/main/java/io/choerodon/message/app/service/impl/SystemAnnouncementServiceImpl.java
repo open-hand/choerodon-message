@@ -95,6 +95,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
     @Override
     public Page<SystemAnnouncementVO> pagingQuery(PageRequest pageRequest, String title, String status, String params) {
         Page<SystemAnnouncementVO> systemAnnouncementVOPage = PageHelper.doPageAndSort(pageRequest, () -> systemAnnouncementMapper.fulltextSearch(title, status, params));
+
         systemAnnouncementVOPage.getContent().forEach(
                 systemAnnouncementVO -> {
                     systemAnnouncementVO.setStatus(getTrueStatus(systemAnnouncementVO.getSendDate()));
@@ -102,7 +103,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         );
         if (!StringUtils.isEmpty(status)) {
             List<SystemAnnouncementVO> announcementVOList = systemAnnouncementVOPage.getContent().stream().filter(t -> t.getStatus().equals(status)).collect(Collectors.toList());
-            return PageInfoUtil.createPageFromList(announcementVOList, pageRequest);
+            systemAnnouncementVOPage.setContent(announcementVOList);
+            return systemAnnouncementVOPage;
         } else {
             return systemAnnouncementVOPage;
         }
