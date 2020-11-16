@@ -62,6 +62,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private static final String JSON = "JSON";
     private static final String MESSAGE_CHOERODON = "CHOERODON.";
     private static final String DINGTALK_WECHAT = "DINGTALKANDWECHAT";
+    private static final String RT = "RT";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -407,6 +408,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         }
         messageTemplate.setLang(messageClientProperties.getDefaultLang());
         messageTemplate.setEnabledFlag(1);
+        messageTemplate.setEditorType(RT);
         messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
 
         // 2. template_server_line表
