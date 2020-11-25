@@ -9,9 +9,14 @@
     </parent>
 
     <artifactId>choerodon-message</artifactId>
-    <version>0.24.0-alpha.2.RELEASE</version>
+    <version>0.24.0-alpha.3-SNAPSHOT</version>
     <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
+
+    <properties>
+        <!-- TODO hzero 发 1.6.0.RELEASE 删除 -->
+        <hzero.websocket.version>1.6.0-SNAPSHOT</hzero.websocket.version>
+    </properties>
 
 
     <dependencies>
@@ -97,6 +102,15 @@
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-websocket</artifactId>
+            <version>${hzero.websocket.version}</version>
+            <!-- 这里exclude hzero-starter-core的依赖是因为单独升级了websocket的版本，避免引入依赖冲突 -->
+            <!-- 如果websocket的版本和 hzero-starter-core 的版本一致，不需要 exclude-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
