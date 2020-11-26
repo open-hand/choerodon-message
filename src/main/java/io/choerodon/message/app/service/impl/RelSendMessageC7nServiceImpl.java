@@ -83,8 +83,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             webHookSenderList.clear();
         }
         super.filterWebHookReceiver(sender, webHookSenderList);
-        //清理tenantId为0的messageMap
-        sender.getMessageMap().clear();
         webHookFilter(sender, webHookSenderList);
     }
 
