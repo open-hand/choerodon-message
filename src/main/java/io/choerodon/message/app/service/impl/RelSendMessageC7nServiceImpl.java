@@ -210,6 +210,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
         }
         webHookSenderList.clear();
+        //这里还有一次操作清理sender的操作,针对发送json信息时内容被钉钉模板替换的问题
+        senderList.forEach(webHookSender -> {
+            webHookSender.setMessage(null);
+        });
         webHookSenderList.addAll(senderList);
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
