@@ -204,7 +204,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
             updateMessageSetting(settingDTO);
             // devops消息不更新通知对象
-            if (!ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
                 // 删除旧数据
                 if (!CollectionUtils.isEmpty(messageSettingTargetUserService.getBySettingId(settingVO.getId()))) {
                     messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
@@ -218,7 +217,6 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                     });
 
                 }
-            }
         });
     }
 
