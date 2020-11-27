@@ -64,6 +64,6 @@ public interface IamFeignClient {
                                                                          @RequestParam("page") int page,
                                                                          @RequestParam("size") int size,
                                                                          @ApiParam(value = "登录名")
-                                                                         @RequestParam(required = false) String loginName);
+                                                                         @RequestParam(required = false, name = "loginName") String loginName);
 
 }
