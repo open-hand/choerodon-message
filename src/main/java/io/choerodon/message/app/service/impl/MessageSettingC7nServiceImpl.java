@@ -23,6 +23,7 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
 import io.choerodon.message.infra.utils.OptionalBean;
 
+import com.sun.deploy.util.StringUtils;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.message.infra.constant.HmsgConstant;
@@ -428,6 +429,10 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 Set<String> roleList = userList.stream()
                         .map(TargetUserVO::getType)
                         .collect(Collectors.toSet());
+                if (ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(settingVO.getNotifyType())) {
+                    List<String> stringList = settingVO.getUserList().stream().map(t -> TargetUserType.nameMapping.get(t.getType())).collect(Collectors.toList());
+                    settingVO.setNotifyObject(StringUtils.join(stringList, ","));
+                }
                 // 设置通知角色
                 settingVO.setSendRoleList(roleList);
                 // 设置要通知的非指定用户
