@@ -23,7 +23,7 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
 import io.choerodon.message.infra.utils.OptionalBean;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.message.infra.constant.HmsgConstant;
