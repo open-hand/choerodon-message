@@ -4,6 +4,7 @@ import com.zaxxer.hikari.util.UtilityElf;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -125,9 +126,8 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
             if (CollectionUtils.isEmpty(targetUserDTOS)) {
                 return;
             }
-            List<Long> userIds = targetUserDTOS.stream().map(TargetUserDTO::getUserId).collect(Collectors.toList());
-            Long[] ids = userIds.toArray(new Long[userIds.size()]);
-            Map<Long, List<UserVO>> longListMap = iamClientOperator.listUsersByIds(ids, Boolean.FALSE).stream().collect(Collectors.groupingBy(UserVO::getId));
+            Set<Long> userIds = targetUserDTOS.stream().map(TargetUserDTO::getUserId).collect(Collectors.toSet());
+            Map<Long, List<UserVO>> longListMap = iamClientOperator.listUsersByIds(userIds, Boolean.FALSE).stream().collect(Collectors.groupingBy(UserVO::getId));
             targetUserDTOS.forEach(targetUserDTO1 -> {
                 //根据通知到的之指定用户，看看他们是否在项目下有角色
                 UserVO userVO = longListMap.get(targetUserDTO1.getUserId()).get(0);

@@ -29,7 +29,7 @@ import java.util.Set;
 public interface IamFeignClient {
 
     @PostMapping(value = "/choerodon/v1/users/ids")
-    ResponseEntity<List<UserVO>> listUsersByIds(@RequestBody Long[] ids, @RequestParam(value = "only_enabled") Boolean onlyEnabled);
+    ResponseEntity<List<UserVO>> listUsersByIds(@RequestBody Set<Long> ids, @RequestParam(value = "only_enabled") Boolean onlyEnabled);
 
 
     @GetMapping("/choerodon/v1/users/ids")
