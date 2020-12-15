@@ -22,6 +22,8 @@ public class UserVO {
 
     private String phone;
 
+    private Long organizationId;
+
     private List<Role> roles;
 
     public List<Role> getRoles() {
@@ -108,5 +110,13 @@ public class UserVO {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 '}';
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }
