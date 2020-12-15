@@ -1,6 +1,7 @@
 package io.choerodon.message.infra.feign.operator;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hzero.core.base.BaseConstants;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class IamClientOperator {
         return pageResponseEntity.getBody().size() > 0 ? pageResponseEntity.getBody().get(0) : null;
     }
 
-    public List<UserVO> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
+    public List<UserVO> listUsersByIds(Set<Long> ids, Boolean onlyEnabled) {
         ResponseEntity<List<UserVO>> listResponseEntity = iamFeignClient.listUsersByIds(ids, onlyEnabled);
         if (!listResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new CommonException("error.get.user.by.ids");

@@ -20,8 +20,8 @@ import io.choerodon.swagger.annotation.Permission;
  * @since 2020/12/15 16:17
  */
 @RestController
-@RequestMapping("/choerodon/v1/message/emails")
-public class C7nMailSendController {
+@RequestMapping("/choerodon/v1/projects/{project_id}/message/emails")
+public class C7nProjectMailSendController {
 
     @Autowired
     private MessageC7nService messageC7nService;
