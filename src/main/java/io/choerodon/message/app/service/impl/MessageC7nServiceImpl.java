@@ -59,8 +59,8 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     @Override
     @Async
     public void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO) {
-        List<UserVO> receiverUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getReceiverIdList().toArray(new Long[10]), false);
-        List<UserVO> ccUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getCcIdList().toArray(new Long[10]), false);
+        List<UserVO> receiverUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getReceiverIdList(), false);
+        List<UserVO> ccUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getCcIdList(), false);
 
         List<Receiver> receiverAddressList = new ArrayList<>();
 
