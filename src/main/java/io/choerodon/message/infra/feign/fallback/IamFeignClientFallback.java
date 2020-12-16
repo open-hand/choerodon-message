@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 public class IamFeignClientFallback implements IamFeignClient {
     @Override
-    public ResponseEntity<List<UserVO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
+    public ResponseEntity<List<UserVO>> listUsersByIds(Set<Long> ids, Boolean onlyEnabled) {
         return null;
     }
 
