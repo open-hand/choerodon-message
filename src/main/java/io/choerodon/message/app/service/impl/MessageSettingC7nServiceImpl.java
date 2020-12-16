@@ -408,8 +408,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         customMessageSettingList.forEach(settingVO -> {
             List<TargetUserVO> userList = settingVO.getUserList();
             if (!CollectionUtils.isEmpty(userList)) {
-                Set<Long> uids = userList.stream().map(TargetUserVO::getUserId).collect(Collectors.toSet());
-                List<UserVO> iamUserList = iamFeignClient.listUsersByIds(uids, false).getBody();
+                Long[] animals = userList.stream().map(TargetUserVO::getUserId).distinct().toArray(Long[]::new);
+                List<UserVO> iamUserList = iamFeignClient.listUsersByIds(animals, false).getBody();
                 Map<Long, UserVO> iamUserMap = iamUserList.stream().collect(Collectors.toMap(UserVO::getId, v -> v));
                 userList.forEach(user -> {
                     UserVO userDTO = iamUserMap.get(user.getUserId());
