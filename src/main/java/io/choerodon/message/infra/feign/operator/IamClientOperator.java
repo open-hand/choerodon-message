@@ -63,7 +63,7 @@ public class IamClientOperator {
     }
 
     public List<UserVO> listUsersByIds(Set<Long> ids, Boolean onlyEnabled) {
-        ResponseEntity<List<UserVO>> listResponseEntity = iamFeignClient.listUsersByIds(ids, onlyEnabled);
+        ResponseEntity<List<UserVO>> listResponseEntity = iamFeignClient.listUsersByIds(ids.toArray(new Long[10]), onlyEnabled);
         if (!listResponseEntity.getStatusCode().is2xxSuccessful()) {
             throw new CommonException("error.get.user.by.ids");
         }
