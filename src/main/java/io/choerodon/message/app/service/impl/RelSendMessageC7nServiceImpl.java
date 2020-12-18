@@ -214,6 +214,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
         }
         webHookSenderList.clear();
+        senderList.forEach(webHookSender -> {
+            webHookSender.setMessage(null);
+        });
         webHookSenderList.addAll(senderList);
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
