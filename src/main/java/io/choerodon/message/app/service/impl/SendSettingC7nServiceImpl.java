@@ -20,6 +20,7 @@ import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -395,6 +396,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     @Override
+    @Transactional
     public MessageTemplateVO createMessageTemplate(MessageTemplateVO messageTemplateVO) {
         MessageTemplate messageTemplate = new MessageTemplate();
         // 1.准备消息模板数据
@@ -403,14 +405,16 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         messageTemplate.setTemplateName(templateServer.getMessageName());
         messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
         if (messageTemplateVO.getSendingType().equals(HmsgConstant.MessageType.WEB_HOOK) && !StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
-            String templateCodeSuffix = messageTemplateVO.getWebhookType().contains(WebHookTypeEnum.JSON.getValue()) ? messageTemplateVO.getWebhookType().toUpperCase() : messageTemplateVO.getWebhookType();
-            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + templateCodeSuffix);
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + messageTemplateVO.getWebhookType().toUpperCase());
         } else {
             messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + messageTemplateVO.getSendingType());
         }
         messageTemplate.setLang(messageClientProperties.getDefaultLang());
         messageTemplate.setEnabledFlag(1);
         messageTemplate.setEditorType(RT);
+        if (StringUtils.isEmpty(messageTemplate.getTemplateTitle())) {
+            messageTemplate.setTemplateTitle(messageTemplateVO.getMessageCode().toUpperCase());
+        }
         messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
 
         // 2. template_server_line表
