@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
@@ -15,6 +16,7 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.domain.repository.TemplateServerRepository;
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -400,11 +402,11 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         BeanUtils.copyProperties(messageTemplateVO, messageTemplate);
         messageTemplate.setTemplateName(templateServer.getMessageName());
         messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
-        if (!StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
+        if (messageTemplateVO.getSendingType().equals(HmsgConstant.MessageType.WEB_HOOK) && !StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
             String templateCodeSuffix = messageTemplateVO.getWebhookType().contains(WebHookTypeEnum.JSON.getValue()) ? messageTemplateVO.getWebhookType().toUpperCase() : messageTemplateVO.getWebhookType();
             messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + templateCodeSuffix);
         } else {
-            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase());
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + messageTemplateVO.getSendingType());
         }
         messageTemplate.setLang(messageClientProperties.getDefaultLang());
         messageTemplate.setEnabledFlag(1);
