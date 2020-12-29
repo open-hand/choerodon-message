@@ -6,6 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
  * 〈功能简述〉
@@ -22,8 +23,10 @@ public class CustomEmailSendInfoVO {
     @NotNull
     private String content;
     @ApiModelProperty("抄送用户id集合")
+    @Encrypt
     private Set<Long> ccIdList;
     @ApiModelProperty("接收用户id集合")
+    @Encrypt
     @NotEmpty
     private Set<Long> receiverIdList;
 
