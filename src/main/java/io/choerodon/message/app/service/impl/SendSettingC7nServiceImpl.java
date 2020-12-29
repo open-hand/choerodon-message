@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
@@ -15,9 +16,11 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.domain.repository.TemplateServerRepository;
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -393,6 +396,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     }
 
     @Override
+    @Transactional
     public MessageTemplateVO createMessageTemplate(MessageTemplateVO messageTemplateVO) {
         MessageTemplate messageTemplate = new MessageTemplate();
         // 1.准备消息模板数据
@@ -400,15 +404,17 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         BeanUtils.copyProperties(messageTemplateVO, messageTemplate);
         messageTemplate.setTemplateName(templateServer.getMessageName());
         messageTemplate.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
-        if (!StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
-            String templateCodeSuffix = messageTemplateVO.getWebhookType().contains(WebHookTypeEnum.JSON.getValue()) ? messageTemplateVO.getWebhookType().toUpperCase() : messageTemplateVO.getWebhookType();
-            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + templateCodeSuffix);
+        if (messageTemplateVO.getSendingType().equals(HmsgConstant.MessageType.WEB_HOOK) && !StringUtils.isEmpty(messageTemplateVO.getWebhookType())) {
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + messageTemplateVO.getWebhookType().toUpperCase());
         } else {
-            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase());
+            messageTemplate.setTemplateCode(MESSAGE_CHOERODON + messageTemplateVO.getMessageCode().toUpperCase() + "_" + messageTemplateVO.getSendingType());
         }
         messageTemplate.setLang(messageClientProperties.getDefaultLang());
         messageTemplate.setEnabledFlag(1);
         messageTemplate.setEditorType(RT);
+        if (StringUtils.isEmpty(messageTemplate.getTemplateTitle())) {
+            messageTemplate.setTemplateTitle(messageTemplateVO.getMessageCode().toUpperCase());
+        }
         messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
 
         // 2. template_server_line表
