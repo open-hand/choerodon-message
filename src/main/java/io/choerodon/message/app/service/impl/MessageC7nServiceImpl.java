@@ -1,5 +1,23 @@
 package io.choerodon.message.app.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.hzero.boot.message.entity.Attachment;
+import org.hzero.boot.message.entity.Message;
+import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.boot.message.entity.Receiver;
+import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
+import org.hzero.message.app.service.EmailSendService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
 import io.choerodon.message.api.vo.UserVO;
@@ -9,25 +27,6 @@ import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-
-import org.hzero.boot.message.entity.Attachment;
-import org.hzero.boot.message.entity.Message;
-import org.hzero.boot.message.entity.MessageSender;
-import org.hzero.boot.message.entity.Receiver;
-import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
-import org.hzero.message.app.service.EmailSendService;
-import org.hzero.message.infra.mapper.MessageMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author lihao
@@ -58,7 +57,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     @Override
     @Async
-    public void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO) {
+    public void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO, MultipartFile file) {
         List<UserVO> receiverUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getReceiverIdList(), false);
         List<UserVO> ccUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getCcIdList(), false);
 
@@ -84,7 +83,14 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
         Message message = (new Message()).setServerCode(DEFAULT_SERVER_CODE).setMessageTypeCode("EMAIL").setTemplateCode("CUSTOM").setLang("zh_CN").setTenantId(0L).setSubject(customEmailSendInfoVO.getSubject()).setContent(customEmailSendInfoVO.getContent());
         MessageSender messageSender = (new MessageSender()).setTenantId(0L).setMessageCode("CUSTOM").setServerCode(DEFAULT_SERVER_CODE).setReceiverAddressList(receiverAddressList).setCcList(ccList).setBccList(null).setMessage(message);
-
+        Attachment attachment = new Attachment();
+        attachment.setFileName(file.getName());
+        try {
+            attachment.setFile(file.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        messageSender.setAttachmentList(Collections.singletonList(attachment));
         emailSendService.sendMessage(messageSender);
     }
 }
