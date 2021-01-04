@@ -32,9 +32,8 @@ public class C7nProjectMailSendController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation("发送自定义邮件")
     @PostMapping("/custom")
-    public ResponseEntity<Void> sendCustomEmail(@RequestBody @Validated CustomEmailSendInfoVO customEmailSendInfoVO,
-                                                @RequestParam(value = "file", required = false) MultipartFile file) {
-        messageC7nService.sendCustomEmail(customEmailSendInfoVO, file);
+    public ResponseEntity<Void> sendCustomEmail(@RequestBody @Validated CustomEmailSendInfoVO customEmailSendInfoVO) {
+        messageC7nService.sendCustomEmail(customEmailSendInfoVO);
         return ResponseEntity.noContent().build();
     }
 

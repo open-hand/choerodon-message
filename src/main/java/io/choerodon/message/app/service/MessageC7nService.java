@@ -25,7 +25,6 @@ public interface MessageC7nService {
     /**
      * 发送自定义邮件
      * @param customEmailSendInfoVO
-     * @param file
      */
-    void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO, MultipartFile file);
+    void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO);
 }
