@@ -3,10 +3,10 @@ package io.choerodon.message.api.controller.v1;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
@@ -32,8 +32,9 @@ public class C7nProjectMailSendController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiOperation("发送自定义邮件")
     @PostMapping("/custom")
-    public ResponseEntity<Void> sendCustomEmail(@RequestBody @Validated CustomEmailSendInfoVO customEmailSendInfoVO) {
-        messageC7nService.sendCustomEmail(customEmailSendInfoVO);
+    public ResponseEntity<Void> sendCustomEmail(@RequestBody @Validated CustomEmailSendInfoVO customEmailSendInfoVO,
+                                                @RequestParam(value = "file", required = false) MultipartFile file) {
+        messageC7nService.sendCustomEmail(customEmailSendInfoVO, file);
         return ResponseEntity.noContent().build();
     }
 
