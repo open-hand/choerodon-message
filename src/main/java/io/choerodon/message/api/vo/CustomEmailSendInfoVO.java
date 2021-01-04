@@ -1,7 +1,6 @@
 package io.choerodon.message.api.vo;
 
 import java.util.Set;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -29,7 +28,10 @@ public class CustomEmailSendInfoVO {
     @Encrypt
     @NotEmpty
     private Set<Long> receiverIdList;
-
+    @ApiModelProperty("base64加密附件")
+    String file;
+    @ApiModelProperty("附件名")
+    String filename;
 
     public String getSubject() {
         return subject;
@@ -61,5 +63,21 @@ public class CustomEmailSendInfoVO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

@@ -1,11 +1,11 @@
 package io.choerodon.message.app.service.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Base64;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
@@ -57,7 +56,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     @Override
     @Async
-    public void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO, MultipartFile file) {
+    public void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO) {
         List<UserVO> receiverUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getReceiverIdList(), false);
         List<UserVO> ccUsers = iamClientOperator.listUsersByIds(customEmailSendInfoVO.getCcIdList(), false);
 
@@ -84,12 +83,8 @@ public class MessageC7nServiceImpl implements MessageC7nService {
         Message message = (new Message()).setServerCode(DEFAULT_SERVER_CODE).setMessageTypeCode("EMAIL").setTemplateCode("CUSTOM").setLang("zh_CN").setTenantId(0L).setSubject(customEmailSendInfoVO.getSubject()).setContent(customEmailSendInfoVO.getContent());
         MessageSender messageSender = (new MessageSender()).setTenantId(0L).setMessageCode("CUSTOM").setServerCode(DEFAULT_SERVER_CODE).setReceiverAddressList(receiverAddressList).setCcList(ccList).setBccList(null).setMessage(message);
         Attachment attachment = new Attachment();
-        attachment.setFileName(file.getName());
-        try {
-            attachment.setFile(file.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        attachment.setFile(Base64.decodeBase64(customEmailSendInfoVO.getFile()));
+        attachment.setFileName(customEmailSendInfoVO.getFilename());
         messageSender.setAttachmentList(Collections.singletonList(attachment));
         emailSendService.sendMessage(messageSender);
     }
