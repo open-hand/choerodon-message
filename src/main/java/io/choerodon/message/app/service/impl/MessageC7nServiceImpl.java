@@ -1,11 +1,8 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.Base64;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
@@ -82,10 +79,18 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
         Message message = (new Message()).setServerCode(DEFAULT_SERVER_CODE).setMessageTypeCode("EMAIL").setTemplateCode("CUSTOM").setLang("zh_CN").setTenantId(0L).setSubject(customEmailSendInfoVO.getSubject()).setContent(customEmailSendInfoVO.getContent());
         MessageSender messageSender = (new MessageSender()).setTenantId(0L).setMessageCode("CUSTOM").setServerCode(DEFAULT_SERVER_CODE).setReceiverAddressList(receiverAddressList).setCcList(ccList).setBccList(null).setMessage(message);
-        Attachment attachment = new Attachment();
-        attachment.setFile(Base64.decodeBase64(customEmailSendInfoVO.getFile()));
-        attachment.setFileName(customEmailSendInfoVO.getFilename());
-        messageSender.setAttachmentList(Collections.singletonList(attachment));
+        if (customEmailSendInfoVO.getFile() != null) {
+            Attachment attachment = new Attachment();
+            // data:application/zip;base64,base64数据
+            String[] base64StrInfo = customEmailSendInfoVO.getFile().split(",");
+            String fileType = base64StrInfo[0].split("/")[1].split(";")[0];
+            String base64Data = base64StrInfo[1];
+            Base64.Decoder decoder = Base64.getDecoder();
+
+            attachment.setFile(decoder.decode(base64Data));
+            attachment.setFileName(customEmailSendInfoVO.getFilename() + "." + fileType);
+            messageSender.setAttachmentList(Collections.singletonList(attachment));
+        }
         emailSendService.sendMessage(messageSender);
     }
 }
