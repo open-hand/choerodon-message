@@ -46,6 +46,15 @@ public class MessageTemplateVO {
     private Integer enabledFlag;
     @ApiModelProperty(value = "编辑器类型，值集HMSG.TEMPLATE_EDITOR_TYPE")
     private String editorType;
+    private Long objectVersionNumber;
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public void setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
+    }
 
     public String getSendingType() {
         return sendingType;
