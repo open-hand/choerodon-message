@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
+import io.choerodon.mybatis.domain.AuditDomain;
+
 /**
  * @author scp
  * @date 2020/5/23
  * @description
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MessageTemplateVO {
+public class MessageTemplateVO extends AuditDomain {
     @ApiModelProperty(value = "发送类型")
     private String sendingType;
 
@@ -46,15 +48,6 @@ public class MessageTemplateVO {
     private Integer enabledFlag;
     @ApiModelProperty(value = "编辑器类型，值集HMSG.TEMPLATE_EDITOR_TYPE")
     private String editorType;
-    private Long objectVersionNumber;
-
-    public Long getObjectVersionNumber() {
-        return objectVersionNumber;
-    }
-
-    public void setObjectVersionNumber(Long objectVersionNumber) {
-        this.objectVersionNumber = objectVersionNumber;
-    }
 
     public String getSendingType() {
         return sendingType;
