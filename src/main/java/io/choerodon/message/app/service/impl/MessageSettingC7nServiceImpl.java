@@ -346,7 +346,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if (CollectionUtils.isEmpty(groupIds)) {
             return new ArrayList<>();
         }
-        return notifyEventGroupList.stream().filter(group -> groupIds.contains(group.getId())).collect(Collectors.toList());
+        return notifyEventGroupList.stream().filter(group -> groupIds.contains(String.valueOf(group.getId()))).collect(Collectors.toList());
     }
 
     private List<CustomMessageSettingVO> filterSettingListByEventName(List<CustomMessageSettingVO> customMessageSettingList, String eventName) {
