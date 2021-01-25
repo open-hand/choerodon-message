@@ -134,6 +134,11 @@ public class OptionalBean<T> {
         return Objects.hashCode(value);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     /**
      * 空值常量
      *
