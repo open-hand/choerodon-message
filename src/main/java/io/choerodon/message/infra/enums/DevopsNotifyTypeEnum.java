@@ -35,7 +35,7 @@ public enum DevopsNotifyTypeEnum {
         return this.value;
     }
 
-    public static Map<String, Integer> orderMapping = new HashMap(13);
+    public static final Map<String, Integer> orderMapping = new HashMap(13);
 
     static {
         orderMapping.put(APP_SERVICE_CREATION_FAILURE.value(), 10);
