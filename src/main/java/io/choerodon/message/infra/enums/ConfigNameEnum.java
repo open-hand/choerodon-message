@@ -23,7 +23,7 @@ public enum ConfigNameEnum {
     }
 
 
-    public static HashMap<String, String> configNames = new HashMap<>(2);
+    public static final HashMap<String, String> configNames = new HashMap<>(2);
 
     static {
         configNames.put(ConfigNameEnum.EMAIL_NAME.value, "Choerodon平台-邮件账户");

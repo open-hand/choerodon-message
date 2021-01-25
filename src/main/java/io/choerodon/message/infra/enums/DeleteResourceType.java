@@ -39,7 +39,7 @@ public enum DeleteResourceType {
         nameMapping.put(SECRET.getTypeName(), "删除密文");
     }
 
-    public static Map<String, Integer> orderMapping = new HashMap(6);
+    public static final Map<String, Integer> orderMapping = new HashMap(6);
 
     static {
         orderMapping.put(INSTANCE.getTypeName(), 10);
