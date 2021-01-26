@@ -24,7 +24,7 @@ public enum AgileNotifyTypeEnum {
         return this.value;
     }
 
-    public static Map<String, Integer> orderMapping = new HashMap(3);
+    public static final Map<String, Integer> orderMapping = new HashMap(3);
 
     static {
         orderMapping.put(ISSUE_CREATE.value(), 10);

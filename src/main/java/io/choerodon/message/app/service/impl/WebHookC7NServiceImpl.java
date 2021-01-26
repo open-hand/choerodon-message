@@ -52,8 +52,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class WebHookC7NServiceImpl implements WebHookC7nService {
-    public static Integer CODE_MAX_LENGTH = 14;
-    public static Integer NAME_MAX_LENGTH = 44;
+    public static final Integer CODE_MAX_LENGTH = 14;
+    public static final Integer NAME_MAX_LENGTH = 44;
     @Autowired
     private WebHookC7nMapper webHookC7nMapper;
     @Autowired
