@@ -235,20 +235,27 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         webHookSenderList.addAll(senderList);
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
+            //为webhook Json 类型加上固有的字段参数
+            Map<String, Object> objectArgs = messageSender.getObjectArgs();
+            Map<String, String> args = new HashMap<>();
+            if (!MapUtils.isEmpty(objectArgs)) {
+                for (Map.Entry<String, Object> stringObjectEntry : objectArgs.entrySet()) {
+                    args.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
+                }
+
+                TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
+                args.put(OBJECT_KIND, templateServer.getMessageCode());
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+                args.put(CREATED_AT, dateFormat.format(date));
+                args.put(EVENT_NAME, templateServer.getMessageName());
+            }
             for (WebHookSender webHookSender : webHookSenderList) {
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
+                //重新设置参数填充
+                webHookSender.setArgs(args);
             }
-        }
-        //为webhook Json 类型加上固有的字段参数
-        Map<String, Object> objectArgs = messageSender.getObjectArgs();
-        if (!MapUtils.isEmpty(objectArgs)) {
-            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
-            objectArgs.put(OBJECT_KIND, templateServer.getMessageCode());
-            Date date = new Date();
-            SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-            objectArgs.put(CREATED_AT, dateFormat.format(date));
-            objectArgs.put(EVENT_NAME, templateServer.getMessageName());
         }
         messageSender.setReceiverAddressList(null);
     }
