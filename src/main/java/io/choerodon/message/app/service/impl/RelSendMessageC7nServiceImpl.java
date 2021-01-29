@@ -16,6 +16,8 @@ import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -231,14 +233,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         }
         //为webhook Json 类型加上固有的字段参数
-        Map<String, String> args = messageSender.getArgs();
-        if (!MapUtils.isEmpty(args)) {
+        Map<String, Object> objectArgs = messageSender.getObjectArgs();
+        if (!MapUtils.isEmpty(objectArgs)) {
             TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
-            args.put(OBJECT_KIND, templateServer.getMessageCode());
+            objectArgs.put(OBJECT_KIND, templateServer.getMessageCode());
             Date date = new Date();
             SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-            args.put(CREATED_AT, dateFormat.format(date));
-            args.put(EVENT_NAME, templateServer.getMessageName());
+            objectArgs.put(CREATED_AT, dateFormat.format(date));
+            objectArgs.put(EVENT_NAME, templateServer.getMessageName());
         }
         messageSender.setReceiverAddressList(null);
     }
