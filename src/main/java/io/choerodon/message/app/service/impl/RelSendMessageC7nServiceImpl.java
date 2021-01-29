@@ -1,12 +1,14 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.MapUtils;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.TemplateServer;
@@ -38,6 +40,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String NO_SEND_WEB = "NoSendWeb";
     private static final String NO_SEND_EMAIL = "NoSendEmail";
     private static final String NO_SEND_SMS = "NoSendSms";
+    private static final String OBJECT_KIND = "objectKind";
+    private static final String CREATED_AT = "createdAt";
+    private static final String EVENT_NAME = "eventName";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -224,6 +229,16 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
             }
+        }
+        //为webhook Json 类型加上固有的字段参数
+        Map<String, String> args = messageSender.getArgs();
+        if (!MapUtils.isEmpty(args)) {
+            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
+            args.put(OBJECT_KIND, templateServer.getMessageCode());
+            Date date = new Date();
+            SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+            args.put(CREATED_AT, dateFormat.format(date));
+            args.put(EVENT_NAME, templateServer.getMessageName());
         }
         messageSender.setReceiverAddressList(null);
     }
