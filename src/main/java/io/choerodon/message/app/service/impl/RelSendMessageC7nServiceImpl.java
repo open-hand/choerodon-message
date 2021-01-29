@@ -1,9 +1,9 @@
 package io.choerodon.message.app.service.impl;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.commons.collections.MapUtils;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
@@ -11,18 +11,18 @@ import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
+import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -57,6 +57,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     @Autowired
     private WebhookServerMapper webhookServerMapper;
 
+
+    public List<Message> relSendMessageReceipt(MessageSender messageSender) {
+        TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
+        if (templateServer == null) {
+            throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
+        }
+        return super.relSendMessageReceipt(messageSender);
+    }
 
     protected void filterWebReceiver(MessageSender sender) {
         //如果有特殊标志则不发送
