@@ -188,7 +188,7 @@ public class WebHookOrganizationC7nController {
     @ApiOperation(value = "接收webhook接口")
     @PostMapping("/receive")
     @Permission(permissionPublic = true)
-    public ResponseEntity receive(
+    public ResponseEntity<Void> receive(
             @RequestBody String json) {
         LOGGER.info("===========================================================\n{}", json);
         return Results.success();
