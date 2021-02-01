@@ -1,14 +1,17 @@
 package io.choerodon.message.app.service.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections.MapUtils;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
+import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
@@ -19,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -38,6 +42,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String NO_SEND_WEB = "NoSendWeb";
     private static final String NO_SEND_EMAIL = "NoSendEmail";
     private static final String NO_SEND_SMS = "NoSendSms";
+    private static final String OBJECT_KIND = "objectKind";
+    private static final String CREATED_AT = "createdAt";
+    private static final String EVENT_NAME = "eventName";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -50,6 +57,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     @Autowired
     private WebhookServerMapper webhookServerMapper;
 
+
+    public List<Message> relSendMessageReceipt(MessageSender messageSender) {
+        TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
+        if (templateServer == null) {
+            throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
+        }
+        return super.relSendMessageReceipt(messageSender);
+    }
 
     protected void filterWebReceiver(MessageSender sender) {
         //如果有特殊标志则不发送
@@ -220,9 +235,26 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         webHookSenderList.addAll(senderList);
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
+            //为webhook Json 类型加上固有的字段参数
+            Map<String, Object> objectArgs = messageSender.getObjectArgs();
+            Map<String, String> args = new HashMap<>();
+            if (!MapUtils.isEmpty(objectArgs)) {
+                for (Map.Entry<String, Object> stringObjectEntry : objectArgs.entrySet()) {
+                    args.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
+                }
+
+                TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
+                args.put(OBJECT_KIND, templateServer.getMessageCode());
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+                args.put(CREATED_AT, dateFormat.format(date));
+                args.put(EVENT_NAME, templateServer.getMessageName());
+            }
             for (WebHookSender webHookSender : webHookSenderList) {
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
+                //重新设置参数填充
+                webHookSender.setArgs(args);
             }
         }
         messageSender.setReceiverAddressList(null);
