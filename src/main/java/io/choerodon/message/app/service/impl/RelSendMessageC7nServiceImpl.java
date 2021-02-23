@@ -240,7 +240,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             webHookSender.setMessage(null);
         });
         webHookSenderList.addAll(senderList);
-        logger.info(">>>>>>>>>>>messageSender1:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             //为webhook Json 类型加上固有的字段参数
@@ -265,7 +264,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                     //重新设置参数填充
                     webHookSender.setArgs(args);
                 }
-                logger.info(">>>>>>>>>>>>>webHookSender:{}>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
             }
         }
         logger.info(">>>>>>>>>>>messageSender2:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
