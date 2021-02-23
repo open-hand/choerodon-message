@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.18.1.RELEASE</version>
+        <version>0.19.0.RELEASE</version>
     </parent>
 
     <artifactId>choerodon-message</artifactId>
@@ -14,8 +14,8 @@
     <description>Message Service For Choerodon</description>
 
     <properties>
-        <!-- TODO hzero 发 1.6.0.RELEASE 删除 -->
-        <hzero.websocket.version>1.6.0-SNAPSHOT</hzero.websocket.version>
+        <!-- TODO hzero 发 1.6.0.RELEASE 删除  1.6.0发了但是choerodon-parent还没升级-->
+        <hzero.websocket.version>1.6.0.RELEASE</hzero.websocket.version>
     </properties>
 
 
