@@ -235,23 +235,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
         }
 
-
-        webHookSenderList.clear();
-        senderList.forEach(webHookSender -> {
-            webHookSender.setMessage(null);
-        });
-        webHookSenderList.addAll(senderList);
-        //如果是钉钉类型的消息清除接收者
-        if (!CollectionUtils.isEmpty(webHookSenderList)) {
-            for (WebHookSender webHookSender : webHookSenderList) {
-                webHookSender.setLang("zh_CN");
-                webHookSender.setReceiverAddressList(null);
-            }
-        }
-        messageSender.setReceiverAddressList(null);
-        logger.info(">>>>>>>>>>>messageSender1:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
-
-        /*
         webHookSenderList.clear();
         senderList.forEach(webHookSender -> {
             webHookSender.setMessage(null);
@@ -261,13 +244,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             //为webhook Json 类型加上固有的字段参数
-            Map<String, Object> objectArgs = messageSender.getObjectArgs();
+//            Map<String, Object> senderObjectArgs = messageSender.getObjectArgs();
+            Map<String, String> messageSenderArgs = messageSender.getArgs();
             Map<String, String> args = new HashMap<>();
-            if (!MapUtils.isEmpty(objectArgs)) {
-                for (Map.Entry<String, Object> stringObjectEntry : objectArgs.entrySet()) {
+            if (!MapUtils.isEmpty(messageSenderArgs)) {
+                for (Map.Entry<String, String> stringObjectEntry : messageSenderArgs.entrySet()) {
                     args.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
                 }
-
                 TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
                 args.put(OBJECT_KIND, templateServer.getMessageCode());
                 Date date = new Date();
@@ -278,14 +261,15 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (WebHookSender webHookSender : webHookSenderList) {
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
-                //重新设置参数填充
-                webHookSender.setArgs(args);
+                if (!org.apache.commons.collections4.MapUtils.isEmpty(args)) {
+                    //重新设置参数填充
+                    webHookSender.setArgs(args);
+                }
+                logger.info(">>>>>>>>>>>>>webHookSender:{}>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
             }
         }
         logger.info(">>>>>>>>>>>messageSender2:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         messageSender.setReceiverAddressList(null);
-
-         */
     }
 
 }
