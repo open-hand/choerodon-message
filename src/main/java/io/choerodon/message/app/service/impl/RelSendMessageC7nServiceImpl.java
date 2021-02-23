@@ -16,6 +16,8 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.WebhookServerMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +31,7 @@ import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.utils.JsonHelper;
 
 /**
  * @author scp
@@ -37,6 +40,9 @@ import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
  */
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
+
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String NO_SEND_WEBHOOK = "NoSendWebHook";
     private static final String NO_SEND_WEB = "NoSendWeb";
@@ -257,6 +263,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 webHookSender.setArgs(args);
             }
         }
+        logger.info(">>>>>>>>>>>messageSender:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         messageSender.setReceiverAddressList(null);
     }
 
