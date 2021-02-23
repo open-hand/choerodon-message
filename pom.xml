@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>choerodon-message</artifactId>
-    <version>0.24.4-SNAPSHOT</version>
+    <version>0.24.4.RELEASE</version>
     <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
 
