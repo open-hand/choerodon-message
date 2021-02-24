@@ -36,14 +36,4 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_arg.groovy') {
             }
         }
     }
-    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
-        preConditions(onFail: "MARK_RAN") {
-            tableExists(tableName: "hmsg_message_template")
-        }
-        sql("""
-            UPDATE hmsg_template_arg hta
-            SET hta.tenant_id = ( SELECT hmt.tenant_id FROM hmsg_message_template hmt WHERE hta.template_id = hmt.template_id)
-            WHERE hta.template_id in ( SELECT template_id FROM hmsg_message_template);
-            """)
-    }
 }
