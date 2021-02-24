@@ -19,6 +19,7 @@ import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.MessageC7nService;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -78,7 +79,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
         }
 
         Message message = (new Message()).setServerCode(DEFAULT_SERVER_CODE).setMessageTypeCode("EMAIL").setTemplateCode("CUSTOM").setLang("zh_CN").setTenantId(0L).setSubject(customEmailSendInfoVO.getSubject()).setContent(customEmailSendInfoVO.getContent());
-        MessageSender messageSender = (new MessageSender()).setTenantId(0L).setMessageCode("CUSTOM").setServerCode(DEFAULT_SERVER_CODE).setReceiverAddressList(receiverAddressList).setCcList(ccList).setBccList(null).setMessage(message);
+        MessageSender messageSender = (new MessageSender()).setTenantId(TenantDTO.DEFAULT_TENANT_ID).setMessageCode("CUSTOM").setServerCode(DEFAULT_SERVER_CODE).setReceiverAddressList(receiverAddressList).setCcList(ccList).setBccList(null).setMessage(message);
         if (customEmailSendInfoVO.getFile() != null) {
             Attachment attachment = new Attachment();
             // data:application/zip;base64,base64数据
@@ -91,6 +92,6 @@ public class MessageC7nServiceImpl implements MessageC7nService {
             attachment.setFileName(customEmailSendInfoVO.getFilename() + "." + fileType);
             messageSender.setAttachmentList(Collections.singletonList(attachment));
         }
-        emailSendService.sendMessage(messageSender);
+        emailSendService.sendMessage(TenantDTO.DEFAULT_TENANT_ID, messageSender);
     }
 }

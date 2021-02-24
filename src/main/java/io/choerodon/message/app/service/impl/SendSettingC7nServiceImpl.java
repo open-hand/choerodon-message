@@ -148,7 +148,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             throw new CommonException("error.query.tempServer");
         }
         templateServer.setReceiveConfigFlag(ConversionUtil.booleanConverToInteger(receiveConfigFlag));
-        templateServerService.updateTemplateServer(templateServer);
+        Long tenantId = templateServer.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : templateServer.getTenantId();
+        templateServerService.updateTemplateServer(tenantId, tempServerId, templateServer);
     }
 
     @Override
@@ -415,7 +416,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (StringUtils.isEmpty(messageTemplate.getTemplateTitle())) {
             messageTemplate.setTemplateTitle(messageTemplateVO.getMessageCode().toUpperCase());
         }
-        messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
+        messageTemplate = messageTemplateService.createMessageTemplate(TenantDTO.DEFAULT_TENANT_ID, messageTemplate);
 
         // 2. template_server_line表
         TemplateServerLine templateServerLine = new TemplateServerLine();

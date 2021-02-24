@@ -28,6 +28,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
@@ -68,7 +69,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (templateServer == null) {
             throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
         }
-        return super.relSendMessageReceipt(messageSender);
+        Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
+        return super.relSendMessageReceipt(messageSender, tenantId);
     }
 
     protected void filterWebReceiver(MessageSender sender) {

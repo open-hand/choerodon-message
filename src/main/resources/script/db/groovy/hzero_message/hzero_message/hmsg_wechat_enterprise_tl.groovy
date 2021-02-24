@@ -27,29 +27,5 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_wechat_enterprise_tl.groovy')
     changeSet(author: "hzero@hand-china.com", id: "2020-09-01-1-hmsg_wechat_enterprise_tl") {
         addUniqueConstraint(columnNames: "server_id,lang", tableName: "hmsg_wechat_enterprise_tl", constraintName: "hmsg_wechat_enterprise_tl_u1")
     }
-
-    changeSet(author: "wx@hand-china.com",id: "2020-09-22-fix-wechat_enterprise_tl"){
-        sql("""
-                     DELETE 
-          FROM
-           hmsg_wechat_enterprise_tl;
-
-          INSERT INTO hmsg_wechat_enterprise_tl ( server_id, lang, server_name, tenant_id ) SELECT
-           server_id,
-           'zh_CN',
-           server_name,
-           tenant_id 
-          FROM
-           hmsg_wechat_enterprise;
-
-          INSERT INTO hmsg_wechat_enterprise_tl ( server_id, lang, server_name, tenant_id ) SELECT
-            server_id,
-            'en_US',
-            "default",
-            tenant_id 
-          FROM
-            hmsg_wechat_enterprise
-        """)
-    }
 }
 
