@@ -67,14 +67,6 @@
                     <groupId>org.hzero.starter</groupId>
                     <artifactId>hzero-starter-integrate-dd</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-sms-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-call-core</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
