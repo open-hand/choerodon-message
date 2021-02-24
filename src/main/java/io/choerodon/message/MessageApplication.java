@@ -13,9 +13,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class MessageApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MessageApplication.class, args);
+        try {
+            SpringApplication.run(MessageApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
+
 }
 
 
