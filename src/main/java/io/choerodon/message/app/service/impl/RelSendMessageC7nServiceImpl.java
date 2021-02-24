@@ -16,6 +16,8 @@ import org.hzero.message.domain.entity.TemplateServer;
 import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.WebhookServerMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +31,7 @@ import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
+import io.choerodon.message.infra.utils.JsonHelper;
 
 /**
  * @author scp
@@ -37,6 +40,8 @@ import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
  */
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String NO_SEND_WEBHOOK = "NoSendWebHook";
     private static final String NO_SEND_WEB = "NoSendWeb";
@@ -236,13 +241,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             //为webhook Json 类型加上固有的字段参数
-            Map<String, Object> objectArgs = messageSender.getObjectArgs();
+//            Map<String, Object> senderObjectArgs = messageSender.getObjectArgs();
+            Map<String, String> messageSenderArgs = messageSender.getArgs();
             Map<String, String> args = new HashMap<>();
-            if (!MapUtils.isEmpty(objectArgs)) {
-                for (Map.Entry<String, Object> stringObjectEntry : objectArgs.entrySet()) {
+            if (!MapUtils.isEmpty(messageSenderArgs)) {
+                for (Map.Entry<String, String> stringObjectEntry : messageSenderArgs.entrySet()) {
                     args.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
                 }
-
                 TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
                 args.put(OBJECT_KIND, templateServer.getMessageCode());
                 Date date = new Date();
@@ -253,10 +258,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (WebHookSender webHookSender : webHookSenderList) {
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
-                //重新设置参数填充
-                webHookSender.setArgs(args);
+                if (!org.apache.commons.collections4.MapUtils.isEmpty(args)) {
+                    //重新设置参数填充
+                    webHookSender.setArgs(args);
+                }
             }
         }
+        logger.info(">>>>>>>>>>>messageSender2:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         messageSender.setReceiverAddressList(null);
     }
 
