@@ -41,7 +41,7 @@ import io.choerodon.message.infra.utils.JsonHelper;
  */
 @Service
 public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl implements RelSendMessageC7nService {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String NO_SEND_WEBHOOK = "NoSendWebHook";
@@ -240,35 +240,57 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             webHookSender.setMessage(null);
         });
         webHookSenderList.addAll(senderList);
-        // TODO: 2021/2/24 webhook参数为完成渲染 
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             //为webhook Json 类型加上固有的字段参数
-//            Map<String, Object> senderObjectArgs = messageSender.getObjectArgs();
+            Map<String, Object> senderObjectArgs = messageSender.getObjectArgs();
             Map<String, String> messageSenderArgs = messageSender.getArgs();
-            Map<String, String> args = new HashMap<>();
-            if (!MapUtils.isEmpty(messageSenderArgs)) {
-                for (Map.Entry<String, String> stringObjectEntry : messageSenderArgs.entrySet()) {
-                    args.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
-                }
-                TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageSender.getMessageCode());
-                args.put(OBJECT_KIND, templateServer.getMessageCode());
-                Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-                args.put(CREATED_AT, dateFormat.format(date));
-                args.put(EVENT_NAME, templateServer.getMessageName());
-            }
+            Map<String, String> reSenderArgs = new HashMap<>();
+            reSenderArgs = getSenderArgs(senderObjectArgs, messageSenderArgs, messageSender.getMessageCode());
             for (WebHookSender webHookSender : webHookSenderList) {
                 webHookSender.setLang("zh_CN");
                 webHookSender.setReceiverAddressList(null);
-                if (!org.apache.commons.collections4.MapUtils.isEmpty(args)) {
+                if (!org.apache.commons.collections4.MapUtils.isEmpty(reSenderArgs)) {
                     //重新设置参数填充
-                    webHookSender.setArgs(args);
+                    webHookSender.setArgs(reSenderArgs);
                 }
             }
         }
         logger.info(">>>>>>>>>>>messageSender2:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         messageSender.setReceiverAddressList(null);
+    }
+
+    private Map<String, String> getSenderArgs(Map<String, Object> senderObjectArgs, Map<String, String> messageSenderArgs, String messageCode) {
+        Map<String, String> reSenderArgs = new HashMap<>();
+        if (MapUtils.isEmpty(senderObjectArgs) && MapUtils.isEmpty(messageSenderArgs)) {
+            return reSenderArgs;
+        }
+        if (!MapUtils.isEmpty(senderObjectArgs)) {
+            for (Map.Entry<String, Object> stringObjectEntry : senderObjectArgs.entrySet()) {
+                reSenderArgs.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
+            }
+            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID,messageCode);
+            reSenderArgs.put(OBJECT_KIND, templateServer.getMessageCode());
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+            reSenderArgs.put(CREATED_AT, dateFormat.format(date));
+            reSenderArgs.put(EVENT_NAME, templateServer.getMessageName());
+            return reSenderArgs;
+        }
+        if (!MapUtils.isEmpty(messageSenderArgs)) {
+            for (Map.Entry<String, String> stringObjectEntry : messageSenderArgs.entrySet()) {
+                reSenderArgs.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
+            }
+            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageCode);
+            reSenderArgs.put(OBJECT_KIND, templateServer.getMessageCode());
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+            reSenderArgs.put(CREATED_AT, dateFormat.format(date));
+            reSenderArgs.put(EVENT_NAME, templateServer.getMessageName());
+            return reSenderArgs;
+        }
+        return reSenderArgs;
+
     }
 
 }
