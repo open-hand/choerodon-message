@@ -30,12 +30,10 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
+import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.ConfigNameEnum;
-import io.choerodon.message.infra.enums.LevelType;
-import io.choerodon.message.infra.enums.SendingTypeEnum;
-import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.enums.*;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
@@ -55,8 +53,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
     public static final String RESOURCE_DELETE_CONFIRMATION = "RESOURCEDELETECONFIRMATION";
-    private static final String AGILE = "AGILE";
-    private static final String OPERATIONS = "OPERATIONS";
     private static final String ADD_OR_IMPORT_USER = "ADD-OR-IMPORT-USER";
     private static final String ISSUE_STATUS_CHANGE_NOTICE = "ISSUE-STATUS-CHANGE-NOTICE";
     private static final String PRO_MANAGEMENT = "PRO-MANAGEMENT";
@@ -370,12 +366,15 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         Boolean contains = true;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            if (projectDTO.getCategory().equals(AGILE) || projectDTO.getCategory().equals(OPERATIONS)) {
+            //项目类型
+            List<ProjectCategoryDTO> categories = projectDTO.getCategories();
+            List<String> categoryCodes = categories.stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
+            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value()) || categoryCodes.contains(ProjectCategoryEnum.N_OPERATIONS.value())) {
                 agileCategories.add(ADD_OR_IMPORT_USER);
                 agileCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
                 agileCategories.add(PRO_MANAGEMENT);
             }
-            if (projectDTO.getCategory().equals(OPERATIONS)) {
+            if (categoryCodes.contains(ProjectCategoryEnum.N_OPERATIONS.value())) {
                 contains = false;
             }
         }
