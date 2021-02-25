@@ -362,21 +362,40 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
         Map<String, String> lovMap = getMeanings();
         Map<String, String> result = new HashMap<>();
-        List<String> agileCategories = new ArrayList<>();
+        List<String> subCategories = new ArrayList<>();
         Boolean contains = true;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             //项目类型
             List<ProjectCategoryDTO> categories = projectDTO.getCategories();
             List<String> categoryCodes = categories.stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
-            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value()) || categoryCodes.contains(ProjectCategoryEnum.N_OPERATIONS.value())) {
-                agileCategories.add(ADD_OR_IMPORT_USER);
-                agileCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
-                agileCategories.add(PRO_MANAGEMENT);
+            subCategories.add(SubcategoryEnum.DEFAULT.getValue());
+            subCategories.add(SubcategoryEnum.ACCOUNT_SECURITY_NOTICE.getValue());
+            subCategories.add(SubcategoryEnum.REGISTER_ORG_NOTICE.getValue());
+            subCategories.add(SubcategoryEnum.ORG_MANAGEMENT.getValue());
+            subCategories.add(SubcategoryEnum.PRO_MANAGEMENT.getValue());
+            subCategories.add(SubcategoryEnum.ADD_OR_IMPORT_USER.getValue());
+
+            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value())) {
+                subCategories.add(ADD_OR_IMPORT_USER);
+                subCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
+                subCategories.add(SubcategoryEnum.BACKLOG_NOTICE.getValue());
             }
-            if (categoryCodes.contains(ProjectCategoryEnum.N_OPERATIONS.value())) {
-                contains = false;
+            if (categoryCodes.contains(ProjectCategoryEnum.N_DEVOPS.value())) {
+                subCategories.add(SubcategoryEnum.ENV_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.CLUSTER_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.APP_DEPLOYMENT_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.CODE_MANAGEMENT_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.APP_SERVICE_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.DEPLOYMENT_RESOURCES_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.STREAM_CHANGE_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.RESOURCE_SECURITY_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.MARKET_APP.getValue());
             }
+            if (categories.contains(ProjectCategoryEnum.N_TEST.value())){
+                subCategories.add(SubcategoryEnum.API_TEST_EXECUTE_NOTICE.getValue());
+            }
+
         }
         if (WEBHOOK_OTHER.equals(type)) {
             type = DINGTALK_WECHAT;
@@ -384,7 +403,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (WEBHOOK_JSON.equals(type)) {
             type = JSON;
         }
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), agileCategories, contains, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), subCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
