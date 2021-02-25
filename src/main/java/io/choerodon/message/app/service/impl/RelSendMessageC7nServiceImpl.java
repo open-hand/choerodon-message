@@ -240,6 +240,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             webHookSender.setMessage(null);
         });
         webHookSenderList.addAll(senderList);
+        // TODO: 2021/2/24 webhook参数为完成渲染 
         //如果是钉钉类型的消息清除接收者
         if (!CollectionUtils.isEmpty(webHookSenderList)) {
             //为webhook Json 类型加上固有的字段参数
