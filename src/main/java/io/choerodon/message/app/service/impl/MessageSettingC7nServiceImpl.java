@@ -11,6 +11,7 @@ import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
 import io.choerodon.message.infra.dto.TargetUserDTO;
+import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.enums.AgileNotifyTypeEnum;
@@ -139,15 +140,15 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             customMessageSettingList = filterSettingListByEventName(customMessageSettingList, eventName);
             // 过滤事件分组
             notifyEventGroupList = filterEventGroupBySettingList(customMessageSettingList, notifyEventGroupList);
-            //运维项目去掉开发相关的通知
-            ProjectDTO projectDTO = iamClientOperator.queryProjectById(projectId);
-            if (CollectionUtils.isEmpty(projectDTO.getCategories()) && projectDTO.getCategories().contains(N_OPERATIONS)) {
-                notifyEventGroupList = notifyEventGroupList.stream().filter(notifyEventGroupVO ->
-                        !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), STREAM_CHANGE_NOTICE)
-                                && !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), APP_SERVICE_NOTICE)
-                                && !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), CODE_MANAGEMENT_NOTICE)
-                ).collect(Collectors.toList());
-            }
+        }
+        //运维项目去掉开发相关的通知
+        ProjectDTO projectDTO = iamClientOperator.queryProjectById(projectId);
+        if (!CollectionUtils.isEmpty(projectDTO.getCategories()) && projectDTO.getCategories().stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList()).contains(N_OPERATIONS)) {
+            notifyEventGroupList = notifyEventGroupList.stream().filter(notifyEventGroupVO ->
+                    !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), STREAM_CHANGE_NOTICE)
+                            && !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), APP_SERVICE_NOTICE)
+                            && !StringUtils.equalsIgnoreCase(notifyEventGroupVO.getCategoryCode(), CODE_MANAGEMENT_NOTICE)
+            ).collect(Collectors.toList());
         }
         // 装配VO
         messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
