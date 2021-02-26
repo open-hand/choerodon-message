@@ -61,6 +61,7 @@
             hm.message_code LIKE concat(concat('%',#{params}),'%')
             )
         </if>
+        ORDER BY hm.message_id desc
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
