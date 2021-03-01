@@ -63,7 +63,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
         //1.构建hzero的NoticeDTO并将数据插入数据库
         NoticeDTO noticeDTO = VOtoDTO(systemAnnouncementVO);
 
-        noticeDTO = noticeService.createNotice(noticeDTO);
+        noticeDTO = noticeService.createNotice(TenantDTO.DEFAULT_TENANT_ID, noticeDTO);
 
         //2.调用hzero公告发布接口
         List<NoticeReceiver> noticeReceiverList = new ArrayList<>();
@@ -86,7 +86,7 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
         NoticeDTO noticeDTO = VOtoDTO(systemAnnouncementVO);
 
-        noticeDTO = noticeService.updateNotice(noticeDTO);
+        noticeDTO = noticeService.updateNotice(TenantDTO.DEFAULT_TENANT_ID, noticeDTO);
 
         return DTOtoVO(noticeDTO);
 
@@ -119,7 +119,8 @@ public class SystemAnnouncementServiceImpl implements SystemAnnouncementService 
 
     @Override
     public void delete(Long id) {
-        noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+        NoticeDTO noticeDTO = noticeRepository.detailNotice(TenantDTO.DEFAULT_TENANT_ID, id);
+        noticeService.deleteNotice(TenantDTO.DEFAULT_TENANT_ID, noticeDTO);
     }
 
     @Override

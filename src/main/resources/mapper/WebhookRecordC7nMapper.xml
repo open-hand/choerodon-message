@@ -7,7 +7,7 @@
         <result column="webhook_address" property="webhookAddress"/>
         <result column="server_type" property="serverType"/>
         <result column="enabled_flag" property="enabledFlag"/>
-        <collection property="templateServers" ofType="org.hzero.message.domain.entity.TemplateServer">
+        <collection property="templateServers" ofType="org.hzero.message.domain.entity.TemplateServer" javaType="org.hzero.message.domain.entity.TemplateServer">
             <id property="temp_server_id" column="tempServerId"/>
             <result property="message_code" column="messageCode"/>
             <result property="message_name" column="messageName"/>

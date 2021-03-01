@@ -62,7 +62,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         if (StringUtils.isEmpty(emailServer.getServerId())) {
             throw new CommonException("error.get.server.email");
         } else {
-            emailServerService.updateEmailServer(newEmailServer);
+            emailServerService.updateEmailServer(TenantDTO.DEFAULT_TENANT_ID, newEmailServer);
         }
         return emailConfigVO;
     }
@@ -95,7 +95,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         if (StringUtils.isEmpty(oleSmsServer.getServerId())) {
             throw new CommonException("error.get.server.sms");
         } else {
-            smsServerService.updateSmsServer(smsServer);
+            smsServerService.updateSmsServer(TenantDTO.DEFAULT_TENANT_ID, smsServer);
         }
         return smsServer;
     }
