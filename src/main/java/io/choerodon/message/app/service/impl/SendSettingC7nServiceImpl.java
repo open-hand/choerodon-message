@@ -30,12 +30,10 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
+import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.ConfigNameEnum;
-import io.choerodon.message.infra.enums.LevelType;
-import io.choerodon.message.infra.enums.SendingTypeEnum;
-import io.choerodon.message.infra.enums.WebHookTypeEnum;
+import io.choerodon.message.infra.enums.*;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
 import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
@@ -55,8 +53,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     public static final String LOV_MESSAGE_CODE = "HMSG.TEMP_SERVER.SUBCATEGORY";
     public static final String RESOURCE_DELETE_CONFIRMATION = "RESOURCEDELETECONFIRMATION";
-    private static final String AGILE = "AGILE";
-    private static final String OPERATIONS = "OPERATIONS";
     private static final String ADD_OR_IMPORT_USER = "ADD-OR-IMPORT-USER";
     private static final String ISSUE_STATUS_CHANGE_NOTICE = "ISSUE-STATUS-CHANGE-NOTICE";
     private static final String PRO_MANAGEMENT = "PRO-MANAGEMENT";
@@ -148,7 +144,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             throw new CommonException("error.query.tempServer");
         }
         templateServer.setReceiveConfigFlag(ConversionUtil.booleanConverToInteger(receiveConfigFlag));
-        templateServerService.updateTemplateServer(templateServer);
+        Long tenantId = templateServer.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : templateServer.getTenantId();
+        templateServerService.updateTemplateServer(tenantId, tempServerId, templateServer);
     }
 
     @Override
@@ -365,18 +362,40 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
         Map<String, String> lovMap = getMeanings();
         Map<String, String> result = new HashMap<>();
-        List<String> agileCategories = new ArrayList<>();
+        List<String> subCategories = new ArrayList<>();
         Boolean contains = true;
         if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
-            if (projectDTO.getCategory().equals(AGILE) || projectDTO.getCategory().equals(OPERATIONS)) {
-                agileCategories.add(ADD_OR_IMPORT_USER);
-                agileCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
-                agileCategories.add(PRO_MANAGEMENT);
+            //项目类型
+            List<ProjectCategoryDTO> categories = projectDTO.getCategories();
+            List<String> categoryCodes = categories.stream().map(ProjectCategoryDTO::getCode).collect(Collectors.toList());
+            subCategories.add(SubcategoryEnum.DEFAULT.getValue());
+            subCategories.add(SubcategoryEnum.ACCOUNT_SECURITY_NOTICE.getValue());
+            subCategories.add(SubcategoryEnum.REGISTER_ORG_NOTICE.getValue());
+            subCategories.add(SubcategoryEnum.ORG_MANAGEMENT.getValue());
+            subCategories.add(SubcategoryEnum.PRO_MANAGEMENT.getValue());
+            subCategories.add(SubcategoryEnum.ADD_OR_IMPORT_USER.getValue());
+
+            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value())) {
+                subCategories.add(ADD_OR_IMPORT_USER);
+                subCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
+                subCategories.add(SubcategoryEnum.BACKLOG_NOTICE.getValue());
             }
-            if (projectDTO.getCategory().equals(OPERATIONS)) {
-                contains = false;
+            if (categoryCodes.contains(ProjectCategoryEnum.N_DEVOPS.value())) {
+                subCategories.add(SubcategoryEnum.ENV_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.CLUSTER_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.APP_DEPLOYMENT_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.CODE_MANAGEMENT_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.APP_SERVICE_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.DEPLOYMENT_RESOURCES_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.STREAM_CHANGE_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.RESOURCE_SECURITY_NOTICE.getValue());
+                subCategories.add(SubcategoryEnum.MARKET_APP.getValue());
             }
+            if (categories.contains(ProjectCategoryEnum.N_TEST.value())){
+                subCategories.add(SubcategoryEnum.API_TEST_EXECUTE_NOTICE.getValue());
+            }
+
         }
         if (WEBHOOK_OTHER.equals(type)) {
             type = DINGTALK_WECHAT;
@@ -384,7 +403,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (WEBHOOK_JSON.equals(type)) {
             type = JSON;
         }
-        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), agileCategories, contains, name, description);
+        List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), subCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
             if (lovMap.containsKey(t.getSubcategoryCode())) {
                 result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
@@ -415,7 +434,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         if (StringUtils.isEmpty(messageTemplate.getTemplateTitle())) {
             messageTemplate.setTemplateTitle(messageTemplateVO.getMessageCode().toUpperCase());
         }
-        messageTemplate = messageTemplateService.createMessageTemplate(messageTemplate);
+        messageTemplate = messageTemplateService.createMessageTemplate(TenantDTO.DEFAULT_TENANT_ID, messageTemplate);
 
         // 2. template_server_line表
         TemplateServerLine templateServerLine = new TemplateServerLine();
