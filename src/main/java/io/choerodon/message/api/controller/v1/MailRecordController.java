@@ -63,10 +63,10 @@ public class MailRecordController {
                                                          @SortDefault(value = "message_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                          @RequestParam(required = false) String status,
                                                          @RequestParam(required = false) String receiveEmail,
-                                                         @RequestParam(required = false) String templateType,
+                                                         @RequestParam(required = false) String messageName,
                                                          @RequestParam(required = false) String failedReason,
                                                          @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(messageC7nService.listMessage(status, receiveEmail, templateType, failedReason, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(messageC7nService.listMessage(status, receiveEmail, messageName, failedReason, params, pageRequest), HttpStatus.OK);
     }
 
     @Permission(level = ResourceLevel.SITE)
@@ -77,10 +77,10 @@ public class MailRecordController {
                                                             @SortDefault(value = "message_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                             @RequestParam(required = false) String status,
                                                             @RequestParam(required = false) String webhookAddress,
-                                                            @RequestParam(required = false) String templateType,
+                                                            @RequestParam(required = false) String messageName,
                                                             @RequestParam(required = false) String failedReason,
                                                             @RequestParam(required = false) String params) {
-        return new ResponseEntity<>(messageC7nService.listWebHooks(status, webhookAddress, templateType, failedReason, params, pageRequest), HttpStatus.OK);
+        return new ResponseEntity<>(messageC7nService.listWebHooks(status, webhookAddress, messageName, failedReason, params, pageRequest), HttpStatus.OK);
     }
 
 }
