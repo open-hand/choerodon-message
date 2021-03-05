@@ -78,4 +78,9 @@ public class IamFeignClientFallback implements IamFeignClient {
     public ResponseEntity<Page<UserVO>> pagingQueryUsersWithRolesOnProjectLevel(Long projectId, int page, int size, String loginName) {
         throw new CommonException("error.get.user");
     }
+
+    @Override
+    public ResponseEntity<List<ProjectVO>> listAllProjects(Boolean enabled) {
+        throw new CommonException("error.get.projects");
+    }
 }
