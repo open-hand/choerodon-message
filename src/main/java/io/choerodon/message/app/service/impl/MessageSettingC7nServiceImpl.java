@@ -9,7 +9,6 @@ import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
 import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
-import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
 import io.choerodon.message.infra.dto.TargetUserDTO;
 import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
@@ -23,6 +22,7 @@ import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.feign.operator.IamClientOperator;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
+import io.choerodon.message.infra.mapper.WebHookC7nMapper;
 import io.choerodon.message.infra.utils.OptionalBean;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +30,10 @@ import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,6 +41,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +77,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private IamClientOperator iamClientOperator;
     @Autowired
     private MessageSettingTargetUserC7nMapper messageSettingTargetUserC7nMapper;
+    @Autowired
+    private WebHookC7nMapper webHookC7nMapper;
 
 
     public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper,
@@ -95,6 +99,139 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     @Override
+    public List<ProjectMessageVO> listEnabledSettingByCode(String code, String notifyType) {
+        List<ProjectMessageVO> result = new ArrayList<>();
+        //默认配置
+        List<CustomMessageSettingVO> defaultSettingList =
+                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, code);
+        if (defaultSettingList.isEmpty()) {
+            return result;
+        }
+        CustomMessageSettingVO defaultSetting = defaultSettingList.get(0);
+        //项目层自定义配置
+        List<CustomMessageSettingVO> customSettingList =
+                messageSettingC7nMapper.listMessageSettingByProjectId(null, notifyType, code);
+        buildFromMessageSetting(result, defaultSetting, customSettingList);
+        addProjectFromWebHookConfig(result, notifyType);
+        return result;
+    }
+
+    private void addProjectFromWebHookConfig(List<ProjectMessageVO> result,
+                                             String notifyType) {
+        Map<Long, ProjectMessageVO> projectMap =
+                result
+                        .stream()
+                        .collect(Collectors.toMap(ProjectMessageVO::getId, Function.identity()));
+        Set<Long> projectIds = webHookC7nMapper.listEnabledWebHookProjectIds(notifyType);
+        if (!projectIds.isEmpty()) {
+            iamFeignClient.listProjectsByIds(projectIds)
+                    .getBody()
+                    .forEach(x -> {
+                        if (Boolean.TRUE.equals(x.getEnabled())) {
+                            Long projectId = x.getId();
+                            if (ObjectUtils.isEmpty(projectMap.get(projectId))) {
+                                ProjectMessageVO projectMessageVO = new ProjectMessageVO();
+                                BeanUtils.copyProperties(x, projectMessageVO);
+                                result.add(projectMessageVO);
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void buildFromMessageSetting(List<ProjectMessageVO> result,
+                                         CustomMessageSettingVO defaultSetting,
+                                         List<CustomMessageSettingVO> customSettingList) {
+        boolean doSendMsg =
+                Boolean.TRUE.equals(defaultSetting.getPmEnable())
+                        || Boolean.TRUE.equals(defaultSetting.getEmailEnable());
+        List<ProjectVO> projects = new ArrayList<>();
+        Map<Long, CustomMessageSettingVO> projectSettingMap = new HashMap<>();
+        if (doSendMsg) {
+            List<ProjectVO> projectList = iamFeignClient.listAllProjects(true).getBody();
+            Set<Long> skipProjectIds = new HashSet<>();
+            customSettingList.forEach(x -> {
+                Long projectId = x.getProjectId();
+                if (Objects.equals(projectId, 0L)) {
+                    return;
+                }
+                projectSettingMap.put(projectId, x);
+                if (Boolean.FALSE.equals(x.getPmEnable())
+                        && Boolean.FALSE.equals(x.getEmailEnable())) {
+                    skipProjectIds.add(x.getProjectId());
+                }
+            });
+            projects.addAll(
+                    projectList
+                            .stream()
+                            .filter(x -> !skipProjectIds.contains(x.getId()))
+                            .collect(Collectors.toList()));
+        } else {
+            Set<Long> projectIds = new HashSet<>();
+            customSettingList.forEach(x -> {
+                Long projectId = x.getProjectId();
+                if (Objects.equals(projectId, 0L)) {
+                    return;
+                }
+                if (Boolean.FALSE.equals(x.getPmEnable())
+                        && Boolean.FALSE.equals(x.getEmailEnable())) {
+                    return;
+                }
+                projectSettingMap.put(projectId, x);
+                projectIds.add(projectId);
+            });
+            List<ProjectDTO> projectList = new ArrayList<>();
+            if (!projectIds.isEmpty()) {
+                projectList.addAll(
+                        iamFeignClient.listProjectsByIds(projectIds)
+                                .getBody()
+                                .stream()
+                                .filter(x -> Boolean.TRUE.equals(x.getEnabled()))
+                                .collect(Collectors.toList()));
+            }
+            projects.addAll(
+                    modelMapper.map(projectList,
+                            new TypeToken<List<ProjectVO>>() {
+                            }.getType()));
+        }
+
+        buildProjectMessageVO(result, defaultSetting, projects, projectSettingMap);
+    }
+
+    private void buildProjectMessageVO(List<ProjectMessageVO> result,
+                                       CustomMessageSettingVO defaultSetting,
+                                       List<ProjectVO> projects,
+                                       Map<Long, CustomMessageSettingVO> projectSettingMap) {
+        projects.forEach(x -> {
+            Long projectId = x.getId();
+            ProjectMessageVO projectMessageVO = new ProjectMessageVO();
+            result.add(projectMessageVO);
+            BeanUtils.copyProperties(x, projectMessageVO);
+            CustomMessageSettingVO customMessageSettingVO = projectSettingMap.get(projectId);
+            List<TargetUserVO> targetUserList;
+            if (customMessageSettingVO != null) {
+                targetUserList = customMessageSettingVO.getUserList();
+            } else {
+                targetUserList = defaultSetting.getUserList();
+            }
+            Set<Long> userIds = new HashSet<>();
+            Set<String> receiverTypes = new HashSet<>();
+            projectMessageVO.setUserIds(userIds);
+            projectMessageVO.setReceiverTypes(receiverTypes);
+            if (!ObjectUtils.isEmpty(targetUserList)) {
+                targetUserList.forEach(y -> {
+                    receiverTypes.add(y.getType());
+                    Long userId = y.getUserId();
+                    if (userId != null
+                            && !Objects.equals(userId, 0L)) {
+                        userIds.add(userId);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
         //查询平台层的发送设置
@@ -104,7 +241,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         }
 
         //查询通知对象
-        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
         assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
 
         // 计算平台层是否启用发送短信，站内信，邮件
@@ -196,7 +333,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if (messageSettingVOS.stream().anyMatch(settingVO -> !notifyType.equals(settingVO.getNotifyType()))) {
             throw new CommonException(ERROR_PARAM_INVALID);
         }
-        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType);
+        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
         // 将非指定用户添加到userList
         calculateNotifyUsersByType(messageSettingVOS);
@@ -492,7 +629,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     private List<CustomMessageSettingVO> handleDevopsOrAgileSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
-        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, notifyType);
+        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, notifyType, null);
         Map<String, CustomMessageSettingVO> customMessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getCode, v -> v));
         defaultMessageSettingList.forEach(defaultMessageSetting -> {
             CustomMessageSettingVO customMessageSettingVO = customMessageSettingVOMap.get(defaultMessageSetting.getCode());
