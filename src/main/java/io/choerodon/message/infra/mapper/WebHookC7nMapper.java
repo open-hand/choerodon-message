@@ -38,4 +38,7 @@ public interface WebHookC7nMapper {
 
 
     Set<Long> queryWebHook(@Param("webHookId") Long webHookId);
+
+
+    Set<Long> listEnabledWebHookProjectIds(@Param("code") String code);
 }

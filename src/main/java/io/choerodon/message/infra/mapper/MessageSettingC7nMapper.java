@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import io.choerodon.message.api.vo.CustomMessageSettingVO;
-import io.choerodon.message.api.vo.MessageSettingCategoryVO;
 import io.choerodon.message.api.vo.MessageSettingVO;
 import io.choerodon.message.api.vo.NotifyEventGroupVO;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
@@ -27,18 +26,23 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * 查询启用的默认通知配置
      *
      * @param notifyType
+     * @param code
      * @return
      */
-    List<CustomMessageSettingVO> listDefaultAndEnabledSettingByNotifyType(@Param("notifyType") String notifyType);
+    List<CustomMessageSettingVO> listDefaultAndEnabledSettingByNotifyType(@Param("notifyType") String notifyType,
+                                                                          @Param("code") String code);
 
     /**
      * 根据通知类型查询项目下的通知配置
      *
      * @param projectId
      * @param notifyType
+     * @param code
      * @return
      */
-    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("projectId") Long projectId, @Param("notifyType") String notifyType);
+    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("projectId") Long projectId,
+                                                               @Param("notifyType") String notifyType,
+                                                               @Param("code") String code);
 
     /**
      * 查询资源删除验证通知设置
