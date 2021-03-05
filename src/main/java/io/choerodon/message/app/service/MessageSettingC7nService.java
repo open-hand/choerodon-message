@@ -2,9 +2,7 @@ package io.choerodon.message.app.service;
 
 import java.util.List;
 
-import io.choerodon.message.api.vo.CustomMessageSettingVO;
-import io.choerodon.message.api.vo.MessageSettingVO;
-import io.choerodon.message.api.vo.MessageSettingWarpVO;
+import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 
@@ -31,4 +29,12 @@ public interface MessageSettingC7nService {
 
     void asyncMessageProjectUser(List<UserMemberEventPayload> userMemberEventPayloads);
 
+    /**
+     * 根据code查询所有开启了发送消息配置（pm/email/webhook）的项目
+     *
+     * @param code
+     * @param notifyType
+     * @return
+     */
+    List<ProjectMessageVO> listEnabledSettingByCode(String code, String notifyType);
 }

@@ -109,4 +109,20 @@
 	     hws.server_id =#{webHookId}
     </select>
 
+    <select id="listEnabledWebHookProjectIds" resultType="java.lang.Long">
+        select
+        distinct wpr.project_id
+        from webhook_project_rel wpr
+        join hmsg_webhook_server hws on wpr.webhook_id = hws.server_id
+        join hmsg_template_server_wh htsh on htsh.server_code = hws.server_code
+        join hmsg_template_server_line htsl on htsl.temp_server_id = htsh.temp_server_id
+        and (
+            htsl.template_code like '%JSON%'
+            or htsl.template_code like '%DINGTALKANDWECHAT%'
+        )
+        join hmsg_template_server hts on hts.temp_server_id = htsl.temp_server_id
+        where 1=1
+        and hts.message_code = #{code}
+    </select>
+
 </mapper>
