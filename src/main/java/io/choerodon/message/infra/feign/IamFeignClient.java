@@ -65,6 +65,6 @@ public interface IamFeignClient {
                                                                          @ApiParam(value = "登录名")
                                                                          @RequestParam(required = false, name = "loginName") String loginName);
 
-    @GetMapping("/choerodon/v1/projects/all")
+    @GetMapping("/choerodon/v1/agile/projects/all")
     ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
 }
