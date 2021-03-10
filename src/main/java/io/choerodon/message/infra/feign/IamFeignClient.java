@@ -2,12 +2,11 @@ package io.choerodon.message.infra.feign;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.OrganizationProjectVO;
+import io.choerodon.message.api.vo.ProjectVO;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.swagger.annotation.CustomPageRequest;
 
 import io.swagger.annotations.ApiParam;
 import org.hzero.common.HZeroService;
@@ -66,4 +65,6 @@ public interface IamFeignClient {
                                                                          @ApiParam(value = "登录名")
                                                                          @RequestParam(required = false, name = "loginName") String loginName);
 
+    @GetMapping("/choerodon/v1/inner/projects/all")
+    ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
 }

@@ -3,7 +3,6 @@ package io.choerodon.message.infra.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.access.method.P;
 
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.mybatis.common.BaseMapper;
