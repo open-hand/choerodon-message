@@ -30,7 +30,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message.groovy') {
             column(name: "last_update_date", type: "datetime",   defaultValueComputed:"CURRENT_TIMESTAMP",   remarks: "")  {constraints(nullable:"false")}
 
         }
-   createIndex(tableName: "hmsg_message", indexName: "hmsg_message_n1") {
+    createIndex(tableName: "hmsg_message", indexName: "hmsg_message_n1") {
             column(name: "send_flag")
             column(name: "tenant_id")
         }
@@ -86,6 +86,17 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message.groovy') {
     changeSet(author: 'wangxiang@hand-china.com', id: '2020-08-06-hmsg_message') {
         createIndex(tableName: "hmsg_message", indexName: "hmsg_message_n4"){
             column(name: "template_code")
+        }
+    }
+    changeSet(author: "hzero@hand-china.com", id: "2020-12-09-hmsg_message") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        addColumn(tableName: 'hmsg_message') {
+            column(name: "source_key", type: "varchar(" + 60 * weight + ")", remarks: "来源标识")
         }
     }
 

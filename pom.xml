@@ -5,18 +5,13 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.18.1.RELEASE</version>
+        <version>0.19.0.RELEASE</version>
     </parent>
 
     <artifactId>choerodon-message</artifactId>
-    <version>0.24.1-SNAPSHOT</version>
+    <version>0.25.0-SNAPSHOT</version>
     <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
-
-    <properties>
-        <!-- TODO hzero 发 1.6.0.RELEASE 删除 -->
-        <hzero.websocket.version>1.6.0-SNAPSHOT</hzero.websocket.version>
-    </properties>
 
 
     <dependencies>
@@ -30,12 +25,43 @@
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-keyencrypt</artifactId>
         </dependency>
+        <!-- 全面升级到1.6删除-->
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-core</artifactId>
+            <version>1.5.3.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-mybatis-mapper</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-mybatis-mapper</artifactId>
+            <version>1.6.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-dubbo</artifactId>
+            <version>2.1.1.RELEASE</version>
+        </dependency>
 
         <!-- 依赖的服务 -->
         <dependency>
             <groupId>org.hzero</groupId>
             <artifactId>hzero-message-saas</artifactId>
             <exclusions>
+                <!-- 全面升级到1.6删除-->
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-dubbo</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.hzero.starter</groupId>
                     <artifactId>hzero-starter-hitoa</artifactId>
@@ -51,14 +77,6 @@
                 <exclusion>
                     <groupId>org.hzero.starter</groupId>
                     <artifactId>hzero-starter-integrate-dd</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-sms-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-call-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -102,7 +120,6 @@
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-websocket</artifactId>
-            <version>${hzero.websocket.version}</version>
             <!-- 这里exclude hzero-starter-core的依赖是因为单独升级了websocket的版本，避免引入依赖冲突 -->
             <!-- 如果websocket的版本和 hzero-starter-core 的版本一致，不需要 exclude-->
             <exclusions>

@@ -32,4 +32,16 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_sms_server.groovy') {
 
         addUniqueConstraint(columnNames:"server_code,tenant_id",tableName:"hmsg_sms_server",constraintName: "hmsg_sms_server_u1")
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2020-10-20-hmsg_sms_server") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        addColumn(tableName: 'hmsg_sms_server') {
+            column(name: "filter_strategy", type: "varchar(" + 30 * weight + ")", remarks: "筛选策略，值集：HMSG.EMAIL.FILTER_STRATEGY")
+        }
+    }
 }

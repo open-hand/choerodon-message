@@ -70,4 +70,9 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server.groovy') {
             column(name: "description", type: "varchar(" + 480 * weight + ")", remarks: "描述")
         }
     }
+
+    changeSet(author: 'hzero@hand-china.com', id: '2020-12-15-hmsg_template_server') {
+        dropUniqueConstraint(tableName:"hmsg_template_server", constraintName: "hmsg_template_server_u1")
+        addUniqueConstraint(tableName:"hmsg_template_server", constraintName: "hmsg_template_server_u1", columnNames:"message_code,tenant_id")
+    }
 }

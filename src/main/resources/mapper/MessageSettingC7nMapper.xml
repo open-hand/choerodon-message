@@ -43,6 +43,9 @@
         nms.NOTIFY_TYPE = #{notifyType}
         AND nms.PROJECT_ID = 0
         AND hts.ENABLED_FLAG = 1
+        <if test="code != null">
+            AND nms.code = #{code}
+        </if>
     </select>
     <select id="listMessageSettingByProjectId" resultMap="customMessageSettingMap">
         SELECT
@@ -68,7 +71,12 @@
           LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
         WHERE
           nms.NOTIFY_TYPE = #{notifyType}
-          AND nms.PROJECT_ID = #{projectId}
+          <if test="projectId != null">
+              AND nms.PROJECT_ID = #{projectId}
+          </if>
+          <if test="code != null">
+              and nms.code = #{code}
+          </if>
           AND hts.ENABLED_FLAG = 1
     </select>
     <select id="listMessageSettingByProjectIdAndEnvId"
