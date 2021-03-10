@@ -1,6 +1,8 @@
 package io.choerodon.message.infra.dto.iam;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+import javax.persistence.Transient;
 
 /**
  * @author superlee
@@ -36,6 +38,17 @@ public class ProjectDTO {
 
     @ApiModelProperty(value = "项目类型（遗留旧字段，一对一）:AGILE(敏捷项目),GENERAL(普通应用项目),PROGRAM(普通项目群)")
     private String category;
+
+    @ApiModelProperty(value = "项目类型(一对多)")
+    private List<ProjectCategoryDTO> categories;
+
+    public List<ProjectCategoryDTO> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<ProjectCategoryDTO> categories) {
+        this.categories = categories;
+    }
 
     public String getCategory() {
         return category;

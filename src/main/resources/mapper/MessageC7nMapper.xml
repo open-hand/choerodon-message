@@ -23,62 +23,45 @@
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
-        temp.transaction_id AS id,
+        hmt.transaction_id AS id,
         hmr.receiver_address AS email,
-        temp.message_code as messageCode,
-        temp.message_name as messageName,
-        temp.trx_status_code as statusCode,
-        temp.transaction_message as failedReason,
-        temp.creation_date
-        FROM
-        hmsg_message_receiver hmr
-        JOIN (
-        SELECT
-        hmt.transaction_id as transaction_id,
-        hm.message_id,
-        hm.tenant_id,
-        hm.message_type_code,
-        hts.message_code,
-        hts.message_name,
-        hm.server_code,
-        hmt.trx_status_code,
-        hmt.transaction_message,
-        hm.creation_date,
-        hm. SUBJECT,
-        hm.object_version_number,
-        hmt.trx_status_code as statusCode
+        hts.message_code AS messageCode,
+        hts.message_name AS messageName,
+        hmt.trx_status_code AS statusCode,
+        hmt.transaction_message AS failedReason,
+        hm.creation_date
         FROM
         hmsg_message hm
         JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
-        AND hm.message_type_code = 'EMAIL'
-        JOIN hmsg_template_server_line htsl ON htsl.server_code = hm.server_code
+        JOIN hmsg_message_receiver hmr ON hmr.message_id = hm.message_id
+        LEFT JOIN hmsg_template_server_line htsl ON htsl.server_code = 'CHOERODON-EMAIL'
         AND htsl.template_code = hm.template_code
-        JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
-        ) AS temp ON hmr.message_id = temp.message_id
-        <where>
-            <if test="status != null and status != ''">
-                and temp.statusCode = #{status}
-            </if>
-            <if test="receiveEmail != null and receiveEmail != ''">
-                and hmr.receiver_address  LIKE concat(concat('%',#{receiveEmail}),'%')
-            </if>
-            <if test="templateType != null and templateType != ''">
-                and (temp.message_code  LIKE concat(concat('%',#{templateType}),'%') or temp.message_name LIKE
-                concat(concat('%',#{templateType}),'%'))
-            </if>
-            <if test="failedReason != null and failedReason != ''">
-                and temp.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
-            </if>
-            <if test="params != null">
-                AND (
-                temp.statusCode LIKE concat(concat('%',#{params}),'%') OR
-                hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
-                temp.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-                temp.message_name  LIKE concat(concat('%',#{templateType}),'%') OR
-                temp.message_code LIKE concat(concat('%',#{params}),'%')
-                )
-            </if>
-        </where>
+        LEFT JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+        WHERE
+        hm.server_code = 'CHOERODON-EMAIL'
+        <if test="status != null and status != ''">
+            and hmt.trx_status_code = #{status}
+        </if>
+        <if test="receiveEmail != null and receiveEmail != ''">
+            and hmr.receiver_address  LIKE concat(concat('%',#{receiveEmail}),'%')
+        </if>
+        <if test="templateType != null and templateType != ''">
+            and (hts.message_code  LIKE concat(concat('%',#{templateType}),'%') or hts.message_name LIKE
+            concat(concat('%',#{templateType}),'%'))
+        </if>
+        <if test="failedReason != null and failedReason != ''">
+            and hmt.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
+        </if>
+        <if test="params != null">
+            AND (
+            hmt.trx_status_code LIKE concat(concat('%',#{params}),'%') OR
+            hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
+            hts.message_name  LIKE concat(concat('%',#{params}),'%') OR
+            hts.message_code LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+        ORDER BY hm.message_id desc
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
@@ -97,28 +80,26 @@
         JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
         WHERE
         hm.message_type_code = 'WEB_HOOK'
-        <where>
-            <if test="status != null and status != ''">
-                hmt.statusCode = #{status}
-            </if>
-            <if test="webhookAddress != null and webhookAddress != ''">
-                and hws.webhook_address  LIKE concat(concat('%',#{webhookAddress}),'%')
-            </if>
-            <if test="templateType != null and templateType != ''">
-                and hm. SUBJECT  LIKE concat(concat('%',#{templateType}),'%')
-            </if>
-            <if test="failedReason != null and failedReason != ''">
-                and hmt.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
-            </if>
-            <if test="params != null">
-                AND (
-                hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-                hws.webhook_address LIKE concat(concat('%',#{params}),'%') OR
-                hm. SUBJECT LIKE concat(concat('%',#{params}),'%') OR
-                hmt.transaction_message LIKE concat(concat('%',#{params}),'%')
-                )
-            </if>
-        </where>
+        <if test="status != null and status != ''">
+            and hmt.trx_status_code = #{status}
+        </if>
+        <if test="webhookAddress != null and webhookAddress != ''">
+            and hws.webhook_address  LIKE concat(concat('%',#{webhookAddress}),'%')
+        </if>
+        <if test="templateType != null and templateType != ''">
+            and hm. SUBJECT  LIKE concat(concat('%',#{templateType}),'%')
+        </if>
+        <if test="failedReason != null and failedReason != ''">
+            and hmt.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
+        </if>
+        <if test="params != null">
+            AND (
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
+            hws.webhook_address LIKE concat(concat('%',#{params}),'%') OR
+            hm. SUBJECT LIKE concat(concat('%',#{params}),'%') OR
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
         ORDER BY
         hm.creation_date DESC
     </select>

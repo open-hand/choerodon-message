@@ -57,4 +57,9 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_template.groovy') {
         }
     }
 
+    changeSet(author: 'hzero@hand-china.com', id: '2020-12-15-hmsg_message_template') {
+        dropUniqueConstraint(tableName:"hmsg_message_template", constraintName: "hmsg_mt_ttclse_uindex")
+        addUniqueConstraint(tableName:"hmsg_message_template", constraintName: "hmsg_message_template_u1", columnNames:"template_code,lang,tenant_id")
+    }
+
 }
