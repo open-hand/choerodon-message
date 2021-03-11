@@ -112,17 +112,17 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<CustomMessageSettingVO> customSettingList =
                 messageSettingC7nMapper.listMessageSettingByProjectId(null, notifyType, code);
         buildFromMessageSetting(result, defaultSetting, customSettingList);
-        addProjectFromWebHookConfig(result, notifyType);
+        addProjectFromWebHookConfig(result, code);
         return result;
     }
 
     private void addProjectFromWebHookConfig(List<ProjectMessageVO> result,
-                                             String notifyType) {
+                                             String code) {
         Map<Long, ProjectMessageVO> projectMap =
                 result
                         .stream()
                         .collect(Collectors.toMap(ProjectMessageVO::getId, Function.identity()));
-        Set<Long> projectIds = webHookC7nMapper.listEnabledWebHookProjectIds(notifyType);
+        Set<Long> projectIds = webHookC7nMapper.listEnabledWebHookProjectIds(code);
         if (!projectIds.isEmpty()) {
             iamFeignClient.listProjectsByIds(projectIds)
                     .getBody()
