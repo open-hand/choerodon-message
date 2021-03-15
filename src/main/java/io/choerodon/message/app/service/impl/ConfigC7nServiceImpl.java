@@ -48,11 +48,17 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     @Override
     public EmailConfigVO createOrUpdateEmail(EmailConfigVO emailConfigVO) {
         EmailServer emailServer = emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value());
+
         // 只处理ssl配置
+        List<EmailProperty> emailProperties = emailServer.getEmailProperties();
+        if (emailProperties == null) {
+            emailProperties = new ArrayList<>();
+        }
         if (emailConfigVO.getSsl()) {
-            emailServer.setEmailProperties(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
+            emailProperties.addAll(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
+            emailServer.setEmailProperties(emailProperties);
         } else {
-            emailServer.setEmailProperties(new ArrayList<>());
+            emailServer.setEmailProperties(emailProperties);
         }
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
         newEmailServer.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
