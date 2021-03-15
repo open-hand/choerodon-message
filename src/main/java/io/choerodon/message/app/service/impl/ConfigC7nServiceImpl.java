@@ -54,11 +54,14 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         if (emailProperties == null) {
             emailProperties = new ArrayList<>();
         }
+        List<EmailProperty> sslProperties = initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString());
         if (emailConfigVO.getSsl()) {
-            emailProperties.addAll(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
-            emailServer.setEmailProperties(emailProperties);
+            if (!emailProperties.containsAll(sslProperties)) {
+                emailProperties.addAll(sslProperties);
+                emailServer.setEmailProperties(emailProperties);
+            }
         } else {
-            emailProperties.removeAll(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
+            emailProperties.removeAll(sslProperties);
             emailServer.setEmailProperties(emailProperties);
         }
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
