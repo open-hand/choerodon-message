@@ -51,6 +51,8 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         // 只处理ssl配置
         if (emailConfigVO.getSsl()) {
             emailServer.setEmailProperties(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
+        } else {
+            emailServer.setEmailProperties(new ArrayList<>());
         }
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
         newEmailServer.setServerCode(ConfigNameEnum.EMAIL_NAME.value());
