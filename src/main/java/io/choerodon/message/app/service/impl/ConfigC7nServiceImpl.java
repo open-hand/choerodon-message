@@ -58,6 +58,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
             emailProperties.addAll(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
             emailServer.setEmailProperties(emailProperties);
         } else {
+            emailProperties.removeAll(initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString()));
             emailServer.setEmailProperties(emailProperties);
         }
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
