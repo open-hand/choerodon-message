@@ -49,19 +49,27 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     public EmailConfigVO createOrUpdateEmail(EmailConfigVO emailConfigVO) {
         EmailServer emailServer = emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value());
 
-        // 只处理ssl配置
+        // 处理ssl配置
         List<EmailProperty> emailProperties = emailServer.getEmailProperties();
-        if (emailProperties == null) {
-            emailProperties = new ArrayList<>();
-        }
-        List<EmailProperty> sslProperties = initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString());
+        List<EmailProperty> tempProperties = new ArrayList<>(emailProperties);
         if (emailConfigVO.getSsl()) {
-            if (!emailProperties.containsAll(sslProperties)) {
+            if (!isSsl(emailProperties)) {
+                List<EmailProperty> sslProperties = initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString());
                 emailProperties.addAll(sslProperties);
-                emailServer.setEmailProperties(emailProperties);
             }
+            emailServer.setEmailProperties(emailProperties);
         } else {
-            emailProperties.removeAll(sslProperties);
+            if (isSsl(emailProperties)) {
+                if (!CollectionUtils.isEmpty(tempProperties)) {
+                    for (EmailProperty property : tempProperties) {
+                        if (property.getPropertyCode().equals(SSL_PROPERTY_CLASS)
+                                || property.getPropertyCode().equals(SSL_PROPERTY_PORT)
+                                || property.getPropertyCode().equals(SSL_PROPERTY_ENABLE)) {
+                            emailProperties.remove(property);
+                        }
+                    }
+                }
+            }
             emailServer.setEmailProperties(emailProperties);
         }
         EmailServer newEmailServer = setEmailServer(emailConfigVO, emailServer);
@@ -74,6 +82,21 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
             emailServerService.updateEmailServer(TenantDTO.DEFAULT_TENANT_ID, newEmailServer);
         }
         return emailConfigVO;
+    }
+
+    private Boolean isSsl(List<EmailProperty> emailProperties) {
+        boolean index = false;
+        if (!CollectionUtils.isEmpty(emailProperties)) {
+            for (EmailProperty t : emailProperties) {
+                if (t.getPropertyCode().equals(SSL_PROPERTY_CLASS)
+                        || t.getPropertyCode().equals(SSL_PROPERTY_PORT)
+                        || t.getPropertyCode().equals(SSL_PROPERTY_ENABLE)) {
+                    index = true;
+                    break;
+                }
+            }
+        }
+        return index;
     }
 
     @Override
