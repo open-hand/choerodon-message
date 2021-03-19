@@ -19,6 +19,7 @@ import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -291,6 +292,21 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         return reSenderArgs;
 
+    }
+
+    @Override
+    @Async
+    public void batchSendMessage(List<MessageSender> senderList) {
+        if (CollectionUtils.isEmpty(senderList)) {
+            return;
+        }
+        senderList.forEach(sender -> {
+            try {
+                this.relSendMessageReceipt(sender, sender.getTenantId());
+            } catch (Exception e) {
+                logger.error("batch send message error", e);
+            }
+        });
     }
 
 }
