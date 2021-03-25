@@ -24,38 +24,4 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_receive_config_tl.groovy') {
             }
         }
     }
-    changeSet(author: 'wanghao', id: '2020-07-21-data-fix') {
-        preConditions(onFail: "MARK_RAN") {
-            tableExists(tableName: "hmsg_receive_config")
-        }
-        sql("""
-            UPDATE hmsg_receive_config_tl hrct
-            SET hrct.tenant_id = ( SELECT hrc.tenant_id FROM hmsg_receive_config hrc WHERE hrct.receive_id = hrc.receive_id)
-            WHERE hrct.receive_id in ( SELECT receive_id FROM hmsg_receive_config);
-            """)
-    }
-
-    changeSet(author: "wx@hand-china.com",id: "2020-09-22-fix-receive_config_tl"){
-        sql("""
-            DELETE 
-            FROM
-              hmsg_receive_config_tl;
-
-            INSERT INTO hmsg_receive_config_tl ( receive_id, lang, receive_name, tenant_id ) SELECT
-              receive_id,
-              'zh_CN',
-              receive_name,
-              tenant_id 
-            FROM
-              hmsg_receive_config;
-
-            INSERT INTO hmsg_receive_config_tl ( receive_id, lang, receive_name, tenant_id ) SELECT
-              receive_id,
-              'en_US',
-              "default",
-              tenant_id 
-            FROM
-              hmsg_receive_config
-        """)
-    }
 }

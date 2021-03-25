@@ -83,11 +83,7 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message.groovy') {
             column(name: "creation_date")
         }
     }
-    changeSet(author: 'wangxiang@hand-china.com', id: '2020-08-06-hmsg_message') {
-        createIndex(tableName: "hmsg_message", indexName: "hmsg_message_n4"){
-            column(name: "template_code")
-        }
-    }
+
     changeSet(author: "hzero@hand-china.com", id: "2020-12-09-hmsg_message") {
         def weight = 1
         if(helper.isSqlServer()){
@@ -99,5 +95,5 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message.groovy') {
             column(name: "source_key", type: "varchar(" + 60 * weight + ")", remarks: "来源标识")
         }
     }
-
+	
 }

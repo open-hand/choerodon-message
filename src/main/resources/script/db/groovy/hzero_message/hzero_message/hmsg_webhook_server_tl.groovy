@@ -27,36 +27,5 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_webhook_server_tl.groovy') {
     changeSet(author: "hzero@hand-china.com", id: "2020-09-01-1-hmsg_webhook_server_tl") {
         addUniqueConstraint(columnNames: "server_id,lang", tableName: "hmsg_webhook_server_tl", constraintName: "hmsg_webhook_server_tl_u1")
     }
-
-    changeSet(author: "wx@hand-china.com",id: "2020-09-22-fix-webhook-server-tl"){
-        sql("""
-            DELETE FROM hmsg_webhook_server_tl;
-            INSERT INTO hmsg_webhook_server_tl(  
-              server_id, 
-              lang, 
-              server_name, 
-              tenant_id
-            )SELECT
-              server_id, 
-              'zh_CN', 
-              server_name, 
-              tenant_id
-            FROM
-            hmsg_webhook_server;  
-
-            INSERT INTO hmsg_webhook_server_tl(  
-               server_id, 
-               lang, 
-               server_name, 
-               tenant_id
-            )SELECT
-               server_id, 
-               'en_US', 
-               "default",
-               tenant_id
-            FROM
-            hmsg_webhook_server  
-        """)
-    }
 }
 
