@@ -26,6 +26,12 @@
             <artifactId>hzero-starter-keyencrypt</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-dubbo</artifactId>
+            <version>2.1.1.RELEASE</version>
+        </dependency>
+
         <!-- 依赖的服务 -->
         <dependency>
             <groupId>org.hzero</groupId>
