@@ -114,7 +114,7 @@ hzero:
   websocket:
     # 用于连接websocket的路径
     websocket: /websocket
-    easy-mode: ${HZERO_WEBSOCKET_EASY_MODE:true}
+    easy-mode: ${HZERO_WEBSOCKET_EASY_MODE:false}
     # 与当前服务的redis数据库一致
     redisDb: ${SPRING_REDIS_DATABASE:1}
     secretKey: hzero
