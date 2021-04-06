@@ -107,8 +107,6 @@ env:
     SERVER_UNDERTOW_BUFFER_SIZE: 1024
     # SMS假处理
     HZERO_SMS_FAKE: false
-    # websocket简易模式
-    HZERO_WEBSOCKET_EASY_MODE: true
     # Ribbon从DiscoveryClient同步Server的间隔时间，默认30秒
     RIBBON_SERVER_LIST_REFRESH_INTERVAL: 10000
     # 续约间隔时间，默认30秒
