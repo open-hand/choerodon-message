@@ -230,7 +230,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         if (!CollectionUtils.isEmpty(newSendIds)) {
             for (Long aLong : newSendIds) {
                 TemplateServerWh templateServerWh = new TemplateServerWh();
-                templateServerWh.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
+                templateServerWh.setTenantId(tenantId);
                 templateServerWh.setServerCode(webhookServer.getServerCode());
                 templateServerWh.setServerName(webhookServer.getServerName());
                 templateServerWh.setServerType(webhookServer.getServerType());
