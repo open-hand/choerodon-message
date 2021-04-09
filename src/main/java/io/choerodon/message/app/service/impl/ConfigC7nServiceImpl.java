@@ -12,6 +12,7 @@ import org.hzero.message.app.service.SmsServerService;
 import org.hzero.message.domain.entity.EmailProperty;
 import org.hzero.message.domain.entity.EmailServer;
 import org.hzero.message.domain.entity.SmsServer;
+import org.hzero.message.domain.repository.EmailServerRepository;
 import org.hzero.message.infra.supporter.EmailSupporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -42,6 +43,8 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
 
     @Autowired
     private EmailServerService emailServerService;
+    @Autowired
+    private EmailServerRepository emailServerRepository;
     @Autowired
     private SmsServerService smsServerService;
 
@@ -89,6 +92,7 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         if (emailServer == null) {
             return null;
         }
+        emailServer.setObjectVersionNumber(emailServerRepository.selectByPrimaryKey(emailServer.getServerId()).getObjectVersionNumber());
         return setEmailConfigVO(new EmailConfigVO(), emailServer);
     }
 
