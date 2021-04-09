@@ -85,7 +85,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
     @Override
     public Page<WebHookVO> pagingWebHook(PageRequest pageRequest, Long sourceId, String sourceLevel, String messageName, String type, Boolean enableFlag, String params, String messageCode) {
         List<WebHookVO> list;
-        if (ResourceLevel.PROJECT.value().toUpperCase().equals(sourceLevel.toUpperCase())) {
+        if (ResourceLevel.PROJECT.value().equalsIgnoreCase(sourceLevel)) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             list = webHookC7nMapper.pagingWebHook(projectDTO.getOrganizationId(), sourceId, messageName, type, enableFlag, params, messageCode);
         } else {
@@ -136,7 +136,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         String codeStr;
         String nameStr;
         Long tenantId = sourceId;
-        if (sourceLevel.toUpperCase().equals(ResourceLevel.PROJECT.value().toUpperCase())) {
+        if (sourceLevel.equalsIgnoreCase(ResourceLevel.PROJECT.value())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             codeStr = projectDTO.getCode();
             nameStr = projectDTO.getName();
@@ -195,7 +195,7 @@ public class WebHookC7NServiceImpl implements WebHookC7nService {
         WebhookServer webhookServer = new WebhookServer();
         BeanUtils.copyProperties(webHookVO, webhookServer);
         Long tenantId = sourceId;
-        if (sourceLevel.equals(ResourceLevel.PROJECT.value().toUpperCase())) {
+        if (sourceLevel.equalsIgnoreCase(ResourceLevel.PROJECT.value())) {
             ProjectDTO projectDTO = iamClientOperator.queryProjectById(sourceId);
             tenantId = projectDTO.getOrganizationId();
         }
