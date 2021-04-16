@@ -64,4 +64,10 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_template_server_line.groovy')
             }
         }
     }
+
+    changeSet(author: "wx@hand-china.com", id: "2021-04-16_add-index"){
+        sql("""
+            ALTER  TABLE  hmsg_template_server_line  ADD  INDEX hmsg_template_server_line_u2 ( template_code)
+         """)
+    }
 }
