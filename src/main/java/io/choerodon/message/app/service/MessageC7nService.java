@@ -9,9 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageC7nService {
     Page<MessageC7nDTO> listMessage(String status,
-                                    String receiveEmail,
-                                    String templateType,
                                     String failedReason,
+                                    String messageName,
                                     String params,
                                     PageRequest pageRequest);
 
@@ -24,6 +23,7 @@ public interface MessageC7nService {
 
     /**
      * 发送自定义邮件
+     *
      * @param customEmailSendInfoVO
      */
     void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO);
