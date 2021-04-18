@@ -45,9 +45,8 @@
         <if test="params != null">
             AND (
             hmt.trx_status_code LIKE concat(concat('%',#{params}),'%') OR
-            hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
             hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-            hts.message_name  LIKE concat(concat('%',#{params}),'%') OR
+            hts.message_name  LIKE concat(concat('%',#{params}),'%')
             )
         </if>
         ORDER BY
