@@ -19,6 +19,17 @@ public class MessageC7nDTO {
 
     private String statusMeaning;
 
+    @Encrypt
+    private Long transactionId;
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public String getStatusCode() {
         return statusCode;
     }
