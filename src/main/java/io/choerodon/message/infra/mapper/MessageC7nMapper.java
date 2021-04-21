@@ -23,7 +23,6 @@ public interface MessageC7nMapper {
                                     @Param("failedReason") String failedReason,
                                     @Param("params") String params);
     List<MessageC7nDTO> listEmailMessage(@Param("status") String status,
-                                    @Param("failedReason") String failedReason,
                                     @Param("subject") String messageName,
                                     @Param("params") String params);
 
