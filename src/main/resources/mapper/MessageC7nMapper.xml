@@ -29,7 +29,7 @@
           hmt.trx_status_code AS statusCode,
           hmt.transaction_message AS failedReason,
           hmt.transaction_id AS transactionId,
-          hm.creation_date
+          hm.creation_date AS creationDate
         FROM hmsg_message hm
         JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
         straight_join  hmsg_template_server_line htsl ON htsl.template_code = hm.template_code
@@ -40,7 +40,7 @@
             and hmt.trx_status_code = #{status}
         </if>
         <if test="subject != null and subject != ''">
-            and hts.message_name = #{subject}
+            and hts.message_name  LIKE concat(concat('%',#{subject}),'%')
         </if>
         <if test="params != null">
             AND (
@@ -54,27 +54,39 @@
     </select>
     <!--手写mybatis select count优化-->
     <select id="listEmailMessage_COUNT" resultType="Long">
-        SELECT COUNT(0) FROM
-        hmsg_message hm
-        JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
-        straight_join hmsg_template_server_line htsl  ON htsl.template_code = hm.template_code
-        JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
-        WHERE
-          hm.message_type_code = 'Email'
-          <if test="status != null and status != ''">
-              and hmt.trx_status_code = #{status}
-          </if>
+        SELECT
+          count(0)
+        FROM
+         (
+          SELECT
+           hm.message_id AS id
+          FROM
+           hmsg_message hm
+        <if test="status != null and status != ''">
+            STRAIGHT_JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+        </if>
+        <if test="subject != null and subject != ''">
+            JOIN hmsg_template_server_line htsl  ON htsl.template_code = hm.template_code
+            straight_join hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
+        </if>
 
-          <if test="subject != null and subject != ''">
-              and hts.message_name LIKE concat(concat('%',#{subject}),'%')
-          </if>
-          <if test="params != null">
-              AND (
-              hmt.trx_status_code LIKE concat(concat('%',#{params}),'%') OR
-              hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-              hts.message_name LIKE concat(concat('%',#{params}),'%')
-              )
-          </if>
+        WHERE
+        hm.message_type_code = 'Email'
+        <if test="status != null and status != ''">
+            and hmt.trx_status_code = #{status}
+        </if>
+
+        <if test="subject != null and subject != ''">
+            and hts.message_name  LIKE concat(concat('%',#{subject}),'%')
+        </if>
+        <if test="params != null">
+            AND (
+            hmt.trx_status_code LIKE concat(concat('%',#{params}),'%') OR
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
+            hts.message_name LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+        ) tmp_count
     </select>
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
