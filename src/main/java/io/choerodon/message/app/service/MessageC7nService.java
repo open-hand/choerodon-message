@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageC7nService {
     Page<MessageC7nDTO> listMessage(String status,
-                                    String failedReason,
                                     String messageName,
                                     String params,
                                     PageRequest pageRequest);

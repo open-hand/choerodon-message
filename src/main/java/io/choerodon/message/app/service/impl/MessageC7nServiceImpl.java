@@ -42,8 +42,8 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     @Override
     @ProcessLovValue
-    public Page<MessageC7nDTO> listMessage(String status, String failedReason, String messageName, String params, PageRequest pageRequest) {
-        Page<MessageC7nDTO> messageC7nDTOS = PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, failedReason, messageName, params));
+    public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
+        Page<MessageC7nDTO> messageC7nDTOS = PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
         return messageC7nDTOS;
     }
 
