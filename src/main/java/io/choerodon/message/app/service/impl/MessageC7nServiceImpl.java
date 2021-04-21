@@ -44,7 +44,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     @Override
     @ProcessLovValue
     public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
-        if (StringUtils.isEmpty(status) && StringUtils.isEmpty(messageName)) {
+        if (StringUtils.isEmpty(status) && StringUtils.isEmpty(messageName) && !StringUtils.isEmpty(params)) {
             return null;
         }
         Page<MessageC7nDTO> messageC7nDTOS = PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
