@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
@@ -42,8 +43,12 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     @Override
     @ProcessLovValue
-    public Page<MessageC7nDTO> listMessage(String status, String receiveEmail, String templateType, String failedReason, String params, PageRequest pageRequest) {
-        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, receiveEmail, templateType, failedReason, params));
+    public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
+        if (StringUtils.isEmpty(status) && StringUtils.isEmpty(messageName) && !StringUtils.isEmpty(params)) {
+            return null;
+        }
+        Page<MessageC7nDTO> messageC7nDTOS = PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
+        return messageC7nDTOS;
     }
 
     @Override

@@ -19,6 +19,21 @@ public class MessageC7nDTO {
 
     private String statusMeaning;
 
+    @Encrypt
+    private Long transactionId;
+    private Date creationDate;
+    private String webhookAddress;
+
+
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public String getStatusCode() {
         return statusCode;
     }
@@ -35,8 +50,7 @@ public class MessageC7nDTO {
         this.statusMeaning = statusMeaning;
     }
 
-    private Date creationDate;
-    private String webhookAddress;
+
 
     public String getWebhookAddress() {
         return webhookAddress;
