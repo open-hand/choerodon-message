@@ -72,6 +72,7 @@ public class C7nWebSendServiceImpl extends WebSendServiceImpl {
         PopMessageVO popMessageVO = new PopMessageVO();
         popMessageVO.setContent(message.getContent());
         popMessageVO.setTitle(message.getSubject());
+        popMessageVO.setMessageId(message.getMessageId());
         //推送给前端
         receiverAddressList.forEach(receiver -> {
             socketSendHelper.sendByUserId(receiver.getUserId(), "choerodon-pop-ups", JsonHelper.marshalByJackson(popMessageVO));
