@@ -9,8 +9,17 @@ public class PopMessageVO {
     @ApiModelProperty("弹窗的内容")
     private String content;
 
-    @ApiModelProperty("状态：S 成功")
-    private String status;
+
+    @ApiModelProperty("消息主题")
+    private String title;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContent() {
         return content;
@@ -18,13 +27,5 @@ public class PopMessageVO {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

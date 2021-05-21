@@ -66,12 +66,12 @@ public class C7nWebSendServiceImpl extends WebSendServiceImpl {
          * 	"templateEditType": "RT"
          * }
          */
-        // TODO: 2021/5/18
-//        socketSendHelper.sendByUserId(message.get);
+
         //获得消息的接收者
         List<Receiver> receiverAddressList = messageSender.getReceiverAddressList();
         PopMessageVO popMessageVO = new PopMessageVO();
         popMessageVO.setContent(message.getContent());
+        popMessageVO.setTitle(message.getSubject());
         //推送给前端
         receiverAddressList.forEach(receiver -> {
             socketSendHelper.sendByUserId(receiver.getUserId(), "choerodon-pop-ups", JsonHelper.marshalByJackson(popMessageVO));
