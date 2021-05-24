@@ -7,7 +7,9 @@ import org.hzero.message.app.service.UserMessageService;
 import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.UserMessage;
 import org.hzero.message.domain.repository.UserMessageRepository;
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.MessageMapper;
+import org.hzero.message.infra.mapper.UserMessageMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class C7nMessageServiceImpl implements C7nMessageService {
     private UserMessageService userMessageService;
     @Autowired
     private MessageMapper messageMapper;
+    @Autowired
+    private UserMessageMapper userMessageMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -49,6 +53,16 @@ public class C7nMessageServiceImpl implements C7nMessageService {
         Message message = messageMapper.selectByPrimaryKey(messageId);
         if (!Objects.isNull(message)) {
             BeanUtils.copyProperties(message, simpleMessageDTO);
+            UserMessage userMessage = new UserMessage();
+            userMessage.setUserId(DetailsHelper.getUserDetails().getUserId());
+            userMessage.setTenantId(DetailsHelper.getUserDetails().getOrganizationId());
+            userMessage.setMessageId(messageId);
+
+            userMessage.setUserMessageTypeCode(HmsgConstant.UserMessageType.MSG);
+            UserMessage selectOne = userMessageMapper.selectOne(userMessage);
+            if (!Objects.isNull(selectOne)) {
+                simpleMessageDTO.setUserMessageId(selectOne.getUserMessageId());
+            }
         }
         return simpleMessageDTO;
     }
