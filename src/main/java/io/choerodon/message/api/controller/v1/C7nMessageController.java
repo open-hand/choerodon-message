@@ -62,7 +62,7 @@ public class C7nMessageController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(permissionLogin = true)
     @ApiOperation(value = "根据messageId查询站内信预览内容")
     @GetMapping("/{message_id}")
     public ResponseEntity<SimpleMessageDTO> getSimpleMessageDTO(@PathVariable(value = "message_id") Long messageId) {
