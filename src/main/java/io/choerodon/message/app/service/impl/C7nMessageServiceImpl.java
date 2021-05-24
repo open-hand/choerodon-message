@@ -2,9 +2,13 @@ package io.choerodon.message.app.service.impl;
 
 import java.util.Objects;
 
+import org.hzero.message.api.dto.SimpleMessageDTO;
 import org.hzero.message.app.service.UserMessageService;
+import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.UserMessage;
 import org.hzero.message.domain.repository.UserMessageRepository;
+import org.hzero.message.infra.mapper.MessageMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,8 @@ public class C7nMessageServiceImpl implements C7nMessageService {
     private UserMessageRepository userMessageRepository;
     @Autowired
     private UserMessageService userMessageService;
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -35,5 +41,15 @@ public class C7nMessageServiceImpl implements C7nMessageService {
 
         // 删除用户的所有信息
         userMessageRepository.delete(condition);
+    }
+
+    @Override
+    public SimpleMessageDTO getSimpleMessageDTO(Long messageId) {
+        SimpleMessageDTO simpleMessageDTO = new SimpleMessageDTO();
+        Message message = messageMapper.selectByPrimaryKey(messageId);
+        if (!Objects.isNull(message)) {
+            BeanUtils.copyProperties(message, simpleMessageDTO);
+        }
+        return simpleMessageDTO;
     }
 }
