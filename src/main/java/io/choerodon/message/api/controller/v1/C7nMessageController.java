@@ -3,10 +3,12 @@ package io.choerodon.message.api.controller.v1;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.ProjectMessageVO;
 import io.choerodon.message.app.service.MessageSettingC7nService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.message.api.dto.SimpleMessageDTO;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -58,5 +60,12 @@ public class C7nMessageController {
     public ResponseEntity<Void> batchSendMessage(@RequestBody @Encrypt List<MessageSender> senderList) {
         relSendMessageC7nService.batchSendMessage(senderList);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiOperation(value = "根据messageId查询站内信预览内容")
+    @GetMapping("/{message_id}")
+    public ResponseEntity<SimpleMessageDTO> getSimpleMessageDTO(@PathVariable(value = "message_id") Long messageId) {
+        return ResponseEntity.ok(c7nMessageService.getSimpleMessageDTO(messageId));
     }
 }
