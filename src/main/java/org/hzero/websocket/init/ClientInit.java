@@ -16,7 +16,6 @@ import org.hzero.websocket.constant.WebSocketConstant;
 import org.hzero.websocket.redis.*;
 import org.hzero.websocket.registry.BaseSessionRegistry;
 import org.hzero.websocket.registry.ChannelCheckRegistry;
-import org.hzero.websocket.registry.TopicRegistry;
 import org.hzero.websocket.registry.UserSessionRegistry;
 import org.hzero.websocket.vo.MsgVO;
 import org.hzero.websocket.vo.SessionVO;
@@ -77,10 +76,8 @@ public class ClientInit implements CommandLineRunner {
         scheduledExecutorService.scheduleWithFixedDelay(new ClientRegister(), 0, 10, TimeUnit.SECONDS);
         // 在线用户自检线程
         scheduledExecutorService.scheduleWithFixedDelay(new Check(), 0, 600, TimeUnit.SECONDS);
-        if (WebSocketConstant.ChannelType.REDIS.equals(webSocketConfig.getBroadcast().getChannelType())) {
-            // 通道监听检查线程
-            scheduledExecutorService.scheduleWithFixedDelay(new ChannelCheck(), 0, 180, TimeUnit.SECONDS);
-        }
+        // 通道监听检查线程
+//        scheduledExecutorService.scheduleWithFixedDelay(new ClientInit.ChannelCheck(), 0, 180, TimeUnit.SECONDS);
     }
 
     class ChannelCheck implements Runnable {
@@ -104,33 +101,11 @@ public class ClientInit implements CommandLineRunner {
             Long now = System.currentTimeMillis();
             if (ChannelCheckRegistry.getPublicTime() - now > 190000) {
                 logger.info("Public channel monitoring fails, re-establish monitoring, last heartbeat time: {}", ChannelCheckRegistry.getPublicTime());
-                try {
-                    PatternTopic topic = TopicRegistry.getTopic(WebSocketConstant.CHANNEL);
-                    if (topic != null) {
-                        container.removeMessageListener(listenerAdapter, topic);
-                        TopicRegistry.removeTopic(WebSocketConstant.CHANNEL);
-                    }
-                } catch (Exception e) {
-                    logger.debug("Failed to remove monitor");
-                }
-                PatternTopic commonTopic = new PatternTopic(WebSocketConstant.CHANNEL);
-                container.addMessageListener(listenerAdapter, commonTopic);
-                TopicRegistry.addTopic(WebSocketConstant.CHANNEL, commonTopic);
+                container.addMessageListener(listenerAdapter, new PatternTopic(WebSocketConstant.CHANNEL));
             }
             if (ChannelCheckRegistry.getOwnTime() - now > 190000) {
                 logger.info("Private channel monitoring fails, re-establish monitoring, last heartbeat time: {}", ChannelCheckRegistry.getOwnTime());
-                try {
-                    PatternTopic topic = TopicRegistry.getTopic(BaseSessionRegistry.getBrokerId());
-                    if (topic != null) {
-                        container.removeMessageListener(listenerAdapter, topic);
-                        TopicRegistry.removeTopic(BaseSessionRegistry.getBrokerId());
-                    }
-                } catch (Exception e) {
-                    logger.debug("Failed to remove monitor");
-                }
-                PatternTopic brokerTopic = new PatternTopic(BaseSessionRegistry.getBrokerId());
-                container.addMessageListener(listenerAdapter, brokerTopic);
-                TopicRegistry.addTopic(BaseSessionRegistry.getBrokerId(), brokerTopic);
+                container.addMessageListener(listenerAdapter, new PatternTopic(BaseSessionRegistry.getBrokerId()));
             }
         }
     }
@@ -254,7 +229,10 @@ public class ClientInit implements CommandLineRunner {
         private boolean checkAccessToken(String accessToken) {
             redisHelper.setCurrentDatabase(HZeroService.Oauth.REDIS_DB);
             String key = "access_token:access:" + accessToken;
-            boolean unable = !redisHelper.hasKey(key);
+            boolean unable = true;
+            if (redisHelper.hasKey(key)) {
+                unable = false;
+            }
             redisHelper.clearCurrentDatabase();
             return unable;
         }
