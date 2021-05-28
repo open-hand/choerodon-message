@@ -75,11 +75,13 @@ public class SocketSessionUtils {
         }
         if (!session.isOpen()) {
             // 清除失效连接
+            logger.debug("++++++3+++++++++++{}", sessionId);
+
             BaseSessionRegistry.clearSession(sessionId);
             return;
         }
         try {
-            logger.debug("================{}", session.getId());
+            logger.debug("=========================={}", sessionId);
             session.sendMessage(new TextMessage(msgVO));
         } catch (Exception e) {
             logger.warn("send websocket text message failed!", e);
@@ -93,11 +95,13 @@ public class SocketSessionUtils {
         }
         if (!session.isOpen()) {
             // 清除失效连接
+            logger.debug("++++++4+++++++++++{}", sessionId);
+
             BaseSessionRegistry.clearSession(sessionId);
             return;
         }
         try {
-            logger.debug("================{}", session.getId());
+            logger.debug("=========================={}", sessionId);
             session.sendMessage(new BinaryMessage(data));
         } catch (Exception e) {
             logger.warn("send websocket byte message failed!", e);
@@ -108,6 +112,8 @@ public class SocketSessionUtils {
         if (CollectionUtils.isEmpty(sessionIds)) {
             return;
         }
+        logger.debug("++++++5+++++++++++{}", sessionIds);
+
         // 清理内存及缓存
         sessionIds.forEach(BaseSessionRegistry::clearSession);
     }
