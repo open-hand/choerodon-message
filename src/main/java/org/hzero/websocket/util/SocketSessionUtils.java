@@ -68,7 +68,7 @@ public class SocketSessionUtils {
         }
     }
 
-    public static void sendMsg(WebSocketSession session, String sessionId, String msgVO) {
+    public static synchronized void sendMsg(WebSocketSession session, String sessionId, String msgVO) {
         if (session == null) {
             // websocketSession不在当前节点
             return;
