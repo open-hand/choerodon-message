@@ -32,6 +32,12 @@
             <version>2.1.1.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-websocket</artifactId>
+            <version>1.6.2-SNAPSHOT</version>
+        </dependency>
+
         <!-- 依赖的服务 -->
         <dependency>
             <groupId>org.hzero</groupId>
@@ -53,8 +59,13 @@
                     <groupId>org.hzero.starter</groupId>
                     <artifactId>hzero-starter-integrate-dd</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-websocket</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.hzero.boot</groupId>
             <artifactId>hzero-boot-platform</artifactId>
