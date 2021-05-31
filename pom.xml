@@ -32,10 +32,21 @@
             <version>2.1.1.RELEASE</version>
         </dependency>
 
+        <!--        全面升级hzero版本时删除-->
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-websocket</artifactId>
-            <version>1.6.2-SNAPSHOT</version>
+            <version>1.6.2.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-redis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- 依赖的服务 -->
