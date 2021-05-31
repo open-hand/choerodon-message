@@ -1,11 +1,10 @@
 package io.choerodon.message.app.service.impl;
 
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.message.api.vo.EmailConfigVO;
-import io.choerodon.message.app.service.ConfigC7nService;
-import io.choerodon.message.infra.enums.ConfigNameEnum;
-
-import io.choerodon.message.infra.dto.iam.TenantDTO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.hzero.message.app.service.EmailServerService;
 import org.hzero.message.app.service.SmsServerService;
@@ -20,13 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.mail.MessagingException;
-
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.message.api.vo.EmailConfigVO;
+import io.choerodon.message.app.service.ConfigC7nService;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.ConfigNameEnum;
 
 /**
  * @author scp
@@ -40,6 +37,11 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     private static final String SSL_PROPERTY_CLASS_VALUE = "javax.net.ssl.SSLSocketFactory";
     private static final String SSL_PROPERTY_PORT = "mail.smtp.socketFactory.port";
     private static final String SSL_PROPERTY_ENABLE = "mail.smtp.ssl.enable";
+    private static final String SSL_PROPERTY_TIMEOUT = "mail.smtp.timeout";
+    private static final String SSL_PROPERTY_SMTPS_TIMEOUT = "mail.smtps.timeout";
+    private static final String SSL_PROPERTY_CONNECTIONTIMEOUT = "mail.smtp.connectiontimeout";
+    private static final String SSL_PROPERTY_SMTPS_CONNECTIONTIMEOUT = "mail.smtps.connectiontimeout";
+    private static final String MAX_TIME = "10000";
 
     @Autowired
     private EmailServerService emailServerService;
@@ -100,8 +102,14 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
     public void testEmailConnect() {
         JavaMailSenderImpl javaMailSender = (JavaMailSenderImpl) EmailSupporter.javaMailSender(emailServerService.getEmailServer(TenantDTO.DEFAULT_TENANT_ID, ConfigNameEnum.EMAIL_NAME.value()));
         try {
+            Properties properties = javaMailSender.getJavaMailProperties();
+            properties.put(SSL_PROPERTY_TIMEOUT, MAX_TIME);
+            properties.put(SSL_PROPERTY_CONNECTIONTIMEOUT, MAX_TIME);
+            properties.put(SSL_PROPERTY_SMTPS_TIMEOUT, MAX_TIME);
+            properties.put(SSL_PROPERTY_SMTPS_CONNECTIONTIMEOUT, MAX_TIME);
+            javaMailSender.setJavaMailProperties(properties);
             javaMailSender.testConnection();
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             throw new CommonException("error.emailConfig.testConnectFailed", e);
         }
     }
