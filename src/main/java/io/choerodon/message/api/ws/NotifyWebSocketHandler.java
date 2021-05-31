@@ -78,7 +78,6 @@ public class NotifyWebSocketHandler implements SocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
         // 这里应该是只会接收到心跳
         LOGGER.info("Notify Socket handler: received message: {}", message.getPayload());
-        LOGGER.info("```````````````````````{}", session.getId());
         // TODO 这个订阅的逻辑原先是为了配合io.choerodon.notify.api.controller.v1.NoticesSendController#postWebSocket方法的
 //        if (!StringUtils.isEmpty(key)) {
 //            webSocketHelper.subscribe(key, session);
