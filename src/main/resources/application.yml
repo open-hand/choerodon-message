@@ -112,6 +112,7 @@ hzero:
     monitor:
       name: choerodon-monitor
   websocket:
+    heartbeat: heartBeat
     # 用于连接websocket的路径
     websocket: /websocket
     easy-mode: ${HZERO_WEBSOCKET_EASY_MODE:false}
