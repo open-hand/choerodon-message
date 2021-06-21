@@ -33,9 +33,6 @@ public class ConfigC7nController {
     @Permission(level = ResourceLevel.SITE)
     @ApiOperation(value = "更新邮箱配置")
     public ResponseEntity<EmailConfigVO> updateEmail(@RequestBody EmailConfigVO emailConfigVO) {
-        if (!StringUtils.isEmpty(emailConfigVO.getAccount()) && !Pattern.matches(EMAIL_REGULAR_EXPRESSION, emailConfigVO.getAccount())) {
-            throw new CommonException("error.emailConfig.accountIllegal");
-        }
         if (emailConfigVO.getPort() == null) {
             emailConfigVO.setPort(25);
         }
