@@ -211,8 +211,14 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             List<TargetUserVO> targetUserList;
             if (customMessageSettingVO != null) {
                 targetUserList = customMessageSettingVO.getUserList();
+                projectMessageVO.setEmailEnable(customMessageSettingVO.getEmailEnable());
+                projectMessageVO.setPmEnable(customMessageSettingVO.getPmEnable());
+                projectMessageVO.setSmsEnable(customMessageSettingVO.getSmsEnable());
             } else {
                 targetUserList = defaultSetting.getUserList();
+                projectMessageVO.setEmailEnable(defaultSetting.getEmailEnable());
+                projectMessageVO.setPmEnable(defaultSetting.getPmEnable());
+                projectMessageVO.setSmsEnable(defaultSetting.getSmsEnable());
             }
             Set<Long> userIds = new HashSet<>();
             Set<String> receiverTypes = new HashSet<>();
