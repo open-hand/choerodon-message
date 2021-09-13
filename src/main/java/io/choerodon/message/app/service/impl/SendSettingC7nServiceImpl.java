@@ -392,7 +392,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 subCategories.add(SubcategoryEnum.RESOURCE_SECURITY_NOTICE.getValue());
                 subCategories.add(SubcategoryEnum.MARKET_APP.getValue());
             }
-            if (categories.contains(ProjectCategoryEnum.N_TEST.value())){
+            if (categoryCodes.contains(ProjectCategoryEnum.N_TEST.value())){
                 subCategories.add(SubcategoryEnum.API_TEST_EXECUTE_NOTICE.getValue());
             }
 
