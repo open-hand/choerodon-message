@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.message.api.vo.MailRecordVO;
 import io.choerodon.message.api.vo.StackingHistogramVO;
 import io.choerodon.message.app.service.MailingRecordService;
 import io.choerodon.message.infra.enums.EmailSendStatusEnum;
@@ -41,12 +42,12 @@ public class MailingRecordServiceImpl implements MailingRecordService {
             throw new CommonException("error.invalid.param");
         }
         StackingHistogramVO stackingHistogramVO = new StackingHistogramVO();
-        List<Message> messageList = messageC7nMapper.selectEmailMessage(
+        List<MailRecordVO> mailRecordVOS = messageC7nMapper.selectEmailMessage(
                 new java.sql.Date(startTime.getTime()),
                 new java.sql.Date(endTime.getTime()));
 
         // 根据日期分组
-        Map<String, List<Message>> dateListMap = messageList.stream()
+        Map<String, List<MailRecordVO>> dateListMap = mailRecordVOS.stream()
                 .collect(Collectors.groupingBy(t -> new java.sql.Date(t.getCreationDate().getTime()).toString()));
 
         ZoneId zoneId = ZoneId.systemDefault();
@@ -58,10 +59,10 @@ public class MailingRecordServiceImpl implements MailingRecordService {
             long countSuccessNum = 0;
             long countFailedNum = 0;
             // 计算成功发送的邮件数
-            List<Message> recordDTOS = dateListMap.get(date);
+            List<MailRecordVO> recordDTOS = dateListMap.get(date);
             if (!CollectionUtils.isEmpty(recordDTOS)) {
-                countSuccessNum = recordDTOS.stream().filter(recordDTO -> EmailSendStatusEnum.COMPLETED.value().equals(recordDTO.getSendFlag())).count();
-                countFailedNum = recordDTOS.stream().filter(recordDTO -> EmailSendStatusEnum.FAILED.value().equals(recordDTO.getSendFlag())).count();
+                countSuccessNum = recordDTOS.get(0).getSuccessCount();
+                countFailedNum = recordDTOS.get(0).getAllCount()-countSuccessNum;
             }
             stackingHistogramVO.getDates().add(date);
             stackingHistogramVO.getSuccessNums().add(countSuccessNum);

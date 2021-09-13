@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.hzero.message.domain.entity.Message;
 
+import io.choerodon.message.api.vo.MailRecordVO;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
 
 /**
@@ -14,8 +14,8 @@ import io.choerodon.message.infra.dto.MessageC7nDTO;
  * @description
  */
 public interface MessageC7nMapper {
-    List<Message> selectEmailMessage(@Param("startDate") Date startDate,
-                                     @Param("endDate") Date endDate);
+    List<MailRecordVO> selectEmailMessage(@Param("startDate") Date startDate,
+                                          @Param("endDate") Date endDate);
 
     List<MessageC7nDTO> listMessage(@Param("status") String status,
                                     @Param("receiveEmail") String receiveEmail,

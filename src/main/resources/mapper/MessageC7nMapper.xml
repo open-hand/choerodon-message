@@ -2,23 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.choerodon.message.infra.mapper.MessageC7nMapper">
 
-    <select id="selectEmailMessage" resultType="org.hzero.message.domain.entity.Message">
-        <bind name="lang" value="@io.choerodon.mybatis.helper.LanguageHelper@language()"/>
+    <select id="selectEmailMessage" resultType="io.choerodon.message.api.vo.MailRecordVO">
         select
-        hm.message_id,
-        hm.tenant_id,
-        hm.message_type_code,
-        hm.server_code,
-        hm.subject,
-        hm.object_version_number,
-        hm.send_flag,
-        hm.creation_date
+            count(hm.message_id) as allCount,
+            sum( hm.send_flag ) as successCount ,
+            date_format( hm.creation_date, '%Y-%m-%d' ) as creationDate
         from hmsg_message hm
         join hmsg_message_transaction hmt on hm.message_id = hmt.message_id
         WHERE hm.message_type_code = 'EMAIL'
         and hmt.last_update_date &gt;= #{startDate}
         and hmt.last_update_date &lt;= #{endDate}
-        order by hmt.last_update_date DESC
+        GROUP BY date_format( hm.creation_date, '%Y-%m-%d' )
     </select>
 
     <select id="listEmailMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
