@@ -31,7 +31,7 @@ public enum DeleteResourceType {
     public static final Map<String, String> nameMapping = new HashMap(6);
 
     static {
-        nameMapping.put(INSTANCE.getTypeName(), "删除实例");
+        nameMapping.put(INSTANCE.getTypeName(), "删除应用");
         nameMapping.put(INGRESS.getTypeName(), "删除域名");
         nameMapping.put(SERVICE.getTypeName(), "删除网络");
         nameMapping.put(CONFIGMAP.getTypeName(), "删除配置映射");
