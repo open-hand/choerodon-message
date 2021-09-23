@@ -175,4 +175,17 @@
         AND hm.message_type_code = #{messageType}
     </delete>
 
+    <select id="listFailedMessageRecord" resultType="java.lang.Long">
+        SELECT
+            hmt.transaction_id
+        FROM
+            hmsg_message_transactio hmt
+            JOIN hmsg_message hm ON hm.message_id = hmt.message_id
+            AND hm.message_type_code = 'email'
+        WHERE
+            hmt.trx_status_code = 'F'
+          AND hmt.creation_date &gt;= #{startDate}
+          AND hmt.creation_date &lt;= #{endDate}
+    </select>
+
 </mapper>
