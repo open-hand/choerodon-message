@@ -22,9 +22,10 @@ public interface MessageC7nMapper {
                                     @Param("templateType") String templateType,
                                     @Param("failedReason") String failedReason,
                                     @Param("params") String params);
+
     List<MessageC7nDTO> listEmailMessage(@Param("status") String status,
-                                    @Param("subject") String messageName,
-                                    @Param("params") String params);
+                                         @Param("subject") String messageName,
+                                         @Param("params") String params);
 
     List<MessageC7nDTO> listWebHooks(@Param("status") String status,
                                      @Param("webhookAddress") String webhookAddress,
@@ -34,5 +35,9 @@ public interface MessageC7nMapper {
 
     void deleteRecord(@Param("messageType") String messageType,
                       @Param("cleanNum") Integer cleanNum);
+
+
+    List<Long> listFailedMessageRecord(@Param("startDate") Date startDate,
+                                       @Param("endDate") Date endDate);
 
 }

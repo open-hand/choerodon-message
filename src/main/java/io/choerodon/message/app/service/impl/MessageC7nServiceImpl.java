@@ -1,15 +1,23 @@
 package io.choerodon.message.app.service.impl;
 
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
 import org.hzero.message.app.service.EmailSendService;
+import org.hzero.message.app.service.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -34,12 +42,21 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     private static final String DEFAULT_SERVER_CODE = "CHOERODON-EMAIL";
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ThreadPoolExecutor RESEND_FAILED_EMAIL_POOL = new ThreadPoolExecutor(10, 20, 300, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(1000), new ThreadFactoryBuilder().setNameFormat("C7n-resend-%d").build());
+
     @Autowired
     private MessageC7nMapper messageC7nMapper;
     @Autowired
     private EmailSendService emailSendService;
     @Autowired
     private IamClientOperator iamClientOperator;
+    @Autowired
+    @Lazy
+    private MessageService messageService;
+
 
     @Override
     @ProcessLovValue
@@ -98,5 +115,24 @@ public class MessageC7nServiceImpl implements MessageC7nService {
             messageSender.setAttachmentList(Collections.singletonList(attachment));
         }
         emailSendService.sendMessage(TenantDTO.DEFAULT_TENANT_ID, messageSender);
+    }
+
+    @Override
+    public void resendFailedEmail() {
+        Date endDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endDate);
+        calendar.add(Calendar.MINUTE, -60);
+        Date startDate = calendar.getTime();
+        List<Long> recordIds = messageC7nMapper.listFailedMessageRecord(new java.sql.Date(startDate.getTime()), new java.sql.Date(endDate.getTime()));
+        RESEND_FAILED_EMAIL_POOL.execute(() -> recordIds.forEach(t -> {
+                    messageService.resendMessage(null, t);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
+        ));
     }
 }

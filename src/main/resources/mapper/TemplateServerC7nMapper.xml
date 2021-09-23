@@ -41,7 +41,11 @@
             AND hts.receive_config_flag = #{receiveConfigFlag}
         </if>
         <if test="params != null">
-            AND hts.message_code LIKE concat(concat('%',#{params}),'%')
+            AND (
+                hts.message_code LIKE concat(concat('%',#{params}),'%') OR
+                hts.message_name LIKE concat(concat('%',#{params}),'%') OR
+                hts.description LIKE concat(concat('%',#{params}),'%')
+            )
         </if>
         <if test="introduce != null ">
             AND hts.description LIKE concat(concat('%',#{introduce}),'%')

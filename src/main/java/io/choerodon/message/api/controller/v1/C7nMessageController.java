@@ -1,13 +1,12 @@
 package io.choerodon.message.api.controller.v1;
 
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.ProjectMessageVO;
-import io.choerodon.message.app.service.MessageSettingC7nService;
+import java.util.List;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.core.util.Results;
 import org.hzero.message.api.dto.SimpleMessageDTO;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.ProjectMessageVO;
 import io.choerodon.message.app.service.C7nMessageService;
+import io.choerodon.message.app.service.MessageC7nService;
+import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.swagger.annotation.Permission;
-
-import java.util.List;
 
 /**
  * @author zmf
@@ -36,6 +37,8 @@ public class C7nMessageController {
     private RelSendMessageC7nService relSendMessageC7nService;
     @Autowired
     private MessageSettingC7nService messageSettingC7nService;
+    @Autowired
+    private MessageC7nService messageC7nService;
 
     @Permission(permissionLogin = true)
     @ApiOperation("彻底删除用户当前的所有站内信")
@@ -67,5 +70,13 @@ public class C7nMessageController {
     @GetMapping("/{message_id}")
     public ResponseEntity<SimpleMessageDTO> getSimpleMessageDTO(@PathVariable(value = "message_id") Long messageId) {
         return ResponseEntity.ok(c7nMessageService.getSimpleMessageDTO(messageId));
+    }
+
+    @Permission(permissionLogin = true)
+    @ApiOperation(value = "失败邮件重新发送")
+    @GetMapping("/resend")
+    public ResponseEntity<Void> resend() {
+        messageC7nService.resendFailedEmail();
+        return Results.success();
     }
 }

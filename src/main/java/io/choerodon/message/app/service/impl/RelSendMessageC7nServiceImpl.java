@@ -178,7 +178,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
         //如果项目下配置没有开启，则查询默认配置
         if (Objects.isNull(messageSettingDTO)) {
-            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), envId, eventName, messageType);
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), null, eventName, messageType);
         }
         //根据消息配置返回项目层是否应该发送消息
         if (ObjectUtils.isEmpty(messageSettingDTO)) {
