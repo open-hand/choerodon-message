@@ -179,7 +179,7 @@
         SELECT
             hmt.transaction_id
         FROM
-            hmsg_message_transactio hmt
+            hmsg_message_transaction hmt
             JOIN hmsg_message hm ON hm.message_id = hmt.message_id
             AND hm.message_type_code = 'email'
         WHERE
