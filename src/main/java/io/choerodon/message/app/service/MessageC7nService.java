@@ -26,4 +26,11 @@ public interface MessageC7nService {
      * @param customEmailSendInfoVO
      */
     void sendCustomEmail(CustomEmailSendInfoVO customEmailSendInfoVO);
+
+    /**
+     * 获取前一小时发送失败的邮件
+     * 并重新发送
+     */
+
+    void resendFailedEmail();
 }

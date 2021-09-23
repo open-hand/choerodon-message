@@ -1,6 +1,7 @@
 package io.choerodon.message.app.task;
 
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
+import io.choerodon.message.app.service.MessageC7nService;
 import io.choerodon.message.app.service.MessageCheckLogService;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
 
@@ -33,10 +35,14 @@ public class HzeroMessageTask {
 
     private MessageCheckLogService messageCheckLogService;
 
+    private MessageC7nService messageC7nService;
+
     public HzeroMessageTask(MessageC7nMapper messageC7nMapper,
-                            MessageCheckLogService messageCheckLogService) {
+                            MessageCheckLogService messageCheckLogService,
+                            MessageC7nService messageC7nService) {
         this.messageC7nMapper = messageC7nMapper;
         this.messageCheckLogService = messageCheckLogService;
+        this.messageC7nService = messageC7nService;
     }
 
 
@@ -78,6 +84,7 @@ public class HzeroMessageTask {
 
     /**
      * 清理所有项目层设置的数据
+     *
      * @param map
      */
     @JobTask(maxRetryCount = 3, code = "clearProjectMessageSetting", description = "清理项目层的通知设置")
@@ -92,6 +99,15 @@ public class HzeroMessageTask {
             LOGGER.error("error.clear.project.message.setting", e);
         }
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clear message project message setting<<<<<<<<<<<<<<<<<<<<<<<<<<");
+    }
+
+
+    @JobTask(code = "resendFailedEmail", description = "重新发送失败的邮件")
+    public Map<String, Object> resendFailedEmail(Map<String, Object> data) {
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        messageC7nService.resendFailedEmail();
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>end resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        return data;
     }
 
 
