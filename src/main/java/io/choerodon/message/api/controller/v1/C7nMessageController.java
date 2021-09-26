@@ -1,5 +1,6 @@
 package io.choerodon.message.api.controller.v1;
 
+import java.util.Date;
 import java.util.List;
 
 import io.swagger.annotations.Api;
@@ -75,8 +76,8 @@ public class C7nMessageController {
     @Permission(permissionLogin = true)
     @ApiOperation(value = "失败邮件重新发送")
     @GetMapping("/resend")
-    public ResponseEntity<Void> resend() {
-        messageC7nService.resendFailedEmail();
+    public ResponseEntity<Void> resend(@RequestParam(required = false) Date endDate) {
+        messageC7nService.resendFailedEmail(endDate);
         return Results.success();
     }
 }
