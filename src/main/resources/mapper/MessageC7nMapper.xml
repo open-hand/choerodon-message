@@ -5,7 +5,7 @@
     <select id="selectEmailMessage" resultType="io.choerodon.message.api.vo.MailRecordVO">
         select
             count(hm.message_id) as allCount,
-            sum( hm.send_flag ) as successCount ,
+            sum( hmt.trx_status_code='S' ) as successCount ,
             date_format( hm.creation_date, '%Y-%m-%d' ) as creationDate
         from hmsg_message hm
         join hmsg_message_transaction hmt on hm.message_id = hmt.message_id
