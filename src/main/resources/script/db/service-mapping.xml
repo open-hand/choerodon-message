@@ -16,6 +16,6 @@
     <service name="hzero_message" filename="hzero_message" schema="hzero_message" description="消息服务"/>
     <service name="hzero_monitor" filename="hzero_monitor" schema="hzero_monitor" description="监控审计服务"/>
     <exclusion>
-        hmsg_email_server,hmsg_message_template.external_code
+        hmsg_email_server,hmsg_message_template.external_code,hmsg_sms_server
     </exclusion>
 </services>
