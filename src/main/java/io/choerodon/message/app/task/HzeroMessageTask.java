@@ -105,7 +105,7 @@ public class HzeroMessageTask {
     @JobTask(code = "resendFailedEmail", description = "重新发送失败的邮件")
     public Map<String, Object> resendFailedEmail(Map<String, Object> data) {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        messageC7nService.resendFailedEmail();
+        messageC7nService.resendFailedEmail(null);
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>end resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
         return data;
     }

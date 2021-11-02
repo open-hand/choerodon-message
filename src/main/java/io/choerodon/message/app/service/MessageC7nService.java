@@ -1,11 +1,11 @@
 package io.choerodon.message.app.service;
 
+import java.util.Date;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-
-import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageC7nService {
     Page<MessageC7nDTO> listMessage(String status,
@@ -32,5 +32,5 @@ public interface MessageC7nService {
      * 并重新发送
      */
 
-    void resendFailedEmail();
+    void resendFailedEmail(Date endDate);
 }

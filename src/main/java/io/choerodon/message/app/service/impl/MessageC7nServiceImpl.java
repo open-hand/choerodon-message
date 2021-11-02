@@ -118,13 +118,15 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     }
 
     @Override
-    public void resendFailedEmail() {
-        Date endDate = new Date();
+    public void resendFailedEmail(Date endDate) {
+        if (endDate == null) {
+            endDate = new Date();
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(endDate);
         calendar.add(Calendar.MINUTE, -60);
         Date startDate = calendar.getTime();
-        List<Long> recordIds = messageC7nMapper.listFailedMessageRecord(new java.sql.Date(startDate.getTime()), new java.sql.Date(endDate.getTime()));
+        List<Long> recordIds = messageC7nMapper.listFailedMessageRecord(startDate, endDate);
         RESEND_FAILED_EMAIL_POOL.execute(() -> recordIds.forEach(t -> {
                     messageService.resendMessage(null, t);
                     try {
