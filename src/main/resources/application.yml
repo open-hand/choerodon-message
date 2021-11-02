@@ -45,15 +45,15 @@ hystrix:
         isolation:
           thread:
             # hystrix熔断时间，12秒，需大于feign/ribbon的超时时间
-            timeoutInMilliseconds: ${HYSTRIX_COMMAND_TIMEOUT_IN_MILLISECONDS:40000}
+            timeoutInMilliseconds: ${HYSTRIX_COMMAND_TIMEOUT_IN_MILLISECONDS:4000}
 
 ribbon:
   # Ribbon从DiscoveryClient同步Server的间隔时间，默认30秒
   ServerListRefreshInterval: ${RIBBON_SERVER_LIST_REFRESH_INTERVAL:10000}
   # 客户端读取超时时间，超时时间要小于Hystrix的超时时间，否则重试机制就无意义了
-  ReadTimeout: ${RIBBON_READ_TIMEOUT:30000}
+  ReadTimeout: ${RIBBON_READ_TIMEOUT:3000}
   # 客户端连接超时时间
-  ConnectTimeout: ${RIBBON_CONNECT_TIMEOUT:10000}
+  ConnectTimeout: ${RIBBON_CONNECT_TIMEOUT:1000}
   # 默认只重试 GET，设置为true时将重试所有类型，如 POST、PUT、DELETE
   # 重试对Feign生效，对RestTemplate不生效，RestTemplate要重试需加入spring-retry依赖
   OkToRetryOnAllOperations: false
