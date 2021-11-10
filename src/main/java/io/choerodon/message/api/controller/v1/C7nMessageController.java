@@ -6,6 +6,7 @@ import java.util.List;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import java.util.Set;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.core.util.Results;
 import org.hzero.message.api.dto.SimpleMessageDTO;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.api.vo.ProjectMessageVO;
 import io.choerodon.message.app.service.C7nMessageService;
 import io.choerodon.message.app.service.MessageC7nService;
@@ -79,5 +81,15 @@ public class C7nMessageController {
     public ResponseEntity<Void> resend(@RequestParam(required = false) Date endDate) {
         messageC7nService.resendFailedEmail(endDate);
         return Results.success();
+    }
+
+    //根据邮件集合查询邮件发送的成功还是失败
+    @Permission(permissionWithin = true)
+    @ApiOperation(value = "失败邮件重新发送")
+    @PostMapping("/trx_status")
+    public ResponseEntity<List<MessageTrxStatusVO>> queryTrxStatusCode(
+            @RequestParam(value = "templateCode") String templateCode,
+            @RequestBody Set<String> userEmails) {
+        return Results.success(messageC7nService.queryTrxStatusCode(userEmails, templateCode));
     }
 }
