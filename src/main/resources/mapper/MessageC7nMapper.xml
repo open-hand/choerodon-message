@@ -188,4 +188,24 @@
           AND hmt.creation_date &lt;= #{endDate}
     </select>
 
+    <select id="queryLastTrxStatusCode" resultType="io.choerodon.message.api.vo.MessageTrxStatusVO">
+
+        SELECT
+	      hmt.trx_status_code,
+	      hmr.receiver_address ,
+          hm.message_id
+        FROM
+        	hmsg_message hm
+        	INNER JOIN hmsg_message_receiver hmr ON hm.message_id = hmr.message_id
+        	INNER JOIN hmsg_message_transaction hmt ON hmt.message_id=hm.message_id
+        WHERE
+            hmr.receiver_address IN
+        	<foreach collection="userEmails" item="email" open="(" separator="," close=")">
+              #{email,jdbcType=VARCHAR}
+            </foreach>
+        	AND hm.template_code = #{templateCode}
+        	AND hm.message_type_code="email"
+        	ORDER BY hm.message_id DESC
+    </select>
+
 </mapper>

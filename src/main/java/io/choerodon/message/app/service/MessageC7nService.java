@@ -1,9 +1,12 @@
 package io.choerodon.message.app.service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
+import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
@@ -33,4 +36,6 @@ public interface MessageC7nService {
      */
 
     void resendFailedEmail(Date endDate);
+
+    List<MessageTrxStatusVO> queryTrxStatusCode(Set<String> userEmails, String templateCode);
 }

@@ -3,9 +3,11 @@ package io.choerodon.message.infra.mapper;
 import java.util.Date;
 import java.util.List;
 
+import java.util.Set;
 import org.apache.ibatis.annotations.Param;
 
 import io.choerodon.message.api.vo.MailRecordVO;
+import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
 
 /**
@@ -40,4 +42,5 @@ public interface MessageC7nMapper {
     List<Long> listFailedMessageRecord(@Param("startDate") Date startDate,
                                        @Param("endDate") Date endDate);
 
+    List<MessageTrxStatusVO> queryLastTrxStatusCode(@Param("userEmails") Set<String> userEmails, @Param("templateCode") String templateCode);
 }

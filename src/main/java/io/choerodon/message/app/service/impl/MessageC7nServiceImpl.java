@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
+import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.MessageC7nService;
 import io.choerodon.message.infra.dto.MessageC7nDTO;
@@ -136,5 +138,25 @@ public class MessageC7nServiceImpl implements MessageC7nService {
                     }
                 }
         ));
+    }
+
+    @Override
+    public List<MessageTrxStatusVO> queryTrxStatusCode(Set<String> userEmails, String templateCode) {
+        if (CollectionUtils.isEmpty(userEmails)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<MessageTrxStatusVO> messageTrxStatusVOS = messageC7nMapper.queryLastTrxStatusCode(userEmails, templateCode);
+        if (CollectionUtils.isEmpty(messageTrxStatusVOS)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<MessageTrxStatusVO> reTrxStatusVOS = new ArrayList<>();
+        Map<String, List<MessageTrxStatusVO>> stringListMap = messageTrxStatusVOS.stream().collect(Collectors.groupingBy(MessageTrxStatusVO::getReceiverAddress));
+        for (Map.Entry<String, List<MessageTrxStatusVO>> stringListEntry : stringListMap.entrySet()) {
+            MessageTrxStatusVO messageTrxStatusVO = new MessageTrxStatusVO();
+            List<MessageTrxStatusVO> trxStatusVOS = stringListEntry.getValue();
+            messageTrxStatusVO = trxStatusVOS.stream().sorted(Comparator.comparing(MessageTrxStatusVO::getMessageId).reversed()).collect(Collectors.toList()).get(0);
+            reTrxStatusVOS.add(messageTrxStatusVO);
+        }
+        return reTrxStatusVOS;
     }
 }
