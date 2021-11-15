@@ -42,7 +42,7 @@
             AND hts.message_name LIKE concat(concat('%',#{messageName}),'%')
         </if>
         <if test="type != null">
-            AND hws.type=#{type}
+            AND hws.server_type=#{type}
         </if>
         <if test="enableFlag != null">
             AND hws.enabled_flag='enableFlag'
