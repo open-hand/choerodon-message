@@ -31,6 +31,7 @@
     <select id="selectLastestSticky" resultType="io.choerodon.message.api.vo.SystemAnnouncementVO">
         SELECT
         hn.notice_id AS id,
+        hn.notice_id AS readId,
         hn.title AS title,
         hnc.notice_body AS content,
         hn.published_date AS sendDate,
