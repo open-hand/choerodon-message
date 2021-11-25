@@ -17,6 +17,9 @@ public class SystemAnnouncementVO {
     @ApiModelProperty(value = "系统公告ID/非必填")
     private Long id;
 
+    @ApiModelProperty(value = "前端需要字段")
+    private Long readId;
+
     @ApiModelProperty(value = "系统公告标题/必填")
     @NotEmpty(message = "error.announcement.title.empty")
     @Size(min = 1, max = 64, message = "error.announcement.title.length")
@@ -37,6 +40,14 @@ public class SystemAnnouncementVO {
 
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
+
+    public Long getReadId() {
+        return readId;
+    }
+
+    public void setReadId(Long readId) {
+        this.readId = readId;
+    }
 
     public Long getId() {
         return id;
