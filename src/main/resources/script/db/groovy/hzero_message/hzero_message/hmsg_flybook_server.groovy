@@ -27,4 +27,14 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_flybook_server.groovy') {
         }
         addUniqueConstraint(columnNames: "server_code,tenant_id", tableName: "hmsg_flybook_server", constraintName: "hmsg_flybook_server_u1")
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2021-05-18-hmsg_flybook_server") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        modifyDataType(tableName: "hmsg_flybook_server", columnName: 'app_secret', newDataType: "varchar(" + 480 * weight + ")")
+    }
 }
