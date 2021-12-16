@@ -252,7 +252,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         whWeChatSend.setMarkdown(weChatMarkdown);
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetryer(tryTimes);
+        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
         try {
             retryer.call(() -> {
                 restTemplate.postForEntity(messageSender.getWebhookAddress(), whWeChatSend, String.class);
@@ -316,7 +316,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         // 5.发送请求
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetryer(tryTimes);
+        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
         try {
             retryer.call(() -> {
                 restTemplate.postForEntity(uri, whDingTalkSend, String.class);
@@ -348,7 +348,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         HttpEntity<String> request = new HttpEntity<>(msgContent, httpHeaders);
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetryer(tryTimes);
+        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
         try {
             retryer.call(() -> {
                 restTemplate.postForEntity(messageSender.getWebhookAddress(), request, String.class);
