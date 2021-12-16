@@ -95,5 +95,21 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message.groovy') {
             column(name: "source_key", type: "varchar(" + 60 * weight + ")", remarks: "来源标识")
         }
     }
-	
+
+    changeSet(author: "hzero@hand-china.com", id: "2021-03-09-hmsg_message") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        dropNotNullConstraint(tableName: "hmsg_message", columnName: "template_code", columnDataType: "varchar(" + 60 * weight + ")")
+        dropNotNullConstraint(tableName: "hmsg_message", columnName: "lang", columnDataType: "varchar(" + 30 * weight + ")")
+    }
+
+    changeSet(author: "hzero@hand-china.com", id: "2021-03-19-hmsg_message") {
+        addColumn(tableName: 'hmsg_message') {
+            column(name: "ext_receiver", type: "longtext", remarks: "接收人拓展属性")
+        }
+    }
 }

@@ -9,6 +9,7 @@ import org.hzero.websocket.constant.WebSocketConstant;
 import org.hzero.websocket.interceptor.SocketInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,6 +39,9 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
         this.webSocketConfig = webSocketConfig;
     }
 
+
+    @Value("${hzero.websocket.oauthUrl:http://choerodon-oauth/oauth/api/user}")
+    private String oauthUrl;
     @Override
     public String processor() {
         return "choerodon_msg";
@@ -53,7 +57,7 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 HttpHeaders headers = new HttpHeaders();
                 headers.set(HttpHeaders.AUTHORIZATION, "bearer " + accessToken);
                 HttpEntity<String> entity = new HttpEntity<>(headers);
-                ResponseEntity<String> responseEntity = restTemplate.exchange(webSocketConfig.getOauthUrl(), HttpMethod.GET, entity, String.class);
+                ResponseEntity<String> responseEntity = restTemplate.exchange(oauthUrl, HttpMethod.GET, entity, String.class);
                 if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
                     responseJson = responseEntity.getBody();
                     JSONObject object = JSONObject.parseObject(responseJson);
@@ -61,7 +65,7 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                     serverHttpRequest.getHeaders().add("X-WebSocket-UserID", object.getJSONObject("principal").getString("userId"));
                     return true;
                 } else {
-                    LOGGER.warn("reject webSocket connect, redirect request to {} not 2xx", webSocketConfig.getOauthUrl());
+                    LOGGER.warn("reject webSocket connect, redirect request to {} not 2xx", oauthUrl);
                     return false;
                 }
             } else {
@@ -69,7 +73,7 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 return false;
             }
         } catch (RestClientException e) {
-            LOGGER.error("reject webSocket connect, redirect request to {} error. The token is {}.", webSocketConfig.getOauthUrl(), accessToken);
+            LOGGER.error("reject webSocket connect, redirect request to {} error. The token is {}.", oauthUrl, accessToken);
             return false;
         } catch (JSONException e) {
             LOGGER.error("reject webSocket connect, oauth-server response json error. the json is {}", responseJson, e);

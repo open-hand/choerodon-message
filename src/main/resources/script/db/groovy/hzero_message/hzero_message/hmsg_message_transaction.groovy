@@ -36,10 +36,4 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_transaction.groovy') 
             column(name: "last_update_date")
         }
     }
-
-    changeSet(author: 'hzero@hand-china.com', id: '2021-04-21-hmsg_message_transaction') {
-        createIndex(tableName: "hmsg_message_transaction", indexName: "hmsg_message_transaction_n3") {
-            column(name: "trx_status_code")
-        }
-    }
 }

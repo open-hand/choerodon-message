@@ -44,4 +44,16 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_sms_server.groovy') {
             column(name: "filter_strategy", type: "varchar(" + 30 * weight + ")", remarks: "筛选策略，值集：HMSG.EMAIL.FILTER_STRATEGY")
         }
     }
+
+    changeSet(author: "hzero@hand-china.com", id: "2021-09-22-hmsg_sms_server") {
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
+        addColumn(tableName: 'hmsg_sms_server') {
+            column(name: "ext_param", type: "varchar(" + 480 * weight + ")",  remarks: "配置扩展参数")
+        }
+    }
 }
