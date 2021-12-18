@@ -100,8 +100,6 @@ env:
     FEIGN_CLIENT_CONFIG_DEFAULT_READ_TIMEOUT: 5000
     # SMS假处理
     HZERO_SMS_FAKE: false
-    # Ribbon从DiscoveryClient同步Server的间隔时间，默认30秒
-    RIBBON_SERVER_LIST_REFRESH_INTERVAL: 10000
     # 续约间隔时间，默认30秒
     EUREKA_INSTANCE_LEASE_RENEWAL_INTERVAL_IN_SECONDS: 30
     # 实例故障摘除时间，默认90秒，实际是90*2=180秒，配置45就是90秒
