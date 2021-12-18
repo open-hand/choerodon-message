@@ -15,6 +15,21 @@
 
 
     <dependencies>
+        <!-- 依赖的服务 -->
+        <dependency>
+            <groupId>org.hzero</groupId>
+            <artifactId>hzero-message-saas</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hzero.starter</groupId>
+                    <artifactId>hzero-starter-hitoa</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-websocket</artifactId>
+        </dependency>
         <!-- 数据库驱动 -->
         <dependency>
             <groupId>mysql</groupId>
@@ -36,76 +51,11 @@
             <artifactId>hzero-starter-sms-aliyun</artifactId>
         </dependency>
 
-        <!--        全面升级hzero版本时删除-->
-        <dependency>
-            <groupId>org.hzero.starter</groupId>
-            <artifactId>hzero-starter-websocket</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-redis</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- 依赖的服务 -->
-        <dependency>
-            <groupId>org.hzero</groupId>
-            <artifactId>hzero-message-saas</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-hitoa</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-integrate-wechat-official</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-integrate-wechat-enterprise</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-integrate-dd</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-websocket</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>org.hzero.boot</groupId>
             <artifactId>hzero-boot-platform</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.hzero.starter</groupId>
-            <artifactId>hzero-starter-integrate-wechat-enterprise</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-integrate-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hzero.starter</groupId>
-            <artifactId>hzero-starter-integrate-dd</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.hzero.starter</groupId>
-                    <artifactId>hzero-starter-integrate-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>org.hzero.starter</groupId>
