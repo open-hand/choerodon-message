@@ -1,9 +1,24 @@
 package io.choerodon.message.app.service.impl;
 
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.*;
+import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
+import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.*;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
+import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
+import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.message.infra.validator.CommonValidator;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
@@ -24,24 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.*;
-import io.choerodon.message.app.service.SendSettingC7nService;
-import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
-import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
-import io.choerodon.message.infra.dto.iam.ProjectDTO;
-import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.*;
-import io.choerodon.message.infra.feign.operator.IamClientOperator;
-import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
-import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
-import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
-import io.choerodon.message.infra.utils.ConversionUtil;
-import io.choerodon.message.infra.validator.CommonValidator;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author scp
@@ -93,8 +92,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         String finalSecondCode = secondCode;
         String finalFirstCode = firstCode;
         Page<MessageServiceVO> serviceVOPage = PageHelper.doPageAndSort(pageRequest, () -> templateServerC7nMapper.selectTemplateServer(messageCode, messageName, finalSecondCode, finalFirstCode, enabled, receiveConfigFlag, params, introduce));
-        Map<String, String> meaningsMap = getMeanings();
-        serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getMessageType())));
+        Map<String, Map<String, String>> meaningsMap = getMeanings();
+        serviceVOPage.getContent().forEach(t -> t.setMessageTypeValue(meaningsMap.get(t.getLevel()).get(t.getMessageType())));
         return serviceVOPage;
     }
 
@@ -225,8 +224,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
 
     private void getSecondMsgServiceTreeVOS(Map<String, Set<String>> categoryMap, List<MsgServiceTreeVO> msgServiceTreeVOS, List<TemplateServer> templateServers) {
         int i = 4;
-        Map<String, String> meaningsMap = getMeanings();
+        Map<String, Map<String, String>> meaningsMap = getMeanings();
         for (String level : categoryMap.keySet()) {
+            Map<String, String> subMeaningsMap = meaningsMap.get(level);
             for (String categoryCode : categoryMap.get(level)) {
                 MsgServiceTreeVO msgServiceTreeVO = new MsgServiceTreeVO();
                 if (level.equals(ResourceLevel.SITE.value().toUpperCase())) {
@@ -236,7 +236,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 } else {
                     msgServiceTreeVO.setParentId(3L);
                 }
-                msgServiceTreeVO.setName(meaningsMap.get(categoryCode));
+                msgServiceTreeVO.setName(subMeaningsMap.get(categoryCode));
                 msgServiceTreeVO.setId((long) i);
                 msgServiceTreeVO.setCode(categoryCode);
                 msgServiceTreeVOS.add(msgServiceTreeVO);
@@ -360,7 +360,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     @Override
     public WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type) {
         WebHookVO.SendSetting sendSetting = new WebHookVO.SendSetting();
-        Map<String, String> lovMap = getMeanings();
+        Map<String, Map<String, String>> lovMap = getMeanings();
         Map<String, String> result = new HashMap<>();
         List<String> subCategories = new ArrayList<>();
         Boolean contains = true;
@@ -392,7 +392,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 subCategories.add(SubcategoryEnum.RESOURCE_SECURITY_NOTICE.getValue());
                 subCategories.add(SubcategoryEnum.MARKET_APP.getValue());
             }
-            if (categoryCodes.contains(ProjectCategoryEnum.N_TEST.value())){
+            if (categoryCodes.contains(ProjectCategoryEnum.N_TEST.value())) {
                 subCategories.add(SubcategoryEnum.API_TEST_EXECUTE_NOTICE.getValue());
             }
 
@@ -405,8 +405,9 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         }
         List<TemplateServer> sendSettingDTOS = templateServerC7nMapper.selectForWebHook(sourceLevel.toUpperCase(), type.toUpperCase(), subCategories, contains, name, description);
         sendSettingDTOS.forEach(t -> {
-            if (lovMap.containsKey(t.getSubcategoryCode())) {
-                result.put(t.getSubcategoryCode(), lovMap.get(t.getSubcategoryCode()));
+            Map<String, String> subCategoryMap = lovMap.get(t.getCategoryCode());
+            if (subCategoryMap.containsKey(t.getSubcategoryCode())) {
+                result.put(t.getSubcategoryCode(), subCategoryMap.get(t.getSubcategoryCode()));
             }
         });
         sendSetting.setCategories(result);
@@ -462,12 +463,12 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         int i = 1;
         // 将不同层级的categoryCode取出
         for (String level : levelAndCategoryCodeMap.keySet()) {
-            Map<String, String> categoryMeanings = getMeanings();
+            Map<String, Map<String, String>> categoryMeanings = getMeanings();
             for (String subCategoryCode : levelAndCategoryCodeMap.get(level)) {
-
+                Map<String, String> subCategoryMeanings = categoryMeanings.get(level);
                 // 表示第一层的SendSettingDetailTreeVO，parentId就是0
                 SendSettingDetailTreeVO sendSettingDetailTreeDTO = new SendSettingDetailTreeVO();
-                sendSettingDetailTreeDTO.setName(categoryMeanings.get(subCategoryCode));
+                sendSettingDetailTreeDTO.setName(subCategoryMeanings.get(subCategoryCode));
                 sendSettingDetailTreeDTO.setSequenceId((long) i);
                 sendSettingDetailTreeDTO.setCode(subCategoryCode);
 
@@ -500,9 +501,16 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         return i;
     }
 
-    private Map<String, String> getMeanings() {
+    private Map<String, Map<String, String>> getMeanings() {
         List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID);
-        return valueDTOList.stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning));
+        Map<String, List<LovValueDTO>> lovValues = valueDTOList.stream()
+                .filter(t->!ObjectUtils.isEmpty(t.getParentValue()))
+                .collect(Collectors.groupingBy(LovValueDTO::getParentValue));
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (Map.Entry<String, List<LovValueDTO>> entry : lovValues.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning)));
+        }
+        return map;
     }
 
     private void SendSettingVOConvertToSendSettingDetailTreeVO(SendSettingVO sendSettingVO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
