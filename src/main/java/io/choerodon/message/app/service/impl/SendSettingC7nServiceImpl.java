@@ -457,6 +457,19 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         return messageTemplateVO;
     }
 
+    @Override
+    public Map<String, Map<String, String>> getMeanings() {
+        List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID);
+        Map<String, List<LovValueDTO>> lovValues = valueDTOList.stream()
+                .filter(t->!ObjectUtils.isEmpty(t.getParentValue()))
+                .collect(Collectors.groupingBy(LovValueDTO::getParentValue));
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (Map.Entry<String, List<LovValueDTO>> entry : lovValues.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning)));
+        }
+        return map;
+    }
+
     private void getSecondSendSettingDetailTreeVOS(Map<String, Set<String>> levelAndCategoryCodeMap,
                                                    List<SendSettingDetailTreeVO> sendSettingDetailTreeDTOS,
                                                    List<SendSettingVO> sendSettingVOList) {
@@ -501,17 +514,6 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
         return i;
     }
 
-    private Map<String, Map<String, String>> getMeanings() {
-        List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID);
-        Map<String, List<LovValueDTO>> lovValues = valueDTOList.stream()
-                .filter(t->!ObjectUtils.isEmpty(t.getParentValue()))
-                .collect(Collectors.groupingBy(LovValueDTO::getParentValue));
-        Map<String, Map<String, String>> map = new HashMap<>();
-        for (Map.Entry<String, List<LovValueDTO>> entry : lovValues.entrySet()) {
-            map.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning)));
-        }
-        return map;
-    }
 
     private void SendSettingVOConvertToSendSettingDetailTreeVO(SendSettingVO sendSettingVO, SendSettingDetailTreeVO sendSettingDetailTreeVO, String level) {
         sendSettingDetailTreeVO.setId(sendSettingVO.getTempServerId())
