@@ -8,6 +8,7 @@ import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
 import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
+import io.choerodon.message.app.service.SendSettingC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.TargetUserDTO;
 import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
@@ -34,6 +35,7 @@ import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -79,6 +81,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private MessageSettingTargetUserC7nMapper messageSettingTargetUserC7nMapper;
     @Autowired
     private WebHookC7nMapper webHookC7nMapper;
+    @Autowired
+    @Lazy
+    private SendSettingC7nService sendSettingC7nService;
 
 
     public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper,
@@ -662,8 +667,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             stringList.forEach(s -> {
                 NotifyEventGroupVO notifyEventGroupVO = new NotifyEventGroupVO();
                 notifyEventGroupVO.setCategoryCode(s);
-                Map<String, String> stringStringMap = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID).stream().collect(Collectors.toMap(LovValueDTO::getValue, LovValueDTO::getMeaning));
-                notifyEventGroupVO.setName(stringStringMap.get(s));
+                Map<String, Map<String, String>> meaningsMap = sendSettingC7nService.getMeanings();
+                notifyEventGroupVO.setName(meaningsMap.get(ResourceLevel.PROJECT.name()).get(s));
                 notifyEventGroupVOS.add(notifyEventGroupVO);
             });
             return notifyEventGroupVOS;

@@ -1,6 +1,7 @@
 package io.choerodon.message.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.*;
@@ -67,4 +68,10 @@ public interface SendSettingC7nService {
     WebHookVO.SendSetting getTempServerForWebhook(Long sourceId, String sourceLevel, String name, String description, String type);
 
     MessageTemplateVO createMessageTemplate(MessageTemplateVO messageTemplateVO);
+
+    /**
+     * 获取lov信息
+     * @return
+     */
+    Map<String, Map<String, String>> getMeanings();
 }
