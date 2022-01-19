@@ -122,7 +122,7 @@ public class HzeroMessageTask {
      * @param data
      * @return map
      */
-    @JobTask(code = "cleanMessageRecordHzero", maxRetryCount = 0, description = "hzero提供的清除消息发送记录，默认保留一个月记录数据",
+    @JobTask(code = "cleanMessageRecordHzero", maxRetryCount = 0, description = "hzero提供的清除消息发送记录，默认保留三个月记录数据",
             params = {@JobParam(name = CLEAN_STRATEGY, description = "清理策略，默认三个月前数据", defaultValue = HmsgConstant.DataCleanStrategy.THREE_MONTH)})
     public Map<String, Object> cleanRecordHzero(Map<String, Object> data) {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin clearing records hzero<<<<<<<<<<<<<<<<<<<<<<<<<<");
