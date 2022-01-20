@@ -26,6 +26,10 @@ import org.springframework.stereotype.Service;
 import io.choerodon.message.app.service.CleanService;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+/**
+ * @author scp 覆盖hzero清楚消息记录方法
+ * @since 2022/01/20
+ */
 @Service
 public class CleanServiceImpl implements CleanService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanServiceImpl.class);

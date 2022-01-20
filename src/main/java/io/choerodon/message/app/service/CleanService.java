@@ -2,6 +2,10 @@ package io.choerodon.message.app.service;
 
 import java.time.LocalDate;
 
+/**
+ * @author scp 覆盖hzero清楚消息记录方法
+ * @since 2022/01/20
+ */
 public interface CleanService {
     /**
      * 清理消息监控日志
