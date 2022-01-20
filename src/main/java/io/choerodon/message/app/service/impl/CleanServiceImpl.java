@@ -81,9 +81,10 @@ public class CleanServiceImpl implements CleanService {
     @Async("commonAsyncTaskExecutor")
     @Override
     public void asyncClearLog(LocalDate localDate, Long tenantId) {
-        PageRequest pageRequest = new PageRequest(0, 100);
+        PageRequest pageRequest = new PageRequest(0, 20);
         List<Message> messageList;
         while (true) {
+            LOGGER.info("===========delete message record1=====");
             messageList = messageRepository.listMessage(tenantId, localDate, pageRequest);
             if (CollectionUtils.isEmpty(messageList)) {
                 return;
@@ -104,6 +105,7 @@ public class CleanServiceImpl implements CleanService {
                         });
                         userMessageRepository.delete(new UserMessage().setMessageId(messageId));
                     }
+                    LOGGER.info("===========delete message record id:{}=====", messageId);
                 });
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
@@ -115,6 +117,7 @@ public class CleanServiceImpl implements CleanService {
             messageRepository.batchDeleteReceiverByIds(messageIds);
             // 批量删除消息
             messageRepository.batchDeleteByIds(messageIds);
+            LOGGER.info("===========delete message record2=====");
         }
     }
 }
