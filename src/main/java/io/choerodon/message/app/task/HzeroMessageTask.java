@@ -13,6 +13,7 @@ import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
+import io.choerodon.message.app.service.CleanService;
 import io.choerodon.message.app.service.MessageC7nService;
 import io.choerodon.message.app.service.MessageCheckLogService;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
@@ -41,7 +42,7 @@ public class HzeroMessageTask {
 
     private MessageC7nService messageC7nService;
     @Autowired
-    private MessageService messageService;
+    private CleanService cleanService;
 
     public HzeroMessageTask(MessageC7nMapper messageC7nMapper,
                             MessageCheckLogService messageCheckLogService,
@@ -127,7 +128,7 @@ public class HzeroMessageTask {
     public Map<String, Object> cleanRecordHzero(Map<String, Object> data) {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin clearing records hzero<<<<<<<<<<<<<<<<<<<<<<<<<<");
         try {
-            messageService.clearLog(null, String.valueOf(data.get(CLEAN_STRATEGY)));
+            cleanService.clearLog(null, String.valueOf(data.get(CLEAN_STRATEGY)));
         } catch (Exception e) {
             LOGGER.error("error.clean.records", e);
         }

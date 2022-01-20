@@ -6,10 +6,14 @@ import java.util.List;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+
 import java.util.Set;
+
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.core.util.Results;
 import org.hzero.message.api.dto.SimpleMessageDTO;
+import org.hzero.message.app.service.MessageService;
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.api.vo.ProjectMessageVO;
-import io.choerodon.message.app.service.C7nMessageService;
-import io.choerodon.message.app.service.MessageC7nService;
-import io.choerodon.message.app.service.MessageSettingC7nService;
-import io.choerodon.message.app.service.RelSendMessageC7nService;
+import io.choerodon.message.app.service.*;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.swagger.annotation.Permission;
 
@@ -42,6 +43,8 @@ public class C7nMessageController {
     private MessageSettingC7nService messageSettingC7nService;
     @Autowired
     private MessageC7nService messageC7nService;
+    @Autowired
+    private CleanService cleanService;
 
     @Permission(permissionLogin = true)
     @ApiOperation("彻底删除用户当前的所有站内信")
@@ -91,5 +94,14 @@ public class C7nMessageController {
             @RequestParam(value = "templateCode") String templateCode,
             @RequestBody Set<String> userEmails) {
         return Results.success(messageC7nService.queryTrxStatusCode(userEmails, templateCode));
+    }
+
+    //根据邮件集合查询邮件发送的成功还是失败
+    @Permission(level = ResourceLevel.SITE)
+    @ApiOperation(value = "清理消息日志")
+    @PostMapping("/clean")
+    public ResponseEntity<Void> cleanMessageRecord(@RequestParam(value = "clean_strategy", defaultValue = HmsgConstant.DataCleanStrategy.THREE_MONTH) String cleanStrategy) {
+        cleanService.clearLog(null, cleanStrategy);
+        return Results.success();
     }
 }
