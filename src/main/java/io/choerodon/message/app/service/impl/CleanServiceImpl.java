@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.choerodon.message.app.service.CleanService;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -80,12 +82,12 @@ public class CleanServiceImpl implements CleanService {
 
     @Async("commonAsyncTaskExecutor")
     @Override
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public void asyncClearLog(LocalDate localDate, Long tenantId) {
         PageRequest pageRequest = new PageRequest(0, 20);
-        List<Message> messageList;
         while (true) {
             LOGGER.info("===========delete message record1=====");
-            messageList = messageRepository.listMessage(tenantId, localDate, pageRequest);
+            List<Message> messageList  = messageRepository.listMessage(tenantId, localDate, pageRequest);
             if (CollectionUtils.isEmpty(messageList)) {
                 return;
             }
