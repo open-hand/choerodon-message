@@ -84,7 +84,7 @@ public class CleanServiceImpl implements CleanService {
     @Override
     @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public void asyncClearLog(LocalDate localDate, Long tenantId) {
-        PageRequest pageRequest = new PageRequest(0, 20);
+        PageRequest pageRequest = new PageRequest(0, 1000);
         while (true) {
             LOGGER.info("===========delete message record1=====");
             List<Message> messageList  = messageRepository.listMessage(tenantId, localDate, pageRequest);
