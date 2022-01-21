@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,12 +83,11 @@ public class CleanServiceImpl implements CleanService {
 
     @Async("commonAsyncTaskExecutor")
     @Override
-    @Transactional(propagation= Propagation.NOT_SUPPORTED)
     public void asyncClearLog(LocalDate localDate, Long tenantId) {
         PageRequest pageRequest = new PageRequest(0, 1000);
         while (true) {
             LOGGER.info("===========delete message record1=====");
-            List<Message> messageList  = messageRepository.listMessage(tenantId, localDate, pageRequest);
+            List<Message> messageList = messageRepository.listMessage(tenantId, localDate, pageRequest);
             if (CollectionUtils.isEmpty(messageList)) {
                 return;
             }
