@@ -66,6 +66,7 @@
             hts.subcategory_code,
             hts.message_code,
             hts.message_name,
+            hts.category_code,
             hts.description
         FROM
             hmsg_template_server hts

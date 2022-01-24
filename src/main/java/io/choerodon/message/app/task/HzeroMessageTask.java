@@ -2,14 +2,18 @@ package io.choerodon.message.app.task;
 
 import java.util.Map;
 
+import org.hzero.message.app.service.MessageService;
+import org.hzero.message.infra.constant.HmsgConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
+import io.choerodon.message.app.service.CleanService;
 import io.choerodon.message.app.service.MessageC7nService;
 import io.choerodon.message.app.service.MessageCheckLogService;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
@@ -30,12 +34,15 @@ public class HzeroMessageTask {
      * 清理多少天前的数据
      */
     private final String CLEAN_NUM = "cleanNum";
+    private final String CLEAN_STRATEGY = "cleanStrategy";
 
     private MessageC7nMapper messageC7nMapper;
 
     private MessageCheckLogService messageCheckLogService;
 
     private MessageC7nService messageC7nService;
+    @Autowired
+    private CleanService cleanService;
 
     public HzeroMessageTask(MessageC7nMapper messageC7nMapper,
                             MessageCheckLogService messageCheckLogService,
@@ -107,6 +114,25 @@ public class HzeroMessageTask {
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
         messageC7nService.resendFailedEmail(null);
         LOGGER.info(">>>>>>>>>>>>>>>>>>>>end resend failed email<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        return data;
+    }
+
+    /**
+     * 清除消息发送记录
+     *
+     * @param data
+     * @return map
+     */
+    @JobTask(code = "cleanMessageRecordHzero", maxRetryCount = 0, description = "hzero提供的清除消息发送记录，默认保留三个月记录数据",
+            params = {@JobParam(name = CLEAN_STRATEGY, description = "清理策略，默认三个月前数据", defaultValue = HmsgConstant.DataCleanStrategy.THREE_MONTH)})
+    public Map<String, Object> cleanRecordHzero(Map<String, Object> data) {
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>begin clearing records hzero<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        try {
+            cleanService.clearLog(null, String.valueOf(data.get(CLEAN_STRATEGY)));
+        } catch (Exception e) {
+            LOGGER.error("error.clean.records", e);
+        }
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>end clearing records hzero<<<<<<<<<<<<<<<<<<<<<<<<<<");
         return data;
     }
 

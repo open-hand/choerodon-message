@@ -44,7 +44,7 @@
             )
         </if>
         ORDER BY
-        hm.last_update_date DESC
+        hm.message_id DESC
     </select>
     <!--手写mybatis select count优化-->
     <select id="listEmailMessage_COUNT" resultType="Long">

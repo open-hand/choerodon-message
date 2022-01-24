@@ -5,11 +5,11 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.2.0.RELEASE</version>
     </parent>
 
     <artifactId>choerodon-message</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0-alpha.3.RELEASE</version>
     <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
 
@@ -49,6 +49,8 @@
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-sms-aliyun</artifactId>
+            <!--升级1.8的时候  hzero有问题 所以指定了1.7-->
+            <version>1.7.0.RELEASE</version>
         </dependency>
 
         <dependency>
