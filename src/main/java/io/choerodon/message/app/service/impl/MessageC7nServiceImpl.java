@@ -4,10 +4,10 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.lang3.ObjectUtils;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
@@ -63,11 +62,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     @Override
     @ProcessLovValue
     public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
-        if (StringUtils.isEmpty(status) && StringUtils.isEmpty(messageName) && !StringUtils.isEmpty(params)) {
-            return null;
-        }
-        Page<MessageC7nDTO> messageC7nDTOS = PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
-        return messageC7nDTOS;
+       return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
     }
 
     @Override
