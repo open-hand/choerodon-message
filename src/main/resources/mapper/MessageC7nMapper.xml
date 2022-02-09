@@ -161,7 +161,7 @@
             )
         </if>
         ORDER BY
-        hm.creation_date DESC
+        hm.message_id DESC
     </select>
 
 
