@@ -56,7 +56,7 @@
            hm.message_id AS id
           FROM
            hmsg_message hm
-           <if test="status != null or  subject != null ">
+           <if test="status != null or  subject != null or params != null">
                JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
                JOIN hmsg_template_server_line htsl  ON htsl.template_code = hm.template_code
                JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
@@ -161,7 +161,46 @@
             )
         </if>
         ORDER BY
-        hm.creation_date DESC
+        hm.message_id DESC
+    </select>
+
+    <!--手写mybatis select count优化-->
+    <select id="listWebHooks_COUNT" resultType="Long">
+        SELECT
+        count(0)
+        FROM
+        (
+        SELECT
+        hm.message_id AS id
+        FROM
+        hmsg_message hm
+        <if test="status != null or  webhookAddress != null or  templateType != null or failedReason != null or params != null">
+            JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+            JOIN hmsg_webhook_server hws ON hws.server_code = hm.server_code
+        </if>
+        WHERE
+        hm.message_type_code = 'WEB_HOOK'
+        <if test="status != null and status != ''">
+            and hmt.trx_status_code = #{status}
+        </if>
+        <if test="webhookAddress != null and webhookAddress != ''">
+            and hws.webhook_address  LIKE concat(concat('%',#{webhookAddress}),'%')
+        </if>
+        <if test="templateType != null and templateType != ''">
+            and hm. SUBJECT  LIKE concat(concat('%',#{templateType}),'%')
+        </if>
+        <if test="failedReason != null and failedReason != ''">
+            and hmt.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
+        </if>
+        <if test="params != null">
+            AND (
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
+            hws.webhook_address LIKE concat(concat('%',#{params}),'%') OR
+            hm. SUBJECT LIKE concat(concat('%',#{params}),'%') OR
+            hmt.transaction_message LIKE concat(concat('%',#{params}),'%')
+            )
+        </if>
+        ) tmp_count
     </select>
 
 
