@@ -62,4 +62,10 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_template.groovy') {
         addUniqueConstraint(tableName:"hmsg_message_template", constraintName: "hmsg_message_template_u1", columnNames:"template_code,lang,tenant_id")
     }
 
+    changeSet(author: 'hzero@hand-china.com', id: '2022-03-01-hmsg_message_template'){
+        addColumn(tableName: "hmsg_message_template") {
+            column(name: "external_param", type: "varchar(" + 240 * weight + ")", remarks: "填写模板的外部参数")
+        }
+    }
+
 }
