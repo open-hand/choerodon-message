@@ -79,9 +79,9 @@ public class HuaweiSmsServiceImpl extends SmsService {
         String templateId = message.getExternalCode();
         //这里根据模板id找到模板关联的通道id
         MessageTemplateDTO messageTemplateDTO = new MessageTemplateDTO();
-        messageTemplateDTO.setTemplateCode(templateId);
+        messageTemplateDTO.setExternalCode(templateId);
         MessageTemplateDTO templateDTO = messageC7nTemplateMapper.selectOne(messageTemplateDTO);
-        sender=templateDTO.getExternalParam();
+        sender = templateDTO.getExternalParam();
         // 获取模板参数
         String[] params;
         if (args.size() > 0) {
