@@ -63,6 +63,12 @@ databaseChangeLog(logicalFilePath: 'script/db/hmsg_message_template.groovy') {
     }
 
     changeSet(author: 'hzero@hand-china.com', id: '2022-03-01-hmsg_message_template'){
+        def weight = 1
+        if(helper.isSqlServer()){
+            weight = 2
+        } else if(helper.isOracle()){
+            weight = 3
+        }
         addColumn(tableName: "hmsg_message_template") {
             column(name: "external_param", type: "varchar(" + 240 * weight + ")", remarks: "填写模板的外部参数")
         }
