@@ -376,7 +376,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             subCategories.add(SubcategoryEnum.PRO_MANAGEMENT.getValue());
             subCategories.add(SubcategoryEnum.ADD_OR_IMPORT_USER.getValue());
 
-            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value())) {
+            if (categoryCodes.contains(ProjectCategoryEnum.N_AGILE.value()) || categoryCodes.contains(ProjectCategoryEnum.N_WATERFALL.value())) {
                 subCategories.add(ADD_OR_IMPORT_USER);
                 subCategories.add(ISSUE_STATUS_CHANGE_NOTICE);
                 subCategories.add(SubcategoryEnum.BACKLOG_NOTICE.getValue());
