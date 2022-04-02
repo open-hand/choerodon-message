@@ -18,7 +18,8 @@ public enum ProjectCategoryEnum {
     N_REQUIREMENT("N_REQUIREMENT"), //需求管理
     N_DEVOPS("N_DEVOPS"), //devops流程
     N_OPERATIONS("N_OPERATIONS"), //运维项目
-    N_TEST("N_TEST"); //测试管理
+    N_TEST("N_TEST"), //测试管理
+    N_WATERFALL("N_WATERFALL"); //瀑布管理
 
 
     private String value;
