@@ -3,10 +3,12 @@ preJob:
   # job 超时时间
   timeout: 1200
   # 工具 jar 包镜像库地址
-  image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.8.0
+  image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.9.2
   preInitDB:
     # 是否初始化本服务数据库
     enabled: true
+    #排除更新某些表或者字段 table1,table2.column1
+    exclusion: ''
     datasource:
       # 本服务数据库相关信息，端口号结尾，不要加/或者数据库名
       url: jdbc:mysql://localhost:3306?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
