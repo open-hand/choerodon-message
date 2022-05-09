@@ -1,12 +1,7 @@
 package io.choerodon.message.infra.feign;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.message.api.vo.OrganizationProjectVO;
-import io.choerodon.message.api.vo.ProjectVO;
-import io.choerodon.message.api.vo.UserVO;
-import io.choerodon.message.infra.dto.iam.ProjectDTO;
-import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
+import java.util.List;
+import java.util.Set;
 
 import io.swagger.annotations.ApiParam;
 import org.hzero.common.HZeroService;
@@ -14,8 +9,13 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Set;
+import io.choerodon.core.domain.Page;
+import io.choerodon.message.api.vo.OrganizationProjectVO;
+import io.choerodon.message.api.vo.ProjectVO;
+import io.choerodon.message.api.vo.UserVO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
 
 /**
  * 〈功能简述〉
@@ -52,6 +52,12 @@ public interface IamFeignClient {
     @GetMapping("/choerodon/v1/projects/{project_id}")
     ResponseEntity<ProjectDTO> queryProjectById(@PathVariable("project_id") Long projectId);
 
+    @GetMapping("/choerodon/v1/projects/{project_id}")
+    ResponseEntity<ProjectDTO> queryProjectByIdWithoutExtraInfo(@PathVariable("project_id") Long projectId,
+                                                                @RequestParam(value = "with_category_info") Boolean withCategoryInfo,
+                                                                @RequestParam(value = "with_user_info") Boolean withUserInfo,
+                                                                @RequestParam(value = "with_agile_info") Boolean withAgileInfo);
+
     @GetMapping("/v1/{organizationId}/tenants")
     ResponseEntity<TenantDTO> queryTenantById(@PathVariable("organizationId") Long organizationId);
 
@@ -67,4 +73,7 @@ public interface IamFeignClient {
 
     @GetMapping("/choerodon/v1/inner/projects/all")
     ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
+
+    @PostMapping("/choerodon/v1/users/query_open_user_ids")
+    ResponseEntity<List<String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList, @RequestParam("open_app_code") String openAppCode);
 }
