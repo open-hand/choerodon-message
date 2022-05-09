@@ -1,5 +1,11 @@
 package io.choerodon.message.infra.feign.fallback;
 
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.api.vo.OrganizationProjectVO;
@@ -8,12 +14,6 @@ import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.IamFeignClient;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * 〈功能简述〉
@@ -65,6 +65,11 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
+    public ResponseEntity<ProjectDTO> queryProjectByIdWithoutExtraInfo(Long projectId, Boolean withCategoryInfo, Boolean withUserInfo, Boolean withAgileInfo) {
+        throw new CommonException("error.query.project");
+    }
+
+    @Override
     public ResponseEntity<TenantDTO> queryTenantById(Long tenantId) {
         throw new CommonException("error.tenant.get");
     }
@@ -82,5 +87,10 @@ public class IamFeignClientFallback implements IamFeignClient {
     @Override
     public ResponseEntity<List<ProjectVO>> listAllProjects(Boolean enabled) {
         throw new CommonException("error.get.projects");
+    }
+
+    @Override
+    public ResponseEntity<List<String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
+        throw new CommonException("error.get.open.user.ids");
     }
 }

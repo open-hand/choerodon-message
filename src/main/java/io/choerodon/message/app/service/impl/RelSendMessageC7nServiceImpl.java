@@ -1,19 +1,26 @@
 package io.choerodon.message.app.service.impl;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.hzero.boot.message.entity.DingTalkSender;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.core.base.BaseConstants;
+import org.hzero.message.app.service.DingTalkSendService;
+import org.hzero.message.app.service.MessageReceiverService;
 import org.hzero.message.app.service.TemplateServerService;
 import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
 import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.message.domain.entity.TemplateServerLine;
 import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.repository.TemplateServerLineRepository;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.slf4j.Logger;
@@ -21,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -29,7 +37,9 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.feign.IamFeignClient;
 import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
@@ -52,6 +62,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String OBJECT_KIND = "objectKind";
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
+    private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -63,6 +74,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private WebhookProjectRelMapper webhookProjectRelMapper;
     @Autowired
     private WebhookServerMapper webhookServerMapper;
+    @Autowired
+    private MessageReceiverService messageReceiverService;
+    @Autowired
+    private TemplateServerLineRepository templateServerLineRepository;
+    @Autowired
+    private DingTalkSendService dingTalkSendService;
+    @Autowired
+    private IamFeignClient iamFeignClient;
 
 
     public List<Message> relSendMessageReceipt(MessageSender messageSender) {
@@ -74,6 +93,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         return super.relSendMessageReceipt(messageSender, tenantId);
     }
 
+    @Override
     protected void filterWebReceiver(MessageSender sender) {
         //如果有特殊标志则不发送
         if (isSend(sender, NO_SEND_WEB)) return;
@@ -89,19 +109,21 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         return false;
     }
 
+    @Override
     protected void filterSmsReceiver(MessageSender sender) {
         if (isSend(sender, NO_SEND_SMS)) return;
         super.filterSmsReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.SMS);
     }
 
+    @Override
     protected void filterEmailReceiver(MessageSender sender) {
         if (isSend(sender, NO_SEND_EMAIL)) return;
         super.filterEmailReceiver(sender);
         filterReceiver(sender, HmsgConstant.MessageType.EMAIL);
     }
 
-
+    @Override
     protected void filterWebHookReceiver(MessageSender sender, List<WebHookSender> webHookSenderList) {
         if (!CollectionUtils.isEmpty(sender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(sender.getAdditionalInformation().get(NO_SEND_WEBHOOK))) {
@@ -110,7 +132,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         super.filterWebHookReceiver(sender, webHookSenderList);
         webHookFilter(sender, webHookSenderList);
     }
-
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
@@ -131,13 +152,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             eventName = String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_EVENT_NAME.getTypeName()));
         }
         List<Receiver> receiverList = messageSender.getReceiverAddressList();
-        if (messageType.equals(HmsgConstant.MessageType.WEB) || messageType.equals(HmsgConstant.MessageType.EMAIL)) {
+        if (messageType.equals(HmsgConstant.MessageType.WEB) || messageType.equals(HmsgConstant.MessageType.EMAIL) || messageType.equals(HmsgConstant.MessageType.DT)) {
             receiveFilter(receiverList, tempServerId, projectId, messageType);
         }
         // 如果项目层未启动 则不发送 接受者为null
         if ((messageType.equals(HmsgConstant.MessageType.WEB) ||
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
-                messageType.equals(HmsgConstant.MessageType.SMS))
+                messageType.equals(HmsgConstant.MessageType.SMS) ||
+                messageType.equals(HmsgConstant.MessageType.DT))
                 && messageSettingC7nMapper.selectProjectMessage().contains(messageSender.getMessageCode())) {
             //项目层设置未开启
             if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
@@ -192,6 +214,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         if (HmsgConstant.MessageType.SMS.equals(messageType)) {
             return messageSettingDTO.getSmsEnable();
+        }
+        if (HmsgConstant.MessageType.DT.equals(messageType)) {
+            return messageSettingDTO.getEmailEnable();
         } else {
             return Boolean.FALSE;
         }
@@ -270,7 +295,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (Map.Entry<String, Object> stringObjectEntry : senderObjectArgs.entrySet()) {
                 reSenderArgs.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
             }
-            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID,messageCode);
+            TemplateServer templateServer = templateServerService.getTemplateServer(BaseConstants.DEFAULT_TENANT_ID, messageCode);
             reSenderArgs.put(OBJECT_KIND, templateServer.getMessageCode());
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
@@ -309,4 +334,85 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         });
     }
 
+    @Override
+    public List<Message> c7nRelSendMessageReceipt(MessageSender messageSender, Long organizationId) {
+        if (organizationId != null) {
+            messageSender.setTenantId(organizationId);
+        }
+
+        this.validObject(messageSender);
+        if (messageSender.getReceiverAddressList() == null) {
+            messageSender.setReceiverAddressList(Collections.emptyList());
+        }
+
+        messageSender = this.messageReceiverService.queryReceiver(messageSender);
+        TemplateServer templateServer = this.templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
+        Assert.notNull(templateServer, "error.data_not_exists");
+        Assert.isTrue(Objects.equals(templateServer.getEnabledFlag(), BaseConstants.Flag.YES), "error.data_not_exists");
+        if (StringUtils.isBlank(messageSender.getReceiveConfigCode())) {
+            messageSender.setReceiveConfigCode(templateServer.getMessageCode());
+        }
+        Map<String, List<TemplateServerLine>> serverLineMap = this.templateServerLineRepository.enabledTemplateServerLine(templateServer.getTempServerId(), templateServer.getTenantId()).stream().collect(Collectors.groupingBy(TemplateServerLine::getTypeCode));
+        List<Message> results = new ArrayList<>();
+        List<Message> dingTalkResults = new ArrayList<>();
+        if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
+            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
+            results.addAll(dingTalkResults);
+        }
+        serverLineMap.remove("DT");
+        Class clazz = super.getClass().getSuperclass();
+        try {
+            Method sendMessageMethod = clazz.getDeclaredMethod("sendMessage", Map.class, MessageSender.class);
+            sendMessageMethod.setAccessible(true);
+            results.addAll((List) sendMessageMethod.invoke(this, serverLineMap, messageSender));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    @Override
+    public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender) {
+        List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
+        List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        List<String> openUserIdList = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
+        Long tenantId = null;
+        Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+        if (projectIdOptional.isPresent()) {
+            Long projectId = (Long) projectIdOptional.get();
+            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
+            if (!ObjectUtils.isEmpty(projectDTO)) {
+                tenantId = projectDTO.getOrganizationId();
+            }
+        } else {
+            Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
+            tenantId = (Long) tenantIdOptional.get();
+        }
+        if (ObjectUtils.isEmpty(tenantId)) {
+            throw new CommonException("error.tenant.id.exist");
+        }
+        this.filterDingTalkReceiver(sender);
+        DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(sender.getTenantId()).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
+        Map<String, String> args = new HashMap<>();
+        sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
+        dingTalkSender.setServerCode(sender.getServerCode());
+        dingTalkSender.setArgs(args);
+        if (!CollectionUtils.isEmpty(openUserIdList)) {
+            Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
+            while (templateServerLineIterator.hasNext()) {
+                TemplateServerLine line = templateServerLineIterator.next();
+                Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()).setServerCode(line.getServerCode()), line.getTryTimes());
+                result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
+            }
+        }
+    }
+
+    @Override
+    public void filterDingTalkReceiver(MessageSender sender) {
+        filterReceiver(sender, HmsgConstant.MessageType.DT);
+    }
+
+    private boolean c7nSendEnable(List<String> typeCodeList, String typeCode) {
+        return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
+    }
 }

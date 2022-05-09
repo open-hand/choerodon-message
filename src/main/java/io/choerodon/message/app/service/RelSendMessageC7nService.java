@@ -1,11 +1,12 @@
 package io.choerodon.message.app.service;
 
-import org.hzero.boot.message.entity.AllSender;
+import java.util.List;
+import java.util.Map;
+
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.message.app.service.RelSendMessageService;
 import org.hzero.message.domain.entity.Message;
-
-import java.util.List;
+import org.hzero.message.domain.entity.TemplateServerLine;
 
 /**
  * @author scp
@@ -15,7 +16,14 @@ import java.util.List;
 public interface RelSendMessageC7nService extends RelSendMessageService {
     /**
      * 批量发送消息
+     *
      * @param senderList senderList
      */
     void batchSendMessage(List<MessageSender> senderList);
+
+    List<Message> c7nRelSendMessageReceipt(MessageSender messageSender, Long organizationId);
+
+    void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender);
+
+    void filterDingTalkReceiver(MessageSender sender);
 }
