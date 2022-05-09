@@ -24,6 +24,9 @@ public class SendSettingVO extends TemplateServer {
 
     private Integer smsEnabledFlag;
 
+    @ApiModelProperty(value = "钉钉")
+    private Integer dtEnabledFlag;
+
     private Integer webhookEnabledFlag;
 
     private Integer webhookJsonEnabledFlag;
@@ -135,5 +138,13 @@ public class SendSettingVO extends TemplateServer {
 
     public void setPmTemplateId(Long pmTemplateId) {
         this.pmTemplateId = pmTemplateId;
+    }
+
+    public Integer getDtEnabledFlag() {
+        return dtEnabledFlag;
+    }
+
+    public void setDtEnabledFlag(Integer dtEnabledFlag) {
+        this.dtEnabledFlag = dtEnabledFlag;
     }
 }

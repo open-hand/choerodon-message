@@ -59,4 +59,11 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
             column(name: "ENV_ID")
         }
     }
+
+    changeSet(author: 'changping.shi@zknow.com', id: '2022-5-09-notify_receive_setting-add-column') {
+        addColumn(tableName: 'notify_message_setting') {
+            column(name: 'DT_ENABLE', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '是否发送钉钉。1发送，0不发送')
+        }
+    }
+
 }
