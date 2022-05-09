@@ -60,6 +60,8 @@ public class MessageSettingDTO extends AuditDomain {
     private Boolean smsEnable;
     @ApiModelProperty(value = "资源删除验证事件名字")
     private String eventName;
+    @ApiModelProperty(value = "是否发送钉钉")
+    private Boolean dtEnable;
 
     public String getEventName() {
         return eventName;
@@ -180,5 +182,13 @@ public class MessageSettingDTO extends AuditDomain {
                 ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public Boolean getDtEnable() {
+        return dtEnable;
+    }
+
+    public void setDtEnable(Boolean dtEnable) {
+        this.dtEnable = dtEnable;
     }
 }

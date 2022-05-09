@@ -54,6 +54,9 @@ public class CustomMessageSettingVO {
     @ApiModelProperty("是否发送短信")
     private Boolean smsEnable;
 
+    @ApiModelProperty("是否发送钉钉")
+    private Boolean dtEnable;
+
     @ApiModelProperty("平台层配置是否允许发送短信")
     private Boolean smsEnabledFlag = false;
 
@@ -280,5 +283,13 @@ public class CustomMessageSettingVO {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public Boolean getDtEnable() {
+        return dtEnable;
+    }
+
+    public void setDtEnable(Boolean dtEnable) {
+        this.dtEnable = dtEnable;
     }
 }

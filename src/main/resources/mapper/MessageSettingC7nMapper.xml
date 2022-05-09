@@ -25,6 +25,7 @@
         nms.SMS_ENABLE,
         nms.PM_ENABLE,
         nms.EMAIL_ENABLE,
+        nms.DT_ENABLE,
         nms.OBJECT_VERSION_NUMBER,
         hts.message_name AS name,
         hts.SUBCATEGORY_CODE,
@@ -57,6 +58,7 @@
           nms.EVENT_NAME,
           nms.SMS_ENABLE,
           nms.PM_ENABLE,
+          nms.DT_ENABLE,
           nms.EMAIL_ENABLE,
           nms.OBJECT_VERSION_NUMBER,
           hts.message_name AS name,
@@ -90,6 +92,7 @@
           nms.EVENT_NAME,
           nms.SMS_ENABLE,
           nms.PM_ENABLE,
+          nms.DT_ENABLE,
           nms.EMAIL_ENABLE,
           nms.OBJECT_VERSION_NUMBER,
           hts.message_name AS name,
@@ -111,7 +114,7 @@
     <select id="getSettingByTypeAndCode" resultMap="messageSettingMap">
         SELECT
         nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE,nms.DT_ENABLE, nms.OBJECT_VERSION_NUMBER,
         nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
@@ -120,7 +123,7 @@
     <select id="getResourceDeleteSettingByOption" resultMap="messageSettingMap">
         SELECT
         nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.DT_ENABLE, nms.OBJECT_VERSION_NUMBER,
         nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
@@ -131,7 +134,7 @@
     <select id="getDefaultResourceDeleteSetting" resultMap="messageSettingMap">
         SELECT
         nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.DT_ENABLE, nms.OBJECT_VERSION_NUMBER,
         nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
@@ -142,7 +145,7 @@
     <select id="getDefaultSettingByCode" resultMap="messageSettingMap">
         SELECT
         nms.ID, nms.ENV_ID, nms.NOTIFY_TYPE, nms.CODE, nms.PROJECT_ID,nms.EVENT_NAME,
-        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE, nms.OBJECT_VERSION_NUMBER,
+        nms.SMS_ENABLE, nms.PM_ENABLE, nms.EMAIL_ENABLE,nms.DT_ENABLE, nms.OBJECT_VERSION_NUMBER,
         nmstu.ID AS NMSTU_ID, nmstu.USER_ID,nmstu.TYPE,nmstu.MESSAGE_SETTING_ID
         FROM notify_message_setting nms
         LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
@@ -176,6 +179,7 @@
         <result property="code" column="CODE"/>
         <result property="smsEnable" column="SMS_ENABLE"/>
         <result property="pmEnable" column="PM_ENABLE"/>
+        <result property="dtEnable" column="DT_ENABLE"/>
         <result property="emailEnable" column="EMAIL_ENABLE"/>
         <result property="objectVersionNumber" column="OBJECT_VERSION_NUMBER"/>
         <result property="groupId" column="GROUP_ID"/>
@@ -272,6 +276,7 @@
 	       nms.EVENT_NAME,
 	       nms.SMS_ENABLE,
 	       nms.PM_ENABLE,
+	       nms.DT_ENABLE,
 	       nms.EMAIL_ENABLE,
 	       nms.OBJECT_VERSION_NUMBER,
 	       hts.message_name AS NAME,
