@@ -1,11 +1,35 @@
 package io.choerodon.message.app.service.impl;
 
+import static io.choerodon.message.app.service.impl.RelSendMessageC7nServiceImpl.DING_TALK_SERVER_CODE;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hzero.boot.platform.lov.feign.LovFeignClient;
+import org.hzero.message.app.service.DingTalkServerService;
+import org.hzero.message.domain.entity.DingTalkServer;
+import org.hzero.message.infra.constant.HmsgConstant;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
 import io.choerodon.core.enums.ServiceNotifyType;
 import io.choerodon.core.enums.TargetUserType;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.*;
 import io.choerodon.message.app.eventhandler.payload.UserMemberEventPayload;
+import io.choerodon.message.app.service.DingTalkServerC7nService;
 import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.app.service.MessageSettingTargetUserC7nService;
 import io.choerodon.message.app.service.SendSettingC7nService;
@@ -25,26 +49,6 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.MessageSettingTargetUserC7nMapper;
 import io.choerodon.message.infra.mapper.WebHookC7nMapper;
 import io.choerodon.message.infra.utils.OptionalBean;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hzero.boot.platform.lov.dto.LovValueDTO;
-import org.hzero.boot.platform.lov.feign.LovFeignClient;
-import org.hzero.message.infra.constant.HmsgConstant;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * User: Mr.Wang
@@ -84,6 +88,10 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     @Autowired
     @Lazy
     private SendSettingC7nService sendSettingC7nService;
+    @Autowired
+    private DingTalkServerC7nService dingTalkServerC7nService;
+    @Autowired
+    private DingTalkServerService dingTalkServerService;
 
 
     public MessageSettingC7nServiceImpl(MessageSettingC7nMapper messageSettingC7nMapper,
@@ -453,6 +461,54 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         userMemberEventPayloads.forEach(userMemberEventPayload -> {
             handUserMember(userMemberEventPayload);
         });
+    }
+
+    @Override
+    public void insertOpenAppConfig(OpenAppVO openAppVO) {
+        if ("ding_talk".equals(openAppVO.getType())) {
+            TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
+            DingTalkServer dingTalkServer = new DingTalkServer();
+            dingTalkServer.setAppKey(openAppVO.getAppId());
+            dingTalkServer.setAppSecret(openAppVO.getAppSecret());
+            dingTalkServer.setTenantId(openAppVO.getTenantId());
+            dingTalkServer.setServerName(tenantDTO.getTenantName());
+            dingTalkServer.setTenantName(tenantDTO.getTenantName());
+            dingTalkServer.setEnabledFlag(1);
+            dingTalkServer.setServerCode(DING_TALK_SERVER_CODE);
+            dingTalkServerC7nService.addDingTalkServer(openAppVO.getTenantId(), dingTalkServer);
+        }
+    }
+
+    @Override
+    public void updateOpenAppConfig(OpenAppVO openAppVO) {
+        if ("ding_talk".equals(openAppVO.getType())) {
+            TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
+            DingTalkServer dingTalkServer = dingTalkServerService.getConfigWithDb(openAppVO.getTenantId(), DING_TALK_SERVER_CODE);
+            dingTalkServer.setAppKey(openAppVO.getAppId());
+            dingTalkServer.setAppSecret(openAppVO.getAppSecret());
+            dingTalkServer.setTenantId(openAppVO.getTenantId());
+            dingTalkServer.setServerName(tenantDTO.getTenantName());
+            dingTalkServer.setTenantName(tenantDTO.getTenantName());
+            dingTalkServer.setEnabledFlag(1);
+            dingTalkServer.setServerCode(DING_TALK_SERVER_CODE);
+            dingTalkServerC7nService.addDingTalkServer(openAppVO.getTenantId(), dingTalkServer);
+        }
+    }
+
+    @Override
+    public void enableOrDisableOpenAppSyncSetting(OpenAppVO openAppVO) {
+        if ("ding_talk".equals(openAppVO.getType())) {
+            TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
+            DingTalkServer dingTalkServer = dingTalkServerService.getConfigWithDb(openAppVO.getTenantId(), DING_TALK_SERVER_CODE);
+            dingTalkServer.setAppKey(openAppVO.getAppId());
+            dingTalkServer.setAppSecret(openAppVO.getAppSecret());
+            dingTalkServer.setTenantId(openAppVO.getTenantId());
+            dingTalkServer.setServerName(tenantDTO.getTenantName());
+            dingTalkServer.setTenantName(tenantDTO.getTenantName());
+            dingTalkServer.setEnabledFlag(openAppVO.getEnabledFlag() ? 1 : 0);
+            dingTalkServer.setServerCode(DING_TALK_SERVER_CODE);
+            dingTalkServerC7nService.addDingTalkServer(openAppVO.getTenantId(), dingTalkServer);
+        }
     }
 
     private void handUserMember(UserMemberEventPayload userMemberEventPayload) {
