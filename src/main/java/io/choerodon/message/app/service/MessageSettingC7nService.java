@@ -37,4 +37,10 @@ public interface MessageSettingC7nService {
      * @return
      */
     List<ProjectMessageVO> listEnabledSettingByCode(String code, String notifyType);
+
+    void insertOpenAppConfig(OpenAppVO openAppVO);
+
+    void updateOpenAppConfig(OpenAppVO openAppVO);
+
+    void enableOrDisableOpenAppSyncSetting(OpenAppVO openAppVO);
 }

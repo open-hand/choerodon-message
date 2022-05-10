@@ -64,6 +64,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String EVENT_NAME = "eventName";
     private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
 
+    public static final String DING_TALK_SERVER_CODE = "DING_TALK";
+
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
@@ -395,7 +397,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(sender.getTenantId()).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
         Map<String, String> args = new HashMap<>();
         sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
-        dingTalkSender.setServerCode(sender.getServerCode());
+        dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
             Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
