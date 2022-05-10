@@ -1,7 +1,8 @@
 package io.choerodon.message.app.aop;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class MessageGeneratorServiceAop {
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
     @Pointcut("execution (* org.hzero.message.app.service.impl.MessageGeneratorServiceImpl.generateMessage(org.hzero.boot.message.entity.DingTalkSender, org.hzero.message.domain.entity.Message))")
     public void modifyMessage() {
@@ -24,7 +25,7 @@ public class MessageGeneratorServiceAop {
     public void afterReturning(JoinPoint joinPoint, Object result) {
         Message message = (Message) result;
         String plainContent = ((Message) result).getPlainContent();
-        plainContent = plainContent + "\n\n发送时间: " + sdf.format(new Date());
+        plainContent = plainContent + "\n\n发送时间: " + dtf.format(LocalDateTime.now());
         message.setPlainContent(plainContent);
     }
 }
