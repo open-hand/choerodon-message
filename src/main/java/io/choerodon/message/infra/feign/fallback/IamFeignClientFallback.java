@@ -93,4 +93,9 @@ public class IamFeignClientFallback implements IamFeignClient {
     public ResponseEntity<List<String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
         throw new CommonException("error.get.open.user.ids");
     }
+
+    @Override
+    public Boolean isMessageEnabled(Long organizationId, String type) {
+        throw new CommonException("error.get.message.enabled");
+    }
 }
