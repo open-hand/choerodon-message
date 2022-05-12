@@ -473,6 +473,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             dingTalkServer.setTenantId(openAppVO.getTenantId());
             dingTalkServer.setServerName(tenantDTO.getTenantName());
             dingTalkServer.setTenantName(tenantDTO.getTenantName());
+            dingTalkServer.setAgentId(Long.parseLong(openAppVO.getAgentId()));
             dingTalkServer.setEnabledFlag(1);
             dingTalkServer.setAuthType("DingTalk");
             dingTalkServer.setServerCode(DING_TALK_SERVER_CODE);
@@ -490,6 +491,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             dingTalkServer.setTenantId(openAppVO.getTenantId());
             dingTalkServer.setServerName(tenantDTO.getTenantName());
             dingTalkServer.setTenantName(tenantDTO.getTenantName());
+            dingTalkServer.setAgentId(Long.parseLong(openAppVO.getAgentId()));
             dingTalkServer.setEnabledFlag(1);
             dingTalkServer.setAuthType("DingTalk");
             dingTalkServer.setServerCode(DING_TALK_SERVER_CODE);
