@@ -168,6 +168,10 @@ hzero:
     # 匹配的资源才会解析JwtToken便于得到UserDetails
     pattern: ${HZERO_RESOURCE_PATTERN:/v1/*,/hzero/*,/hmsg/v1/*,/hmsg/hzero/*,/choerodon/v1/*}
 
+services:
+  front:
+    url: ${SERVICES_FRONT_URL:http://front.exmaple.com}
+
 logging:
   level:
     org.springframework.cloud: info
