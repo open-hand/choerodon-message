@@ -1,5 +1,7 @@
 package io.choerodon.message.api.vo;
 
+import javax.validation.constraints.NotBlank;
+
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
@@ -20,6 +22,9 @@ public class OpenAppVO {
     private String appSecret;
     @ApiModelProperty("是否启用")
     private Boolean enabledFlag;
+    @ApiModelProperty("appid agentId")
+    @NotBlank
+    private String agentId;
 
     private OpenAppConfigVO openAppConfigVO;
 
@@ -77,5 +82,13 @@ public class OpenAppVO {
 
     public void setEnabledFlag(Boolean enabledFlag) {
         this.enabledFlag = enabledFlag;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 }
