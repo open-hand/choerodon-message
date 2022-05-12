@@ -358,8 +358,11 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<Message> results = new ArrayList<>();
         List<Message> dingTalkResults = new ArrayList<>();
         if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
-            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
-            results.addAll(dingTalkResults);
+            Boolean enabled = iamFeignClient.isMessageEnabled(organizationId, "ding_talk");
+            if (Boolean.TRUE.equals(enabled)) {
+                this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
+                results.addAll(dingTalkResults);
+            }
         }
         serverLineMap.remove("DT");
         Class clazz = super.getClass().getSuperclass();
