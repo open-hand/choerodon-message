@@ -1,8 +1,8 @@
 package io.choerodon.message.api.vo;
 
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Set;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author superlee
@@ -22,6 +22,8 @@ public class ProjectMessageVO extends ProjectVO {
 
     @ApiModelProperty("是否发送短信")
     private Boolean smsEnable;
+    @ApiModelProperty("是否发送钉钉")
+    private Boolean dtEnable;
 
     public Boolean getPmEnable() {
         return pmEnable;
@@ -61,5 +63,13 @@ public class ProjectMessageVO extends ProjectVO {
 
     public void setReceiverTypes(Set<String> receiverTypes) {
         this.receiverTypes = receiverTypes;
+    }
+
+    public Boolean getDtEnable() {
+        return dtEnable;
+    }
+
+    public void setDtEnable(Boolean dtEnable) {
+        this.dtEnable = dtEnable;
     }
 }

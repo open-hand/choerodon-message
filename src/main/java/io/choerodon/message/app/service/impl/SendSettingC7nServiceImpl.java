@@ -524,11 +524,13 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 .setCategoryCode(sendSettingVO.getSubcategoryCode())
                 .setCode(sendSettingVO.getMessageCode())
                 .setEmailTemplateId(sendSettingVO.getEmailTemplateId())
+                .setDtTemplateId(sendSettingVO.getDtTemplateId())
                 .setSmsTemplateId(sendSettingVO.getSmsTemplateId())
                 .setPmTemplateId(sendSettingVO.getPmTemplateId())
                 .setAllowConfig(Optional.ofNullable(sendSettingVO.getReceiveConfigFlag()).map(t -> t.equals(1)).orElse(false))
                 .setEmailEnabledFlag(Optional.ofNullable(sendSettingVO.getEmailEnabledFlag()).map(t -> t.equals(1)).orElse(false))
                 .setPmEnabledFlag(Optional.ofNullable(sendSettingVO.getPmEnabledFlag()).map(t -> t.equals(1)).orElse(false))
+                .setDtEnabledFlag(Optional.ofNullable(sendSettingVO.getDtEnabledFlag()).map(t -> t.equals(1)).orElse(false))
                 .setSmsEnabledFlag(Optional.ofNullable(sendSettingVO.getSmsEnabledFlag()).map(t -> t.equals(1)).orElse(false));
     }
 

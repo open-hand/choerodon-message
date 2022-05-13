@@ -25,6 +25,8 @@ public class SendSettingDetailVO {
 
     @Encrypt
     private Long pmTemplateId;
+    @Encrypt
+    private Long dtTemplateId;
 
     private String level;
 
@@ -40,6 +42,7 @@ public class SendSettingDetailVO {
     private Boolean webhookEnabledFlag;
     private Boolean pmEnabledFlag;
     private Boolean emailEnabledFlag;
+    private Boolean dtEnabledFlag;
 
     private Long objectVersionNumber;
 
@@ -211,6 +214,24 @@ public class SendSettingDetailVO {
 
     public SendSettingDetailVO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
+        return this;
+    }
+
+    public Long getDtTemplateId() {
+        return dtTemplateId;
+    }
+
+    public SendSettingDetailVO setDtTemplateId(Long dtTemplateId) {
+        this.dtTemplateId = dtTemplateId;
+        return this;
+    }
+
+    public Boolean getDtEnabledFlag() {
+        return dtEnabledFlag;
+    }
+
+    public SendSettingDetailVO setDtEnabledFlag(Boolean dtEnabledFlag) {
+        this.dtEnabledFlag = dtEnabledFlag;
         return this;
     }
 }

@@ -7,7 +7,6 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.starter.keyencrypt.core.Encrypt;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 〈功能简述〉
@@ -56,6 +55,9 @@ public class CustomMessageSettingVO {
 
     @ApiModelProperty("是否发送钉钉")
     private Boolean dtEnable;
+
+    @ApiModelProperty("平台层配置是否允许发送钉钉")
+    private Boolean dtEnabledFlag = false;
 
     @ApiModelProperty("平台层配置是否允许发送短信")
     private Boolean smsEnabledFlag = false;
@@ -292,4 +294,13 @@ public class CustomMessageSettingVO {
     public void setDtEnable(Boolean dtEnable) {
         this.dtEnable = dtEnable;
     }
+
+    public Boolean getDtEnabledFlag() {
+        return dtEnabledFlag;
+    }
+
+    public void setDtEnabledFlag(Boolean dtEnabledFlag) {
+        this.dtEnabledFlag = dtEnabledFlag;
+    }
 }
+

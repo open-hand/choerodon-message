@@ -226,11 +226,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 targetUserList = customMessageSettingVO.getUserList();
                 projectMessageVO.setEmailEnable(customMessageSettingVO.getEmailEnable());
                 projectMessageVO.setPmEnable(customMessageSettingVO.getPmEnable());
+                projectMessageVO.setDtEnable(customMessageSettingVO.getDtEnable());
                 projectMessageVO.setSmsEnable(customMessageSettingVO.getSmsEnable());
             } else {
                 targetUserList = defaultSetting.getUserList();
                 projectMessageVO.setEmailEnable(defaultSetting.getEmailEnable());
                 projectMessageVO.setPmEnable(defaultSetting.getPmEnable());
+                projectMessageVO.setDtEnable(defaultSetting.getDtEnable());
                 projectMessageVO.setSmsEnable(defaultSetting.getSmsEnable());
             }
             Set<Long> userIds = new HashSet<>();
@@ -323,6 +325,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             if (SendingTypeEnum.WEB.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
                 customMessageSettingVO.setPmEnabledFlag(Boolean.TRUE);
             }
+            if (SendingTypeEnum.DT.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+                customMessageSettingVO.setDtEnabledFlag(Boolean.TRUE);
+            }
         });
         targetUser.forEach(customMessageSettingVO -> {
             defaultMessageSettingList.forEach(customMessageSettingVO1 -> {
@@ -340,6 +345,11 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                         && customMessageSettingVO1.getCode().equals(customMessageSettingVO.getCode())
                         && customMessageSettingVO1.getEnabledFlag()) {
                     customMessageSettingVO.setSmsEnabledFlag(Boolean.TRUE);
+                }
+                if (SendingTypeEnum.DT.getValue().equals(customMessageSettingVO1.getSendingType())
+                        && customMessageSettingVO1.getCode().equals(customMessageSettingVO.getCode())
+                        && customMessageSettingVO1.getEnabledFlag()) {
+                    customMessageSettingVO.setDtEnabledFlag(Boolean.TRUE);
                 }
             });
         });
@@ -589,6 +599,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 if (SendingTypeEnum.EMAIL.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
                     settingVO.setEmailEnabledFlag(true);
                 }
+                if (SendingTypeEnum.DT.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
+                    settingVO.setDtEnabledFlag(true);
+                }
                 if (SendingTypeEnum.SMS.getValue().equals(settingVO.getSendSetting().getSendingType().trim())) {
                     settingVO.setSmsEnabledFlag(true);
                 }
@@ -691,6 +704,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 } else {
                     customMessageSettingVO.setSmsEnabledFlag(setting.getSmsEnabledFlag());
                     customMessageSettingVO.setEmailEnabledFlag(setting.getEmailEnabledFlag());
+                    customMessageSettingVO.setDtEnabledFlag(setting.getDtEnabledFlag());
                     customMessageSettingVO.setPmEnabledFlag(setting.getPmEnabledFlag());
                 }
             });
@@ -711,6 +725,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             } else {
                 customMessageSettingVO.setSmsEnabledFlag(defaultMessageSetting.getSmsEnabledFlag());
                 customMessageSettingVO.setEmailEnabledFlag(defaultMessageSetting.getEmailEnabledFlag());
+                customMessageSettingVO.setDtEnabledFlag(defaultMessageSetting.getDtEnabledFlag());
                 customMessageSettingVO.setPmEnabledFlag(defaultMessageSetting.getPmEnabledFlag());
             }
         });

@@ -39,6 +39,8 @@ public class SendSettingVO extends TemplateServer {
 
     @Encrypt
     private Long pmTemplateId;
+    @Encrypt
+    private Long dtTemplateId;
     private String sendingType;
     private Integer edit;
 
@@ -146,5 +148,13 @@ public class SendSettingVO extends TemplateServer {
 
     public void setDtEnabledFlag(Integer dtEnabledFlag) {
         this.dtEnabledFlag = dtEnabledFlag;
+    }
+
+    public Long getDtTemplateId() {
+        return dtTemplateId;
+    }
+
+    public void setDtTemplateId(Long dtTemplateId) {
+        this.dtTemplateId = dtTemplateId;
     }
 }
