@@ -283,8 +283,10 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 break;
             case WEB:
                 sendSettingVO.setPmEnabledFlag(templateServerLine.getEnabledFlag());
+                break;
             case DT:
                 sendSettingVO.setDtEnabledFlag(templateServerLine.getEnabledFlag());
+                break;
             case WEB_HOOK:
                 if (templateServerLine.getTemplateCode().contains(WebHookTypeEnum.JSON.getValue().toUpperCase())) {
                     sendSettingVO.setWebhookJsonEnabledFlag(templateServerLine.getEnabledFlag());
