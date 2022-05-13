@@ -28,6 +28,8 @@ public class MessageSettingVO {
     private Boolean pmEnable;
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
+    @ApiModelProperty("是否发送钉钉")
+    private Boolean dtEnable;
     @ApiModelProperty(value = "版本号")
     private Long objectVersionNumber;
     @ApiModelProperty(value = "消息设置的分组")
@@ -171,6 +173,7 @@ public class MessageSettingVO {
                 ", code='" + code + '\'' +
                 ", projectId=" + projectId +
                 ", pmEnable=" + pmEnable +
+                ", dtEnable=" + dtEnable +
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + objectVersionNumber +
                 ", category='" + category + '\'' +
@@ -178,5 +181,13 @@ public class MessageSettingVO {
                 ", targetUserDTOS=" + targetUserDTOS +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public Boolean getDtEnable() {
+        return dtEnable;
+    }
+
+    public void setDtEnable(Boolean dtEnable) {
+        this.dtEnable = dtEnable;
     }
 }

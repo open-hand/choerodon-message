@@ -157,7 +157,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                                          List<CustomMessageSettingVO> customSettingList) {
         boolean doSendMsg =
                 Boolean.TRUE.equals(defaultSetting.getPmEnable())
-                        || Boolean.TRUE.equals(defaultSetting.getEmailEnable());
+                        || Boolean.TRUE.equals(defaultSetting.getEmailEnable())
+                        || Boolean.TRUE.equals(defaultSetting.getDtEnable());
         List<ProjectVO> projects = new ArrayList<>();
         Map<Long, CustomMessageSettingVO> projectSettingMap = new HashMap<>();
         if (doSendMsg) {
@@ -170,7 +171,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                 }
                 projectSettingMap.put(projectId, x);
                 if (Boolean.FALSE.equals(x.getPmEnable())
-                        && Boolean.FALSE.equals(x.getEmailEnable())) {
+                        && Boolean.FALSE.equals(x.getEmailEnable())
+                        && Boolean.FALSE.equals(x.getDtEnable())) {
                     skipProjectIds.add(x.getProjectId());
                 }
             });
@@ -187,7 +189,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
                     return;
                 }
                 if (Boolean.FALSE.equals(x.getPmEnable())
-                        && Boolean.FALSE.equals(x.getEmailEnable())) {
+                        && Boolean.FALSE.equals(x.getEmailEnable())
+                        && Boolean.FALSE.equals(x.getDtEnable())) {
                     return;
                 }
                 projectSettingMap.put(projectId, x);
