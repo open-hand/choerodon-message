@@ -34,6 +34,7 @@ import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -380,7 +381,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender) {
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        List<String> openUserIdList = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
         Long tenantId = null;
         Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
         if (projectIdOptional.isPresent()) {
@@ -393,11 +393,33 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
             tenantId = (Long) tenantIdOptional.get();
         }
-        if (ObjectUtils.isEmpty(tenantId)) {
-            throw new CommonException("error.tenant.id.exist");
+        Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
+        if (ObjectUtils.isEmpty(openUserIdMap)) {
+            return;
         }
-        this.filterDingTalkReceiver(sender);
-        DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(sender.getTenantId()).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
+        // tenantId为空时，表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
+        if (ObjectUtils.isEmpty(tenantId)) {
+            List<UserVO> userVOS = iamFeignClient.queryOrgId(userIdList);
+            Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
+            userVOMapGroupingByOrgId.forEach((orgId, users) -> {
+                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                List<String> openUserIdList = new ArrayList<>();
+                openUserIdMap.forEach((userId, openId) -> {
+                    if (userIds.contains(userId)) {
+                        openUserIdList.add(openId);
+                    }
+                });
+                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+            });
+        } else {
+            this.filterDingTalkReceiver(sender);
+            List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+            sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+        }
+    }
+
+    private void sendDingTalkMessage(Long tenantId, List<String> openUserIdList, List<TemplateServerLine> templateServerLineList, MessageSender sender, List<Message> result) {
+        DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(tenantId).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
         Map<String, String> args = new HashMap<>();
         sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
