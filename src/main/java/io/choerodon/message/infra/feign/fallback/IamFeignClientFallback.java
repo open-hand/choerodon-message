@@ -1,6 +1,7 @@
 package io.choerodon.message.infra.feign.fallback;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
@@ -90,7 +91,7 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
-    public ResponseEntity<List<String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
+    public ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
         throw new CommonException("error.get.open.user.ids");
     }
 
@@ -98,4 +99,10 @@ public class IamFeignClientFallback implements IamFeignClient {
     public Boolean isMessageEnabled(Long organizationId, String type) {
         throw new CommonException("error.get.message.enabled");
     }
+
+    @Override
+    public List<UserVO> queryOrgId(List<Long> userIdList) {
+        throw new CommonException("error.get.user");
+    }
+
 }
