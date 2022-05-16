@@ -154,4 +154,9 @@ public class MessageC7nServiceImpl implements MessageC7nService {
         }
         return reTrxStatusVOS;
     }
+
+    @Override
+    public Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest) {
+        return null;
+    }
 }

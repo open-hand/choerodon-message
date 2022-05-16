@@ -4,15 +4,11 @@ import java.util.Date;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import io.choerodon.core.domain.Page;
@@ -79,6 +75,19 @@ public class MailRecordController {
                                                             @RequestParam(required = false) String failedReason,
                                                             @RequestParam(required = false) String params) {
         return new ResponseEntity<>(messageC7nService.listWebHooks(status, webhookAddress, messageName, failedReason, params, pageRequest), HttpStatus.OK);
+    }
+
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/ding_talk/{organization_id}")
+    @ApiOperation(value = "查询组织下钉钉消息记录（分页接口）")
+    @CustomPageRequest
+    public ResponseEntity<Page<MessageC7nDTO>> pageDingTalk(@PathVariable("organization_id") Long organizationId,
+                                                            @ApiIgnore
+                                                            @SortDefault(value = "message_id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                            @RequestParam(required = false) String status,
+                                                            @RequestParam(required = false) String messageName,
+                                                            @RequestParam(required = false) String params) {
+        return new ResponseEntity<>(messageC7nService.pageDingTalk(organizationId, status, messageName, params, pageRequest), HttpStatus.OK);
     }
 
 

@@ -38,4 +38,15 @@ public interface MessageC7nService {
     void resendFailedEmail(Date endDate);
 
     List<MessageTrxStatusVO> queryTrxStatusCode(Set<String> userEmails, String templateCode);
+
+    /**
+     * 查询钉钉执行记录
+     * @param organizationId
+     * @param status
+     * @param messageName
+     * @param params
+     * @param pageRequest
+     * @return
+     */
+    Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest);
 }
