@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.lang3.ObjectUtils;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
@@ -62,7 +61,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     @Override
     @ProcessLovValue
     public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
-       return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
+        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, messageName, "Email", null, params));
     }
 
     @Override
@@ -157,6 +156,6 @@ public class MessageC7nServiceImpl implements MessageC7nService {
 
     @Override
     public Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest) {
-        return null;
+        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, messageName, "DT", organizationId, params));
     }
 }
