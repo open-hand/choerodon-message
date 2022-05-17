@@ -1,6 +1,6 @@
 # choerodon-message
 
-Gateway of Choerodon.
+Message service of Choerodon.
 
 ## Installing the Chart
 
