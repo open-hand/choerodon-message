@@ -29,6 +29,9 @@ public class MessageGeneratorServiceAop {
     public void afterReturning(JoinPoint joinPoint, Object result) {
         Message message = (Message) result;
         String plainContent = ((Message) result).getPlainContent();
+        if ("/".endsWith(frontUrl)) {
+            frontUrl = frontUrl.substring(0, frontUrl.length() - 1);
+        }
         plainContent = plainContent.replaceAll("\\$\\{CHOERODON_FRONT_URL}", frontUrl);
         plainContent = plainContent + "\n\n发送时间: " + dtf.format(LocalDateTime.now());
         message.setPlainContent(plainContent);
