@@ -110,6 +110,8 @@ env:
     LOG_LEVEL: info
     # 资源匹配路径
     HZERO_RESOURCE_PATTERN: /v1/*,/hzero/*,/iam/v1/*,/iam/hzero/*,/choerodon/v1/*
+    # dubbo路径
+    DUBBO_REGISTRY_FILE: /choerodon/cache
 #    # JVM参数
 #    JAVA_OPTS: >-
 #      -Xms1024m
