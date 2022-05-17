@@ -23,7 +23,7 @@ public interface RelSendMessageC7nService extends RelSendMessageService {
 
     List<Message> c7nRelSendMessageReceipt(MessageSender messageSender, Long organizationId);
 
-    void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender);
+    void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender, String sendDingTalk);
 
     void filterDingTalkReceiver(MessageSender sender);
 }

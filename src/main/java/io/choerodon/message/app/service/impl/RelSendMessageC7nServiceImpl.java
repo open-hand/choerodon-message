@@ -64,6 +64,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
     private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
+    private static final String SITE = "site";
 
     public static final String DING_TALK_SERVER_CODE = "DING_TALK";
 
@@ -359,7 +360,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<Message> results = new ArrayList<>();
         List<Message> dingTalkResults = new ArrayList<>();
         if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
-            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
+            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender), templateServer.getCategoryCode());
             results.addAll(dingTalkResults);
         }
         serverLineMap.remove("DT");
@@ -375,7 +376,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
     @Override
-    public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender) {
+    public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender, String categoryCode) {
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         Long tenantId = null;
@@ -394,8 +395,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (ObjectUtils.isEmpty(openUserIdMap)) {
             return;
         }
-        // tenantId为空时，表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
-        if (ObjectUtils.isEmpty(tenantId)) {
+        // 表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
+        if ("SITE".equals(categoryCode)) {
             List<UserVO> userVOS = iamFeignClient.queryOrgId(userIdList);
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
             userVOMapGroupingByOrgId.forEach((orgId, users) -> {
