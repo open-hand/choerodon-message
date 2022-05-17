@@ -67,7 +67,7 @@ spec:
             - >
               java -Ddata.init=true 
               -Dlogging.level.root=info
-              -Dinstaller.jarPath.init=true
+              -Dinstaller.jarPath.init=false
               -Dinstaller.exclusion={{ .Values.initDatabases.exclusion }}
               -Dspring.datasource.url="{{ .Values.initDatabases.datasource.url }}"
               -Dspring.datasource.username={{ .Values.initDatabases.datasource.username }}
