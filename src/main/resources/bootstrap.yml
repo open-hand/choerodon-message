@@ -20,7 +20,7 @@ dubbo:
   registry:
     #    address: zookeeper://127.0.0.1:2181
     address: spring-cloud://dev.hzero.org
-    file: /choerodon/cache
+    file: ${DUBBO_REGISTRY_FILE:/choerodon/cache}
   cloud:
     subscribed-services: choerodon-message
 
