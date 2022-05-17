@@ -359,11 +359,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<Message> results = new ArrayList<>();
         List<Message> dingTalkResults = new ArrayList<>();
         if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
-            Boolean enabled = iamFeignClient.isMessageEnabled(organizationId, "ding_talk");
-            if (Boolean.TRUE.equals(enabled)) {
-                this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
-                results.addAll(dingTalkResults);
-            }
+            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
+            results.addAll(dingTalkResults);
         }
         serverLineMap.remove("DT");
         Class clazz = super.getClass().getSuperclass();
@@ -402,19 +399,25 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             List<UserVO> userVOS = iamFeignClient.queryOrgId(userIdList);
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
             userVOMapGroupingByOrgId.forEach((orgId, users) -> {
-                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
-                List<String> openUserIdList = new ArrayList<>();
-                openUserIdMap.forEach((userId, openId) -> {
-                    if (userIds.contains(userId)) {
-                        openUserIdList.add(openId);
-                    }
-                });
-                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                Boolean enabled = iamFeignClient.isMessageEnabled(orgId, "ding_talk");
+                if (enabled) {
+                    List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                    List<String> openUserIdList = new ArrayList<>();
+                    openUserIdMap.forEach((userId, openId) -> {
+                        if (userIds.contains(userId)) {
+                            openUserIdList.add(openId);
+                        }
+                    });
+                    sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                }
             });
         } else {
-            this.filterDingTalkReceiver(sender);
-            List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-            sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk");
+            if (enabled) {
+                this.filterDingTalkReceiver(sender);
+                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+            }
         }
     }
 
