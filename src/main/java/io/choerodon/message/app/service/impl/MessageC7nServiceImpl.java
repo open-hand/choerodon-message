@@ -157,6 +157,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     }
 
     @Override
+    @ProcessLovValue
     public Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest) {
         return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, messageName, "DT", organizationId, params));
     }
