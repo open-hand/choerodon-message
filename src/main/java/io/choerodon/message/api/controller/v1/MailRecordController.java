@@ -4,6 +4,9 @@ import java.util.Date;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.hzero.core.util.Results;
+import org.hzero.message.domain.entity.MessageReceiver;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
@@ -90,5 +93,14 @@ public class MailRecordController {
         return new ResponseEntity<>(messageC7nService.pageDingTalk(organizationId, status, messageName, params, pageRequest), HttpStatus.OK);
     }
 
+    @ApiOperation("查询消息接收人列表")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/ding_talk/{organization_id}/messages/{messageId}/receivers")
+    @CustomPageRequest
+    public ResponseEntity<Page<MessageReceiver>> listMessageReceiver(@PathVariable("organization_id") Long organizationId,
+                                                                     @Encrypt @PathVariable long messageId,
+                                                                     @ApiIgnore PageRequest pageRequest) {
+        return Results.success(messageC7nService.listMessageReceiver(organizationId, messageId, pageRequest));
+    }
 
 }

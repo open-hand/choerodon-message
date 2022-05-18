@@ -76,11 +76,16 @@ public interface IamFeignClient {
     ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
 
     @PostMapping("/choerodon/v1/users/query_open_user_ids")
-    ResponseEntity<Map<Long,String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList, @RequestParam("open_app_code") String openAppCode);
+    ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList, @RequestParam("open_app_code") String openAppCode);
 
     @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_message_enabled")
     Boolean isMessageEnabled(@RequestParam("organization_id") Long organizationId, @RequestParam("type") String type);
 
     @GetMapping("/choerodon/v1/users/query_org_id")
     List<UserVO> queryOrgId(List<Long> userIdList);
+
+    @PostMapping("/choerodon/v1/organizations/{organization_id}/open_app/list_user_by_openIds")
+    ResponseEntity<List<UserVO>> listUserByOpenIds(@PathVariable("organization_id") Long tenantId,
+                                                   @RequestParam(value = "app_type") String openAppType,
+                                                   @RequestBody Set<String> openIds);
 }

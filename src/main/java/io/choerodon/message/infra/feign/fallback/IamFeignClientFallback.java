@@ -105,4 +105,8 @@ public class IamFeignClientFallback implements IamFeignClient {
         throw new CommonException("error.get.user");
     }
 
+    @Override
+    public ResponseEntity<List<UserVO>> listUserByOpenIds(Long tenantId, String openAppType, Set<String> openIds) {
+        throw new CommonException("error.get.user.by.openIds");
+    }
 }

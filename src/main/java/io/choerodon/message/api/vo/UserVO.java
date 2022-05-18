@@ -24,6 +24,8 @@ public class UserVO {
 
     private Long organizationId;
 
+    private String openId;
+
     private List<Role> roles;
 
     public List<Role> getRoles() {
@@ -109,6 +111,7 @@ public class UserVO {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
+                ", openId='" + openId + '\'' +
                 '}';
     }
 
@@ -118,5 +121,13 @@ public class UserVO {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 }
