@@ -432,7 +432,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
             while (templateServerLineIterator.hasNext()) {
                 TemplateServerLine line = templateServerLineIterator.next();
-                Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()).setServerCode(line.getServerCode()), line.getTryTimes());
+                Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()), line.getTryTimes());
                 result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
             }
         }
