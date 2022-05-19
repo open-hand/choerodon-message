@@ -2,7 +2,6 @@ package io.choerodon.message.app.aop;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -18,7 +17,7 @@ public class MessageGeneratorServiceAop {
     @Value("${services.front.url}")
     private String frontUrl;
 
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:MM");
 
     @Pointcut("execution (* org.hzero.message.app.service.impl.MessageGeneratorServiceImpl.generateMessage(org.hzero.boot.message.entity.DingTalkSender, org.hzero.message.domain.entity.Message))")
     public void modifyMessage() {
@@ -33,7 +32,7 @@ public class MessageGeneratorServiceAop {
             frontUrl = frontUrl.substring(0, frontUrl.length() - 1);
         }
         plainContent = plainContent.replaceAll("\\$\\{CHOERODON_FRONT_URL}", frontUrl);
-        plainContent = plainContent + "\n\n发送时间: " + dtf.format(LocalDateTime.now());
+        plainContent = plainContent + "\n\n发送时间: " + DATE_TIME_FORMATTER.format(LocalDateTime.now());
         message.setPlainContent(plainContent);
     }
 }
