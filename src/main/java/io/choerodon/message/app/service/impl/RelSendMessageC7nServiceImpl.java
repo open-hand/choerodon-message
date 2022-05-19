@@ -359,9 +359,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         Map<String, List<TemplateServerLine>> serverLineMap = this.templateServerLineRepository.enabledTemplateServerLine(templateServer.getTempServerId(), templateServer.getTenantId()).stream().collect(Collectors.groupingBy(TemplateServerLine::getTypeCode));
         List<Message> results = new ArrayList<>();
         List<Message> dingTalkResults = new ArrayList<>();
-        if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
-            this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender), templateServer.getCategoryCode());
-            results.addAll(dingTalkResults);
+        try {
+            if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
+                this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender), templateServer.getCategoryCode());
+                results.addAll(dingTalkResults);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         serverLineMap.remove("DT");
         Class clazz = super.getClass().getSuperclass();
@@ -379,18 +383,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender, String categoryCode) {
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        Long tenantId = null;
-        Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
-        if (projectIdOptional.isPresent()) {
-            Long projectId = (Long) projectIdOptional.get();
-            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
-            if (!ObjectUtils.isEmpty(projectDTO)) {
-                tenantId = projectDTO.getOrganizationId();
-            }
-        } else {
-            Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-            tenantId = (Long) tenantIdOptional.get();
-        }
         Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
         if (ObjectUtils.isEmpty(openUserIdMap)) {
             return;
@@ -413,8 +405,20 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 }
             });
         } else {
+            Long tenantId = null;
+            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+            if (projectIdOptional.isPresent()) {
+                Long projectId = (Long) projectIdOptional.get();
+                ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
+                if (!ObjectUtils.isEmpty(projectDTO)) {
+                    tenantId = projectDTO.getOrganizationId();
+                }
+            } else {
+                Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
+                tenantId = (Long) tenantIdOptional.get();
+            }
             Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk");
-            if (enabled) {
+            if (Boolean.TRUE.equals(enabled)) {
                 this.filterDingTalkReceiver(sender);
                 List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
                 sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
