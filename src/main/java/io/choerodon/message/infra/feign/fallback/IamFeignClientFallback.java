@@ -101,7 +101,7 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
-    public List<UserVO> queryOrgId(List<Long> userIdList) {
+    public List<UserVO> queryUserOrgId(List<Long> userIdList) {
         throw new CommonException("error.get.user");
     }
 

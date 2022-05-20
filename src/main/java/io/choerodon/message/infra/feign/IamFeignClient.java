@@ -82,7 +82,7 @@ public interface IamFeignClient {
     Boolean isMessageEnabled(@RequestParam("organization_id") Long organizationId, @RequestParam("type") String type);
 
     @GetMapping("/choerodon/v1/users/query_org_id")
-    List<UserVO> queryOrgId(List<Long> userIdList);
+    List<UserVO> queryUserOrgId(List<Long> userIdList);
 
     @PostMapping("/choerodon/v1/organizations/{organization_id}/open_app/list_user_by_openIds")
     ResponseEntity<List<UserVO>> listUserByOpenIds(@PathVariable("organization_id") Long tenantId,

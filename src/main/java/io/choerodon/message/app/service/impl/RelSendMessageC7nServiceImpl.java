@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.MapUtils;
@@ -11,7 +12,9 @@ import org.hzero.boot.message.entity.DingTalkSender;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.common.HZeroService;
 import org.hzero.core.base.BaseConstants;
+import org.hzero.core.redis.safe.SafeRedisHelper;
 import org.hzero.message.app.service.DingTalkSendService;
 import org.hzero.message.app.service.MessageReceiverService;
 import org.hzero.message.app.service.TemplateServerService;
@@ -64,6 +67,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
     private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
+    private static final String REDIS_KEY_SYSTEM_MESSAGE = "open-app-system-message:%s:%s";
     private static final String SITE = "site";
 
     public static final String DING_TALK_SERVER_CODE = "DING_TALK";
@@ -389,11 +393,11 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         // 表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
         if ("SITE".equals(categoryCode)) {
-            List<UserVO> userVOS = iamFeignClient.queryOrgId(userIdList);
+            List<UserVO> userVOS = iamFeignClient.queryUserOrgId(userIdList);
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
             userVOMapGroupingByOrgId.forEach((orgId, users) -> {
-                Boolean enabled = iamFeignClient.isMessageEnabled(orgId, "ding_talk");
-                if (enabled) {
+                Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
+                if (Boolean.TRUE.equals(enabled)) {
                     List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
                     List<String> openUserIdList = new ArrayList<>();
                     openUserIdMap.forEach((userId, openId) -> {
@@ -449,5 +453,21 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
     private boolean c7nSendEnable(List<String> typeCodeList, String typeCode) {
         return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
+    }
+
+    private Boolean isMessageEnabled(Long tenantId, String typeCode) {
+        AtomicReference<Boolean> result = new AtomicReference<>();
+        SafeRedisHelper.execute(HZeroService.Message.REDIS_DB, helper -> {
+            String redisKey = String.format(REDIS_KEY_SYSTEM_MESSAGE, typeCode, tenantId);
+            String s = helper.strGet(redisKey);
+            if (s != null) {
+                result.set(Boolean.parseBoolean(s));
+            }
+        });
+        if (result.get() == null) {
+            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode);
+            result.set(messageEnabled);
+        }
+        return result.get();
     }
 }
