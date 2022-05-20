@@ -331,7 +331,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         senderList.forEach(sender -> {
             try {
-                this.relSendMessageReceipt(sender, sender.getTenantId());
+                this.c7nRelSendMessageReceipt(sender, sender.getTenantId());
             } catch (Exception e) {
                 logger.error("batch send message error", e);
             }
