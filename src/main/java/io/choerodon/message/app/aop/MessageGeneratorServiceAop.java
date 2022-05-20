@@ -1,10 +1,9 @@
 package io.choerodon.message.app.aop;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,12 +28,21 @@ public class MessageGeneratorServiceAop {
     @AfterReturning(pointcut = "modifyMessage()", returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
         Message message = (Message) result;
-        String plainContent = ((Message) result).getPlainContent();
+        String messageContent = ((Message) result).getPlainContent();
+        if (!ObjectUtils.isEmpty(messageContent)) {
+            message.setPlainContent(processMessageContent(messageContent));
+        } else {
+            messageContent = ((Message) result).getContent();
+            message.setContent(processMessageContent(messageContent));
+        }
+    }
+
+    private String processMessageContent(String message) {
         if ("/".endsWith(frontUrl)) {
             frontUrl = frontUrl.substring(0, frontUrl.length() - 1);
         }
-        plainContent = plainContent.replaceAll("\\$\\{CHOERODON_FRONT_URL}", frontUrl);
-        plainContent = plainContent + "\n\n发送时间: " + DATE_TIME_FORMATTER.format(LocalDateTime.now());
-        message.setPlainContent(plainContent);
+        message = message.replaceAll("\\$\\{CHOERODON_FRONT_URL}", frontUrl);
+        message = message + "\n\n发送时间: " + DATE_TIME_FORMATTER.format(LocalDateTime.now());
+        return message;
     }
 }

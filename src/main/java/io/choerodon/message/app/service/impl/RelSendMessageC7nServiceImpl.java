@@ -433,7 +433,12 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private void sendDingTalkMessage(Long tenantId, List<String> openUserIdList, List<TemplateServerLine> templateServerLineList, MessageSender sender, List<Message> result) {
         DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(tenantId).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
         Map<String, String> args = new HashMap<>();
-        sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
+        if (!CollectionUtils.isEmpty(sender.getArgs())) {
+            args.putAll(sender.getArgs());
+        }
+        if (!CollectionUtils.isEmpty(sender.getObjectArgs())) {
+            sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
+        }
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
