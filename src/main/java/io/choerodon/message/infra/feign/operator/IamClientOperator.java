@@ -70,4 +70,12 @@ public class IamClientOperator {
         return OptionalBean.ofNullable(listResponseEntity.getBody()).get();
     }
 
+
+    public List<UserVO> listUserByOpenIds(Long tenantId, String openAppType, Set<String> openIds) {
+        ResponseEntity<List<UserVO>> listResponseEntity = iamFeignClient.listUserByOpenIds(tenantId, openAppType, openIds);
+        if (!listResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.get.user.by.openIds");
+        }
+        return OptionalBean.ofNullable(listResponseEntity.getBody()).get();
+    }
 }

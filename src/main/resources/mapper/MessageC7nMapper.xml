@@ -15,7 +15,7 @@
         GROUP BY date_format( hm.creation_date, '%Y-%m-%d' )
     </select>
 
-    <select id="listEmailMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
+    <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
         SELECT
           hm.message_id AS id,
           hts.message_name,
@@ -26,10 +26,13 @@
           hm.creation_date AS creationDate
         FROM hmsg_message hm
         JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+        <if test="tenantId != null">
+              AND  hmt.tenant_id = #{tenantId}
+        </if>
         straight_join  hmsg_template_server_line htsl ON htsl.template_code = hm.template_code
         JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
         WHERE
-           hm.message_type_code	= 'Email'
+           hm.message_type_code	= #{templateType}
         <if test="status != null and status != ''">
             and hmt.trx_status_code = #{status}
         </if>
@@ -47,7 +50,7 @@
         hm.message_id DESC
     </select>
     <!--手写mybatis select count优化-->
-    <select id="listEmailMessage_COUNT" resultType="Long">
+    <select id="listMessage_COUNT" resultType="Long">
         SELECT
           count(0)
         FROM
@@ -56,14 +59,14 @@
            hm.message_id AS id
           FROM
            hmsg_message hm
-           <if test="status != null or  subject != null or params != null">
-               JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
+           <if test="status != null or  subject != null or params != null or tenantId != null">
+               JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id and hmt.tenant_id = #{tenantId}
                JOIN hmsg_template_server_line htsl  ON htsl.template_code = hm.template_code
                JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
            </if>
 
         WHERE
-        hm.message_type_code = 'Email'
+        hm.message_type_code = #{templateType}
         <if test="status != null and status != ''">
             and hmt.trx_status_code = #{status}
         </if>
@@ -79,49 +82,6 @@
             )
         </if>
         ) tmp_count
-    </select>
-
-    <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">
-        SELECT
-        hmt.transaction_id AS id,
-        hmr.receiver_address AS email,
-        hts.message_code AS messageCode,
-        hts.message_name AS messageName,
-        hmt.trx_status_code AS statusCode,
-        hmt.transaction_message AS failedReason,
-        hm.creation_date
-        FROM
-        hmsg_message hm
-        JOIN hmsg_message_transaction hmt ON hm.message_id = hmt.message_id
-        JOIN hmsg_message_receiver hmr ON hmr.message_id = hm.message_id
-        LEFT JOIN hmsg_template_server_line htsl ON htsl.server_code = 'CHOERODON-EMAIL'
-        AND htsl.template_code = hm.template_code
-        LEFT JOIN hmsg_template_server hts ON hts.temp_server_id = htsl.temp_server_id
-        WHERE
-        hm.server_code = 'CHOERODON-EMAIL'
-        <if test="status != null and status != ''">
-            and hmt.trx_status_code = #{status}
-        </if>
-        <if test="receiveEmail != null and receiveEmail != ''">
-            and hmr.receiver_address  LIKE concat(concat('%',#{receiveEmail}),'%')
-        </if>
-        <if test="templateType != null and templateType != ''">
-            and (hts.message_code  LIKE concat(concat('%',#{templateType}),'%') or hts.message_name LIKE
-            concat(concat('%',#{templateType}),'%'))
-        </if>
-        <if test="failedReason != null and failedReason != ''">
-            and hmt.transaction_message  LIKE concat(concat('%',#{failedReason}),'%')
-        </if>
-        <if test="params != null">
-            AND (
-            hmt.trx_status_code LIKE concat(concat('%',#{params}),'%') OR
-            hmr.receiver_address LIKE concat(concat('%',#{params}),'%') OR
-            hmt.transaction_message LIKE concat(concat('%',#{params}),'%') OR
-            hts.message_name  LIKE concat(concat('%',#{params}),'%') OR
-            hts.message_code LIKE concat(concat('%',#{params}),'%')
-            )
-        </if>
-        ORDER BY hm.message_id desc
     </select>
 
     <select id="listWebHooks" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">

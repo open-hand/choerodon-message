@@ -2,8 +2,8 @@ package io.choerodon.message.infra.mapper;
 
 import java.util.Date;
 import java.util.List;
-
 import java.util.Set;
+
 import org.apache.ibatis.annotations.Param;
 
 import io.choerodon.message.api.vo.MailRecordVO;
@@ -20,14 +20,10 @@ public interface MessageC7nMapper {
                                           @Param("endDate") Date endDate);
 
     List<MessageC7nDTO> listMessage(@Param("status") String status,
-                                    @Param("receiveEmail") String receiveEmail,
+                                    @Param("subject") String messageName,
                                     @Param("templateType") String templateType,
-                                    @Param("failedReason") String failedReason,
+                                    @Param("tenantId") Long tenantId,
                                     @Param("params") String params);
-
-    List<MessageC7nDTO> listEmailMessage(@Param("status") String status,
-                                         @Param("subject") String messageName,
-                                         @Param("params") String params);
 
     List<MessageC7nDTO> listWebHooks(@Param("status") String status,
                                      @Param("webhookAddress") String webhookAddress,

@@ -499,6 +499,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if ("ding_talk".equals(openAppVO.getType())) {
             TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
             DingTalkServer dingTalkServer = dingTalkServerService.getConfigWithDb(openAppVO.getTenantId(), DING_TALK_SERVER_CODE);
+            if (dingTalkServer==null){
+                insertOpenAppConfig(openAppVO);
+            }
             dingTalkServer.setAppKey(openAppVO.getAppId());
             dingTalkServer.setAppSecret(openAppVO.getAppSecret());
             dingTalkServer.setTenantId(openAppVO.getTenantId());

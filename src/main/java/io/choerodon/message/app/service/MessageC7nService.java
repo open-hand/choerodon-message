@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.hzero.message.domain.entity.MessageReceiver;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.message.api.vo.CustomEmailSendInfoVO;
 import io.choerodon.message.api.vo.MessageTrxStatusVO;
@@ -38,4 +40,24 @@ public interface MessageC7nService {
     void resendFailedEmail(Date endDate);
 
     List<MessageTrxStatusVO> queryTrxStatusCode(Set<String> userEmails, String templateCode);
+
+    /**
+     * 查询钉钉执行记录
+     * @param organizationId
+     * @param status
+     * @param messageName
+     * @param params
+     * @param pageRequest
+     * @return
+     */
+    Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest);
+
+    /**
+     * 查询消息接收人
+     * @param organizationId
+     * @param messageId
+     * @param pageRequest
+     * @return
+     */
+    Page<MessageReceiver> listMessageReceiver(Long organizationId, Long messageId, PageRequest pageRequest);
 }

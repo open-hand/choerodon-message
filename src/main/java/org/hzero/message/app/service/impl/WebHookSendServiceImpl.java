@@ -5,18 +5,24 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hzero.boot.message.entity.*;
+import org.apache.dubbo.config.annotation.DubboService;
+import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.boot.message.entity.Receiver;
+import org.hzero.boot.message.entity.WebHookSender;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.core.convert.CommonConverter;
+import org.hzero.core.util.SystemClock;
 import org.hzero.message.api.dto.UserMessageDTO;
 import org.hzero.message.app.service.MessageGeneratorService;
 import org.hzero.message.app.service.MessageReceiverService;
@@ -25,11 +31,10 @@ import org.hzero.message.config.MessageConfigProperties;
 import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.MessageReceiver;
 import org.hzero.message.domain.entity.MessageTransaction;
-import org.hzero.message.domain.entity.WebhookServer;
 import org.hzero.message.domain.repository.MessageReceiverRepository;
 import org.hzero.message.domain.repository.MessageRepository;
 import org.hzero.message.domain.repository.MessageTransactionRepository;
-import org.hzero.message.domain.repository.WebhookServerRepository;
+import org.hzero.message.domain.vo.*;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.message.infra.retry.MessageSendRetryer;
 import org.hzero.mybatis.helper.DataSecurityHelper;
@@ -50,11 +55,12 @@ import io.choerodon.core.exception.CommonException;
 
 /**
  * webHook消息发送
- *
+ * 覆盖该方法 不能因为一个消息出错 导致后续都发送不成功
+ * {@link WebHookSendServiceImpl#sendWebHook(org.hzero.boot.message.entity.WebHookSender, java.lang.Integer)}
  * @author xiaoyu.zhao@hand-china.com 2020-04-26 19:57:46
  */
 @Service
-@org.apache.dubbo.config.annotation.Service
+@DubboService
 public class WebHookSendServiceImpl extends AbstractSendService implements WebHookSendService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebHookSendServiceImpl.class);
@@ -65,21 +71,22 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
     private final MessageReceiverService messageReceiverService;
     private final MessageConfigProperties messageConfigProperties;
     private final MessageGeneratorService messageGeneratorService;
-    private final WebhookServerRepository webhookServerRepository;
     private final MessageTransactionRepository messageTransactionRepository;
     private final MessageReceiverRepository messageReceiverRepository;
     private final MessageSendRetryer messageSendRetryer;
 
     @Autowired
-    public WebHookSendServiceImpl(MessageRepository messageRepository, MessageReceiverService messageReceiverService,
-                                  MessageConfigProperties messageConfigProperties, MessageGeneratorService messageGeneratorService,
-                                  WebhookServerRepository webhookServerRepository, MessageTransactionRepository messageTransactionRepository,
-                                  MessageReceiverRepository messageReceiverRepository, MessageSendRetryer messageSendRetryer) {
+    public WebHookSendServiceImpl(MessageRepository messageRepository,
+                                  MessageReceiverService messageReceiverService,
+                                  MessageConfigProperties messageConfigProperties,
+                                  MessageGeneratorService messageGeneratorService,
+                                  MessageTransactionRepository messageTransactionRepository,
+                                  MessageReceiverRepository messageReceiverRepository,
+                                  MessageSendRetryer messageSendRetryer) {
         this.messageRepository = messageRepository;
         this.messageReceiverService = messageReceiverService;
         this.messageConfigProperties = messageConfigProperties;
         this.messageGeneratorService = messageGeneratorService;
-        this.webhookServerRepository = webhookServerRepository;
         this.messageTransactionRepository = messageTransactionRepository;
         this.messageReceiverRepository = messageReceiverRepository;
         this.messageSendRetryer = messageSendRetryer;
@@ -113,24 +120,14 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         Assert.notNull(messageSender.getMessageCode(), BaseConstants.ErrorCode.DATA_INVALID);
         Assert.notNull(messageSender.getServerCode(), BaseConstants.ErrorCode.DATA_INVALID);
         Assert.notNull(messageSender.getTenantId(), BaseConstants.ErrorCode.DATA_INVALID);
-        // 获取数据库中的webHook配置
-        WebhookServer webhookServer = webhookServerRepository.selectOne(new WebhookServer()
-                .setTenantId(messageSender.getTenantId())
-                .setServerCode(messageSender.getServerCode())
-                .setEnabledFlag(BaseConstants.Flag.YES));
-        if (webhookServer == null && !messageSender.getTenantId().equals(BaseConstants.DEFAULT_TENANT_ID)) {
-            webhookServer = webhookServerRepository.selectOne(new WebhookServer()
-                    .setTenantId(BaseConstants.DEFAULT_TENANT_ID)
-                    .setServerCode(messageSender.getServerCode())
-                    .setEnabledFlag(BaseConstants.Flag.YES));
-        }
+        // 获取webHook配置
+        WebhookServerConfig webhookServer = WebhookServerConfig.getConfig(messageSender.getTenantId(), messageSender.getServerCode());
         // 确保WebHook一定存在
-        // todo 覆盖该类唯一修改逻辑
+        // todo 覆盖逻辑
 //        Assert.notNull(webhookServer, HmsgConstant.ErrorCode.WEBHOOK_NOT_EXISTS);
         if (webhookServer == null) {
             return null;
         }
-
         if (StringUtils.isNotBlank(webhookServer.getSecret())) {
             webhookServer.setSecret(this.decryptSecret(webhookServer.getSecret()));
         }
@@ -155,9 +152,9 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
             messageRepository.updateByPrimaryKeySelective(message);
             Long messageId = message.getMessageId();
             Long tenantId = message.getTenantId();
-            // 记录接收人信息，TODO 仅处理钉钉手机号接收人的情况
+            // 记录接收人信息
             if (CollectionUtils.isNotEmpty(ms.getReceiverAddressList())
-                    && messageSender.getServerType().equals(HmsgConstant.WebHookServerType.DING_TALK)) {
+                    && StringUtils.equalsAny(messageSender.getServerType(), HmsgConstant.WebHookServerType.DING_TALK, HmsgConstant.WebHookServerType.WE_CHAT)) {
                 ms.getReceiverAddressList().forEach(receiver -> {
                     if (!StringUtils.isBlank(receiver.getPhone())) {
                         messageReceiverRepository.insertSelective(new MessageReceiver()
@@ -185,44 +182,70 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
     }
 
     /**
-     * 发送webhook消息 TODO 代码待优化，目前仅支持发送markdown类型消息，考虑之后扩展其它类型
+     * 发送webhook消息
      *
      * @param messageSender WebHookSender
      * @param message       消息内容类
      * @param tryTimes      重试次数
      */
-    private void sendWHMessage(WebHookSender messageSender, Message message, Integer tryTimes) {
+    private void sendWHMessage(WebHookSender messageSender, Message message, Integer tryTimes) throws ExecutionException, RetryException {
+        // 获取接收人
+        List<Receiver> receivers = messageSender.getReceiverAddressList();
+        Set<String> phoneSet = new HashSet<>();
         // 判断WebHook的类型，执行不同的消息发送方式
         switch (messageSender.getServerType()) {
             case HmsgConstant.WebHookServerType.JSON:
                 sendWHJsonMessage(messageSender, message, tryTimes);
                 break;
             case HmsgConstant.WebHookServerType.DING_TALK:
-                // 获取接收人
-                List<Receiver> receivers = messageSender.getReceiverAddressList();
-                Set<String> phoneSet = new HashSet<>();
                 // 获取手机号信息，用于钉钉@人使用
                 if (CollectionUtils.isNotEmpty(receivers)) {
                     for (Receiver receiver : receivers) {
-                        if (StringUtils.isNotBlank(receiver.getPhone())) {
-                            // 处理消息发送配置发送webhook消息传递手机号中使用逗号拼接多个手机号的情况
-                            String[] split = StringUtils.split(receiver.getPhone(), BaseConstants.Symbol.COMMA);
-                            for (String phone : split) {
-                                // 拼接国际冠码
-                                if (StringUtils.isNotBlank(receiver.getIdd())) {
-                                    phoneSet.add(StringUtils.join(receiver.getIdd(), BaseConstants.Symbol.MIDDLE_LINE,
-                                            phone));
-                                } else {
-                                    phoneSet.add(phone);
-                                }
+                        if (StringUtils.isBlank(receiver.getPhone())) {
+                            continue;
+                        }
+                        // 处理消息发送配置发送webhook消息传递手机号中使用逗号拼接多个手机号的情况
+                        String[] split = StringUtils.split(receiver.getPhone(), BaseConstants.Symbol.COMMA);
+                        for (String phone : split) {
+                            // 拼接国际冠码
+                            if (StringUtils.isNotBlank(receiver.getIdd())) {
+                                phoneSet.add(StringUtils.join(receiver.getIdd(), BaseConstants.Symbol.MIDDLE_LINE, phone));
+                            } else {
+                                phoneSet.add(phone);
                             }
                         }
                     }
                 }
-                sendWHDingTalkMessage(messageSender, message, phoneSet, tryTimes);
+                switch (messageSender.getMsgType()) {
+                    case TEXT:
+                        sendWhDingTalkTextMessage(messageSender, message, phoneSet, tryTimes);
+                        break;
+                    case MARK_DOWN:
+                    default:
+                        sendWhDingTalkMarkdownMessage(messageSender, message, phoneSet, tryTimes);
+                        break;
+                }
                 break;
             case HmsgConstant.WebHookServerType.WE_CHAT:
-                sendWHWeChatMessage(messageSender, message, tryTimes);
+                switch (messageSender.getMsgType()) {
+                    case TEXT:
+                        // 获取手机号信息，用于企业微信@人使用  企业微信目前只有文本消息支持@
+                        if (CollectionUtils.isNotEmpty(receivers)) {
+                            for (Receiver receiver : receivers) {
+                                if (StringUtils.isBlank(receiver.getPhone())) {
+                                    continue;
+                                }
+                                // 处理消息发送配置发送webhook消息传递手机号中使用逗号拼接多个手机号的情况
+                                phoneSet.addAll(Arrays.asList(StringUtils.split(receiver.getPhone(), BaseConstants.Symbol.COMMA)));
+                            }
+                        }
+                        sendWhWeChatTextMessage(messageSender, message, phoneSet, tryTimes);
+                        break;
+                    case MARK_DOWN:
+                    default:
+                        sendWhWeChatMarkdownMessage(messageSender, message, tryTimes);
+                        break;
+                }
                 break;
             default:
                 throw new CommonException(HmsgConstant.ErrorCode.WEBHOOK_TYPE_ILLEGAL);
@@ -230,12 +253,12 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
     }
 
     /**
-     * 发送企业微信WebHook消息
+     * 发送企业微信 text WebHook消息
      *
      * @param messageSender WebHookSender
      * @param message       消息内容类
      */
-    private void sendWHWeChatMessage(WebHookSender messageSender, Message message, Integer tryTimes) {
+    private void sendWhWeChatTextMessage(WebHookSender messageSender, Message message, Set<String> phones, Integer tryTimes) throws ExecutionException, RetryException {
         String msgContent = StringUtils.isEmpty(message.getPlainContent()) ? message.getContent() : message.getPlainContent();
         String content = msgContent
                 .replaceAll("<(?!font|/font).*?>", "")
@@ -244,38 +267,62 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
                 .replace("&quot;", "\"")
                 .replace("&amp;", "&");
         content = this.urlEncode(content);
-        //this.urlEncode();
-        WhWeChatSend whWeChatSend = new WhWeChatSend();
-        WhWeChatSend.WhWeChatMarkdown weChatMarkdown = new WhWeChatSend.WhWeChatMarkdown();
-        weChatMarkdown.setContent(content);
-        whWeChatSend.setMsgtype("markdown");
-        whWeChatSend.setMarkdown(weChatMarkdown);
+        WhWeChatText whWeChatText = new WhWeChatText();
+        WhWeChatText.Content textContent = new WhWeChatText.Content();
+        textContent.setContent(content);
+        // 企业微信只有text类型消息支持@
+        textContent.setMentioned_mobile_list(phones);
+        whWeChatText.setText(textContent);
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
-        try {
-            retryer.call(() -> {
-                restTemplate.postForEntity(messageSender.getWebhookAddress(), whWeChatSend, String.class);
-                return null;
-            });
-        } catch (Exception e) {
-            LOGGER.error("Error send call {}", message);
-            throw new CommonException(e.getCause());
-        }
+        Retryer<?> retry = messageSendRetryer.buildRetry(tryTimes);
+        retry.call(() -> {
+            restTemplate.postForEntity(messageSender.getWebhookAddress(), whWeChatText, String.class);
+            return null;
+        });
     }
 
     /**
-     * 发送钉钉WebHook消息
+     * 发送企业微信 markdown WebHook消息
      *
      * @param messageSender WebHookSender
      * @param message       消息内容类
-     * @param receivers     需要@的手机号
      */
-    private void sendWHDingTalkMessage(WebHookSender messageSender, Message message, Set<String> receivers, Integer tryTimes) {
+    private void sendWhWeChatMarkdownMessage(WebHookSender messageSender, Message message, Integer tryTimes) throws ExecutionException, RetryException {
         String msgContent = StringUtils.isEmpty(message.getPlainContent()) ? message.getContent() : message.getPlainContent();
-        WhDingTalkSend whDingTalkSend = new WhDingTalkSend();
-        WhDingTalkSend.WhDingAt whDingAt = new WhDingTalkSend.WhDingAt();
-        WhDingTalkSend.WhDingMarkdown whDingMarkdown = new WhDingTalkSend.WhDingMarkdown();
+        String content = msgContent
+                .replaceAll("<(?!font|/font).*?>", "")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&amp;", "&");
+        content = this.urlEncode(content);
+        WhWeChatMarkdown whWeChatMarkdown = new WhWeChatMarkdown();
+        WhWeChatMarkdown.Content markdownContent = new WhWeChatMarkdown.Content();
+        markdownContent.setContent(content);
+        whWeChatMarkdown.setMarkdown(markdownContent);
+        RestTemplate restTemplate = new RestTemplate();
+
+        Retryer<?> retry = messageSendRetryer.buildRetry(tryTimes);
+        retry.call(() -> {
+            restTemplate.postForEntity(messageSender.getWebhookAddress(), whWeChatMarkdown, String.class);
+            return null;
+        });
+    }
+
+    /**
+     * 发送钉钉 text WebHook消息
+     *
+     * @param messageSender WebHookSender
+     * @param message       消息内容类
+     * @param phones        需要@的手机号
+     */
+    @SuppressWarnings("DuplicatedCode")
+    private void sendWhDingTalkTextMessage(WebHookSender messageSender, Message message, Set<String> phones, Integer tryTimes) throws ExecutionException, RetryException {
+        String msgContent = StringUtils.isEmpty(message.getPlainContent()) ? message.getContent() : message.getPlainContent();
+        WhDingTalkText whDingTalkText = new WhDingTalkText();
+        WhDingTalkText.WhDingAt whDingAt = new WhDingTalkText.WhDingAt();
+        WhDingTalkText.Content textContent = new WhDingTalkText.Content();
         // 转换内容格式
         String contentText = String.format("%s", msgContent
                 .replaceAll("<[^>]+>", "")
@@ -283,22 +330,21 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
                 .replace("&gt;", ">")
                 .replace("&quot;", "\"")
                 .replace("&amp;", "&"));
-        //contentText = this.urlEncode(contentText);
-        if (CollectionUtils.isNotEmpty(receivers)) {
-            for (String receiver : receivers) {
-                contentText = StringUtils.join(contentText, BaseConstants.Symbol.SPACE, BaseConstants.Symbol.AT,
-                        receiver);
+        if (CollectionUtils.isNotEmpty(phones)) {
+            for (String receiver : phones) {
+                // 消息内容text内要带上"@手机号"，跟atMobiles参数结合使用，才有@效果
+                contentText = StringUtils.join(contentText, BaseConstants.Symbol.SPACE, BaseConstants.Symbol.AT, receiver);
             }
             whDingAt.setAtAll(false);
-            whDingAt.setAtMobiles(receivers.toArray(new String[0]));
+            whDingAt.setAtMobiles(phones);
         } else {
             whDingAt.setAtAll(true);
         }
         // 1.添加@对象
-        whDingTalkSend.setAt(whDingAt);
+        whDingTalkText.setAt(whDingAt);
         // 2.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate
         // 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
-        long timestamp = System.currentTimeMillis();
+        long timestamp = SystemClock.now();
         URI uri;
         try {
             uri = new URI(messageSender.getWebhookAddress() + "&timestamp=" + timestamp + "&sign="
@@ -306,26 +352,74 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         } catch (URISyntaxException e) {
             throw new CommonException(e);
         }
-        // 3.添加发送类型
-        whDingTalkSend.setMsgtype("markdown");
-
-        // 4.添加发送内容
-        whDingMarkdown.setText(contentText);
-        whDingMarkdown.setTitle(message.getSubject());
-        whDingTalkSend.setMarkdown(whDingMarkdown);
-        // 5.发送请求
+        // 3.添加发送内容
+        textContent.setText(contentText);
+        textContent.setTitle(message.getSubject());
+        whDingTalkText.setText(textContent);
+        // 4.发送请求
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
-        try {
-            retryer.call(() -> {
-                restTemplate.postForEntity(uri, whDingTalkSend, String.class);
-                return null;
-            });
-        } catch (Exception e) {
-            LOGGER.error("Error send call {}", message);
-            throw new CommonException(e.getCause());
+        Retryer<?> retry = messageSendRetryer.buildRetry(tryTimes);
+        retry.call(() -> {
+            restTemplate.postForEntity(uri, whDingTalkText, String.class);
+            return null;
+        });
+    }
+
+    /**
+     * 发送钉钉 markdown WebHook消息
+     *
+     * @param messageSender WebHookSender
+     * @param message       消息内容类
+     * @param phones        需要@的手机号
+     */
+    @SuppressWarnings("DuplicatedCode")
+    private void sendWhDingTalkMarkdownMessage(WebHookSender messageSender, Message message, Set<String> phones, Integer tryTimes) throws ExecutionException, RetryException {
+        String msgContent = StringUtils.isEmpty(message.getPlainContent()) ? message.getContent() : message.getPlainContent();
+        WhDingTalkMarkdown whDingTalkMarkdown = new WhDingTalkMarkdown();
+        WhDingTalkMarkdown.WhDingAt whDingAt = new WhDingTalkMarkdown.WhDingAt();
+        WhDingTalkMarkdown.Content markdownContent = new WhDingTalkMarkdown.Content();
+        // 转换内容格式
+        String contentText = String.format("%s", msgContent
+                .replaceAll("<[^>]+>", "")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&amp;", "&"));
+        if (CollectionUtils.isNotEmpty(phones)) {
+            for (String receiver : phones) {
+                contentText = StringUtils.join(contentText, BaseConstants.Symbol.SPACE, BaseConstants.Symbol.AT,
+                        receiver);
+            }
+            whDingAt.setAtAll(false);
+            whDingAt.setAtMobiles(phones);
+        } else {
+            whDingAt.setAtAll(true);
         }
+        // 1.添加@对象
+        whDingTalkMarkdown.setAt(whDingAt);
+        // 2.添加安全设置，构造请求uri（此处直接封装uri而非用String类型来进行http请求：RestTemplate
+        // 在执行请求时，如果路径为String类型，将分析路径参数并组合路径，此时会丢失sign的部分特殊字符）
+        long timestamp = SystemClock.now();
+        URI uri;
+        try {
+            uri = new URI(messageSender.getWebhookAddress() + "&timestamp=" + timestamp + "&sign="
+                    + addSignature(messageSender.getSecret(), timestamp));
+        } catch (URISyntaxException e) {
+            throw new CommonException(e);
+        }
+        // 3.添加发送内容
+        markdownContent.setText(contentText);
+        markdownContent.setTitle(message.getSubject());
+        whDingTalkMarkdown.setMarkdown(markdownContent);
+        // 4.发送请求
+        RestTemplate restTemplate = new RestTemplate();
+
+        Retryer<?> retry = messageSendRetryer.buildRetry(tryTimes);
+        retry.call(() -> {
+            restTemplate.postForEntity(uri, whDingTalkMarkdown, String.class);
+            return null;
+        });
     }
 
     /**
@@ -334,7 +428,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
      *
      * @param messageSender WebHookSender
      */
-    private void sendWHJsonMessage(WebHookSender messageSender, Message message, Integer tryTimes) {
+    private void sendWHJsonMessage(WebHookSender messageSender, Message message, Integer tryTimes) throws ExecutionException, RetryException {
         String msgContent = StringUtils.isEmpty(message.getPlainContent()) ? message.getContent() : message.getPlainContent();
         HttpHeaders httpHeaders = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
@@ -348,16 +442,11 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         HttpEntity<String> request = new HttpEntity<>(msgContent, httpHeaders);
         RestTemplate restTemplate = new RestTemplate();
 
-        Retryer retryer = messageSendRetryer.buildRetry(tryTimes);
-        try {
-            retryer.call(() -> {
-                restTemplate.postForEntity(messageSender.getWebhookAddress(), request, String.class);
-                return null;
-            });
-        } catch (Exception e) {
-            LOGGER.error("Error send call {}", message);
-            throw new CommonException(e.getCause());
-        }
+        Retryer<?> retry = messageSendRetryer.buildRetry(tryTimes);
+        retry.call(() -> {
+            restTemplate.postForEntity(messageSender.getWebhookAddress(), request, String.class);
+            return null;
+        });
     }
 
     @Override
@@ -368,11 +457,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
         if (messageContent != null) {
             message.setPlainContent(messageContent.getPlainContent());
         }
-        WebhookServer dbWebHook = webhookServerRepository.selectOne(new WebhookServer().setServerCode(message.getServerCode()).setTenantId(message.getTenantId()));
-        if (dbWebHook == null && !message.getTenantId().equals(BaseConstants.DEFAULT_TENANT_ID)) {
-            dbWebHook = webhookServerRepository.selectOne(new WebhookServer()
-                    .setTenantId(BaseConstants.DEFAULT_TENANT_ID).setServerCode(message.getServerCode()));
-        }
+        WebhookServerConfig dbWebHook = WebhookServerConfig.getConfig(message.getTenantId(), message.getServerCode());
         Assert.notNull(dbWebHook, BaseConstants.ErrorCode.NOT_NULL);
         if (StringUtils.isNotBlank(dbWebHook.getSecret())) {
             dbWebHook.setSecret(this.decryptSecret(dbWebHook.getSecret()));
@@ -383,9 +468,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
                 message.getMessageReceiverList().forEach(receiver -> {
                     if (!org.springframework.util.StringUtils.hasText(receiver.getReceiverAddress())
                             || receiver.getTenantId() == null) {
-                        throw new CommonException(
-                                "Sending a message error because no recipient or target tenant is specified : "
-                                        + receiver.toString());
+                        throw new CommonException("Sending a message error because no recipient or target tenant is specified : " + receiver);
                     }
                     Receiver rc = new Receiver();
                     rc.setIdd(receiver.getIdd());
@@ -477,7 +560,7 @@ public class WebHookSendServiceImpl extends AbstractSendService implements WebHo
                 url = StringUtils.replace(url, chinese, encodeChinese);
             } catch (Exception e) {
                 LOGGER.error("url encode failed, exception is : {}", e.getMessage());
-                throw new CommonException(BaseConstants.ErrorCode.ERROR);
+                throw new CommonException(BaseConstants.ErrorCode.ERROR, e);
             }
         }
         return url;

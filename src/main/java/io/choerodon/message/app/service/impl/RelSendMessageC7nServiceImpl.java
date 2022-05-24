@@ -3,6 +3,7 @@ package io.choerodon.message.app.service.impl;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.MapUtils;
@@ -11,7 +12,9 @@ import org.hzero.boot.message.entity.DingTalkSender;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.common.HZeroService;
 import org.hzero.core.base.BaseConstants;
+import org.hzero.core.redis.safe.SafeRedisHelper;
 import org.hzero.message.app.service.DingTalkSendService;
 import org.hzero.message.app.service.MessageReceiverService;
 import org.hzero.message.app.service.TemplateServerService;
@@ -64,6 +67,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
     private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
+    private static final String REDIS_KEY_SYSTEM_MESSAGE = "open-app-system-message:%s:%s";
+    private static final String SITE = "site";
 
     public static final String DING_TALK_SERVER_CODE = "DING_TALK";
 
@@ -330,7 +335,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         senderList.forEach(sender -> {
             try {
-                this.relSendMessageReceipt(sender, sender.getTenantId());
+                this.c7nRelSendMessageReceipt(sender, sender.getTenantId());
             } catch (Exception e) {
                 logger.error("batch send message error", e);
             }
@@ -358,12 +363,13 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         Map<String, List<TemplateServerLine>> serverLineMap = this.templateServerLineRepository.enabledTemplateServerLine(templateServer.getTempServerId(), templateServer.getTenantId()).stream().collect(Collectors.groupingBy(TemplateServerLine::getTypeCode));
         List<Message> results = new ArrayList<>();
         List<Message> dingTalkResults = new ArrayList<>();
-        if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
-            Boolean enabled = iamFeignClient.isMessageEnabled(organizationId, "ding_talk");
-            if (Boolean.TRUE.equals(enabled)) {
-                this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender));
+        try {
+            if (serverLineMap.containsKey("DT") && this.c7nSendEnable(messageSender.getTypeCodeList(), "DT")) {
+                this.sendDingTalk(serverLineMap, dingTalkResults, new MessageSender(messageSender), templateServer.getCategoryCode());
                 results.addAll(dingTalkResults);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         serverLineMap.remove("DT");
         Class clazz = super.getClass().getSuperclass();
@@ -378,57 +384,68 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
     @Override
-    public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender) {
+    public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender, String categoryCode) {
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        Long tenantId = null;
-        Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
-        if (projectIdOptional.isPresent()) {
-            Long projectId = (Long) projectIdOptional.get();
-            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
-            if (!ObjectUtils.isEmpty(projectDTO)) {
-                tenantId = projectDTO.getOrganizationId();
-            }
-        } else {
-            Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-            tenantId = (Long) tenantIdOptional.get();
-        }
         Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
         if (ObjectUtils.isEmpty(openUserIdMap)) {
             return;
         }
-        // tenantId为空时，表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
-        if (ObjectUtils.isEmpty(tenantId)) {
-            List<UserVO> userVOS = iamFeignClient.queryOrgId(userIdList);
+        // 表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
+        if ("SITE".equals(categoryCode)) {
+            List<UserVO> userVOS = iamFeignClient.queryUserOrgId(userIdList);
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
             userVOMapGroupingByOrgId.forEach((orgId, users) -> {
-                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
-                List<String> openUserIdList = new ArrayList<>();
-                openUserIdMap.forEach((userId, openId) -> {
-                    if (userIds.contains(userId)) {
-                        openUserIdList.add(openId);
-                    }
-                });
-                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
+                if (Boolean.TRUE.equals(enabled)) {
+                    List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                    List<String> openUserIdList = new ArrayList<>();
+                    openUserIdMap.forEach((userId, openId) -> {
+                        if (userIds.contains(userId)) {
+                            openUserIdList.add(openId);
+                        }
+                    });
+                    sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                }
             });
         } else {
-            this.filterDingTalkReceiver(sender);
-            List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-            sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+            Long tenantId = null;
+            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+            if (projectIdOptional.isPresent()) {
+                Long projectId = (Long) projectIdOptional.get();
+                ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
+                if (!ObjectUtils.isEmpty(projectDTO)) {
+                    tenantId = projectDTO.getOrganizationId();
+                }
+            } else {
+                Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
+                tenantId = (Long) tenantIdOptional.get();
+            }
+            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk");
+            if (Boolean.TRUE.equals(enabled)) {
+                this.filterDingTalkReceiver(sender);
+                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+            }
         }
     }
 
     private void sendDingTalkMessage(Long tenantId, List<String> openUserIdList, List<TemplateServerLine> templateServerLineList, MessageSender sender, List<Message> result) {
         DingTalkSender dingTalkSender = (new DingTalkSender()).setTenantId(tenantId).setReceiveConfigCode(sender.getReceiveConfigCode()).setLang(sender.getLang()).setUserIdList(openUserIdList).setSourceKey(sender.getSourceKey());
         Map<String, String> args = new HashMap<>();
-        sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
+        if (!CollectionUtils.isEmpty(sender.getArgs())) {
+            args.putAll(sender.getArgs());
+        }
+        if (!CollectionUtils.isEmpty(sender.getObjectArgs())) {
+            sender.getObjectArgs().forEach((key, value) -> args.put(key, (String) value));
+        }
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
             Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
             while (templateServerLineIterator.hasNext()) {
                 TemplateServerLine line = templateServerLineIterator.next();
-                Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()).setServerCode(line.getServerCode()), line.getTryTimes());
+                Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()), line.getTryTimes());
                 result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
             }
         }
@@ -441,5 +458,21 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
     private boolean c7nSendEnable(List<String> typeCodeList, String typeCode) {
         return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
+    }
+
+    private Boolean isMessageEnabled(Long tenantId, String typeCode) {
+        AtomicReference<Boolean> result = new AtomicReference<>();
+        SafeRedisHelper.execute(HZeroService.Message.REDIS_DB, helper -> {
+            String redisKey = String.format(REDIS_KEY_SYSTEM_MESSAGE, typeCode, tenantId);
+            String s = helper.strGet(redisKey);
+            if (s != null) {
+                result.set(Boolean.parseBoolean(s));
+            }
+        });
+        if (result.get() == null) {
+            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode);
+            result.set(messageEnabled);
+        }
+        return result.get();
     }
 }

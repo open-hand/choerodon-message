@@ -4,10 +4,10 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.lang3.ObjectUtils;
 import org.hzero.boot.message.entity.Attachment;
 import org.hzero.boot.message.entity.Message;
 import org.hzero.boot.message.entity.MessageSender;
@@ -15,6 +15,7 @@ import org.hzero.boot.message.entity.Receiver;
 import org.hzero.boot.platform.lov.annotation.ProcessLovValue;
 import org.hzero.message.app.service.EmailSendService;
 import org.hzero.message.app.service.MessageService;
+import org.hzero.message.domain.entity.MessageReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class MessageC7nServiceImpl implements MessageC7nService {
     @Override
     @ProcessLovValue
     public Page<MessageC7nDTO> listMessage(String status, String messageName, String params, PageRequest pageRequest) {
-       return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listEmailMessage(status, messageName, params));
+        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, messageName, "Email", null, params));
     }
 
     @Override
@@ -153,5 +154,32 @@ public class MessageC7nServiceImpl implements MessageC7nService {
             reTrxStatusVOS.add(messageTrxStatusVO);
         }
         return reTrxStatusVOS;
+    }
+
+    @Override
+    @ProcessLovValue
+    public Page<MessageC7nDTO> pageDingTalk(Long organizationId, String status, String messageName, String params, PageRequest pageRequest) {
+        return PageHelper.doPage(pageRequest, () -> messageC7nMapper.listMessage(status, messageName, "DT", organizationId, params));
+    }
+
+    @Override
+    public Page<MessageReceiver> listMessageReceiver(Long organizationId, Long messageId, PageRequest pageRequest) {
+        Page<MessageReceiver> page = messageService.listMessageReceiver(organizationId, messageId, pageRequest);
+        Set<String> openUserIds = page.getContent().stream().map(MessageReceiver::getReceiverAddress).collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(openUserIds)) {
+            List<UserVO> userVOS = iamClientOperator.listUserByOpenIds(organizationId, "ding_talk", openUserIds);
+            Map<String, UserVO> userVOMap =
+                    userVOS
+                            .stream()
+                            .collect(Collectors.toMap(UserVO::getOpenId, Function.identity()));
+            page.getContent().forEach(t -> {
+                UserVO userVO = userVOMap.get(t.getReceiverAddress());
+                if (userVO != null) {
+                    t.setRealName(userVO.getRealName());
+                    t.setLoginName(userVO.getLoginName());
+                }
+            });
+        }
+        return page;
     }
 }
