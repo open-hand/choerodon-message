@@ -37,7 +37,7 @@ public class MessageGeneratorServiceAop {
         }
     }
 
-    private String processMessageContent(String message) {
+    public String processMessageContent(String message) {
         if ("/".endsWith(frontUrl)) {
             frontUrl = frontUrl.substring(0, frontUrl.length() - 1);
         }

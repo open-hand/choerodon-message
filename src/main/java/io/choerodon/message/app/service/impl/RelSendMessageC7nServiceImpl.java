@@ -224,7 +224,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             return messageSettingDTO.getSmsEnable();
         }
         if (HmsgConstant.MessageType.DT.equals(messageType)) {
-            return messageSettingDTO.getEmailEnable();
+            return messageSettingDTO.getDtEnable();
         } else {
             return Boolean.FALSE;
         }
@@ -386,6 +386,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     @Override
     public void sendDingTalk(Map<String, List<TemplateServerLine>> serverLineMap, List<Message> result, MessageSender sender, String categoryCode) {
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
+        this.filterDingTalkReceiver(sender);
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
         if (ObjectUtils.isEmpty(openUserIdMap)) {
@@ -423,7 +424,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
             Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk");
             if (Boolean.TRUE.equals(enabled)) {
-                this.filterDingTalkReceiver(sender);
                 List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
                 sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
             }
