@@ -79,9 +79,9 @@ public class C7nDingTalkSendServiceImpl extends DingTalkSendServiceImpl {
                 // todo 唯一覆盖逻辑
                 // 确保钉钉消息重试能正常发送
                 if (!ObjectUtils.isEmpty(messageContent.getPlainContent())) {
-                    message.setPlainContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent()));
+                    message.setPlainContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent(), message.getTenantId()));
                 } else {
-                    message.setContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent()));
+                    message.setContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent(), message.getTenantId()));
                 }
                 message.setTemplateEditType("RT");
             }
