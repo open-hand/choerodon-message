@@ -28,7 +28,9 @@ import io.choerodon.message.infra.feign.IamFeignClient;
 public class MessageGeneratorServiceAop {
     private static final String REDIS_KEY_CORP_ID = "corp-id-%s";
 
-    private static final Pattern URL_PATTERN = Pattern.compile("\\[([\\u4e00-\\u9fa5]+)\\]\\((.*)\\)");
+    private static final String REG_STRING = "\\[([\\u4e00-\\u9fa5\\w\\W]+)\\]\\(([\\u4e00-\\u9fa5\\w\\W]*)\\)";
+
+    private static final Pattern URL_PATTERN = Pattern.compile(REG_STRING);
 
     private static final String DING_TALK_URL_TEMPLATE = "[%s](dingtalk://dingtalkclient/action/openapp?corpid=%s&container_type=work_platform&app_id=0_%s&redirect_type=jump&redirect_url=%s)";
 
@@ -54,6 +56,7 @@ public class MessageGeneratorServiceAop {
     @AfterReturning(pointcut = "modifyMessage()", returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
         Message message = (Message) result;
+        message.setTemplateEditType("RT");
         String messageContent = ((Message) result).getPlainContent();
         if (!ObjectUtils.isEmpty(messageContent)) {
             message.setPlainContent(processMessageContent(messageContent, message.getTenantId()));
@@ -78,7 +81,7 @@ public class MessageGeneratorServiceAop {
                 String urlText = matcher.group(1);
                 String encodedUrl = URLEncoder.encode(matcher.group(2), "UTF-8");
                 String finalJumpUrl = String.format(DING_TALK_URL_TEMPLATE, urlText, corpId, agentId.toString(), encodedUrl);
-                message = message.replaceAll("\\[[\\u4e00-\\u9fa5\\w\\W\\d\\D]+\\]\\(.*\\)", finalJumpUrl);
+                message = message.replaceAll(REG_STRING, finalJumpUrl);
             }
         } catch (Exception e) {
             throw new CommonException(e);
