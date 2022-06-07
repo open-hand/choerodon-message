@@ -96,17 +96,22 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
-    public Boolean isMessageEnabled(Long organizationId, String type) {
+    public ResponseEntity<Boolean> isMessageEnabled(Long organizationId, String type) {
         throw new CommonException("error.get.message.enabled");
     }
 
     @Override
-    public List<UserVO> queryUserOrgId(List<Long> userIdList) {
+    public ResponseEntity<List<UserVO>> queryUserOrgId(List<Long> userIdList) {
         throw new CommonException("error.get.user");
     }
 
     @Override
     public ResponseEntity<List<UserVO>> listUserByOpenIds(Long tenantId, String openAppType, Set<String> openIds) {
         throw new CommonException("error.get.user.by.openIds");
+    }
+
+    @Override
+    public ResponseEntity<String> queryDingTalkCorpId(Long organizationId) {
+        throw new CommonException("error.get.dingtalk.corp.id");
     }
 }

@@ -394,7 +394,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         // 表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
         if ("SITE".equals(categoryCode)) {
-            List<UserVO> userVOS = iamFeignClient.queryUserOrgId(userIdList);
+            List<UserVO> userVOS = iamFeignClient.queryUserOrgId(userIdList).getBody();
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
             userVOMapGroupingByOrgId.forEach((orgId, users) -> {
                 Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
@@ -422,7 +422,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
                 tenantId = (Long) tenantIdOptional.get();
             }
-            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk");
+            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk").getBody();
             if (Boolean.TRUE.equals(enabled)) {
                 List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
                 sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
@@ -470,7 +470,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         });
         if (result.get() == null) {
-            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode);
+            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode).getBody();
             result.set(messageEnabled);
         }
         return result.get();
