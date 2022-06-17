@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
@@ -91,7 +92,7 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
-    public ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
+    public ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(List<Long> userIdList, @RequestParam("organization_id") Long organizationId, String openAppCode) {
         throw new CommonException("error.get.open.user.ids");
     }
 

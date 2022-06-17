@@ -76,7 +76,9 @@ public interface IamFeignClient {
     ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
 
     @PostMapping("/choerodon/v1/users/query_open_user_ids")
-    ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList, @RequestParam("open_app_code") String openAppCode);
+    ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList,
+                                                              @RequestParam("organization_id") Long organizationId,
+                                                              @RequestParam("open_app_code") String openAppCode);
 
     @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_message_enabled")
     ResponseEntity<Boolean> isMessageEnabled(@RequestParam("organization_id") Long organizationId, @RequestParam("type") String type);

@@ -37,6 +37,7 @@ import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
@@ -388,17 +389,19 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<TemplateServerLine> templateServerLineList = serverLineMap.get("DT");
         this.filterDingTalkReceiver(sender);
         List<Long> userIdList = sender.getReceiverAddressList().stream().map(Receiver::getUserId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-        Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, DING_TALK_OPEN_APP_CODE).getBody();
-        if (ObjectUtils.isEmpty(openUserIdMap)) {
-            return;
-        }
         // 表示发送平台层的消息，那么此时需要找出每个用户对应的组织，按组织来发送
         if ("SITE".equals(categoryCode)) {
             List<UserVO> userVOS = iamFeignClient.queryUserOrgId(userIdList).getBody();
             Map<Long, List<UserVO>> userVOMapGroupingByOrgId = userVOS.stream().collect(Collectors.groupingBy(UserVO::getOrganizationId));
-            userVOMapGroupingByOrgId.forEach((orgId, users) -> {
+            for (Map.Entry<Long, List<UserVO>> entry : userVOMapGroupingByOrgId.entrySet()) {
+                Long orgId = entry.getKey();
+                List<UserVO> users = entry.getValue();
                 Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
                 if (Boolean.TRUE.equals(enabled)) {
+                    Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
+                    if (ObjectUtils.isEmpty(openUserIdMap)) {
+                        continue;
+                    }
                     List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
                     List<String> openUserIdList = new ArrayList<>();
                     openUserIdMap.forEach((userId, openId) -> {
@@ -408,24 +411,27 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                     });
                     sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
                 }
-            });
+            }
         } else {
             Long tenantId = null;
             Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
             if (projectIdOptional.isPresent()) {
-                Long projectId = (Long) projectIdOptional.get();
+                Long projectId = TypeUtils.objToLong(projectIdOptional.get());
                 ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
                 if (!ObjectUtils.isEmpty(projectDTO)) {
                     tenantId = projectDTO.getOrganizationId();
                 }
             } else {
                 Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-                tenantId = (Long) tenantIdOptional.get();
+                tenantId = TypeUtils.objToLong(tenantIdOptional.get());
             }
             Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk").getBody();
             if (Boolean.TRUE.equals(enabled)) {
-                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
+                if (!ObjectUtils.isEmpty(openUserIdMap)) {
+                    List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                    sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
+                }
             }
         }
     }
