@@ -15,6 +15,10 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-core</artifactId>
+        </dependency>
         <!-- 依赖的服务 -->
         <dependency>
             <groupId>org.hzero</groupId>
@@ -101,10 +105,6 @@
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-config-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-core</artifactId>
         </dependency>
 
         <dependency>
