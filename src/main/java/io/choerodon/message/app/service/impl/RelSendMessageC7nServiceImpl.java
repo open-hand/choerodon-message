@@ -1,5 +1,7 @@
 package io.choerodon.message.app.service.impl;
 
+import static io.choerodon.message.infra.constant.Constants.*;
+
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -67,11 +69,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String OBJECT_KIND = "objectKind";
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
-    private static final String DING_TALK_OPEN_APP_CODE = "ding_talk";
-    private static final String REDIS_KEY_SYSTEM_MESSAGE = "open-app-system-message:%s:%s";
-    private static final String SITE = "site";
-
-    public static final String DING_TALK_SERVER_CODE = "DING_TALK";
 
     @Autowired
     private TemplateServerService templateServerService;

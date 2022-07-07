@@ -1,6 +1,6 @@
 package io.choerodon.message.app.service.impl;
 
-import static io.choerodon.message.app.service.impl.RelSendMessageC7nServiceImpl.DING_TALK_SERVER_CODE;
+import static io.choerodon.message.infra.constant.Constants.DING_TALK_SERVER_CODE;
 
 import java.util.*;
 import java.util.function.Function;

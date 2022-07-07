@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.swagger.annotations.ApiParam;
+import microsoft.exchange.webservices.data.core.service.item.Item;
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -93,4 +94,8 @@ public interface IamFeignClient {
 
     @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/ding_talk/corp_id")
     ResponseEntity<String> queryDingTalkCorpId(@PathVariable(name = "organization_id") Long organizationId);
+
+    @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_internal_browser")
+    ResponseEntity<Boolean> isInternalBrowser(@RequestParam("organization_id") Long organizationId,
+                                              @RequestParam("type") String type);
 }
