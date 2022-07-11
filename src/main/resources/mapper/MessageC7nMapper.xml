@@ -3,16 +3,16 @@
 <mapper namespace="io.choerodon.message.infra.mapper.MessageC7nMapper">
 
     <select id="selectEmailMessage" resultType="io.choerodon.message.api.vo.MailRecordVO">
-        select
-            count(hm.message_id) as allCount,
-            sum( hmt.trx_status_code='S' ) as successCount ,
-            date_format( hm.creation_date, '%Y-%m-%d' ) as creationDate
-        from hmsg_message hm
-        join hmsg_message_transaction hmt on hm.message_id = hmt.message_id
-        WHERE hm.message_type_code = 'EMAIL'
-        and hmt.last_update_date &gt;= #{startDate}
-        and hmt.last_update_date &lt;= #{endDate}
-        GROUP BY date_format( hm.creation_date, '%Y-%m-%d' )
+        SELECT
+        count( hmt.message_id ) AS allCount,
+        sum( hmt.trx_status_code = 'S' ) AS successCount,
+        date_format( hmt.creation_date, '%Y-%m-%d' ) AS creationDate
+        FROM
+        hmsg_message_transaction hmt
+        WHERE
+        hmt.message_id IN ( SELECT hm.message_id FROM hmsg_message hm WHERE hm.message_type_code = 'EMAIL' AND hm.creation_date &gt;= #{startDate} AND hm.creation_date &lt;= #{endDate} )
+        GROUP BY
+        date_format( hmt.creation_date, '%Y-%m-%d' );
     </select>
 
     <select id="listMessage" resultType="io.choerodon.message.infra.dto.MessageC7nDTO">

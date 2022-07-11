@@ -102,6 +102,11 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
+    public ResponseEntity<Boolean> isInternalBrowser(Long organizationId, String type) {
+        throw new CommonException("error.get.internal.browser");
+    }
+
+    @Override
     public ResponseEntity<List<UserVO>> queryUserOrgId(List<Long> userIdList) {
         throw new CommonException("error.get.user");
     }
