@@ -40,6 +40,8 @@ public class SystemAnnouncementVO {
 
     @ApiModelProperty(value = "乐观锁版本号")
     private Long objectVersionNumber;
+    @ApiModelProperty(value = "是否当前时刻")
+    private Boolean currentFlag;
 
     public Long getReadId() {
         return readId;
@@ -119,5 +121,13 @@ public class SystemAnnouncementVO {
     public SystemAnnouncementVO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
         return this;
+    }
+
+    public Boolean getCurrentFlag() {
+        return currentFlag;
+    }
+
+    public void setCurrentFlag(Boolean currentFlag) {
+        this.currentFlag = currentFlag;
     }
 }

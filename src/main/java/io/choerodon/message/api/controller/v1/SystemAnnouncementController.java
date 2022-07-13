@@ -1,5 +1,16 @@
 package io.choerodon.message.api.controller.v1;
 
+import java.util.Date;
+import javax.validation.Valid;
+
+import io.swagger.annotations.ApiOperation;
+import org.hzero.message.domain.entity.Notice;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.InitRoleCode;
@@ -10,16 +21,6 @@ import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.Permission;
-import io.swagger.annotations.ApiOperation;
-import org.hzero.message.domain.entity.Notice;
-import org.hzero.starter.keyencrypt.core.Encrypt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Date;
 
 /**
  * @author dengyouquan, Eugen
@@ -37,8 +38,10 @@ public class SystemAnnouncementController {
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO vo) {
-        if (vo.getSendDate().getTime() < System.currentTimeMillis()) {
-            throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
+        if (vo.getCurrentFlag() == null || !vo.getCurrentFlag()) {
+            if (vo.getSendDate().getTime() < System.currentTimeMillis()) {
+                throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
+            }
         }
         if (vo.getSendDate() == null) {
             vo.setSendDate(new Date());
