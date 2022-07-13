@@ -38,10 +38,8 @@ public class SystemAnnouncementController {
     @ApiOperation(value = "新增系统公告")
     @PostMapping("/create")
     public ResponseEntity<SystemAnnouncementVO> create(@RequestBody @Valid SystemAnnouncementVO vo) {
-        if (vo.getCurrentFlag() == null || !vo.getCurrentFlag()) {
-            if (vo.getSendDate().getTime() < System.currentTimeMillis()) {
-                throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
-            }
+        if (vo.getSendDate().getTime() < System.currentTimeMillis()) {
+            throw new CommonException("error.create.system.announcement.sendDate.cant.before.now");
         }
         if (vo.getSendDate() == null) {
             vo.setSendDate(new Date());
