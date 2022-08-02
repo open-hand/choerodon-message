@@ -31,12 +31,15 @@ public class MessageSettingDTO extends AuditDomain {
     private String notifyType;
     @ApiModelProperty("消息code")
     private String code;
-    @ApiModelProperty("项目Id")
-    private Long projectId;
+    @ApiModelProperty("来源Id")
+    private Long sourceId;
     @ApiModelProperty("是否发送站内信")
     private Boolean pmEnable;
     @ApiModelProperty("是否发送邮件")
     private Boolean emailEnable;
+
+    @ApiModelProperty("资源层级")
+    private String sourceLevel;
 
     @ApiModelProperty(value = "消息设置的分组")
     @Transient
@@ -143,12 +146,21 @@ public class MessageSettingDTO extends AuditDomain {
         this.code = code;
     }
 
-    public Long getProjectId() {
-        return projectId;
+
+    public Long getSourceId() {
+        return sourceId;
     }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public String getSourceLevel() {
+        return sourceLevel;
+    }
+
+    public void setSourceLevel(String sourceLevel) {
+        this.sourceLevel = sourceLevel;
     }
 
     public Boolean getPmEnable() {
@@ -173,7 +185,7 @@ public class MessageSettingDTO extends AuditDomain {
                 "id=" + id +
                 ", notifyType='" + notifyType + '\'' +
                 ", code='" + code + '\'' +
-                ", projectId=" + projectId +
+                ", sourceId=" + sourceId +
                 ", pmEnable=" + pmEnable +
                 ", emailEnable=" + emailEnable +
                 ", objectVersionNumber=" + super.getObjectVersionNumber() +
