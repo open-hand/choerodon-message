@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import io.choerodon.core.iam.ResourceLevel;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.message.entity.DingTalkSender;
@@ -166,7 +167,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
                 messageType.equals(HmsgConstant.MessageType.SMS) ||
                 messageType.equals(HmsgConstant.MessageType.DT))
-                && messageSettingC7nMapper.selectProjectMessage().contains(messageSender.getMessageCode())) {
+                && messageSettingC7nMapper.selectProjectMessage(ResourceLevel.PROJECT.value()).contains(messageSender.getMessageCode())) {
             //项目层设置未开启
             if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
@@ -203,10 +204,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
         //1.查询项目下是否设置了改消息的发送设置.没有就用默认的
-        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
+        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, ResourceLevel.PROJECT.value(), messageSender.getMessageCode(), envId, eventName, messageType);
         //如果项目下配置没有开启，则查询默认配置
         if (Objects.isNull(messageSettingDTO)) {
-            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), null, eventName, messageType);
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, ResourceLevel.PROJECT.value(), messageSender.getMessageCode(), null, eventName, messageType);
         }
         //根据消息配置返回项目层是否应该发送消息
         if (ObjectUtils.isEmpty(messageSettingDTO)) {

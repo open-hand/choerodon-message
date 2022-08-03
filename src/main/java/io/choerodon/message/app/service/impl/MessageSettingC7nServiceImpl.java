@@ -116,7 +116,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<ProjectMessageVO> result = new ArrayList<>();
         //默认配置
         List<CustomMessageSettingVO> defaultSettingList =
-                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, code);
+                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, code, ResourceLevel.PROJECT.value());
         if (defaultSettingList.isEmpty()) {
             return result;
         }
@@ -259,13 +259,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
         //查询平台层的发送设置
-        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType);
+        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value());
         if (CollectionUtils.isEmpty(defaultMessageSettings)) {
             return messageSettingWarpVO;
         }
 
         //查询通知对象
-        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), null);
         assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
 
         // 计算平台层是否启用发送短信，站内信，邮件
@@ -365,7 +365,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if (messageSettingVOS.stream().anyMatch(settingVO -> !notifyType.equals(settingVO.getNotifyType()))) {
             throw new CommonException(ERROR_PARAM_INVALID);
         }
-        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
+        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), null);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
         // 将非指定用户添加到userList
         calculateNotifyUsersByType(messageSettingVOS);
@@ -500,7 +500,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if ("ding_talk".equals(openAppVO.getType())) {
             TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
             DingTalkServer dingTalkServer = dingTalkServerService.getConfigWithDb(openAppVO.getTenantId(), DING_TALK_SERVER_CODE);
-            if (dingTalkServer==null){
+            if (dingTalkServer == null) {
                 insertOpenAppConfig(openAppVO);
             }
             dingTalkServer.setAppKey(openAppVO.getAppId());
@@ -534,11 +534,50 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     @Override
-    public MessageSettingWarpVO queryMessageSettings(Long organizationId) {
+    public MessageSettingWarpVO queryOrgMessageSettings(Long organizationId, String notifyType) {
         //查询组织层的配置
-
         //如果没有则返回默认的配置
-        return null;
+        MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
+        //查询平台层的发送设置
+        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType, ResourceLevel.ORGANIZATION.value());
+        if (CollectionUtils.isEmpty(defaultMessageSettings)) {
+            return messageSettingWarpVO;
+        }
+
+        //查询通知对象
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.ORGANIZATION.value(), null);
+        assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
+
+        // 计算平台层是否启用发送短信，站内信，邮件
+        calculateStieSendSetting(defaultMessageSettingList);
+        List<NotifyEventGroupVO> notifyEventGroupList = listEventGroupList(organizationId, notifyType);
+        // 资源删除验证，项目下没有启用的环境
+        if (ServiceNotifyType.RESOURCE_DELETE_NOTIFY.getTypeName().equals(notifyType)
+                && CollectionUtils.isEmpty(notifyEventGroupList)) {
+            return messageSettingWarpVO;
+        }
+        List<CustomMessageSettingVO> customMessageSettingList = new ArrayList<>();
+
+        customMessageSettingList.stream().map(customMessageSettingVO -> {
+            String lovCode = customMessageSettingVO.getSubcategoryCode();
+            customMessageSettingVO.setGroupId(lovCode);
+            return customMessageSettingVO;
+        }).collect(Collectors.toList());
+
+        // 计算通知对象
+        calculateSendRole(customMessageSettingList);
+        // 添加用户信息
+        addUserInfo(customMessageSettingList);
+        // 计算通知事件的名称
+        calculateEventName(customMessageSettingList);
+
+        //运维项目去掉开发相关的通知
+
+        // 装配VO
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
+        messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
+        return messageSettingWarpVO;
+
     }
 
     private void handUserMember(UserMemberEventPayload userMemberEventPayload) {
