@@ -461,7 +461,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             messageSettingDTO.setSmsEnable(false);
         }
         messageSettingDTO.setCode(code);
-        messageSettingDTO.setProjectId(TenantDTO.DEFAULT_TENANT_ID);
+        messageSettingDTO.setSourceId(TenantDTO.DEFAULT_TENANT_ID);
+        // TODO: 2022/8/2   sourceLevel
         messageSettingC7nMapper.updateOptional(messageSettingDTO);
     }
 
@@ -532,6 +533,14 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         }
     }
 
+    @Override
+    public MessageSettingWarpVO queryMessageSettings(Long organizationId) {
+        //查询组织层的配置
+
+        //如果没有则返回默认的配置
+        return null;
+    }
+
     private void handUserMember(UserMemberEventPayload userMemberEventPayload) {
         //如果用户在这个项目下没有任何角色，那么删除他在通知里面的对象
         if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT.value())) {
@@ -545,7 +554,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         }
         //清理项目层通知对象
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-        messageSettingDTO.setProjectId(userMemberEventPayload.getResourceId());
+        // TODO: 2022/8/2 sourceLevel
+        messageSettingDTO.setSourceId(userMemberEventPayload.getResourceId());
         List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.select(messageSettingDTO);
         if (CollectionUtils.isEmpty(messageSettingDTOS)) {
             return;
