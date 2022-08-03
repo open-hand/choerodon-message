@@ -26,7 +26,8 @@ public class MessageSettingOrganizationController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @ApiModelProperty(value = "查询组织层的通知配置")
     public ResponseEntity<MessageSettingWarpVO> queryMessageSettings(
-            @PathVariable(value = "organization_id") Long organizationId) {
-        return ResponseEntity.ok(messageSettingC7nService.queryMessageSettings(organizationId));
+            @PathVariable(value = "organization_id") Long organizationId,
+            @PathVariable(value = "notify_type") String notifyType) {
+        return ResponseEntity.ok(messageSettingC7nService.queryOrgMessageSettings(organizationId, notifyType));
     }
 }

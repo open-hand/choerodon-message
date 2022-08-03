@@ -30,6 +30,7 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     List<CustomMessageSettingVO> listDefaultAndEnabledSettingByNotifyType(@Param("notifyType") String notifyType,
+                                                                          @Param("sourceLevel") String sourceLevel,
                                                                           @Param("code") String code);
 
     /**
@@ -112,7 +113,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      */
     void deleteByTypeAndEnvId(@Param("type") String type, @Param("envId") Long envId);
 
-    MessageSettingDTO selectByParams(@Param("projectId") Long projectId,
+    MessageSettingDTO selectByParams(@Param("source_id") Long sourceId,
+                                     @Param("source_level") String sourceLevel,
                                      @Param("messageCode") String messageCode,
                                      @Param("envId") Long envId,
                                      @Param("eventName") String eventName,
@@ -121,9 +123,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
 
     List<String> listCategoryCode(@Param("notifyType") String notifyType);
 
-    List<String> selectProjectMessage();
+    List<String> selectProjectMessage(@Param("source_level") String sourceLevel);
 
 
-
-    List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType);
+    List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType, @Param("source_level") String sourceLevel);
 }
