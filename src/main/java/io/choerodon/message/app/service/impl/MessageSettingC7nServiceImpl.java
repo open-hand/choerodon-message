@@ -65,6 +65,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private static final String STREAM_CHANGE_NOTICE = "STREAM-CHANGE-NOTICE";
     private static final String APP_SERVICE_NOTICE = "APP-SERVICE-NOTICE";
     private static final String CODE_MANAGEMENT_NOTICE = "CODE-MANAGEMENT-NOTICE";
+    private static final String ORG_MESSAGE_TYPE = "healthStateChange";
+    private static final String ORG_MESSAGE_CODE = "PROJECT_HEALTHSTAT_ECHANGE";
 
 
     private ModelMapper modelMapper = new ModelMapper();
@@ -613,6 +615,18 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
             }
         });
+    }
+
+    @Override
+    public MessageSettingVO getSettingByCode(Long sourceId, String notifyType, String code) {
+        if (StringUtils.equalsIgnoreCase(notifyType, ORG_MESSAGE_TYPE)) {
+            MessageSettingVO projectHealthByOption = messageSettingC7nMapper.getProjectHealthByOption(notifyType, sourceId, ResourceLevel.ORGANIZATION.value(), code);
+            if (projectHealthByOption == null) {
+                MessageSettingVO defaultProjectHealthSetting = messageSettingC7nMapper.getDefaultProjectHealthSetting(notifyType, code);
+                return defaultProjectHealthSetting;
+            }
+        }
+        return new MessageSettingVO();
     }
 
     private List<CustomMessageSettingVO> handleHealthStateSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long sourceId, String notifyType) {

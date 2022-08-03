@@ -132,4 +132,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
 
 
     List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType, @Param("source_level") String sourceLevel);
+
+    MessageSettingVO getDefaultProjectHealthSetting(String notifyType, String code);
+
+    MessageSettingVO getProjectHealthByOption(String notifyType, Long sourceId, String value, String code);
 }

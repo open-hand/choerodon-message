@@ -3,6 +3,7 @@ package io.choerodon.message.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.CustomMessageSettingVO;
+import io.choerodon.message.api.vo.MessageSettingVO;
 import io.choerodon.message.api.vo.MessageSettingWarpVO;
 import io.choerodon.message.app.service.MessageSettingC7nService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
@@ -11,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +46,16 @@ public class MessageSettingOrganizationController {
             @RequestBody List<CustomMessageSettingVO> messageSettingVOS) {
         messageSettingC7nService.batchOrgUpdateByType(organizationId, notifyType, messageSettingVOS);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by_type")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
+    public ResponseEntity<MessageSettingVO> getSettingByCode(
+            @Encrypt
+            @PathVariable(value = "organization_id") Long sourceId,
+            @RequestParam(value = "notify_type") String notifyType,
+            @RequestParam(value = "code") String code) {
+        return ResponseEntity.ok(messageSettingC7nService.getSettingByCode(sourceId, notifyType, code));
     }
 }

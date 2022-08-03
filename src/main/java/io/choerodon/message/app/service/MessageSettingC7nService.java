@@ -48,4 +48,5 @@ public interface MessageSettingC7nService {
 
     void batchOrgUpdateByType(Long organizationId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS);
 
+    MessageSettingVO getSettingByCode(Long sourceId, String notifyType, String code);
 }
