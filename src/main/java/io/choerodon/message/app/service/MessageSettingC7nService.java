@@ -45,4 +45,7 @@ public interface MessageSettingC7nService {
     void enableOrDisableOpenAppSyncSetting(OpenAppVO openAppVO);
 
     MessageSettingWarpVO queryOrgMessageSettings(Long organizationId, String notifyType);
+
+    void batchOrgUpdateByType(Long organizationId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS);
+
 }
