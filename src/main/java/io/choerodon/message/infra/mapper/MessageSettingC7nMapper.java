@@ -41,7 +41,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @param code
      * @return
      */
-    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("projectId") Long projectId,
+    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("sourceId") Long sourceId,
+                                                               @Param("sourceLevel") String sourceLevel,
                                                                @Param("notifyType") String notifyType,
                                                                @Param("code") String code);
 
@@ -53,7 +54,9 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @param notifyType
      * @return
      */
-    List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("projectId") Long projectId, @Param("envId") Long envId, @Param("notifyType") String notifyType);
+    List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("sourceId") Long sourceId,
+                                                                       @Param("sourceLevel") String sourceLevel,
+                                                                       @Param("envId") Long envId, @Param("notifyType") String notifyType);
 
     /**
      * 根据类型和code，查询项目下的通知配置
@@ -64,7 +67,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     MessageSettingVO getSettingByTypeAndCode(@Param("notifyType") String notifyType,
-                                             @Param("projectId") Long projectId,
+                                             @Param("sourceId") Long sourceId,
+                                             @Param("sourceLevel") String sourceLevel,
                                              @Param("code") String code);
 
     /**
@@ -78,7 +82,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     MessageSettingVO getResourceDeleteSettingByOption(@Param("notifyType") String notifyType,
-                                                      @Param("projectId") Long projectId,
+                                                      @Param("sourceId") Long sourceId,
+                                                      @Param("sourceLevel") String sourceLevel,
                                                       @Param("code") String code,
                                                       @Param("envId") Long envId,
                                                       @Param("eventName") String eventName);

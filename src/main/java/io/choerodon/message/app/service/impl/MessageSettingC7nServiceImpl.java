@@ -123,7 +123,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         CustomMessageSettingVO defaultSetting = defaultSettingList.get(0);
         //项目层自定义配置
         List<CustomMessageSettingVO> customSettingList =
-                messageSettingC7nMapper.listMessageSettingByProjectId(null, notifyType, code);
+                messageSettingC7nMapper.listMessageSettingByProjectId(null, ResourceLevel.PROJECT.value(), notifyType, code);
         buildFromMessageSetting(result, defaultSetting, customSettingList);
         addProjectFromWebHookConfig(result, code);
         return result;
@@ -420,12 +420,12 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             if (envId == null || ObjectUtils.isEmpty(eventName)) {
                 throw new CommonException(ERROR_PARAM_INVALID);
             }
-            messageSettingVO = messageSettingC7nMapper.getResourceDeleteSettingByOption(notifyType, projectId, code, envId, eventName);
+            messageSettingVO = messageSettingC7nMapper.getResourceDeleteSettingByOption(notifyType, projectId, ResourceLevel.PROJECT.value(), code, envId, eventName);
             if (messageSettingVO == null) {
                 messageSettingVO = messageSettingC7nMapper.getDefaultResourceDeleteSetting(notifyType, code, eventName);
             }
         } else {
-            messageSettingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, projectId, code);
+            messageSettingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, projectId, ResourceLevel.PROJECT.value(), code);
             if (messageSettingVO == null) {
                 messageSettingVO = messageSettingC7nMapper.getDefaultSettingByCode(notifyType, code);
             }
@@ -741,7 +741,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private List<CustomMessageSettingVO> handleResorceDeleteSettings(List<NotifyEventGroupVO> notifyEventGroupList, List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
-            List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
+            List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId,ResourceLevel.PROJECT.value(), envId, notifyType);
             customMessageSettingList.stream().map(customMessageSettingVO -> {
                 String lovCode = customMessageSettingVO.getSubcategoryCode();
                 customMessageSettingVO.setGroupId(lovCode);
@@ -770,7 +770,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     private List<CustomMessageSettingVO> handleDevopsOrAgileSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
-        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, notifyType, null);
+        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, ResourceLevel.PROJECT.value(), notifyType, null);
         Map<String, CustomMessageSettingVO> customMessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getCode, v -> v));
         defaultMessageSettingList.forEach(defaultMessageSetting -> {
             CustomMessageSettingVO customMessageSettingVO = customMessageSettingVOMap.get(defaultMessageSetting.getCode());
