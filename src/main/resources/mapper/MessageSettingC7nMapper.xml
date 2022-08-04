@@ -20,6 +20,7 @@
         nms.ENV_ID,
         nms.NOTIFY_TYPE,
         nms.CODE,
+        nms.PROJECT_ID,
         nms.SOURCE_ID,
         nms.SOURCE_LEVEL,
         nms.EVENT_NAME,
@@ -209,6 +210,7 @@
     <resultMap id="customMessageSettingMap" type="io.choerodon.message.api.vo.CustomMessageSettingVO">
         <id property="id" column="ID"/>
         <result property="sourceId" column="SOURCE_ID"/>
+        <result property="projectId" column="SOURCE_ID"/>
         <result property="sourceLevel" column="SOURCE_LEVEL"/>
         <result property="envId" column="ENV_ID"/>
         <result property="notifyType" column="NOTIFY_TYPE"/>
@@ -257,7 +259,7 @@
         WHERE
         nms. CODE = #{messageCode}
         <choose>
-            <when test="sourceId != null">
+            <when test="source_id != null">
                 AND nms.sourceId = #{source_id}
             </when>
             <otherwise>
@@ -265,7 +267,7 @@
             </otherwise>
         </choose>
         <choose>
-            <when test="sourceLevel != null">
+            <when test="source_level != null">
                 AND nms.sourceLevel = #{source_level}
             </when>
             <otherwise>
@@ -318,6 +320,7 @@
 	       nms.NOTIFY_TYPE,
 	       nms.CODE,
 	       nms.source_id,
+           nms.PROJECT_ID,
 	       nms.EVENT_NAME,
 	       nms.SMS_ENABLE,
 	       nms.PM_ENABLE,
