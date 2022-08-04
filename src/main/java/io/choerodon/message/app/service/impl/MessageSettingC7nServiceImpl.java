@@ -620,10 +620,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     @Override
     public MessageSettingVO getSettingByCode(Long sourceId, String notifyType, String code) {
         if (StringUtils.equalsIgnoreCase(notifyType, ORG_MESSAGE_TYPE)) {
-            MessageSettingVO projectHealthByOption = messageSettingC7nMapper.getProjectHealthByOption(notifyType, sourceId, ResourceLevel.ORGANIZATION.value(), code);
-            if (projectHealthByOption == null) {
-                MessageSettingVO defaultProjectHealthSetting = messageSettingC7nMapper.getDefaultProjectHealthSetting(notifyType, code);
-                return defaultProjectHealthSetting;
+            MessageSettingVO settingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, sourceId, ResourceLevel.ORGANIZATION.value(), code);
+            if (settingVO == null) {
+                return messageSettingC7nMapper.getDefaultProjectHealthSetting(notifyType, code);
             }
         }
         return new MessageSettingVO();

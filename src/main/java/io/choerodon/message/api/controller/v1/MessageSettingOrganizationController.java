@@ -50,9 +50,8 @@ public class MessageSettingOrganizationController {
 
     @GetMapping("/by_type")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @ApiModelProperty(value = "根据项目id,业务code,返回项目层的发送设置")
+    @ApiModelProperty(value = "根据项目id,业务code,返回组织层的发送设置")
     public ResponseEntity<MessageSettingVO> getSettingByCode(
-            @Encrypt
             @PathVariable(value = "organization_id") Long sourceId,
             @RequestParam(value = "notify_type") String notifyType,
             @RequestParam(value = "code") String code) {

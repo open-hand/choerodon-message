@@ -195,6 +195,7 @@
         <result property="code" column="CODE"/>
         <result property="smsEnable" column="SMS_ENABLE"/>
         <result property="pmEnable" column="PM_ENABLE"/>
+        <result property="dtEnable" column="DT_ENABLE"/>
         <result property="emailEnable" column="EMAIL_ENABLE"/>
         <result property="objectVersionNumber" column="OBJECT_VERSION_NUMBER"/>
         <result property="eventName" column="EVENT_NAME"/>
@@ -337,4 +338,38 @@
 	       AND nms.source_level=#{source_level}
 	       AND hts.ENABLED_FLAG = 1
     </select>
+
+    <select id="getDefaultProjectHealthSetting" resultMap="messageSettingMap">
+        SELECT
+            nms.ID,
+            nms.NOTIFY_TYPE,
+            nms.CODE,
+            nms.source_id,
+            nms.EVENT_NAME,
+            nms.SMS_ENABLE,
+            nms.PM_ENABLE,
+            nms.DT_ENABLE,
+            nms.EMAIL_ENABLE,
+            nms.OBJECT_VERSION_NUMBER,
+            hts.message_name AS NAME,
+            hts.SUBCATEGORY_CODE,
+            htsl.type_code AS SENDING_TYPE,
+            htsl.ENABLED_FLAG,
+            nmstu.ID AS NMSTU_ID,
+            nmstu.USER_ID,
+            nmstu.TYPE,
+            nmstu.MESSAGE_SETTING_ID
+        FROM
+            notify_message_setting nms
+                INNER JOIN hmsg_template_server hts ON nms.`CODE` = hts.MESSAGE_CODE
+                LEFT JOIN hmsg_template_server_line htsl ON htsl.temp_server_id = hts.temp_server_id
+                LEFT JOIN notify_message_setting_target nmstu ON nmstu.MESSAGE_SETTING_ID = nms.ID
+        WHERE
+            nms.NOTIFY_TYPE = #{notifyType}
+          AND nms.source_id = 0
+          AND nms.source_level= 'organization'
+          AND nms.CODE = #{code}
+          AND hts.ENABLED_FLAG = 1
+    </select>
+
 </mapper>
