@@ -3,6 +3,8 @@ package io.choerodon.message.infra.feign.operator;
 import java.util.List;
 import java.util.Set;
 
+import io.choerodon.message.api.vo.Role;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hzero.core.base.BaseConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,5 +79,29 @@ public class IamClientOperator {
             throw new CommonException("error.get.user.by.openIds");
         }
         return OptionalBean.ofNullable(listResponseEntity.getBody()).get();
+    }
+
+    public List<Role> queryRoleCodeByTenantId(Long organizationId) {
+
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setPage(0);
+        pageRequest.setSize(0);
+        ResponseEntity<Page<Role>> pageResponseEntity = iamFeignClient.queryRoleCodeByTenantId(pageRequest, organizationId, true, null);
+
+        if (!pageResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.get.role.by.openIds");
+        }
+        return OptionalBean.ofNullable(pageResponseEntity.getBody().getContent()).get();
+    }
+
+    public List<Role> queryTenantRoleCodeByTenantId(Long organizationId, String roleLevel) {
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setPage(0);
+        pageRequest.setSize(0);
+        ResponseEntity<Page<Role>> pageResponseEntity = iamFeignClient.queryRoleCodeByTenantId(pageRequest, organizationId, true, roleLevel);
+        if (!pageResponseEntity.getStatusCode().is2xxSuccessful()) {
+            throw new CommonException("error.get.role.by.openIds");
+        }
+        return OptionalBean.ofNullable(pageResponseEntity.getBody().getContent()).get();
     }
 }
