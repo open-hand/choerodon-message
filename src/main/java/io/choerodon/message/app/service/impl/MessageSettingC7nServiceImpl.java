@@ -376,6 +376,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         // 默认配置的修改
         defaultMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setSourceId(settingVO.getProjectId());
             settingDTO.setId(null);
             saveMessageSetting(settingDTO);
             List<TargetUserVO> userList = settingVO.getUserList();
@@ -389,6 +390,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         // 自定配置修改
         customMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setSourceId(settingVO.getProjectId());
             updateMessageSetting(settingDTO);
             // devops消息不更新通知对象
             // 删除旧数据
