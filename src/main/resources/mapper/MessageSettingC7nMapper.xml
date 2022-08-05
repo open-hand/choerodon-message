@@ -260,18 +260,18 @@
         nms. CODE = #{messageCode}
         <choose>
             <when test="source_id != null">
-                AND nms.sourceId = #{source_id}
+                AND nms.source_id = #{source_id}
             </when>
             <otherwise>
-                AND nms.sourceId = 0
+                AND nms.source_id = 0
             </otherwise>
         </choose>
         <choose>
             <when test="source_level != null">
-                AND nms.sourceLevel = #{source_level}
+                AND nms.source_level = #{source_level}
             </when>
             <otherwise>
-                AND nms.sourceLevel = 0
+                AND nms.source_level = "project"
             </otherwise>
         </choose>
         <if test="envId!=null">
@@ -309,8 +309,8 @@
         FROM
             notify_message_setting nms
         WHERE
-            nms.souce_id = 0
-            AND   nms.souce_level=#{source_level}
+            nms.source_id = 0
+            AND   nms.source_level=#{source_level}
     </select>
 
     <select id="listDefaultSettingByNotifyType" resultType="io.choerodon.message.api.vo.CustomMessageSettingVO">
