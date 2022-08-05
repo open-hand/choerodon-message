@@ -71,6 +71,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
 
+
+    private static final String SOURCE_LEVEL = "sourceLevel";
+
     @Autowired
     private TemplateServerService templateServerService;
     @Autowired
@@ -144,12 +147,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
+        Long tenantId = null;
+        String sourceLevel = null;
         Long envId = null;
         String eventName = null;
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID))) {
+            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID)));
+        }
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(SOURCE_LEVEL))) {
+            sourceLevel = String.valueOf(messageSender.getAdditionalInformation().get(SOURCE_LEVEL));
+        }
+
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName()))) {
             envId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName())));
@@ -172,6 +186,46 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
+        }
+        //组织层拦截配置
+        if (StringUtils.equalsIgnoreCase(sourceLevel, ResourceLevel.ORGANIZATION.value()) && tenantId != null) {
+            if ((messageType.equals(HmsgConstant.MessageType.WEB) ||
+                    messageType.equals(HmsgConstant.MessageType.EMAIL) ||
+                    messageType.equals(HmsgConstant.MessageType.DT))
+                    && messageSettingC7nMapper.selectProjectMessage(ResourceLevel.ORGANIZATION.value()).contains(messageSender.getMessageCode())) {
+                //项目层设置未开启
+                if (!orgFilter(messageSender, tenantId, messageType)) {
+                    receiverList.clear();
+                }
+            }
+        }
+
+    }
+
+    private boolean orgFilter(MessageSender messageSender, Long organizationId, String messageType) {
+        //1.查询项目下是否设置了改消息的发送设置.没有就用默认的
+        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(organizationId, ResourceLevel.ORGANIZATION.value(), messageSender.getMessageCode(), null, null, messageType);
+        //如果项目下配置没有开启，则查询默认配置
+        if (Objects.isNull(messageSettingDTO)) {
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(BaseConstants.DEFAULT_TENANT_ID, ResourceLevel.ORGANIZATION.value(), messageSender.getMessageCode(), null, null, messageType);
+        }
+        //根据消息配置返回项目层是否应该发送消息
+        if (ObjectUtils.isEmpty(messageSettingDTO)) {
+            return Boolean.FALSE;
+        }
+        if (HmsgConstant.MessageType.WEB.equals(messageType)) {
+            return messageSettingDTO.getPmEnable();
+        }
+        if (HmsgConstant.MessageType.EMAIL.equals(messageType)) {
+            return messageSettingDTO.getEmailEnable();
+        }
+        if (HmsgConstant.MessageType.SMS.equals(messageType)) {
+            return messageSettingDTO.getSmsEnable();
+        }
+        if (HmsgConstant.MessageType.DT.equals(messageType)) {
+            return messageSettingDTO.getDtEnable();
+        } else {
+            return Boolean.FALSE;
         }
     }
 
