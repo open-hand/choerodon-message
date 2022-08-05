@@ -100,6 +100,9 @@ public class CustomMessageSettingVO {
 
     private String sendingType;
 
+    @ApiModelProperty("可选择的通知类型")
+    private List<Role> sendTargetRole;
+
     public String getSendingType() {
         return sendingType;
     }
@@ -325,6 +328,14 @@ public class CustomMessageSettingVO {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public List<Role> getSendTargetRole() {
+        return sendTargetRole;
+    }
+
+    public void setSendTargetRole(List<Role> sendTargetRole) {
+        this.sendTargetRole = sendTargetRole;
     }
 }
 

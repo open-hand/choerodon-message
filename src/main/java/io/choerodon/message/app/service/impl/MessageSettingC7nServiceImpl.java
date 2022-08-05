@@ -66,8 +66,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private static final String APP_SERVICE_NOTICE = "APP-SERVICE-NOTICE";
     private static final String CODE_MANAGEMENT_NOTICE = "CODE-MANAGEMENT-NOTICE";
     private static final String ORG_MESSAGE_TYPE = "healthStateChange";
-    private static final String ORG_MESSAGE_CODE = "PROJECT_HEALTHSTAT_ECHANGE";
-
+    private static final String PROJECT_HEALTHSTAT_ECHANGE = "PROJECT_HEALTHSTAT_ECHANGE";
+    private static final String PRODUCT_HEALTHSTAT_ECHANGE = "PRODUCT_HEALTHSTAT_ECHANGE";
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -556,6 +556,27 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         customMessageSettingList.stream().map(customMessageSettingVO -> {
             String lovCode = customMessageSettingVO.getSubcategoryCode();
             customMessageSettingVO.setGroupId(lovCode);
+            //这里角色前端说不好接口请求拼接，所以后端返回
+            if (StringUtils.equalsIgnoreCase(customMessageSettingVO.getCode(), PROJECT_HEALTHSTAT_ECHANGE)) {
+                //可选项为你组织层角色，项目层角色
+                List<Role> roles = iamClientOperator.queryRoleCodeByTenantId(organizationId);
+                customMessageSettingVO.setSendTargetRole(roles);
+            }
+            if (StringUtils.equalsIgnoreCase(customMessageSettingVO.getCode(), PRODUCT_HEALTHSTAT_ECHANGE)) {
+
+                //产品负责人
+                Role role = new Role();
+                role.setCode("product-owner");
+                role.setName("产品负责人");
+                //组织层角色
+                List<Role> roleList = iamClientOperator.queryTenantRoleCodeByTenantId(organizationId, "organization");
+                List<Role> reRoleList = new ArrayList<>();
+                reRoleList.add(role);
+                if (!CollectionUtils.isEmpty(roleList)) {
+                    reRoleList.addAll(roleList);
+                }
+                customMessageSettingVO.setSendTargetRole(reRoleList);
+            }
             return customMessageSettingVO;
         }).collect(Collectors.toList());
 
