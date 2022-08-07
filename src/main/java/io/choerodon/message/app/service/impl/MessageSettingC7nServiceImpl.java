@@ -646,6 +646,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             MessageSettingVO settingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, sourceId, ResourceLevel.ORGANIZATION.value(), code);
             if (settingVO == null) {
                 return messageSettingC7nMapper.getDefaultProjectHealthSetting(notifyType, code);
+            } else {
+                return settingVO;
             }
         }
         return new MessageSettingVO();
