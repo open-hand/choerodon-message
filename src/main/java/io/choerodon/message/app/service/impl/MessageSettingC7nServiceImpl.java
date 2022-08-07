@@ -588,8 +588,10 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         addUserInfo(customMessageSettingList);
         // 计算通知事件的名称
         calculateEventName(customMessageSettingList);
+        //排序
+        List<CustomMessageSettingVO> reCustomMessageSettingVOS = customMessageSettingList.stream().sorted(Comparator.comparing(CustomMessageSettingVO::getId)).collect(Collectors.toList());
         // 装配VO
-        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, customMessageSettingList));
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, reCustomMessageSettingVOS));
         messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
         return messageSettingWarpVO;
 
