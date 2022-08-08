@@ -156,8 +156,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
-                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID))) {
-            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID)));
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
         }
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(SOURCE_LEVEL))) {
