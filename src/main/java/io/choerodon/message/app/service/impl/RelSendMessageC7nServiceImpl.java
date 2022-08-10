@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import io.choerodon.core.iam.ResourceLevel;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.message.entity.DingTalkSender;
@@ -38,8 +37,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import io.choerodon.asgard.common.ApplicationContextHelper;
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
@@ -448,21 +449,18 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (Map.Entry<Long, List<UserVO>> entry : userVOMapGroupingByOrgId.entrySet()) {
                 Long orgId = entry.getKey();
                 List<UserVO> users = entry.getValue();
-                Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
-                if (Boolean.TRUE.equals(enabled)) {
-                    Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
-                    if (ObjectUtils.isEmpty(openUserIdMap)) {
-                        continue;
-                    }
-                    List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
-                    List<String> openUserIdList = new ArrayList<>();
-                    openUserIdMap.forEach((userId, openId) -> {
-                        if (userIds.contains(userId)) {
-                            openUserIdList.add(openId);
-                        }
-                    });
-                    sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
+                if (ObjectUtils.isEmpty(openUserIdMap)) {
+                    continue;
                 }
+                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                List<String> openUserIdList = new ArrayList<>();
+                openUserIdMap.forEach((userId, openId) -> {
+                    if (userIds.contains(userId)) {
+                        openUserIdList.add(openId);
+                    }
+                });
+                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
             }
         } else {
             Long tenantId = null;
@@ -477,13 +475,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
                 tenantId = TypeUtils.objToLong(tenantIdOptional.get());
             }
-            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk").getBody();
-            if (Boolean.TRUE.equals(enabled)) {
-                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
-                if (!ObjectUtils.isEmpty(openUserIdMap)) {
-                    List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-                    sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
-                }
+            Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
+            if (!ObjectUtils.isEmpty(openUserIdMap)) {
+                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
             }
         }
     }
@@ -518,7 +513,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
     }
 
-    private Boolean isMessageEnabled(Long tenantId, String typeCode) {
+    public static Boolean isMessageEnabled(Long tenantId, String typeCode) {
         AtomicReference<Boolean> result = new AtomicReference<>();
         SafeRedisHelper.execute(HZeroService.Message.REDIS_DB, helper -> {
             String redisKey = String.format(REDIS_KEY_SYSTEM_MESSAGE, typeCode, tenantId);
@@ -528,7 +523,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         });
         if (result.get() == null) {
-            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode).getBody();
+            Boolean messageEnabled = ApplicationContextHelper.getBean(IamFeignClient.class).isMessageEnabled(tenantId, typeCode).getBody();
             result.set(messageEnabled);
         }
         return result.get();
