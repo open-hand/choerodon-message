@@ -10,24 +10,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hzero.boot.message.entity.DingTalkSender;
-import org.hzero.boot.message.entity.MessageSender;
-import org.hzero.boot.message.entity.Receiver;
-import org.hzero.boot.message.entity.WebHookSender;
-import org.hzero.common.HZeroService;
-import org.hzero.core.base.BaseConstants;
-import org.hzero.core.redis.safe.SafeRedisHelper;
-import org.hzero.message.app.service.DingTalkSendService;
-import org.hzero.message.app.service.MessageReceiverService;
-import org.hzero.message.app.service.TemplateServerService;
-import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
-import org.hzero.message.domain.entity.Message;
-import org.hzero.message.domain.entity.TemplateServer;
-import org.hzero.message.domain.entity.TemplateServerLine;
-import org.hzero.message.domain.entity.WebhookServer;
-import org.hzero.message.domain.repository.TemplateServerLineRepository;
-import org.hzero.message.infra.constant.HmsgConstant;
-import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +35,25 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import io.choerodon.message.infra.utils.JsonHelper;
+
+import org.hzero.boot.message.entity.DingTalkSender;
+import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.boot.message.entity.Receiver;
+import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.common.HZeroService;
+import org.hzero.core.base.BaseConstants;
+import org.hzero.core.redis.safe.SafeRedisHelper;
+import org.hzero.message.app.service.DingTalkSendService;
+import org.hzero.message.app.service.MessageReceiverService;
+import org.hzero.message.app.service.TemplateServerService;
+import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
+import org.hzero.message.domain.entity.Message;
+import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.repository.TemplateServerLineRepository;
+import org.hzero.message.infra.constant.HmsgConstant;
+import org.hzero.message.infra.mapper.WebhookServerMapper;
 
 /**
  * @author scp
@@ -464,7 +465,8 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         } else {
             Long tenantId = null;
-            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation())
+                    .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
             if (projectIdOptional.isPresent()) {
                 Long projectId = TypeUtils.objToLong(projectIdOptional.get());
                 ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
@@ -472,8 +474,12 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                     tenantId = projectDTO.getOrganizationId();
                 }
             } else {
-                Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-                tenantId = TypeUtils.objToLong(tenantIdOptional.get());
+                tenantId = Optional.ofNullable(sender.getAdditionalInformation())
+                        .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))
+                        .map(TypeUtils::objToLong)
+                        // 兼容班翎工作流发消息的请求
+                        // gaokuo.dai@zknow.com 2022-08-11
+                        .orElse(sender.getTenantId());
             }
             Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
             if (!ObjectUtils.isEmpty(openUserIdMap)) {
@@ -495,9 +501,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
-            Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
-            while (templateServerLineIterator.hasNext()) {
-                TemplateServerLine line = templateServerLineIterator.next();
+            for (TemplateServerLine line : templateServerLineList) {
                 Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()), line.getTryTimes());
                 result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
             }
