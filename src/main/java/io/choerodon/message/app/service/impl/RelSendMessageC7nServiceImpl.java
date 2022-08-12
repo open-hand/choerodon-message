@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import io.choerodon.core.iam.ResourceLevel;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.message.entity.DingTalkSender;
@@ -38,8 +37,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import io.choerodon.asgard.common.ApplicationContextHelper;
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
@@ -309,13 +310,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<WebHookSender> senderList;
         if (!ObjectUtils.isEmpty(projectId)) {
             //项目成获取到应该发送的webhook地址
-            webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            webServerCodes = webhookProjectRelMapper.selectByProjectId(projectId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
             //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
             //获取本组织下要发送webhook地址
             WebhookServer webHookSender = new WebhookServer();
             webHookSender.setTenantId(tenantId);
+            webHookSender.setEnabledFlag(1);
             webServerCodes = webhookServerMapper.select(webHookSender).stream().map(WebhookServer::getServerCode).collect(Collectors.toList());
             //获取本组织的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())
@@ -448,25 +450,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (Map.Entry<Long, List<UserVO>> entry : userVOMapGroupingByOrgId.entrySet()) {
                 Long orgId = entry.getKey();
                 List<UserVO> users = entry.getValue();
-                Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
-                if (Boolean.TRUE.equals(enabled)) {
-                    Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
-                    if (ObjectUtils.isEmpty(openUserIdMap)) {
-                        continue;
-                    }
-                    List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
-                    List<String> openUserIdList = new ArrayList<>();
-                    openUserIdMap.forEach((userId, openId) -> {
-                        if (userIds.contains(userId)) {
-                            openUserIdList.add(openId);
-                        }
-                    });
-                    sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
+                if (ObjectUtils.isEmpty(openUserIdMap)) {
+                    continue;
                 }
+                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                List<String> openUserIdList = new ArrayList<>();
+                openUserIdMap.forEach((userId, openId) -> {
+                    if (userIds.contains(userId)) {
+                        openUserIdList.add(openId);
+                    }
+                });
+                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
             }
         } else {
             Long tenantId = null;
-            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation())
+                    .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
             if (projectIdOptional.isPresent()) {
                 Long projectId = TypeUtils.objToLong(projectIdOptional.get());
                 ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
@@ -474,16 +474,17 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                     tenantId = projectDTO.getOrganizationId();
                 }
             } else {
-                Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-                tenantId = TypeUtils.objToLong(tenantIdOptional.get());
+                tenantId = Optional.ofNullable(sender.getAdditionalInformation())
+                        .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))
+                        .map(TypeUtils::objToLong)
+                        // 兼容班翎工作流发消息的请求
+                        // gaokuo.dai@zknow.com 2022-08-11
+                        .orElse(sender.getTenantId());
             }
-            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk").getBody();
-            if (Boolean.TRUE.equals(enabled)) {
-                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
-                if (!ObjectUtils.isEmpty(openUserIdMap)) {
-                    List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-                    sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
-                }
+            Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
+            if (!ObjectUtils.isEmpty(openUserIdMap)) {
+                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
             }
         }
     }
@@ -500,9 +501,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
-            Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
-            while (templateServerLineIterator.hasNext()) {
-                TemplateServerLine line = templateServerLineIterator.next();
+            for (TemplateServerLine line : templateServerLineList) {
                 Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()), line.getTryTimes());
                 result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
             }
@@ -518,7 +517,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
     }
 
-    private Boolean isMessageEnabled(Long tenantId, String typeCode) {
+    public static Boolean isMessageEnabled(Long tenantId, String typeCode) {
         AtomicReference<Boolean> result = new AtomicReference<>();
         SafeRedisHelper.execute(HZeroService.Message.REDIS_DB, helper -> {
             String redisKey = String.format(REDIS_KEY_SYSTEM_MESSAGE, typeCode, tenantId);
@@ -528,7 +527,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         });
         if (result.get() == null) {
-            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode).getBody();
+            Boolean messageEnabled = ApplicationContextHelper.getBean(IamFeignClient.class).isMessageEnabled(tenantId, typeCode).getBody();
             result.set(messageEnabled);
         }
         return result.get();
