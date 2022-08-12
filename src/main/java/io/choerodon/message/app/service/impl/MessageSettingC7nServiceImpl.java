@@ -118,7 +118,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<ProjectMessageVO> result = new ArrayList<>();
         //默认配置
         List<CustomMessageSettingVO> defaultSettingList =
-                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, code, ResourceLevel.PROJECT.value());
+                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), code);
         if (defaultSettingList.isEmpty()) {
             return result;
         }
