@@ -10,6 +10,24 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hzero.boot.message.entity.DingTalkSender;
+import org.hzero.boot.message.entity.MessageSender;
+import org.hzero.boot.message.entity.Receiver;
+import org.hzero.boot.message.entity.WebHookSender;
+import org.hzero.common.HZeroService;
+import org.hzero.core.base.BaseConstants;
+import org.hzero.core.redis.safe.SafeRedisHelper;
+import org.hzero.message.app.service.DingTalkSendService;
+import org.hzero.message.app.service.MessageReceiverService;
+import org.hzero.message.app.service.TemplateServerService;
+import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
+import org.hzero.message.domain.entity.Message;
+import org.hzero.message.domain.entity.TemplateServer;
+import org.hzero.message.domain.entity.TemplateServerLine;
+import org.hzero.message.domain.entity.WebhookServer;
+import org.hzero.message.domain.repository.TemplateServerLineRepository;
+import org.hzero.message.infra.constant.HmsgConstant;
+import org.hzero.message.infra.mapper.WebhookServerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,25 +53,6 @@ import io.choerodon.message.infra.mapper.MessageSettingC7nMapper;
 import io.choerodon.message.infra.mapper.ReceiveSettingC7nMapper;
 import io.choerodon.message.infra.mapper.WebhookProjectRelMapper;
 import io.choerodon.message.infra.utils.JsonHelper;
-
-import org.hzero.boot.message.entity.DingTalkSender;
-import org.hzero.boot.message.entity.MessageSender;
-import org.hzero.boot.message.entity.Receiver;
-import org.hzero.boot.message.entity.WebHookSender;
-import org.hzero.common.HZeroService;
-import org.hzero.core.base.BaseConstants;
-import org.hzero.core.redis.safe.SafeRedisHelper;
-import org.hzero.message.app.service.DingTalkSendService;
-import org.hzero.message.app.service.MessageReceiverService;
-import org.hzero.message.app.service.TemplateServerService;
-import org.hzero.message.app.service.impl.RelSendMessageServiceImpl;
-import org.hzero.message.domain.entity.Message;
-import org.hzero.message.domain.entity.TemplateServer;
-import org.hzero.message.domain.entity.TemplateServerLine;
-import org.hzero.message.domain.entity.WebhookServer;
-import org.hzero.message.domain.repository.TemplateServerLineRepository;
-import org.hzero.message.infra.constant.HmsgConstant;
-import org.hzero.message.infra.mapper.WebhookServerMapper;
 
 /**
  * @author scp
@@ -311,13 +310,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<WebHookSender> senderList;
         if (!ObjectUtils.isEmpty(projectId)) {
             //项目成获取到应该发送的webhook地址
-            webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            webServerCodes = webhookProjectRelMapper.selectByProjectId(projectId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
             //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
             //获取本组织下要发送webhook地址
             WebhookServer webHookSender = new WebhookServer();
             webHookSender.setTenantId(tenantId);
+            webHookSender.setEnabledFlag(1);
             webServerCodes = webhookServerMapper.select(webHookSender).stream().map(WebhookServer::getServerCode).collect(Collectors.toList());
             //获取本组织的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())
