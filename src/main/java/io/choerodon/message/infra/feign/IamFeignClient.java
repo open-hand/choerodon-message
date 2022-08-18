@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.choerodon.message.api.vo.Role;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.swagger.annotations.ApiParam;
+import microsoft.exchange.webservices.data.core.service.item.Item;
 import org.hzero.common.HZeroService;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,7 @@ import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 〈功能简述〉
@@ -76,16 +82,33 @@ public interface IamFeignClient {
     ResponseEntity<List<ProjectVO>> listAllProjects(@RequestParam Boolean enabled);
 
     @PostMapping("/choerodon/v1/users/query_open_user_ids")
-    ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList, @RequestParam("open_app_code") String openAppCode);
+    ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(@RequestBody List<Long> userIdList,
+                                                              @RequestParam("organization_id") Long organizationId,
+                                                              @RequestParam("open_app_code") String openAppCode);
 
     @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_message_enabled")
-    Boolean isMessageEnabled(@RequestParam("organization_id") Long organizationId, @RequestParam("type") String type);
+    ResponseEntity<Boolean> isMessageEnabled(@RequestParam("organization_id") Long organizationId, @RequestParam("type") String type);
 
     @GetMapping("/choerodon/v1/users/query_org_id")
-    List<UserVO> queryUserOrgId(List<Long> userIdList);
+    ResponseEntity<List<UserVO>> queryUserOrgId(List<Long> userIdList);
 
     @PostMapping("/choerodon/v1/organizations/{organization_id}/open_app/list_user_by_openIds")
     ResponseEntity<List<UserVO>> listUserByOpenIds(@PathVariable("organization_id") Long tenantId,
                                                    @RequestParam(value = "app_type") String openAppType,
                                                    @RequestBody Set<String> openIds);
+
+    @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/ding_talk/corp_id")
+    ResponseEntity<String> queryDingTalkCorpId(@PathVariable(name = "organization_id") Long organizationId);
+
+    @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_internal_browser")
+    ResponseEntity<Boolean> isInternalBrowser(@RequestParam("organization_id") Long organizationId,
+                                              @RequestParam("type") String type);
+
+    @GetMapping("/choerodon/v1/roles/search")
+    ResponseEntity<Page<Role>> queryRoleCodeByTenantId(
+            @ApiIgnore
+            @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+            @RequestParam(value = "tenantId") Long tenantId,
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) String roleLevel);
 }

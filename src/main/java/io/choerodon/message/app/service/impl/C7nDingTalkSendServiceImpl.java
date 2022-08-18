@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.boot.message.entity.DingTalkMsgType;
+import org.hzero.boot.message.entity.DingTalkSender;
 import org.hzero.boot.message.entity.WeChatSender;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.dd.service.DingCorpMessageService;
@@ -59,6 +60,17 @@ public class C7nDingTalkSendServiceImpl extends DingTalkSendServiceImpl {
     }
 
     @Override
+    public Message sendMessage(DingTalkSender dingTalkSender, Integer tryTimes) {
+        Long tenantId = dingTalkSender.getTenantId();
+        Boolean enabled = RelSendMessageC7nServiceImpl.isMessageEnabled(tenantId, "ding_talk");
+        if (Boolean.TRUE.equals(enabled)) {
+            return super.sendMessage(dingTalkSender, tryTimes);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public Message resendMessage(UserMessageDTO message) {
         if (CollectionUtils.isEmpty(message.getMessageReceiverList())) {
             return message;
@@ -79,9 +91,9 @@ public class C7nDingTalkSendServiceImpl extends DingTalkSendServiceImpl {
                 // todo 唯一覆盖逻辑
                 // 确保钉钉消息重试能正常发送
                 if (!ObjectUtils.isEmpty(messageContent.getPlainContent())) {
-                    message.setPlainContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent()));
+                    message.setPlainContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent(), message.getTenantId()));
                 } else {
-                    message.setContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent()));
+                    message.setContent(messageGeneratorServiceAop.processMessageContent(messageContent.getPlainContent(), message.getTenantId()));
                 }
                 message.setTemplateEditType("RT");
             }

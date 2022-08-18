@@ -66,4 +66,14 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
         }
     }
 
+    changeSet(author: 'xiang.wang@zknow.com', id: '2022-8-02-notify_message_setting-add-column') {
+        addColumn(tableName: 'notify_message_setting') {
+            column(name: 'SOURCE_LEVEL',type: 'VARCHAR(64)', defaultValue: "project", remarks: '来源层级')
+        }
+
+
+        sql("""
+            ALTER TABLE notify_message_setting CHANGE PROJECT_ID SOURCE_ID BIGINT
+        """)
+    }
 }

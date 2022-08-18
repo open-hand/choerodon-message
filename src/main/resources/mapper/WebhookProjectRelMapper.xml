@@ -11,4 +11,16 @@
         and PROJECT_ID is not null
     </select>
 
+    <select id="selectByProjectId" resultType="io.choerodon.message.infra.dto.WebhookProjectRelDTO">
+        SELECT
+        wpr.*
+        FROM
+        webhook_project_rel wpr
+        JOIN hmsg_webhook_server hws ON hws.server_id = wpr.WEBHOOK_ID
+        AND hws.enabled_flag = 1
+        WHERE
+        wpr.PROJECT_ID = #{projectId}
+    </select>
+
+
 </mapper>

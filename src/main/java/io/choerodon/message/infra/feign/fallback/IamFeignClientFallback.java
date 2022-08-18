@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.choerodon.message.api.vo.Role;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
@@ -91,22 +94,37 @@ public class IamFeignClientFallback implements IamFeignClient {
     }
 
     @Override
-    public ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(List<Long> userIdList, String openAppCode) {
+    public ResponseEntity<Map<Long, String>> getOpenUserIdsByUserIds(List<Long> userIdList, @RequestParam("organization_id") Long organizationId, String openAppCode) {
         throw new CommonException("error.get.open.user.ids");
     }
 
     @Override
-    public Boolean isMessageEnabled(Long organizationId, String type) {
+    public ResponseEntity<Boolean> isMessageEnabled(Long organizationId, String type) {
         throw new CommonException("error.get.message.enabled");
     }
 
     @Override
-    public List<UserVO> queryUserOrgId(List<Long> userIdList) {
+    public ResponseEntity<Boolean> isInternalBrowser(Long organizationId, String type) {
+        throw new CommonException("error.get.internal.browser");
+    }
+
+    @Override
+    public ResponseEntity<List<UserVO>> queryUserOrgId(List<Long> userIdList) {
         throw new CommonException("error.get.user");
     }
 
     @Override
     public ResponseEntity<List<UserVO>> listUserByOpenIds(Long tenantId, String openAppType, Set<String> openIds) {
         throw new CommonException("error.get.user.by.openIds");
+    }
+
+    @Override
+    public ResponseEntity<String> queryDingTalkCorpId(Long organizationId) {
+        throw new CommonException("error.get.dingtalk.corp.id");
+    }
+
+    @Override
+    public ResponseEntity<Page<Role>> queryRoleCodeByTenantId(PageRequest pageRequest, Long tenantId, Boolean enabled, String roleLevel) {
+        throw new CommonException("error.get.role.by.condition");
     }
 }
