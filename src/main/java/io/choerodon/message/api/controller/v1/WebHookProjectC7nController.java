@@ -149,10 +149,10 @@ public class WebHookProjectC7nController {
             @PathVariable(name = "project_id") Long projectId,
             @Encrypt
             @RequestParam(name = "webhook_id", required = false) Long webhookId,
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String statusCode,
             @RequestParam(required = false, name = "messageName") String eventName,
             @RequestParam(required = false, name = "type") String type) {
-        return new ResponseEntity<>(webhookRecordC7nService.pagingWebHookRecord(pageRequest, projectId, webhookId, status, eventName, type, ResourceLevel.PROJECT.value()), HttpStatus.OK);
+        return new ResponseEntity<>(webhookRecordC7nService.pagingWebHookRecord(pageRequest, projectId, webhookId, statusCode, eventName, type, ResourceLevel.PROJECT.value()), HttpStatus.OK);
     }
 
     @ApiOperation(value = "查询WebHook发送记录详情")
