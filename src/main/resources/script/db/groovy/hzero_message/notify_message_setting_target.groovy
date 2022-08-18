@@ -5,7 +5,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting-target.groo
         if (helper.dbType().isSupportSequence()) {
             createSequence(sequenceName: 'NOTIFY_TARGET_USER_S', startValue: "1")
         }
-        createTable(tableName: "NOTIFY_MESSAGE_SETTING_TARGET") {
+        createTable(tableName: "NOTIFY_MESSAGE_SETTING_TARGET",remarks: "项目层消息设置对象表") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }
@@ -26,14 +26,5 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting-target.groo
         }
         addUniqueConstraint(tableName: 'NOTIFY_MESSAGE_SETTING_TARGET', columnNames: 'TYPE, USER_ID, MESSAGE_SETTING_ID', constraintName: 'UK_notify-message-setting-target_U1')
     }
-
-    changeSet(author: 'xiangwang04@mail.com', id: '2020-10-15-fix-message-data') {
-        sql("""
-            DELETE 
-            FROM
-              notify_message_setting_target 
-            WHERE
-            MESSAGE_SETTING_ID IN ( SELECT ID FROM notify_message_setting WHERE PROJECT_ID != 0 AND ENV_ID = 0 AND EVENT_NAME != 'defaultValue' AND NOTIFY_TYPE = 'resourceDelete' );
-            """)
-    }
+    
 }
