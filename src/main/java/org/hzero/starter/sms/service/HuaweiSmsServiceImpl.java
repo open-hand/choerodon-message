@@ -1,7 +1,8 @@
 package org.hzero.starter.sms.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.core.util.JsonUtils;
@@ -106,7 +107,7 @@ public class HuaweiSmsServiceImpl extends SmsService {
 
 
         try {
-            HuaweiSmsSupporter.sendSms(sender, receiver, templateId, templateParas, null, signature, appKey, appSecret, url);
+            HuaweiSmsSupporter.sendSms(sender, receiver, templateId, message.getContent(), templateParas, null, signature, appKey, appSecret, url);
         } catch (Exception e) {
             throw new CommonException(e);
         }
