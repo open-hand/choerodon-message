@@ -13,6 +13,9 @@ import java.util.*;
 import javax.net.ssl.*;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.starter.sms.constant.HuaweiSmsConstant;
 import org.hzero.starter.sms.exception.SendMessageException;
@@ -124,7 +127,7 @@ public class HuaweiSmsSupporter {
         if (!ObjectUtils.isEmpty(templateId)) {
             map.put(HuaweiSmsConstant.HuaweiParams.TEMPLATE_ID, templateId);
         } else {
-            map.put(HuaweiSmsConstant.HuaweiParams.BODY, "【" + signature + "】" + content);
+            map.put(HuaweiSmsConstant.HuaweiParams.BODY, content);
         }
         if (null != templateParas && !templateParas.isEmpty()) {
             map.put(HuaweiSmsConstant.HuaweiParams.TEMPLATE_PARAS, templateParas);

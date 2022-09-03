@@ -15,6 +15,7 @@ import org.hzero.starter.sms.entity.SmsReceiver;
 import org.hzero.starter.sms.support.HuaweiSmsSupporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.infra.dto.MessageTemplateDTO;
@@ -78,11 +79,13 @@ public class HuaweiSmsServiceImpl extends SmsService {
         String signature = smsConfig.getSignName();
         // 必填,模板ID
         String templateId = message.getExternalCode();
-        //这里根据模板id找到模板关联的通道id
-        MessageTemplateDTO messageTemplateDTO = new MessageTemplateDTO();
-        messageTemplateDTO.setExternalCode(templateId);
-        MessageTemplateDTO templateDTO = messageC7nTemplateMapper.selectOne(messageTemplateDTO);
-        sender = templateDTO.getExternalParam();
+        if (!ObjectUtils.isEmpty(templateId)) {
+            //这里根据模板id找到模板关联的通道id
+            MessageTemplateDTO messageTemplateDTO = new MessageTemplateDTO();
+            messageTemplateDTO.setExternalCode(templateId);
+            MessageTemplateDTO templateDTO = messageC7nTemplateMapper.selectOne(messageTemplateDTO);
+            sender = templateDTO.getExternalParam();
+        }
         // 获取模板参数
         String[] params;
         if (args.size() > 0) {
