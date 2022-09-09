@@ -427,7 +427,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             e.printStackTrace();
         }
         serverLineMap.remove("DT");
-        Class clazz = super.getClass().getSuperclass();
+        Class<?> clazz = this.getClass().getSuperclass();
+        while (!clazz.isAssignableFrom(RelSendMessageServiceImpl.class)) {
+            clazz = clazz.getSuperclass();
+        }
         try {
             Method sendMessageMethod = clazz.getDeclaredMethod("sendMessage", Map.class, MessageSender.class);
             sendMessageMethod.setAccessible(true);
