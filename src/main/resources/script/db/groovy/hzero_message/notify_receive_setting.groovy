@@ -5,7 +5,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_receive_setting.groovy') {
         if(helper.dbType().isSupportSequence()){
             createSequence(sequenceName: 'NOTIFY_RECEIVE_SETTING_S', startValue:"1")
         }
-        createTable(tableName: "NOTIFY_RECEIVE_SETTING") {
+        createTable(tableName: "NOTIFY_RECEIVE_SETTING",remarks: "消息接受设置表") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_RECEIVE_SETTING')
             }

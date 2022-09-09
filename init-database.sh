@@ -6,6 +6,8 @@ TOOL_VERSION=1.1.4.RELEASE
 TOOL_JAR_PATH=${MAVEN_LOCAL_REPO}/${TOOL_GROUP_ID/\./\/}/${TOOL_ARTIFACT_ID}/${TOOL_VERSION}/${TOOL_ARTIFACT_ID}-${TOOL_VERSION}.jar
 mvn org.apache.maven.plugins:maven-dependency-plugin:get \
  -Dartifact=${TOOL_GROUP_ID}:${TOOL_ARTIFACT_ID}:${TOOL_VERSION} \
+ -Dmaven.wagon.http.ssl.insecure=true \
+ -Dmaven.wagon.http.ssl.allowall=true \
  -Dtransitive=false
 
 java -Dspring.datasource.url="jdbc:mysql://localhost:3306?serverTimezone=CTT&useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true" \

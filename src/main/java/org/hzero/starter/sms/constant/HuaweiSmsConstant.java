@@ -13,7 +13,8 @@ public class HuaweiSmsConstant {
     public static class HuaweiParams {
         public static final String FROM = "from";
         public static final String TO = "to";
-        public static final String TEMPLATE_ID= "templateId";
+        public static final String TEMPLATE_ID = "templateId";
+        public static final String BODY = "body";
         public static final String TEMPLATE_PARAS = "templateParas";
         public static final String STATUS_CALL_BACK = "statusCallback";
         public static final String SIGNATURE = "signature";

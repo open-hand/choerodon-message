@@ -45,7 +45,7 @@
             AND hws.server_type=#{type}
         </if>
         <if test="enableFlag != null">
-            AND hws.enabled_flag='enableFlag'
+            AND hws.enabled_flag='1'
         </if>
         <if test="params != null">
             AND (hws.webhook_address like concat(concat('%',#{params}),'%') or hts.message_name like concat(concat('%',#{params}),'%'))
