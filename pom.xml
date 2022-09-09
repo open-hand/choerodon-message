@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>choerodon-message</artifactId>
-    <version>2.1.1.RELEASE</version>
+    <version>2.2.0-SNAPSHOT</version>
     <name>choerodon-message</name>
     <description>Message Service For Choerodon</description>
 
@@ -102,6 +102,12 @@
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-config-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-developer-route</artifactId>
+            <version>1.10.0-SNAPSHOT</version>
+            <optional>true</optional>
+        </dependency>
 
         <dependency>
             <groupId>org.modelmapper</groupId>
@@ -123,11 +129,9 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream</artifactId>
         </dependency>
-        <!--        后续升级考虑去掉版本号-->
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-core</artifactId>
-            <version>2.0.0.RELEASE</version>
         </dependency>
     </dependencies>
 

@@ -5,7 +5,7 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
         if (helper.dbType().isSupportSequence()) {
             createSequence(sequenceName: 'NOTIFY_MESSAGE_SETTING_S', startValue: "1")
         }
-        createTable(tableName: "NOTIFY_MESSAGE_SETTING") {
+        createTable(tableName: "NOTIFY_MESSAGE_SETTING",remarks: "项目层消息设置表") {
             column(name: 'ID', type: 'BIGINT UNSIGNED', autoIncrement: true, remarks: '表ID，主键，供其他表做外键，unsigned bigint、单表时自增、步长为 1') {
                 constraints(primaryKey: true, primaryKeyName: 'PK_NOTIFY_CONFIG')
             }
@@ -66,4 +66,14 @@ databaseChangeLog(logicalFilePath: 'script/db/notify_message_setting.groovy') {
         }
     }
 
+    changeSet(author: 'xiang.wang@zknow.com', id: '2022-8-02-notify_message_setting-add-column') {
+        addColumn(tableName: 'notify_message_setting') {
+            column(name: 'SOURCE_LEVEL',type: 'VARCHAR(64)', defaultValue: "project", remarks: '来源层级')
+        }
+
+
+        sql("""
+            ALTER TABLE notify_message_setting CHANGE PROJECT_ID SOURCE_ID BIGINT
+        """)
+    }
 }

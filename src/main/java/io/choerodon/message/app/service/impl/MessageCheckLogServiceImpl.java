@@ -112,7 +112,8 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
         //查询项目下所有的自定义的通知设置，和指定用户
         //根据通知到的之指定用户，看看他们是否在项目下有角色
         //如果没有则清理
-        List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.selectAll().stream().filter(e -> e.getProjectId() != 0L).collect(Collectors.toList());
+        // TODO: 2022/8/2 SourceLevel 
+        List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.selectAll().stream().filter(e -> e.getSourceId() != 0L).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(messageSettingDTOS)) {
             return;
         }
@@ -131,7 +132,8 @@ public class MessageCheckLogServiceImpl implements MessageCheckLogService {
             targetUserDTOS.forEach(targetUserDTO1 -> {
                 //根据通知到的之指定用户，看看他们是否在项目下有角色
                 UserVO userVO = longListMap.get(targetUserDTO1.getUserId()).get(0);
-                boolean present = OptionalBean.ofNullable(iamClientOperator.getUser(settingDTO.getProjectId(), userVO.getLoginName())).getBean(UserVO::getRoles).isPresent();
+                // TODO: 2022/8/2 SourceId 
+                boolean present = OptionalBean.ofNullable(iamClientOperator.getUser(settingDTO.getSourceId(), userVO.getLoginName())).getBean(UserVO::getRoles).isPresent();
                 //user存在的时候返回
                 if (present) {
                     return;

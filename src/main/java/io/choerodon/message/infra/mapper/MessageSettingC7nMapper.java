@@ -30,6 +30,7 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     List<CustomMessageSettingVO> listDefaultAndEnabledSettingByNotifyType(@Param("notifyType") String notifyType,
+                                                                          @Param("sourceLevel") String sourceLevel,
                                                                           @Param("code") String code);
 
     /**
@@ -40,7 +41,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @param code
      * @return
      */
-    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("projectId") Long projectId,
+    List<CustomMessageSettingVO> listMessageSettingByProjectId(@Param("sourceId") Long sourceId,
+                                                               @Param("sourceLevel") String sourceLevel,
                                                                @Param("notifyType") String notifyType,
                                                                @Param("code") String code);
 
@@ -52,7 +54,9 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @param notifyType
      * @return
      */
-    List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("projectId") Long projectId, @Param("envId") Long envId, @Param("notifyType") String notifyType);
+    List<CustomMessageSettingVO> listMessageSettingByProjectIdAndEnvId(@Param("sourceId") Long sourceId,
+                                                                       @Param("sourceLevel") String sourceLevel,
+                                                                       @Param("envId") Long envId, @Param("notifyType") String notifyType);
 
     /**
      * 根据类型和code，查询项目下的通知配置
@@ -63,7 +67,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     MessageSettingVO getSettingByTypeAndCode(@Param("notifyType") String notifyType,
-                                             @Param("projectId") Long projectId,
+                                             @Param("sourceId") Long sourceId,
+                                             @Param("sourceLevel") String sourceLevel,
                                              @Param("code") String code);
 
     /**
@@ -77,7 +82,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      * @return
      */
     MessageSettingVO getResourceDeleteSettingByOption(@Param("notifyType") String notifyType,
-                                                      @Param("projectId") Long projectId,
+                                                      @Param("sourceId") Long sourceId,
+                                                      @Param("sourceLevel") String sourceLevel,
                                                       @Param("code") String code,
                                                       @Param("envId") Long envId,
                                                       @Param("eventName") String eventName);
@@ -112,7 +118,8 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
      */
     void deleteByTypeAndEnvId(@Param("type") String type, @Param("envId") Long envId);
 
-    MessageSettingDTO selectByParams(@Param("projectId") Long projectId,
+    MessageSettingDTO selectByParams(@Param("source_id") Long sourceId,
+                                     @Param("source_level") String sourceLevel,
                                      @Param("messageCode") String messageCode,
                                      @Param("envId") Long envId,
                                      @Param("eventName") String eventName,
@@ -121,9 +128,11 @@ public interface MessageSettingC7nMapper extends BaseMapper<MessageSettingDTO> {
 
     List<String> listCategoryCode(@Param("notifyType") String notifyType);
 
-    List<String> selectProjectMessage();
+    List<String> selectProjectMessage(@Param("source_level") String sourceLevel);
 
 
+    List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType, @Param("source_level") String sourceLevel);
 
-    List<CustomMessageSettingVO> listDefaultSettingByNotifyType(@Param("notifyType") String notifyType);
+    MessageSettingVO getDefaultProjectHealthSetting(@Param("notifyType") String notifyType, @Param("code") String code);
+
 }

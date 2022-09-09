@@ -11,6 +11,11 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.net.ssl.*;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.starter.sms.constant.HuaweiSmsConstant;
 import org.hzero.starter.sms.exception.SendMessageException;
@@ -29,9 +34,9 @@ public class HuaweiSmsSupporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HuaweiSmsSupporter.class);
 
-    public static void sendSms(String sender, String receiver, String templateId, String templateParas, String statusCallBack, String signature, String appKey, String appSecret, String url) throws Exception {
+    public static void sendSms(String sender, String receiver, String templateId, String content, String templateParas, String statusCallBack, String signature, String appKey, String appSecret, String url) throws Exception {
 
-        String body = buildRequestBody(sender, receiver, templateId, templateParas, statusCallBack, signature);
+        String body = buildRequestBody(sender, receiver, templateId, content, templateParas, statusCallBack, signature);
         if (body.isEmpty()) {
             throw new SendMessageException("body is null.");
         }
@@ -110,17 +115,20 @@ public class HuaweiSmsSupporter {
      * @param signature      签名名称
      * @return 请求体
      */
-    public static String buildRequestBody(String sender, String receiver, String templateId, String templateParas,
+    public static String buildRequestBody(String sender, String receiver, String templateId, String content, String templateParas,
                                           String statusCallBack, String signature) {
-        if (null == sender || null == receiver || null == templateId || sender.isEmpty() || receiver.isEmpty()
-                || templateId.isEmpty()) {
+        if (null == sender || null == receiver || sender.isEmpty() || receiver.isEmpty()) {
             throw new SendMessageException("buildRequestBody(): sender, receiver or templateId is null.");
         }
         Map<String, String> map = new HashMap<>(8);
 
         map.put(HuaweiSmsConstant.HuaweiParams.FROM, sender);
         map.put(HuaweiSmsConstant.HuaweiParams.TO, receiver);
-        map.put(HuaweiSmsConstant.HuaweiParams.TEMPLATE_ID, templateId);
+        if (!ObjectUtils.isEmpty(templateId)) {
+            map.put(HuaweiSmsConstant.HuaweiParams.TEMPLATE_ID, templateId);
+        } else {
+            map.put(HuaweiSmsConstant.HuaweiParams.BODY, content);
+        }
         if (null != templateParas && !templateParas.isEmpty()) {
             map.put(HuaweiSmsConstant.HuaweiParams.TEMPLATE_PARAS, templateParas);
         }

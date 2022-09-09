@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
 import org.hzero.boot.message.entity.DingTalkMsgType;
+import org.hzero.boot.message.entity.DingTalkSender;
 import org.hzero.boot.message.entity.WeChatSender;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.dd.service.DingCorpMessageService;
@@ -56,6 +57,17 @@ public class C7nDingTalkSendServiceImpl extends DingTalkSendServiceImpl {
 
     public C7nDingTalkSendServiceImpl(MessageRepository messageRepository, DingCorpMessageService dingCorpMessageService, MessageConfigProperties messageConfigProperties, MessageGeneratorService messageGeneratorService, MessageReceiverRepository messageReceiverRepository, MessageTransactionRepository messageTransactionRepository, MessageClientProperties messageClientProperties, MessageSendRetryer messageSendRetryer, DingFileStorageService dingFileStorageService) {
         super(messageRepository, dingCorpMessageService, messageConfigProperties, messageGeneratorService, messageReceiverRepository, messageTransactionRepository, messageClientProperties, messageSendRetryer, dingFileStorageService);
+    }
+
+    @Override
+    public Message sendMessage(DingTalkSender dingTalkSender, Integer tryTimes) {
+        Long tenantId = dingTalkSender.getTenantId();
+        Boolean enabled = RelSendMessageC7nServiceImpl.isMessageEnabled(tenantId, "ding_talk");
+        if (Boolean.TRUE.equals(enabled)) {
+            return super.sendMessage(dingTalkSender, tryTimes);
+        } else {
+            return null;
+        }
     }
 
     @Override

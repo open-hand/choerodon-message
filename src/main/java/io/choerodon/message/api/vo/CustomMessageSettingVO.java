@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
+import javax.persistence.Transient;
+
 /**
  * 〈功能简述〉
  * 〈自定义通知设置VO〉
@@ -19,8 +21,14 @@ public class CustomMessageSettingVO {
     @Encrypt
     private Long id;
 
-    @ApiModelProperty("项目Id")
+    @ApiModelProperty("资源Id")
+    private Long sourceId;
+
+    @Transient
     private Long projectId;
+
+    @ApiModelProperty("资源层级")
+    private String sourceLevel;
 
     @Encrypt
     @ApiModelProperty("环境Id")
@@ -92,6 +100,9 @@ public class CustomMessageSettingVO {
 
     private String sendingType;
 
+    @ApiModelProperty("可选择的通知类型")
+    private List<Role> sendTargetRole;
+
     public String getSendingType() {
         return sendingType;
     }
@@ -127,12 +138,20 @@ public class CustomMessageSettingVO {
         this.id = id;
     }
 
-    public Long getProjectId() {
-        return projectId;
+    public Long getSourceId() {
+        return sourceId;
     }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
+    public void setSourceId(Long sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public String getSourceLevel() {
+        return sourceLevel;
+    }
+
+    public void setSourceLevel(String sourceLevel) {
+        this.sourceLevel = sourceLevel;
     }
 
     public String getNotifyType() {
@@ -301,6 +320,22 @@ public class CustomMessageSettingVO {
 
     public void setDtEnabledFlag(Boolean dtEnabledFlag) {
         this.dtEnabledFlag = dtEnabledFlag;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public List<Role> getSendTargetRole() {
+        return sendTargetRole;
+    }
+
+    public void setSendTargetRole(List<Role> sendTargetRole) {
+        this.sendTargetRole = sendTargetRole;
     }
 }
 

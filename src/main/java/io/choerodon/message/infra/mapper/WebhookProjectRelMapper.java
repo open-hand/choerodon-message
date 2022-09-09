@@ -15,4 +15,7 @@ import io.choerodon.mybatis.common.BaseMapper;
 public interface WebhookProjectRelMapper extends BaseMapper<WebhookProjectRelDTO> {
 
     List<WebhookProjectRelDTO> selectByTenantId(@Param("tenantId") Long tenantId);
+
+    List<WebhookProjectRelDTO> selectByProjectId(@Param("projectId") Long projectId);
+
 }

@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.choerodon.message.api.vo.Role;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.swagger.annotations.ApiParam;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import org.hzero.common.HZeroService;
@@ -18,6 +22,7 @@ import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.feign.fallback.IamFeignClientFallback;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 〈功能简述〉
@@ -98,4 +103,12 @@ public interface IamFeignClient {
     @GetMapping("/choerodon/v1/organizations/{organization_id}/open_app/is_internal_browser")
     ResponseEntity<Boolean> isInternalBrowser(@RequestParam("organization_id") Long organizationId,
                                               @RequestParam("type") String type);
+
+    @GetMapping("/choerodon/v1/roles/search")
+    ResponseEntity<Page<Role>> queryRoleCodeByTenantId(
+            @ApiIgnore
+            @SortDefault(value = "id", direction = Sort.Direction.DESC) PageRequest pageRequest,
+            @RequestParam(value = "tenantId") Long tenantId,
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) String roleLevel);
 }

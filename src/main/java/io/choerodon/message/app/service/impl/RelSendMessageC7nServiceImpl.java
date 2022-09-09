@@ -37,8 +37,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import io.choerodon.asgard.common.ApplicationContextHelper;
 import io.choerodon.core.enums.MessageAdditionalType;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
@@ -69,6 +71,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private static final String OBJECT_KIND = "objectKind";
     private static final String CREATED_AT = "createdAt";
     private static final String EVENT_NAME = "eventName";
+
+
+    private static final String SOURCE_LEVEL = "sourceLevel";
 
     @Autowired
     private TemplateServerService templateServerService;
@@ -143,12 +148,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
+        Long tenantId = null;
+        String sourceLevel = null;
         Long envId = null;
         String eventName = null;
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()))) {
             projectId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName())));
         }
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+        }
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(SOURCE_LEVEL))) {
+            sourceLevel = String.valueOf(messageSender.getAdditionalInformation().get(SOURCE_LEVEL));
+        }
+
         if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
                 !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName()))) {
             envId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_ENV_ID.getTypeName())));
@@ -166,11 +182,51 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 messageType.equals(HmsgConstant.MessageType.EMAIL) ||
                 messageType.equals(HmsgConstant.MessageType.SMS) ||
                 messageType.equals(HmsgConstant.MessageType.DT))
-                && messageSettingC7nMapper.selectProjectMessage().contains(messageSender.getMessageCode())) {
+                && messageSettingC7nMapper.selectProjectMessage(ResourceLevel.PROJECT.value()).contains(messageSender.getMessageCode())) {
             //项目层设置未开启
             if (!projectFilter(messageSender, projectId, envId, eventName, messageType)) {
                 receiverList.clear();
             }
+        }
+        //组织层拦截配置
+        if (StringUtils.equalsIgnoreCase(sourceLevel, ResourceLevel.ORGANIZATION.value()) && tenantId != null) {
+            if ((messageType.equals(HmsgConstant.MessageType.WEB) ||
+                    messageType.equals(HmsgConstant.MessageType.EMAIL) ||
+                    messageType.equals(HmsgConstant.MessageType.DT))
+                    && messageSettingC7nMapper.selectProjectMessage(ResourceLevel.ORGANIZATION.value()).contains(messageSender.getMessageCode())) {
+                //项目层设置未开启
+                if (!orgFilter(messageSender, tenantId, messageType)) {
+                    receiverList.clear();
+                }
+            }
+        }
+
+    }
+
+    private boolean orgFilter(MessageSender messageSender, Long organizationId, String messageType) {
+        //1.查询项目下是否设置了改消息的发送设置.没有就用默认的
+        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(organizationId, ResourceLevel.ORGANIZATION.value(), messageSender.getMessageCode(), null, null, messageType);
+        //如果项目下配置没有开启，则查询默认配置
+        if (Objects.isNull(messageSettingDTO)) {
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(BaseConstants.DEFAULT_TENANT_ID, ResourceLevel.ORGANIZATION.value(), messageSender.getMessageCode(), null, null, messageType);
+        }
+        //根据消息配置返回项目层是否应该发送消息
+        if (ObjectUtils.isEmpty(messageSettingDTO)) {
+            return Boolean.FALSE;
+        }
+        if (HmsgConstant.MessageType.WEB.equals(messageType)) {
+            return messageSettingDTO.getPmEnable();
+        }
+        if (HmsgConstant.MessageType.EMAIL.equals(messageType)) {
+            return messageSettingDTO.getEmailEnable();
+        }
+        if (HmsgConstant.MessageType.SMS.equals(messageType)) {
+            return messageSettingDTO.getSmsEnable();
+        }
+        if (HmsgConstant.MessageType.DT.equals(messageType)) {
+            return messageSettingDTO.getDtEnable();
+        } else {
+            return Boolean.FALSE;
         }
     }
 
@@ -203,10 +259,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
      */
     private Boolean projectFilter(MessageSender messageSender, Long projectId, Long envId, String eventName, String messageType) {
         //1.查询项目下是否设置了改消息的发送设置.没有就用默认的
-        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, messageSender.getMessageCode(), envId, eventName, messageType);
+        MessageSettingDTO messageSettingDTO = messageSettingC7nMapper.selectByParams(projectId, ResourceLevel.PROJECT.value(), messageSender.getMessageCode(), envId, eventName, messageType);
         //如果项目下配置没有开启，则查询默认配置
         if (Objects.isNull(messageSettingDTO)) {
-            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, messageSender.getMessageCode(), null, eventName, messageType);
+            messageSettingDTO = messageSettingC7nMapper.selectByParams(0L, ResourceLevel.PROJECT.value(), messageSender.getMessageCode(), null, eventName, messageType);
         }
         //根据消息配置返回项目层是否应该发送消息
         if (ObjectUtils.isEmpty(messageSettingDTO)) {
@@ -254,13 +310,14 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         List<WebHookSender> senderList;
         if (!ObjectUtils.isEmpty(projectId)) {
             //项目成获取到应该发送的webhook地址
-            webServerCodes = webhookProjectRelMapper.select(new WebhookProjectRelDTO().setProjectId(projectId)).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
+            webServerCodes = webhookProjectRelMapper.selectByProjectId(projectId).stream().map(WebhookProjectRelDTO::getServerCode).collect(Collectors.toList());
             //获取本项目的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())).collect(Collectors.toList());
         } else {
             //获取本组织下要发送webhook地址
             WebhookServer webHookSender = new WebhookServer();
             webHookSender.setTenantId(tenantId);
+            webHookSender.setEnabledFlag(1);
             webServerCodes = webhookServerMapper.select(webHookSender).stream().map(WebhookServer::getServerCode).collect(Collectors.toList());
             //获取本组织的webhook发送地址
             senderList = webHookSenderList.stream().filter(t -> webServerCodes.contains(t.getServerCode())
@@ -396,25 +453,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             for (Map.Entry<Long, List<UserVO>> entry : userVOMapGroupingByOrgId.entrySet()) {
                 Long orgId = entry.getKey();
                 List<UserVO> users = entry.getValue();
-                Boolean enabled = isMessageEnabled(orgId, DING_TALK_OPEN_APP_CODE);
-                if (Boolean.TRUE.equals(enabled)) {
-                    Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
-                    if (ObjectUtils.isEmpty(openUserIdMap)) {
-                        continue;
-                    }
-                    List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
-                    List<String> openUserIdList = new ArrayList<>();
-                    openUserIdMap.forEach((userId, openId) -> {
-                        if (userIds.contains(userId)) {
-                            openUserIdList.add(openId);
-                        }
-                    });
-                    sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
+                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, orgId, DING_TALK_OPEN_APP_CODE).getBody();
+                if (ObjectUtils.isEmpty(openUserIdMap)) {
+                    continue;
                 }
+                List<Long> userIds = users.stream().map(UserVO::getId).collect(Collectors.toList());
+                List<String> openUserIdList = new ArrayList<>();
+                openUserIdMap.forEach((userId, openId) -> {
+                    if (userIds.contains(userId)) {
+                        openUserIdList.add(openId);
+                    }
+                });
+                sendDingTalkMessage(orgId, openUserIdList, templateServerLineList, sender, result);
             }
         } else {
             Long tenantId = null;
-            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+            Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation())
+                    .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
             if (projectIdOptional.isPresent()) {
                 Long projectId = TypeUtils.objToLong(projectIdOptional.get());
                 ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
@@ -422,16 +477,17 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                     tenantId = projectDTO.getOrganizationId();
                 }
             } else {
-                Optional<Object> tenantIdOptional = Optional.of(sender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
-                tenantId = TypeUtils.objToLong(tenantIdOptional.get());
+                tenantId = Optional.ofNullable(sender.getAdditionalInformation())
+                        .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))
+                        .map(TypeUtils::objToLong)
+                        // 兼容班翎工作流发消息的请求
+                        // gaokuo.dai@zknow.com 2022-08-11
+                        .orElse(sender.getTenantId());
             }
-            Boolean enabled = iamFeignClient.isMessageEnabled(tenantId, "ding_talk").getBody();
-            if (Boolean.TRUE.equals(enabled)) {
-                Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
-                if (!ObjectUtils.isEmpty(openUserIdMap)) {
-                    List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
-                    sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
-                }
+            Map<Long, String> openUserIdMap = iamFeignClient.getOpenUserIdsByUserIds(userIdList, tenantId, DING_TALK_OPEN_APP_CODE).getBody();
+            if (!ObjectUtils.isEmpty(openUserIdMap)) {
+                List<String> openUserIdList = new ArrayList<>(openUserIdMap.values());
+                sendDingTalkMessage(tenantId, openUserIdList, templateServerLineList, sender, result);
             }
         }
     }
@@ -448,9 +504,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         dingTalkSender.setServerCode(DING_TALK_SERVER_CODE);
         dingTalkSender.setArgs(args);
         if (!CollectionUtils.isEmpty(openUserIdList)) {
-            Iterator<TemplateServerLine> templateServerLineIterator = templateServerLineList.iterator();
-            while (templateServerLineIterator.hasNext()) {
-                TemplateServerLine line = templateServerLineIterator.next();
+            for (TemplateServerLine line : templateServerLineList) {
                 Message msg = this.dingTalkSendService.sendMessage(dingTalkSender.setMessageCode(line.getTemplateCode()), line.getTryTimes());
                 result.add(msg == null ? (new Message()).setSendFlag(BaseConstants.Flag.YES).setMessageTypeCode("DT") : msg);
             }
@@ -466,7 +520,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         return CollectionUtils.isEmpty(typeCodeList) || typeCodeList.contains(typeCode);
     }
 
-    private Boolean isMessageEnabled(Long tenantId, String typeCode) {
+    public static Boolean isMessageEnabled(Long tenantId, String typeCode) {
         AtomicReference<Boolean> result = new AtomicReference<>();
         SafeRedisHelper.execute(HZeroService.Message.REDIS_DB, helper -> {
             String redisKey = String.format(REDIS_KEY_SYSTEM_MESSAGE, typeCode, tenantId);
@@ -476,7 +530,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             }
         });
         if (result.get() == null) {
-            Boolean messageEnabled = iamFeignClient.isMessageEnabled(tenantId, typeCode).getBody();
+            Boolean messageEnabled = ApplicationContextHelper.getBean(IamFeignClient.class).isMessageEnabled(tenantId, typeCode).getBody();
             result.set(messageEnabled);
         }
         return result.get();

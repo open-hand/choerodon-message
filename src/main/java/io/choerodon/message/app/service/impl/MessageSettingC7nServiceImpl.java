@@ -65,7 +65,9 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private static final String STREAM_CHANGE_NOTICE = "STREAM-CHANGE-NOTICE";
     private static final String APP_SERVICE_NOTICE = "APP-SERVICE-NOTICE";
     private static final String CODE_MANAGEMENT_NOTICE = "CODE-MANAGEMENT-NOTICE";
-
+    private static final String ORG_MESSAGE_TYPE = "healthStateChange";
+    private static final String PROJECT_HEALTHSTAT_ECHANGE = "PROJECT_HEALTHSTAT_ECHANGE";
+    private static final String PRODUCT_HEALTHSTAT_ECHANGE = "PRODUCT_HEALTHSTAT_ECHANGE";
 
     private ModelMapper modelMapper = new ModelMapper();
 
@@ -116,14 +118,14 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         List<ProjectMessageVO> result = new ArrayList<>();
         //默认配置
         List<CustomMessageSettingVO> defaultSettingList =
-                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, code);
+                messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), code);
         if (defaultSettingList.isEmpty()) {
             return result;
         }
         CustomMessageSettingVO defaultSetting = defaultSettingList.get(0);
         //项目层自定义配置
         List<CustomMessageSettingVO> customSettingList =
-                messageSettingC7nMapper.listMessageSettingByProjectId(null, notifyType, code);
+                messageSettingC7nMapper.listMessageSettingByProjectId(null, ResourceLevel.PROJECT.value(), notifyType, code);
         buildFromMessageSetting(result, defaultSetting, customSettingList);
         addProjectFromWebHookConfig(result, code);
         return result;
@@ -259,13 +261,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     public MessageSettingWarpVO listMessageSettingByType(Long projectId, String notifyType, String eventName) {
         MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
         //查询平台层的发送设置
-        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType);
+        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value());
         if (CollectionUtils.isEmpty(defaultMessageSettings)) {
             return messageSettingWarpVO;
         }
 
         //查询通知对象
-        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), null);
         assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
 
         // 计算平台层是否启用发送短信，站内信，邮件
@@ -365,7 +367,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if (messageSettingVOS.stream().anyMatch(settingVO -> !notifyType.equals(settingVO.getNotifyType()))) {
             throw new CommonException(ERROR_PARAM_INVALID);
         }
-        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, null);
+        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.PROJECT.value(), null);
         Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
         // 将非指定用户添加到userList
         calculateNotifyUsersByType(messageSettingVOS);
@@ -374,6 +376,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         // 默认配置的修改
         defaultMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setSourceId(settingVO.getProjectId());
             settingDTO.setId(null);
             saveMessageSetting(settingDTO);
             List<TargetUserVO> userList = settingVO.getUserList();
@@ -387,6 +390,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         // 自定配置修改
         customMessagesSettings.forEach(settingVO -> {
             MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setSourceId(settingVO.getProjectId());
             updateMessageSetting(settingDTO);
             // devops消息不更新通知对象
             // 删除旧数据
@@ -420,12 +424,12 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             if (envId == null || ObjectUtils.isEmpty(eventName)) {
                 throw new CommonException(ERROR_PARAM_INVALID);
             }
-            messageSettingVO = messageSettingC7nMapper.getResourceDeleteSettingByOption(notifyType, projectId, code, envId, eventName);
+            messageSettingVO = messageSettingC7nMapper.getResourceDeleteSettingByOption(notifyType, projectId, ResourceLevel.PROJECT.value(), code, envId, eventName);
             if (messageSettingVO == null) {
                 messageSettingVO = messageSettingC7nMapper.getDefaultResourceDeleteSetting(notifyType, code, eventName);
             }
         } else {
-            messageSettingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, projectId, code);
+            messageSettingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, projectId, ResourceLevel.PROJECT.value(), code);
             if (messageSettingVO == null) {
                 messageSettingVO = messageSettingC7nMapper.getDefaultSettingByCode(notifyType, code);
             }
@@ -461,7 +465,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             messageSettingDTO.setSmsEnable(false);
         }
         messageSettingDTO.setCode(code);
-        messageSettingDTO.setProjectId(TenantDTO.DEFAULT_TENANT_ID);
+        messageSettingDTO.setSourceId(TenantDTO.DEFAULT_TENANT_ID);
+        // TODO: 2022/8/2   sourceLevel
         messageSettingC7nMapper.updateOptional(messageSettingDTO);
     }
 
@@ -499,7 +504,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         if ("ding_talk".equals(openAppVO.getType())) {
             TenantDTO tenantDTO = iamClientOperator.queryTenantById(openAppVO.getTenantId());
             DingTalkServer dingTalkServer = dingTalkServerService.getConfigWithDb(openAppVO.getTenantId(), DING_TALK_SERVER_CODE);
-            if (dingTalkServer==null){
+            if (dingTalkServer == null) {
                 insertOpenAppConfig(openAppVO);
             }
             dingTalkServer.setAppKey(openAppVO.getAppId());
@@ -532,6 +537,142 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         }
     }
 
+    @Override
+    public MessageSettingWarpVO queryOrgMessageSettings(Long organizationId, String notifyType) {
+        MessageSettingWarpVO messageSettingWarpVO = new MessageSettingWarpVO();
+        //查询平台层的发送设置
+        List<CustomMessageSettingVO> defaultMessageSettings = messageSettingC7nMapper.listDefaultSettingByNotifyType(notifyType, ResourceLevel.ORGANIZATION.value());
+        if (CollectionUtils.isEmpty(defaultMessageSettings)) {
+            return messageSettingWarpVO;
+        }
+        //查询通知对象
+        List<CustomMessageSettingVO> defaultMessageSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.ORGANIZATION.value(), null);
+        assemblingSendSetting(defaultMessageSettingList, defaultMessageSettings);
+
+        // 计算平台层是否启用发送短信，站内信，邮件
+        calculateStieSendSetting(defaultMessageSettingList);
+        List<NotifyEventGroupVO> notifyEventGroupList = listEventGroupList(organizationId, notifyType);
+
+        List<CustomMessageSettingVO> customMessageSettingList = handleHealthStateSettings(defaultMessageSettingList, organizationId, notifyType);
+
+        customMessageSettingList.stream().map(customMessageSettingVO -> {
+            String lovCode = customMessageSettingVO.getSubcategoryCode();
+            customMessageSettingVO.setGroupId(lovCode);
+            //这里角色前端说不好接口请求拼接，所以后端返回
+            if (StringUtils.equalsIgnoreCase(customMessageSettingVO.getCode(), PROJECT_HEALTHSTAT_ECHANGE)) {
+                //可选项为你组织层角色，项目层角色
+                List<Role> roles = iamClientOperator.queryRoleCodeByTenantId(organizationId);
+                customMessageSettingVO.setSendTargetRole(roles);
+            }
+            if (StringUtils.equalsIgnoreCase(customMessageSettingVO.getCode(), PRODUCT_HEALTHSTAT_ECHANGE)) {
+
+                //产品负责人
+                Role role = new Role();
+                role.setCode("product-owner");
+                role.setName("产品负责人");
+                //组织层角色
+                List<Role> roleList = iamClientOperator.queryTenantRoleCodeByTenantId(organizationId, "organization");
+                List<Role> reRoleList = new ArrayList<>();
+                reRoleList.add(role);
+                if (!CollectionUtils.isEmpty(roleList)) {
+                    reRoleList.addAll(roleList);
+                }
+                customMessageSettingVO.setSendTargetRole(reRoleList);
+            }
+            return customMessageSettingVO;
+        }).collect(Collectors.toList());
+
+        // 计算通知对象
+        calculateSendRole(customMessageSettingList);
+        // 添加用户信息
+        addUserInfo(customMessageSettingList);
+        // 计算通知事件的名称
+        calculateEventName(customMessageSettingList);
+        //排序
+        List<CustomMessageSettingVO> reCustomMessageSettingVOS = customMessageSettingList.stream().sorted(Comparator.comparing(CustomMessageSettingVO::getId)).collect(Collectors.toList());
+        // 装配VO
+        messageSettingWarpVO.setCustomMessageSettingList(sortEvent(notifyType, reCustomMessageSettingVOS));
+        messageSettingWarpVO.setNotifyEventGroupList(notifyEventGroupList);
+        return messageSettingWarpVO;
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchOrgUpdateByType(Long organizationId, String notifyType, List<CustomMessageSettingVO> messageSettingVOS) {
+        if (messageSettingVOS.stream().anyMatch(settingVO -> !notifyType.equals(settingVO.getNotifyType()))) {
+            throw new CommonException(ERROR_PARAM_INVALID);
+        }
+        List<CustomMessageSettingVO> defaultSettingList = messageSettingC7nMapper.listDefaultAndEnabledSettingByNotifyType(notifyType, ResourceLevel.ORGANIZATION.value(), null);
+        Set<Long> defaultSettingIds = defaultSettingList.stream().map(CustomMessageSettingVO::getId).collect(Collectors.toSet());
+        // 将非指定用户添加到userList
+        calculateNotifyUsersByType(messageSettingVOS);
+        List<CustomMessageSettingVO> defaultMessagesSettings = messageSettingVOS.stream().filter(settingVO -> defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
+        List<CustomMessageSettingVO> customMessagesSettings = messageSettingVOS.stream().filter(settingVO -> !defaultSettingIds.contains(settingVO.getId())).collect(Collectors.toList());
+        // 默认配置的修改
+        defaultMessagesSettings.forEach(settingVO -> {
+            MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            settingDTO.setId(null);
+            saveMessageSetting(settingDTO);
+            List<TargetUserVO> userList = settingVO.getUserList();
+            if (!CollectionUtils.isEmpty(userList)) {
+                settingVO.getUserList().forEach(user -> {
+                    user.setMessageSettingId(settingDTO.getId());
+                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+                });
+            }
+        });
+        // 自定配置修改
+        customMessagesSettings.forEach(settingVO -> {
+            MessageSettingDTO settingDTO = modelMapper.map(settingVO, MessageSettingDTO.class);
+            updateMessageSetting(settingDTO);
+            // 删除旧数据
+            if (!CollectionUtils.isEmpty(messageSettingTargetUserService.getBySettingId(settingVO.getId()))) {
+                messageSettingTargetUserService.deleteBySettingId(settingVO.getId());
+            }
+            // 添加新数据
+            List<TargetUserVO> userList = settingVO.getUserList();
+            if (!CollectionUtils.isEmpty(userList)) {
+                userList.forEach(user -> {
+                    user.setMessageSettingId(settingDTO.getId());
+                    messageSettingTargetUserService.save(modelMapper.map(user, TargetUserDTO.class));
+                });
+
+            }
+        });
+    }
+
+    @Override
+    public MessageSettingVO getSettingByCode(Long sourceId, String notifyType, String code) {
+        if (StringUtils.equalsIgnoreCase(notifyType, ORG_MESSAGE_TYPE)) {
+            MessageSettingVO settingVO = messageSettingC7nMapper.getSettingByTypeAndCode(notifyType, sourceId, ResourceLevel.ORGANIZATION.value(), code);
+            if (settingVO == null) {
+                return messageSettingC7nMapper.getDefaultProjectHealthSetting(notifyType, code);
+            } else {
+                return settingVO;
+            }
+        }
+        return new MessageSettingVO();
+    }
+
+    private List<CustomMessageSettingVO> handleHealthStateSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long sourceId, String notifyType) {
+        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(sourceId, ResourceLevel.ORGANIZATION.value(), notifyType, null);
+        Map<String, CustomMessageSettingVO> customMessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getCode, v -> v));
+        defaultMessageSettingList.forEach(defaultMessageSetting -> {
+            CustomMessageSettingVO customMessageSettingVO = customMessageSettingVOMap.get(defaultMessageSetting.getCode());
+            if (customMessageSettingVO == null) {
+                defaultMessageSetting.setSourceId(sourceId);
+                customMessageSettingList.add(defaultMessageSetting);
+            } else {
+                customMessageSettingVO.setSmsEnabledFlag(defaultMessageSetting.getSmsEnabledFlag());
+                customMessageSettingVO.setEmailEnabledFlag(defaultMessageSetting.getEmailEnabledFlag());
+                customMessageSettingVO.setDtEnabledFlag(defaultMessageSetting.getDtEnabledFlag());
+                customMessageSettingVO.setPmEnabledFlag(defaultMessageSetting.getPmEnabledFlag());
+            }
+        });
+        return customMessageSettingList;
+    }
+
     private void handUserMember(UserMemberEventPayload userMemberEventPayload) {
         //如果用户在这个项目下没有任何角色，那么删除他在通知里面的对象
         if (!userMemberEventPayload.getResourceType().equals(ResourceLevel.PROJECT.value())) {
@@ -545,7 +686,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
         }
         //清理项目层通知对象
         MessageSettingDTO messageSettingDTO = new MessageSettingDTO();
-        messageSettingDTO.setProjectId(userMemberEventPayload.getResourceId());
+        // TODO: 2022/8/2 sourceLevel
+        messageSettingDTO.setSourceId(userMemberEventPayload.getResourceId());
         List<MessageSettingDTO> messageSettingDTOS = messageSettingC7nMapper.select(messageSettingDTO);
         if (CollectionUtils.isEmpty(messageSettingDTOS)) {
             return;
@@ -692,7 +834,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     private List<CustomMessageSettingVO> handleResorceDeleteSettings(List<NotifyEventGroupVO> notifyEventGroupList, List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
         List<CustomMessageSettingVO> resorceDeleteSettingList = new ArrayList<>();
         notifyEventGroupList.stream().map(NotifyEventGroupVO::getId).forEach(envId -> {
-            List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId, envId, notifyType);
+            List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectIdAndEnvId(projectId, ResourceLevel.PROJECT.value(), envId, notifyType);
             customMessageSettingList.stream().map(customMessageSettingVO -> {
                 String lovCode = customMessageSettingVO.getSubcategoryCode();
                 customMessageSettingVO.setGroupId(lovCode);
@@ -721,7 +863,7 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
     }
 
     private List<CustomMessageSettingVO> handleDevopsOrAgileSettings(List<CustomMessageSettingVO> defaultMessageSettingList, Long projectId, String notifyType) {
-        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, notifyType, null);
+        List<CustomMessageSettingVO> customMessageSettingList = messageSettingC7nMapper.listMessageSettingByProjectId(projectId, ResourceLevel.PROJECT.value(), notifyType, null);
         Map<String, CustomMessageSettingVO> customMessageSettingVOMap = customMessageSettingList.stream().collect(Collectors.toMap(CustomMessageSettingVO::getCode, v -> v));
         defaultMessageSettingList.forEach(defaultMessageSetting -> {
             CustomMessageSettingVO customMessageSettingVO = customMessageSettingVOMap.get(defaultMessageSetting.getCode());
@@ -740,7 +882,8 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
 
     private List<NotifyEventGroupVO> listEventGroupList(Long projectId, String notifyType) {
         if (ServiceNotifyType.AGILE_NOTIFY.getTypeName().equals(notifyType)
-                || ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)) {
+                || ServiceNotifyType.DEVOPS_NOTIFY.getTypeName().equals(notifyType)
+                || "healthStateChange".equals(notifyType)) {
             List<NotifyEventGroupVO> notifyEventGroupVOS = new ArrayList<>();
             List<String> stringList = messageSettingC7nMapper.listCategoryCode(notifyType);
             if (CollectionUtils.isEmpty(stringList)) {
