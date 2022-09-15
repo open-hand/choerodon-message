@@ -324,13 +324,13 @@ public class MessageSettingC7nServiceImpl implements MessageSettingC7nService {
             if (SendingTypeEnum.EMAIL.getValue().equals(customMessageSettingVO.getSendingType()) && customMessageSettingVO.getEnabledFlag()) {
                 customMessageSettingVO.setEmailEnabledFlag(Boolean.TRUE);
             }
-            if (SendingTypeEnum.SMS.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+            if (SendingTypeEnum.SMS.getValue().equals(customMessageSettingVO.getSendingType()) && customMessageSettingVO.getEnabledFlag()) {
                 customMessageSettingVO.setSmsEnabledFlag(Boolean.TRUE);
             }
-            if (SendingTypeEnum.WEB.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+            if (SendingTypeEnum.WEB.getValue().equals(customMessageSettingVO.getSendingType()) && customMessageSettingVO.getEnabledFlag()) {
                 customMessageSettingVO.setPmEnabledFlag(Boolean.TRUE);
             }
-            if (SendingTypeEnum.DT.getValue().equals(customMessageSettingVO.getNotifyType()) && customMessageSettingVO.getEnabledFlag()) {
+            if (SendingTypeEnum.DT.getValue().equals(customMessageSettingVO.getSendingType()) && customMessageSettingVO.getEnabledFlag()) {
                 customMessageSettingVO.setDtEnabledFlag(Boolean.TRUE);
             }
         });
