@@ -57,12 +57,20 @@ public class ConfigC7nServiceImpl implements ConfigC7nService {
         List<EmailProperty> emailProperties = emailServer.getEmailProperties();
         List<EmailProperty> tempProperties = new ArrayList<>(emailProperties);
         if (emailConfigVO.getSsl()) {
+            // 开启了ssl并且没有Properties信息 init Properties
             if (!isSsl(emailProperties)) {
                 List<EmailProperty> sslProperties = initEmailProperties(emailServer.getServerId(), emailConfigVO.getPort().toString());
                 emailProperties.addAll(sslProperties);
+            } else {
+                emailProperties.forEach(t -> {
+                    if (t.getPropertyCode().equals(SSL_PROPERTY_PORT)) {
+                        t.setPropertyValue(emailConfigVO.getPort().toString());
+                    }
+                });
             }
             emailServer.setEmailProperties(emailProperties);
         } else {
+            // 没有开启ssl 清空之前Properties 信息
             if (isSsl(emailProperties)) {
                 if (!CollectionUtils.isEmpty(tempProperties)) {
                     for (EmailProperty property : tempProperties) {
