@@ -146,7 +146,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
     private void filterReceiver(MessageSender messageSender, String messageType) {
-        logger.info(">>>>>>>>>>>filterReceiver messageSender start :{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
+//        logger.info(">>>>>>>>>>>filterReceiver messageSender start :{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         Long tempServerId = templateServer.getTempServerId();
         Long projectId = null;
