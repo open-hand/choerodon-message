@@ -96,6 +96,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
 
     public List<Message> relSendMessageReceipt(MessageSender messageSender) {
+        logger.info(">>>>>>>>>>>relSendMessageReceipt messageSender:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         if (templateServer == null) {
             throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
@@ -200,7 +201,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
                 }
             }
         }
-
+        logger.info(">>>>>>>>>>>filterReceiver messageSender:{}>>>>>>>>>>>>>>>>>>>>", JsonHelper.marshalByJackson(messageSender));
     }
 
     private boolean orgFilter(MessageSender messageSender, Long organizationId, String messageType) {
