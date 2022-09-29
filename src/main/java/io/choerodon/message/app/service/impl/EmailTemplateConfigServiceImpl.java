@@ -32,6 +32,9 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         String configJson = stringRedisTemplate.opsForValue().get(cacheKey);
         if (ObjectUtils.isEmpty(configJson)) {
             EmailTemplateConfigDTO configDTO = emailTemplateConfigMapper.selectByTenantId(tenantId);
+            if (configDTO == null) {
+                configDTO = new EmailTemplateConfigDTO();
+            }
             stringRedisTemplate.opsForValue().set(cacheKey, JsonHelper.marshalByJackson(configDTO), 1, TimeUnit.HOURS);
             return configDTO;
         } else {
@@ -41,7 +44,7 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
 
     @Override
     public void createOrUpdateConfig(EmailTemplateConfigDTO emailTemplateConfigDTO) {
-        EmailTemplateConfigDTO configDTO = queryConfigByTenantId(emailTemplateConfigDTO.getTenantId());
+        EmailTemplateConfigDTO configDTO = emailTemplateConfigMapper.selectByTenantId(emailTemplateConfigDTO.getTenantId());
         if (configDTO == null) {
             emailTemplateConfigMapper.insertSelective(emailTemplateConfigDTO);
         } else {
@@ -49,8 +52,8 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
             configDTO.setLogo(emailTemplateConfigDTO.getLogo());
             configDTO.setSlogan(emailTemplateConfigDTO.getSlogan());
             emailTemplateConfigMapper.updateByPrimaryKey(configDTO);
-            String cacheKey = String.format(EMAIL_CONFIG_CACHE_KEY_FORMAT, configDTO.getTenantId());
-            stringRedisTemplate.delete(cacheKey);
         }
+        String cacheKey = String.format(EMAIL_CONFIG_CACHE_KEY_FORMAT, emailTemplateConfigDTO.getTenantId());
+        stringRedisTemplate.delete(cacheKey);
     }
 }

@@ -1,5 +1,7 @@
 package io.choerodon.message.api.controller.v1;
 
+import javax.validation.Valid;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hzero.core.util.Results;
@@ -32,7 +34,7 @@ public class EmailTemplateConfigController {
     @PostMapping("/{tenant_id}/create_or_update")
     @ApiOperation(value = "创建或者更新邮件模板配置")
     public ResponseEntity<Void> createOrUpdate(@PathVariable("tenant_id") Long tenantId,
-                                               @RequestBody EmailTemplateConfigDTO emailTemplateConfigDTO) {
+                                               @RequestBody @Valid EmailTemplateConfigDTO emailTemplateConfigDTO) {
         emailTemplateConfigDTO.setTenantId(tenantId);
         emailTemplateConfigService.createOrUpdateConfig(emailTemplateConfigDTO);
         return Results.success();

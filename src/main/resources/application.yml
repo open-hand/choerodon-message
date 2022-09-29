@@ -98,6 +98,9 @@ mapper:
   not-empty: true
 
 choerodon:
+  fix:
+    data:
+      flag: true
   saga:
     service: choerodon-asgard
     consumer:
