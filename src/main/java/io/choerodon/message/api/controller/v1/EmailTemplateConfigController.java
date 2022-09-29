@@ -13,6 +13,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.app.service.EmailTemplateConfigService;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
 import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.swagger.annotation.Permission;
 
 /**
@@ -29,6 +30,22 @@ public class EmailTemplateConfigController {
 
     @Autowired
     private EmailTemplateConfigService emailTemplateConfigService;
+
+    @Permission(level = ResourceLevel.SITE)
+    @PostMapping("/site/create_or_update")
+    @ApiOperation(value = "平台层-创建或者更新邮件模板配置")
+    public ResponseEntity<Void> siteCreateOrUpdate(@RequestBody @Valid EmailTemplateConfigDTO emailTemplateConfigDTO) {
+        emailTemplateConfigDTO.setTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        emailTemplateConfigService.createOrUpdateConfig(emailTemplateConfigDTO);
+        return Results.success();
+    }
+
+    @Permission(level = ResourceLevel.SITE)
+    @GetMapping("/site/query_config")
+    @ApiOperation(value = "平台层-查询邮件模板配置")
+    public ResponseEntity<EmailTemplateConfigDTO> siteQueryConfigByTenantId() {
+        return Results.success(emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID));
+    }
 
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{tenant_id}/create_or_update")
