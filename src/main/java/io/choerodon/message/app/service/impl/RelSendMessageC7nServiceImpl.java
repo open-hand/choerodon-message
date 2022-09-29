@@ -43,7 +43,9 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
+import io.choerodon.message.app.service.EmailTemplateConfigService;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
+import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
 import io.choerodon.message.infra.dto.iam.ProjectDTO;
@@ -93,14 +95,26 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private DingTalkSendService dingTalkSendService;
     @Autowired
     private IamFeignClient iamFeignClient;
+    @Autowired
+    private EmailTemplateConfigService emailTemplateConfigService;
 
 
-    public List<Message> relSendMessageReceipt(MessageSender messageSender) {
+    @Override
+    public List<Message> relSendMessageReceipt(MessageSender messageSender, Long organizationId) {
         TemplateServer templateServer = templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
         if (templateServer == null) {
             throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
         }
         Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
+        // c7n自定义逻辑添加页脚页眉
+        EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
+        if (configDTO == null || configDTO.getId() == null) {
+            configDTO = emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        }
+        Map<String, Object> map = messageSender.getObjectArgs();
+        map.put("choerodonLogo", configDTO.getLogo());
+        map.put("choerodonSlogan", configDTO.getSlogan());
+        map.put("choerodonFooter", configDTO.getFooter());
         return super.relSendMessageReceipt(messageSender, tenantId);
     }
 
