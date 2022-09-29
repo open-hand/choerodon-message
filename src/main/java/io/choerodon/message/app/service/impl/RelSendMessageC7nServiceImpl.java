@@ -106,15 +106,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
         }
         Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
-        // c7n自定义逻辑添加页脚页眉
-        EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
-        if (configDTO == null || configDTO.getId() == null) {
-            configDTO = emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID);
-        }
-        Map<String, Object> map = messageSender.getObjectArgs();
-        map.put("choerodonLogo", configDTO.getLogo());
-        map.put("choerodonSlogan", configDTO.getSlogan());
-        map.put("choerodonFooter", configDTO.getFooter());
+        setEmailConfigArgs(messageSender, tenantId);
         return super.relSendMessageReceipt(messageSender, tenantId);
     }
 
@@ -421,6 +413,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (messageSender.getReceiverAddressList() == null) {
             messageSender.setReceiverAddressList(Collections.emptyList());
         }
+        // 设置邮件模板参数
+        Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
+        setEmailConfigArgs(messageSender, tenantId);
 
         messageSender = this.messageReceiverService.queryReceiver(messageSender);
         TemplateServer templateServer = this.templateServerService.getTemplateServer(messageSender.getTenantId(), messageSender.getMessageCode());
@@ -549,4 +544,17 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
         return result.get();
     }
+
+    private void setEmailConfigArgs(MessageSender messageSender, Long tenantId) {
+        // c7n自定义逻辑添加页脚页眉
+        EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
+        if (configDTO == null || configDTO.getId() == null) {
+            configDTO = emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        }
+        Map<String, Object> map = messageSender.getObjectArgs();
+        map.put("choerodonLogo", configDTO.getLogo());
+        map.put("choerodonSlogan", configDTO.getSlogan());
+        map.put("choerodonFooter", configDTO.getFooter());
+    }
+
 }
