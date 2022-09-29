@@ -10,9 +10,9 @@ mvn org.apache.maven.plugins:maven-dependency-plugin:get \
  -Dmaven.wagon.http.ssl.allowall=true \
  -Dtransitive=false
 
-java -Dspring.datasource.url="jdbc:mysql://172.22.5.56:3306?serverTimezone=CTT&useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true" \
- -Dspring.datasource.username=choerodon \
- -Dspring.datasource.password=Eq74HpIYMgJ6GW56 \
+java -Dspring.datasource.url="jdbc:mysql://localhost:3306?serverTimezone=CTT&useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true" \
+ -Dspring.datasource.username=root \
+ -Dspring.datasource.password=root \
  -Ddata.init=false \
  -Dinstaller.jarPath=target/app.jar \
  -jar ${TOOL_JAR_PATH}
