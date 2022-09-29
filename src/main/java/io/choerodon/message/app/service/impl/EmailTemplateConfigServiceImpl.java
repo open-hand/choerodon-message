@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import io.choerodon.message.app.service.EmailTemplateConfigService;
 import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.mapper.EmailTemplateConfigMapper;
 import io.choerodon.message.infra.utils.JsonHelper;
 
@@ -33,7 +34,11 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         if (ObjectUtils.isEmpty(configJson)) {
             EmailTemplateConfigDTO configDTO = emailTemplateConfigMapper.selectByTenantId(tenantId);
             if (configDTO == null) {
+                EmailTemplateConfigDTO defaultConfigDTO = emailTemplateConfigMapper.selectByTenantId(TenantDTO.DEFAULT_TENANT_ID);
                 configDTO = new EmailTemplateConfigDTO();
+                configDTO.setSlogan(defaultConfigDTO.getSlogan());
+                configDTO.setLogo(defaultConfigDTO.getLogo());
+                configDTO.setFooter(defaultConfigDTO.getFooter());
             }
             stringRedisTemplate.opsForValue().set(cacheKey, JsonHelper.marshalByJackson(configDTO), 1, TimeUnit.HOURS);
             return configDTO;
