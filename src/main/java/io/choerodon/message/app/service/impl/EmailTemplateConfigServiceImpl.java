@@ -1,13 +1,21 @@
 package io.choerodon.message.app.service.impl;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.hzero.boot.message.util.VelocityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.EmailTemplateConfigService;
 import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
@@ -33,7 +41,7 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         String configJson = stringRedisTemplate.opsForValue().get(cacheKey);
         if (ObjectUtils.isEmpty(configJson)) {
             EmailTemplateConfigDTO configDTO = emailTemplateConfigMapper.selectByTenantId(tenantId);
-            if (configDTO == null) {
+            if (configDTO == null || !configDTO.getCustom()) {
                 EmailTemplateConfigDTO defaultConfigDTO = emailTemplateConfigMapper.selectByTenantId(TenantDTO.DEFAULT_TENANT_ID);
                 configDTO = new EmailTemplateConfigDTO();
                 configDTO.setSlogan(defaultConfigDTO.getSlogan());
@@ -53,6 +61,7 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         if (configDTO == null) {
             emailTemplateConfigMapper.insertSelective(emailTemplateConfigDTO);
         } else {
+            configDTO.setCustom(emailTemplateConfigDTO.getCustom());
             configDTO.setFooter(emailTemplateConfigDTO.getFooter());
             configDTO.setLogo(emailTemplateConfigDTO.getLogo());
             configDTO.setSlogan(emailTemplateConfigDTO.getSlogan());
@@ -60,5 +69,20 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         }
         String cacheKey = String.format(EMAIL_CONFIG_CACHE_KEY_FORMAT, emailTemplateConfigDTO.getTenantId());
         stringRedisTemplate.delete(cacheKey);
+    }
+
+    @Override
+    public String previewTemplate(EmailTemplateConfigDTO emailTemplateConfigDTO) {
+        ClassPathResource cpr = new ClassPathResource("/template/template.html");
+        try {
+            String str = IOUtils.toString(cpr.getInputStream(), StandardCharsets.UTF_8);
+            Map<String, Object> map = new HashMap<>();
+            map.put("choerodonLogo", emailTemplateConfigDTO.getLogo());
+            map.put("choerodonSlogan", emailTemplateConfigDTO.getSlogan());
+            map.put("choerodonFooter", emailTemplateConfigDTO.getFooter());
+            return VelocityUtils.parseObject(str, map);
+        } catch (IOException e) {
+            throw new CommonException("IOException", e);
+        }
     }
 }

@@ -60,7 +60,21 @@ public class EmailTemplateConfigController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/{tenant_id}")
     @ApiOperation(value = "查询邮件模板配置")
-    public ResponseEntity<EmailTemplateConfigDTO> queryConfigByTenantId(@PathVariable("tenant_id") Long tenantId) {
-        return Results.success(emailTemplateConfigService.queryConfigByTenantId(tenantId));
+    public ResponseEntity<EmailTemplateConfigDTO> queryConfigByTenantId(@PathVariable("tenant_id") Long tenantId,
+                                                                        @RequestParam(value = "default_config", defaultValue = "false") Boolean defaultConfig) {
+        EmailTemplateConfigDTO emailTemplateConfigDTO;
+        if (defaultConfig) {
+            emailTemplateConfigDTO = emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        } else {
+            emailTemplateConfigDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
+        }
+        return Results.success(emailTemplateConfigDTO);
+    }
+
+    @Permission(permissionLogin = true)
+    @GetMapping("/preview")
+    @ApiOperation(value = "预览邮件模板")
+    public ResponseEntity<String> previewTemplate(@RequestBody EmailTemplateConfigDTO emailTemplateConfigDTO) {
+        return Results.success(emailTemplateConfigService.previewTemplate(emailTemplateConfigDTO));
     }
 }

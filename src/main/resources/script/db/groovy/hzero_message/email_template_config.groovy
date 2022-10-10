@@ -20,4 +20,9 @@ databaseChangeLog(logicalFilePath: 'script/db/email_template_config.groovy') {
         }
         addUniqueConstraint(tableName: 'EMAIL_TEMPLATE_CONFIG', columnNames: 'TENANT_ID', constraintName: 'UK_EMAIL_TEMPLATE_CONFIG_U1')
     }
+    changeSet(author: 'changping.shi@zknow.com', id: '2022-10-10-email_template_config-add-column') {
+        addColumn(tableName: 'email_template_config') {
+            column(name: 'custom', type: "TINYINT UNSIGNED", defaultValue: "0", remarks: '1自定义 0平台默认')
+        }
+    }
 }
