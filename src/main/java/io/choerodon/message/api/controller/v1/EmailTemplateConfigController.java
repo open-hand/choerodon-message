@@ -72,9 +72,10 @@ public class EmailTemplateConfigController {
     }
 
     @Permission(permissionLogin = true)
-    @GetMapping("/preview")
+    @PostMapping("/{tenant_id}/preview")
     @ApiOperation(value = "预览邮件模板")
-    public ResponseEntity<String> previewTemplate(@RequestBody EmailTemplateConfigDTO emailTemplateConfigDTO) {
+    public ResponseEntity<String> previewTemplate(@PathVariable("tenant_id") Long tenantId,
+                                                  @RequestBody EmailTemplateConfigDTO emailTemplateConfigDTO) {
         return Results.success(emailTemplateConfigService.previewTemplate(emailTemplateConfigDTO));
     }
 }
