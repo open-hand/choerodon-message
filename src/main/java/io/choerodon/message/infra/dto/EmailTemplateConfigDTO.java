@@ -6,6 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import io.choerodon.mybatis.annotation.ModifyAudit;
@@ -26,6 +27,8 @@ public class EmailTemplateConfigDTO extends AuditDomain {
     private String footer;
 
     private Long tenantId;
+    @ApiModelProperty("是否自定义模板")
+    private Boolean custom;
 
     public Long getId() {
         return id;
@@ -65,5 +68,13 @@ public class EmailTemplateConfigDTO extends AuditDomain {
 
     public void setTenantId(Long tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public Boolean getCustom() {
+        return custom;
+    }
+
+    public void setCustom(Boolean custom) {
+        this.custom = custom;
     }
 }

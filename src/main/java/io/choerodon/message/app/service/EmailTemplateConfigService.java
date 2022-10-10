@@ -22,4 +22,11 @@ public interface EmailTemplateConfigService {
      */
     void createOrUpdateConfig(EmailTemplateConfigDTO emailTemplateConfigDTO);
 
+    /**
+     * 邮件模板配置效果预览
+     * @param emailTemplateConfigDTO
+     * @return
+     */
+    String previewTemplate(EmailTemplateConfigDTO emailTemplateConfigDTO);
+
 }

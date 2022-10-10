@@ -135,4 +135,24 @@
         </dependency>
     </dependencies>
 
+<!--    <build>-->
+<!--        <finalName>app</finalName>-->
+<!--        &lt;!&ndash;        设置资源编译插件, 避免编译导致一些文件损坏不可用, 比如code-i.tgz这个文件&ndash;&gt;-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <nonFilteredFileExtensions>-->
+<!--                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>xml</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>yml</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>json</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>-->
+<!--                    </nonFilteredFileExtensions>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 </project>
