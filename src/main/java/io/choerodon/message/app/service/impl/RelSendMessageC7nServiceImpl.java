@@ -548,13 +548,18 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     private void setEmailConfigArgs(MessageSender messageSender, Long tenantId) {
         // c7n自定义逻辑添加页脚页眉
         EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
-        if (configDTO == null) {
-            return;
+        if (!CollectionUtils.isEmpty(messageSender.getObjectArgs())) {
+            Map<String, Object> map = messageSender.getObjectArgs();
+            map.put("choerodonLogo", configDTO.getLogo());
+            map.put("choerodonSlogan", configDTO.getSlogan());
+            map.put("choerodonFooter", configDTO.getFooter());
         }
-        Map<String, Object> map = messageSender.getObjectArgs();
-        map.put("choerodonLogo", configDTO.getLogo());
-        map.put("choerodonSlogan", configDTO.getSlogan());
-        map.put("choerodonFooter", configDTO.getFooter());
+        if (!CollectionUtils.isEmpty(messageSender.getArgs())) {
+            Map<String, String> map = messageSender.getArgs();
+            map.put("choerodonLogo", configDTO.getLogo());
+            map.put("choerodonSlogan", configDTO.getSlogan());
+            map.put("choerodonFooter", configDTO.getFooter());
+        }
     }
 
 }
