@@ -73,10 +73,10 @@ public class NotifyWebSocketInterceptor implements SocketInterceptor {
                 return false;
             }
         } catch (RestClientException e) {
-            LOGGER.error("reject webSocket connect, redirect request to {} error. The token is {}.", oauthUrl, accessToken);
+            LOGGER.warn("reject webSocket connect, redirect request to {}. The token is {}.", oauthUrl, accessToken);
             return false;
         } catch (JSONException e) {
-            LOGGER.error("reject webSocket connect, oauth-server response json error. the json is {}", responseJson, e);
+            LOGGER.warn("reject webSocket connect, oauth-server response json. the json is {}", responseJson, e);
             return false;
         }
     }
