@@ -479,7 +479,9 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             Long tenantId = null;
             Optional<Object> projectIdOptional = Optional.ofNullable(sender.getAdditionalInformation())
                     .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
-            if (projectIdOptional.isPresent()) {
+            Optional<Object> tenantOptional = Optional.ofNullable(sender.getAdditionalInformation())
+                    .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
+            if (!tenantOptional.isPresent() && projectIdOptional.isPresent()) {
                 Long projectId = TypeUtils.objToLong(projectIdOptional.get());
                 ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
                 if (!ObjectUtils.isEmpty(projectDTO)) {
@@ -546,11 +548,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
     private void setEmailConfigArgs(MessageSender messageSender, Long tenantId) {
-        // c7n自定义逻辑添加页脚页眉
-        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
-                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
-            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+        // 获取组织id
+        Optional<Object> projectIdOptional = Optional.ofNullable(messageSender.getAdditionalInformation())
+                .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+        if (projectIdOptional.isPresent()) {
+            Long projectId = TypeUtils.objToLong(projectIdOptional.get());
+            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
+            if (!ObjectUtils.isEmpty(projectDTO)) {
+                tenantId = projectDTO.getOrganizationId();
+                messageSender.getAdditionalInformation().put(MessageAdditionalType.PARAM_TENANT_ID.getTypeName(), tenantId);
+            }
+        } else {
+            if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                    !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+                tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+            }
         }
+
         EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
         if (!CollectionUtils.isEmpty(messageSender.getObjectArgs())) {
             Map<String, Object> map = messageSender.getObjectArgs();
