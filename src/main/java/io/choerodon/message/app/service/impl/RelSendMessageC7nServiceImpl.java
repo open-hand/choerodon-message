@@ -547,6 +547,10 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
 
     private void setEmailConfigArgs(MessageSender messageSender, Long tenantId) {
         // c7n自定义逻辑添加页脚页眉
+        if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+            tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+        }
         EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
         if (!CollectionUtils.isEmpty(messageSender.getObjectArgs())) {
             Map<String, Object> map = messageSender.getObjectArgs();
