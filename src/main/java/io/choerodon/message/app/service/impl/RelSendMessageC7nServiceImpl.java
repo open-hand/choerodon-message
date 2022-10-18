@@ -105,7 +105,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         if (templateServer == null) {
             throw new CommonException("message.code.not.exit:" + messageSender.getMessageCode());
         }
-        Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
+        Long tenantId = getTenantId(messageSender);
         setEmailConfigArgs(messageSender, tenantId);
         return super.relSendMessageReceipt(messageSender, tenantId);
     }
@@ -414,7 +414,7 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
             messageSender.setReceiverAddressList(Collections.emptyList());
         }
         // 设置邮件模板参数
-        Long tenantId = messageSender.getTenantId() == null ? TenantDTO.DEFAULT_TENANT_ID : messageSender.getTenantId();
+        Long tenantId = getTenantId(messageSender);
         setEmailConfigArgs(messageSender, tenantId);
 
         messageSender = this.messageReceiverService.queryReceiver(messageSender);
@@ -548,23 +548,6 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
     }
 
     private void setEmailConfigArgs(MessageSender messageSender, Long tenantId) {
-        // 获取组织id
-        Optional<Object> projectIdOptional = Optional.ofNullable(messageSender.getAdditionalInformation())
-                .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
-        if (projectIdOptional.isPresent()) {
-            Long projectId = TypeUtils.objToLong(projectIdOptional.get());
-            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
-            if (!ObjectUtils.isEmpty(projectDTO)) {
-                tenantId = projectDTO.getOrganizationId();
-                messageSender.getAdditionalInformation().put(MessageAdditionalType.PARAM_TENANT_ID.getTypeName(), tenantId);
-            }
-        } else {
-            if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
-                    !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
-                tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
-            }
-        }
-
         EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
         if (!CollectionUtils.isEmpty(messageSender.getObjectArgs())) {
             Map<String, Object> map = messageSender.getObjectArgs();
@@ -580,4 +563,23 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         }
     }
 
+    private Long getTenantId(MessageSender messageSender) {
+        Long tenantId = TenantDTO.DEFAULT_TENANT_ID;
+        Optional<Object> projectIdOptional = Optional.ofNullable(messageSender.getAdditionalInformation())
+                .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
+        if (projectIdOptional.isPresent()) {
+            Long projectId = TypeUtils.objToLong(projectIdOptional.get());
+            ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
+            if (!ObjectUtils.isEmpty(projectDTO)) {
+                tenantId = projectDTO.getOrganizationId();
+                messageSender.getAdditionalInformation().put(MessageAdditionalType.PARAM_TENANT_ID.getTypeName(), tenantId);
+            }
+        } else {
+            if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
+                    !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
+                tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
+            }
+        }
+        return tenantId;
+    }
 }
