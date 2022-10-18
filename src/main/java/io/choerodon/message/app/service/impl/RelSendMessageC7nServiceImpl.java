@@ -567,17 +567,17 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         Long tenantId = TenantDTO.DEFAULT_TENANT_ID;
         Optional<Object> projectIdOptional = Optional.ofNullable(messageSender.getAdditionalInformation())
                 .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_PROJECT_ID.getTypeName()));
-        if (projectIdOptional.isPresent()) {
+        Optional<Object> tenantIdOptional = Optional.ofNullable(messageSender.getAdditionalInformation())
+                .map(additionalInformation -> additionalInformation.get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()));
+        if (tenantIdOptional.isPresent()) {
+            tenantId = TypeUtils.objToLong(tenantIdOptional.get());
+        }
+        if (projectIdOptional.isPresent() && tenantId.equals(TenantDTO.DEFAULT_TENANT_ID)) {
             Long projectId = TypeUtils.objToLong(projectIdOptional.get());
             ProjectDTO projectDTO = iamFeignClient.queryProjectByIdWithoutExtraInfo(projectId, false, false, false).getBody();
             if (!ObjectUtils.isEmpty(projectDTO)) {
                 tenantId = projectDTO.getOrganizationId();
                 messageSender.getAdditionalInformation().put(MessageAdditionalType.PARAM_TENANT_ID.getTypeName(), tenantId);
-            }
-        } else {
-            if (!CollectionUtils.isEmpty(messageSender.getAdditionalInformation()) &&
-                    !ObjectUtils.isEmpty(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName()))) {
-                tenantId = Long.valueOf(String.valueOf(messageSender.getAdditionalInformation().get(MessageAdditionalType.PARAM_TENANT_ID.getTypeName())));
             }
         }
         return tenantId;
