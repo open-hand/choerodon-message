@@ -47,7 +47,7 @@ public class EmailTemplateConfigController {
         return Results.success(emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID));
     }
 
-    @Permission(level = ResourceLevel.ORGANIZATION)
+    @Permission(permissionLogin = true)
     @PostMapping("/{tenant_id}/create_or_update")
     @ApiOperation(value = "创建或者更新邮件模板配置")
     public ResponseEntity<Void> createOrUpdate(@PathVariable("tenant_id") Long tenantId,
