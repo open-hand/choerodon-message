@@ -16,4 +16,16 @@ public class Constants {
 
     public static final String REDIS_KEY_SYSTEM_MESSAGE = "open-app-system-message:%s:%s";
 
+    public static class EmailTemplateConstants {
+        public EmailTemplateConstants() {
+        }
+
+        public static final String EMAIL_TEMPLATE_LOGO = "choerodonLogo";
+
+        public static final String EMAIL_TEMPLATE_SLOGAN = "choerodonSlogan";
+
+        public static final String EMAIL_TEMPLATE_FOOTER = "choerodonFooter";
+
+    }
+
 }

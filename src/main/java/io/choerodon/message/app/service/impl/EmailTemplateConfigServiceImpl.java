@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.hzero.boot.message.util.VelocityUtils;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.message.app.service.EmailTemplateConfigService;
+import io.choerodon.message.infra.constant.Constants;
 import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
 import io.choerodon.message.infra.dto.iam.TenantDTO;
 import io.choerodon.message.infra.mapper.EmailTemplateConfigMapper;
@@ -67,8 +70,10 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
             configDTO.setSlogan(emailTemplateConfigDTO.getSlogan());
             emailTemplateConfigMapper.updateByPrimaryKey(configDTO);
         }
-        String cacheKey = String.format(EMAIL_CONFIG_CACHE_KEY_FORMAT, emailTemplateConfigDTO.getTenantId());
-        stringRedisTemplate.delete(cacheKey);
+        Set<String> keys = stringRedisTemplate.keys(String.format(EMAIL_CONFIG_CACHE_KEY_FORMAT, "*"));
+        if (CollectionUtils.isNotEmpty(keys)) {
+            stringRedisTemplate.delete(keys);
+        }
     }
 
     @Override
@@ -77,9 +82,9 @@ public class EmailTemplateConfigServiceImpl implements EmailTemplateConfigServic
         try {
             String str = IOUtils.toString(cpr.getInputStream(), StandardCharsets.UTF_8);
             Map<String, Object> map = new HashMap<>();
-            map.put("choerodonLogo", emailTemplateConfigDTO.getLogo());
-            map.put("choerodonSlogan", emailTemplateConfigDTO.getSlogan());
-            map.put("choerodonFooter", emailTemplateConfigDTO.getFooter());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_LOGO, emailTemplateConfigDTO.getLogo());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_SLOGAN, emailTemplateConfigDTO.getSlogan());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_FOOTER, emailTemplateConfigDTO.getFooter());
             return VelocityUtils.parseObject(str, map);
         } catch (IOException e) {
             throw new CommonException("IOException", e);

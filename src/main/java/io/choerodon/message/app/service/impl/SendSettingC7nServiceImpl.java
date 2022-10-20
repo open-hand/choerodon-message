@@ -1,26 +1,12 @@
 package io.choerodon.message.app.service.impl;
 
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.message.api.vo.*;
-import io.choerodon.message.app.service.SendSettingC7nService;
-import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
-import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
-import io.choerodon.message.infra.dto.iam.ProjectDTO;
-import io.choerodon.message.infra.dto.iam.TenantDTO;
-import io.choerodon.message.infra.enums.*;
-import io.choerodon.message.infra.feign.operator.IamClientOperator;
-import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
-import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
-import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
-import io.choerodon.message.infra.utils.ConversionUtil;
-import io.choerodon.message.infra.validator.CommonValidator;
-import io.choerodon.mybatis.pagehelper.PageHelper;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.hzero.boot.message.config.MessageClientProperties;
+import org.hzero.boot.message.util.VelocityUtils;
 import org.hzero.boot.platform.lov.dto.LovValueDTO;
 import org.hzero.boot.platform.lov.feign.LovFeignClient;
 import org.hzero.core.base.BaseConstants;
@@ -39,8 +25,27 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.message.api.vo.*;
+import io.choerodon.message.app.service.EmailTemplateConfigService;
+import io.choerodon.message.app.service.SendSettingC7nService;
+import io.choerodon.message.infra.constant.Constants;
+import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
+import io.choerodon.message.infra.dto.NotifyMessageSettingConfigDTO;
+import io.choerodon.message.infra.dto.iam.ProjectCategoryDTO;
+import io.choerodon.message.infra.dto.iam.ProjectDTO;
+import io.choerodon.message.infra.dto.iam.TenantDTO;
+import io.choerodon.message.infra.enums.*;
+import io.choerodon.message.infra.feign.operator.IamClientOperator;
+import io.choerodon.message.infra.mapper.HzeroTemplateServerMapper;
+import io.choerodon.message.infra.mapper.NotifyMessageSettingConfigMapper;
+import io.choerodon.message.infra.mapper.TemplateServerC7nMapper;
+import io.choerodon.message.infra.utils.ConversionUtil;
+import io.choerodon.message.infra.validator.CommonValidator;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author scp
@@ -80,6 +85,8 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     private LovFeignClient lovFeignClient;
     @Autowired
     private IamClientOperator iamClientOperator;
+    @Autowired
+    private EmailTemplateConfigService emailTemplateConfigService;
 
     @Autowired
     private NotifyMessageSettingConfigMapper notifyMessageSettingConfigMapper;
@@ -165,6 +172,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
             lineList.forEach(t -> {
                         MessageTemplateVO template = new MessageTemplateVO();
                         BeanUtils.copyProperties(messageTemplateService.getMessageTemplate(BaseConstants.DEFAULT_TENANT_ID, t.getTemplateCode(), messageClientProperties.getDefaultLang()), template);
+                        template.setTemplateContent(setTemplateContent(template.getTemplateContent()));
                         messageTemplates.add(template);
                         template.setSendingType(t.getTypeCode());
                         setSendTypeEnable(t, sendSettingVO);
@@ -468,7 +476,7 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
     public Map<String, Map<String, String>> getMeanings() {
         List<LovValueDTO> valueDTOList = lovFeignClient.queryLovValue(LOV_MESSAGE_CODE, TenantDTO.DEFAULT_TENANT_ID);
         Map<String, List<LovValueDTO>> lovValues = valueDTOList.stream()
-                .filter(t->!ObjectUtils.isEmpty(t.getParentValue()))
+                .filter(t -> !ObjectUtils.isEmpty(t.getParentValue()))
                 .collect(Collectors.groupingBy(LovValueDTO::getParentValue));
         Map<String, Map<String, String>> map = new HashMap<>();
         for (Map.Entry<String, List<LovValueDTO>> entry : lovValues.entrySet()) {
@@ -539,4 +547,12 @@ public class SendSettingC7nServiceImpl implements SendSettingC7nService {
                 .setSmsEnabledFlag(Optional.ofNullable(sendSettingVO.getSmsEnabledFlag()).map(t -> t.equals(1)).orElse(false));
     }
 
+    private String setTemplateContent(String templateContent) {
+        Map<String, Object> map = new HashMap<>();
+        EmailTemplateConfigDTO emailTemplateConfigDTO = emailTemplateConfigService.queryConfigByTenantId(TenantDTO.DEFAULT_TENANT_ID);
+        map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_LOGO, emailTemplateConfigDTO.getLogo());
+        map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_SLOGAN, emailTemplateConfigDTO.getSlogan());
+        map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_FOOTER, emailTemplateConfigDTO.getFooter());
+        return VelocityUtils.parseObject(templateContent, map);
+    }
 }

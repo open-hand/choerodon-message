@@ -45,6 +45,7 @@ import io.choerodon.core.utils.TypeUtils;
 import io.choerodon.message.api.vo.UserVO;
 import io.choerodon.message.app.service.EmailTemplateConfigService;
 import io.choerodon.message.app.service.RelSendMessageC7nService;
+import io.choerodon.message.infra.constant.Constants;
 import io.choerodon.message.infra.dto.EmailTemplateConfigDTO;
 import io.choerodon.message.infra.dto.MessageSettingDTO;
 import io.choerodon.message.infra.dto.WebhookProjectRelDTO;
@@ -552,15 +553,15 @@ public class RelSendMessageC7nServiceImpl extends RelSendMessageServiceImpl impl
         EmailTemplateConfigDTO configDTO = emailTemplateConfigService.queryConfigByTenantId(tenantId);
         if (!CollectionUtils.isEmpty(messageSender.getObjectArgs())) {
             Map<String, Object> map = messageSender.getObjectArgs();
-            map.put("choerodonLogo", configDTO.getLogo());
-            map.put("choerodonSlogan", configDTO.getSlogan());
-            map.put("choerodonFooter", configDTO.getFooter());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_LOGO, configDTO.getLogo());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_SLOGAN, configDTO.getSlogan());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_FOOTER, configDTO.getFooter());
         }
         if (!CollectionUtils.isEmpty(messageSender.getArgs())) {
             Map<String, String> map = messageSender.getArgs();
-            map.put("choerodonLogo", configDTO.getLogo());
-            map.put("choerodonSlogan", configDTO.getSlogan());
-            map.put("choerodonFooter", configDTO.getFooter());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_LOGO, configDTO.getLogo());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_SLOGAN, configDTO.getSlogan());
+            map.put(Constants.EmailTemplateConstants.EMAIL_TEMPLATE_FOOTER, configDTO.getFooter());
         }
     }
 
