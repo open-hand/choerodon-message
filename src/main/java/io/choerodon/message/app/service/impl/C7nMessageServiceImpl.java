@@ -1,8 +1,11 @@
 package io.choerodon.message.app.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.hzero.message.api.dto.SimpleMessageDTO;
+import org.hzero.message.api.dto.UserMessageDTO;
 import org.hzero.message.app.service.UserMessageService;
 import org.hzero.message.domain.entity.Message;
 import org.hzero.message.domain.entity.UserMessage;
@@ -14,9 +17,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.message.app.service.C7nMessageService;
+import io.choerodon.message.infra.mapper.MessageC7nMapper;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author zmf
@@ -24,6 +32,8 @@ import io.choerodon.message.app.service.C7nMessageService;
  */
 @Service
 public class C7nMessageServiceImpl implements C7nMessageService {
+    private static final String UNREAD_MESSAGE_COUNT = "unreadMessageCount";
+
     @Autowired
     private UserMessageRepository userMessageRepository;
     @Autowired
@@ -32,6 +42,8 @@ public class C7nMessageServiceImpl implements C7nMessageService {
     private MessageMapper messageMapper;
     @Autowired
     private UserMessageMapper userMessageMapper;
+    @Autowired
+    private MessageC7nMapper messageC7nMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -66,4 +78,19 @@ public class C7nMessageServiceImpl implements C7nMessageService {
         }
         return simpleMessageDTO;
     }
+
+    @Override
+    public Map<String, Integer> countUnreadMessageMap(PageRequest pageRequest) {
+        Map<String, Integer> resultMap = new HashMap<>(4);
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+        Page<UserMessageDTO> messageDTOPage = PageHelper.doPage(pageRequest, () -> messageC7nMapper.queryUnreadMessage(userId));
+        if (!CollectionUtils.isEmpty(messageDTOPage.getContent())) {
+            Integer count = (int) messageDTOPage.getContent().stream().filter(t -> t.getReadFlag() == 0).count();
+            resultMap.put(UNREAD_MESSAGE_COUNT, count);
+        } else {
+            resultMap.put(UNREAD_MESSAGE_COUNT, 0);
+        }
+        return resultMap;
+    }
+
 }

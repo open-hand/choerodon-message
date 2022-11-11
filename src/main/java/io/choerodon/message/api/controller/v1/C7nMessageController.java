@@ -2,29 +2,30 @@ package io.choerodon.message.api.controller.v1;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.Set;
-
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.core.util.Results;
 import org.hzero.message.api.dto.SimpleMessageDTO;
-import org.hzero.message.app.service.MessageService;
 import org.hzero.message.infra.constant.HmsgConstant;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.message.api.vo.MessageTrxStatusVO;
 import io.choerodon.message.api.vo.ProjectMessageVO;
 import io.choerodon.message.app.service.*;
 import io.choerodon.message.infra.config.C7nSwaggerApiConfig;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.CustomPageRequest;
 import io.choerodon.swagger.annotation.Permission;
 
 /**
@@ -103,5 +104,13 @@ public class C7nMessageController {
     public ResponseEntity<Void> cleanMessageRecord(@RequestParam(value = "clean_strategy", defaultValue = HmsgConstant.DataCleanStrategy.THREE_MONTH) String cleanStrategy) {
         cleanService.clearLog(null, cleanStrategy);
         return Results.success();
+    }
+
+    @CustomPageRequest
+    @Permission(permissionLogin = true)
+    @ApiOperation(value = "计算当前用户未读消息数")
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Integer>> countUnreadMessageMap(@ApiIgnore PageRequest pageRequest) {
+        return Results.success(c7nMessageService.countUnreadMessageMap(pageRequest));
     }
 }

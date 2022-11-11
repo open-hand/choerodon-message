@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
+import org.hzero.message.api.dto.UserMessageDTO;
 
 import io.choerodon.message.api.vo.MailRecordVO;
 import io.choerodon.message.api.vo.MessageTrxStatusVO;
@@ -39,4 +40,6 @@ public interface MessageC7nMapper {
                                        @Param("endDate") Date endDate);
 
     List<MessageTrxStatusVO> queryLastTrxStatusCode(@Param("userEmails") Set<String> userEmails, @Param("templateCode") String templateCode);
+
+    List<UserMessageDTO> queryUnreadMessage(Long userId);
 }

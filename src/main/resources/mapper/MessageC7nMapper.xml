@@ -208,4 +208,18 @@
         	ORDER BY hm.message_id DESC
     </select>
 
+    <select id="queryUnreadMessage" resultType="org.hzero.message.api.dto.UserMessageDTO">
+        SELECT
+        hum.user_message_id,
+        hum.read_flag
+        FROM
+        hmsg_user_message hum
+        JOIN hzero_message.hmsg_message hm ON hm.message_id = hum.message_id
+        AND hum.user_message_type_code = 'MSG'
+        AND hm.message_type_code = 'WEB'
+        WHERE
+        hum.user_id = #{userId}
+        AND hum.user_message_type_code = 'MSG'
+    </select>
+
 </mapper>

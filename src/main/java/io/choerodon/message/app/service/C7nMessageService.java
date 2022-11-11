@@ -1,6 +1,10 @@
 package io.choerodon.message.app.service;
 
+import java.util.Map;
+
 import org.hzero.message.api.dto.SimpleMessageDTO;
+
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
 /**
  * @author zmf
@@ -13,5 +17,12 @@ public interface C7nMessageService {
     void deleteAllSiteMessages();
 
     SimpleMessageDTO getSimpleMessageDTO(Long messageId);
+
+    /**
+     * 计算当前用户未读消息数
+     * @param pageRequest
+     * @return
+     */
+    Map<String, Integer> countUnreadMessageMap(PageRequest pageRequest);
 
 }
