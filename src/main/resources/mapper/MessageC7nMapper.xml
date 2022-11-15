@@ -220,6 +220,9 @@
         WHERE
         hum.user_id = #{userId}
         AND hum.user_message_type_code = 'MSG'
+        ORDER BY
+        hum.read_flag ASC,
+        hum.creation_date DESC
     </select>
 
 </mapper>
