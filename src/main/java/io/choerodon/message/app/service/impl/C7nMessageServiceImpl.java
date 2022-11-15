@@ -25,7 +25,6 @@ import io.choerodon.message.app.service.C7nMessageService;
 import io.choerodon.message.infra.mapper.MessageC7nMapper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
 
 /**
  * @author zmf
