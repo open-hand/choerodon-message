@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.choerodon.message.infra.mapper.C7nUserMessageMapper">
+    <select id="selectMessageList" parameterType="org.hzero.message.api.dto.UserMsgParamDTO" resultType="org.hzero.message.api.dto.UserMessageDTO">
+        <bind name="lang" value="@io.choerodon.mybatis.helper.LanguageHelper@language()" />
+        select
+        	hum.user_message_id,
+            hum.message_id,
+            hum.user_message_type_code,
+            hum.read_flag,
+            hum.object_version_number,
+            hum.creation_date,
+            <if test="userMessageTypeCode == 'MSG'">
+                hm.message_type_code,
+                hm.subject subject,
+            </if>
+            <if test="userMessageTypeCode != 'MSG'">
+                hn.title subject,
+            </if>
+            <if test="withContent and userMessageTypeCode == 'MSG'">
+                hm.content content,
+            </if>
+            <if test="withContent and userMessageTypeCode != 'MSG'">
+                hnp.notice_body content,
+            </if>
+            hum.tenant_id,
+            ht.tenant_name
+        from hmsg_user_message hum
+            join hpfm_tenant_tl ht on ht.tenant_id = hum.tenant_id and ht.lang = #{lang}
+            <if test="userMessageTypeCode == 'MSG'">
+            join hmsg_message hm on hm.message_id = hum.message_id and hum.user_message_type_code = 'MSG' and hm.message_type_code = #{messageTypeCode}
+            </if>
+            <if test="userMessageTypeCode != 'MSG'">
+            join hmsg_notice_published hnp on hum.message_id = hnp.published_id and hnp.published_status_code ='PUBLISHED' and hum.user_message_type_code != 'MSG'
+			join hmsg_notice hn on hnp.notice_id = hn.notice_id
+            </if>
+        where
+            hum.user_id = #{userId}
+            and hum.user_message_type_code = #{userMessageTypeCode}
+        <if test="userMessageTypeCode == null or userMessageTypeCode == ''">
+            and hum.user_message_type_code = 'MSG'
+        </if>
+        <if test="readFlag != null">
+            and hum.read_flag = #{readFlag}
+        </if>
+        <if test="fromDate != null">
+            and hum.creation_date &gt;= #{fromDate}
+        </if>
+        <if test="toDate != null">
+            and hum.creation_date &lt;= #{toDate}
+        </if>
+        <if test="subject != null and subject != '' and userMessageTypeCode == 'MSG'">
+            <bind name="subjectLike" value="'%'+subject+'%'"/>
+            and hm.subject LIKE #{subjectLike}
+        </if>
+        <if test="templateCodeList != null and templateCodeList.size() > 0 and userMessageTypeCode == 'MSG'">
+            and
+            <foreach collection="templateCodeList" index="index" item="item" open="(" separator=" or " close=")">
+                hm.template_code LIKE CONCAT(CONCAT('%', #{item}), '%')
+            </foreach>
+        </if>
+        <if test="subject != null and subject != '' and userMessageTypeCode != 'MSG'">
+            <bind name="subjectLike" value="'%'+subject+'%'"/>
+            and hn.title LIKE #{subjectLike}
+        </if>
+    </select>
+
+
+    <!--手写mybatis select count优化-->
+    <select id="selectMessageList_COUNT" resultType="Long">
+        explain SELECT
+        count( 0 )
+        FROM
+        hmsg_user_message hum
+        JOIN hzero_message.hmsg_message hm ON hm.message_id = hum.message_id
+        AND hum.user_message_type_code = 'MSG'
+        AND hm.message_type_code = 'WEB'
+        WHERE
+        hum.user_id = #{userId}
+        AND hum.user_message_type_code = 'MSG';
+
+    </select>
+</mapper>
